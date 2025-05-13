@@ -8,7 +8,19 @@ body:
     attributes:
       label: '🎟️ 상위 작업 (Ticket Number)'
       description: '상위 작업의 Ticket Number를 기입해주세요'
-      placeholder: 'PRJ-00'
+      placeholder: 'THIP2025-00'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: branchType
+    attributes:
+    label: '브랜치 타입'
+    options:
+      - feature
+      - bugfix
+      - hotfix
+      - refactor
     validations:
       required: true
 
