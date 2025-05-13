@@ -21,7 +21,8 @@ jobs:
         id: extract-key
         run: |
           ISSUE_TITLE="${{ github.event.issue.title }}"
-          JIRA_KEY=$(echo "$ISSUE_TITLE" | grep -oE '[A-Z]+-[0-9]+')
+          CLEANED_TITLE=$(echo "$ISSUE_TITLE" | sed 's/\[//g' | sed 's/\]//g')
+          JIRA_KEY=$(echo "$CLEANED_TITLE" | grep -oE '[A-Z]+-[0-9]+')
           echo "JIRA_KEY=$JIRA_KEY" >> $GITHUB_ENV
 
       - name: Close Jira issue
