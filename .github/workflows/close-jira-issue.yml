@@ -21,23 +21,16 @@ jobs:
         id: extract-key
         run: |
           ISSUE_TITLE="${{ github.event.issue.title }}"
-          CLEANED_TITLE=$(echo "$ISSUE_TITLE" | sed 's/\[//g' | sed 's/\]//g')
-          echo "Cleaned title: $CLEANED_TITLE"
 
-          # Use grep -oiE for case-insensitive and more robust match
-          JIRA_KEY=$(echo "$CLEANED_TITLE" | grep -oiE '[A-Z]+-[0-9]+')
+          CLEANED_TITLE=$(echo "$ISSUE_TITLE" | tr '–—−‑' '-')
+          echo "🧼 Cleaned title: $CLEANED_TITLE"
+
+          JIRA_KEY=$(echo "$CLEANED_TITLE" | grep -oE '[A-Z]+-[0-9]+')
 
           if [ -z "$JIRA_KEY" ]; then
-            echo "❌ JIRA key could not be extracted. Exiting."
-            exit 1
+          echo "❌ JIRA key could not be extracted. Exiting."
+          exit 1
           fi
 
           echo "✅ Extracted JIRA_KEY=$JIRA_KEY"
           echo "JIRA_KEY=$JIRA_KEY" >> $GITHUB_ENV
-
-      - name: Close Jira issue
-        if: env.JIRA_KEY != ''
-        uses: atlassian/gajira-transition@v3
-        with:
-          issue: ${{ env.JIRA_KEY }}
-          transition: Done
