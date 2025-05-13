@@ -22,7 +22,7 @@ jobs:
         run: |
           ISSUE_TITLE="${{ github.event.issue.title }}"
 
-          CLEANED_TITLE=$(echo "$ISSUE_TITLE" | tr '–—−‑' '-')
+          CLEANED_TITLE=$(echo "$ISSUE_TITLE" | sed 's/[–—−‑]/-/g')
           echo "🧼 Cleaned title: $CLEANED_TITLE"
 
           JIRA_KEY=$(echo "$CLEANED_TITLE" | grep -oE '[A-Z]+-[0-9]+')
