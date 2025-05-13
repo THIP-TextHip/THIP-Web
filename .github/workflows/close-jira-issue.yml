@@ -24,7 +24,7 @@ jobs:
           CLEANED_TITLE=$(echo "$ISSUE_TITLE" | tr -d '[]')
           echo "🧼 Cleaned title: $CLEANED_TITLE"
 
-          JIRA_KEY=$(echo "$CLEANED_TITLE" | grep -oE '[A-Z]+-[0-9]+')
+          JIRA_KEY=$(echo "$CLEANED_TITLE" | grep -oE '[A-Z0-9]+-[0-9]+')
 
           if [ -z "$JIRA_KEY" ]; then
             echo "❌ JIRA key could not be extracted. Exiting."
