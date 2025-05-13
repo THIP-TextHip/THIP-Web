@@ -33,3 +33,9 @@ jobs:
 
           echo "✅ Extracted JIRA_KEY=$JIRA_KEY"
           echo "JIRA_KEY=$JIRA_KEY" >> $GITHUB_ENV
+
+      - name: Transition Jira issue to Done
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ env.JIRA_KEY }}
+          transition: Done
