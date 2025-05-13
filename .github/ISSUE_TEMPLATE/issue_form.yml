@@ -15,12 +15,12 @@ body:
   - type: dropdown
     id: branchType
     attributes:
-    label: '브랜치 타입'
-    options:
-      - feature
-      - bugfix
-      - hotfix
-      - refactor
+      label: '브랜치 타입'
+      options:
+        - feature
+        - bugfix
+        - hotfix
+        - refactor
     validations:
       required: true
 
