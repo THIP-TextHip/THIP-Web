@@ -66,17 +66,16 @@ jobs:
         with:
           ref: develop
 
-      - name: Create branch with Ticket number
-        run: |
-          BRANCH_TYPE="${{ steps.issue-parser.outputs.issueparser_branchType }}"
-          ISSUE_TITLE="${{ steps.issue-parser.outputs.issueparser_branch }}"
-          BRANCH_NAME="${BRANCH_TYPE}/$(echo ${ISSUE_TITLE} | sed 's/ /-/g')"
-          git checkout -b "${BRANCH_NAME}"
-          git push origin "${BRANCH_NAME}"
-
-        # ISSUE_NUMBER="${{ steps.create.outputs.issue }}"
-
+      # - name: Create branch with Ticket number
+      #   run: |
+      #     BRANCH_TYPE="${{ steps.issue-parser.outputs.issueparser_branchType }}"
+      #     ISSUE_TITLE="${{ steps.issue-parser.outputs.issueparser_branch }}"
+      #     BRANCH_NAME="${BRANCH_TYPE}/$(echo ${ISSUE_TITLE} | sed 's/ /-/g')"
+      #     git checkout -b "${BRANCH_NAME}"
+      #     git push origin "${BRANCH_NAME}"
+      # ISSUE_NUMBER="${{ steps.create.outputs.issue }}"
       - name: Update issue title
+
         uses: actions-cool/issues-helper@v3
         with:
           actions: 'update-issue'
