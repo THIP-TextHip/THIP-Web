@@ -24,7 +24,7 @@ jobs:
         uses: stefanbuck/github-issue-praser@v3
         id: issue-parser
         with:
-          template-path: .github/ISSUE_TEMPLATE/issue-form.yml
+          template-path: .github/ISSUE_TEMPLATE/issue_form.yml
 
       - name: Log Issue Parser
         run: |
@@ -47,7 +47,7 @@ jobs:
         id: create
         uses: atlassian/gajira-create@v3
         with:
-          project: SKP
+          project: THIP2025
           issuetype: Task
           summary: '${{ github.event.issue.title }}'
           description: '${{ steps.md2jira.outputs.output-text }}'
@@ -66,20 +66,23 @@ jobs:
         with:
           ref: develop
 
-      - name: Create branch with Ticket number
-        run: |
-          ISSUE_NUMBER="${{ steps.create.outputs.issue }}"
-          ISSUE_TITLE="${{ steps.issue-parser.outputs.issueparser_branch}}"
-          BRANCH_NAME="${ISSUE_NUMBER}-$(echo ${ISSUE_TITLE} | sed 's/ /-/g')"
-          git checkout -b "${BRANCH_NAME}"
-          git push origin "${BRANCH_NAME}"
-
+      # - name: Create branch with Ticket number
+      #   run: |
+      #     BRANCH_TYPE="${{ steps.issue-parser.outputs.issueparser_branchType }}"
+      #     ISSUE_TITLE="${{ steps.issue-parser.outputs.issueparser_branch }}"
+      #     BRANCH_NAME="${BRANCH_TYPE}/$(echo ${ISSUE_TITLE} | sed 's/ /-/g')"
+      #     git checkout -b "${BRANCH_NAME}"
+      #     git push origin "${BRANCH_NAME}"
+      # ISSUE_NUMBER="${{ steps.create.outputs.issue }}"
       - name: Update issue title
+
         uses: actions-cool/issues-helper@v3
         with:
           actions: 'update-issue'
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: '[${{ steps.create.outputs.issue }}] ${{ github.event.issue.title }}'
+          title: '${{ github.event.issue.title }}'
+
+        # [${{ steps.create.outputs.issue }}]
 
       - name: Add comment with Jira issue link
         uses: actions-cool/issues-helper@v3
