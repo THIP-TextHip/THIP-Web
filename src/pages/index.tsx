@@ -14,7 +14,7 @@ const Router = () => {
       <>
         <Route path="signup" element={<Signup />}>
           <Route index element={<SignupNickname />} />
-          <Route path="second" element={<SignupGenre />} />
+          <Route path="genre" element={<SignupGenre />} />
         </Route>
       </>,
     ),
