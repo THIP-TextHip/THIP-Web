@@ -95,6 +95,8 @@ export const Container = styled.div`
     padding: 10px 12px;
     justify-content: center;
     align-items: center;
+    width: 180px;
+    height: 44px;
     gap: 8px;
     border-radius: 12px;
     background: #6868ff;
@@ -119,11 +121,17 @@ export const Container = styled.div`
       gap: 10px;
       border-radius: 12px;
       border: 1px solid #3d3d3d;
-      padding: 12px;
       text-align: center;
       cursor: pointer;
       transition: border-color 0.2s;
       justify-content: center;
+
+      .textbox {
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
 
       img.bg {
         position: absolute;
@@ -133,15 +141,6 @@ export const Container = styled.div`
         left: 5px;
         opacity: 0.2;
         z-index: 0;
-      }
-
-      .content {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 5px;
       }
 
       .genreTitle {

@@ -65,8 +65,8 @@ const Login = () => {
         <SocialButton onClick={handleKakaoLogin} bg="#fee500">
           <img src={KaKao} /> 카카오계정 로그인
         </SocialButton>
-        <SocialButton bg="#fefefe">
-          <img src={Google} onClick={handleGoogleLogin} /> 구글계정 로그인
+        <SocialButton onClick={handleGoogleLogin} bg="#fefefe">
+          <img src={Google} /> 구글계정 로그인
         </SocialButton>
       </ButtonBox>
     </Wrapper>

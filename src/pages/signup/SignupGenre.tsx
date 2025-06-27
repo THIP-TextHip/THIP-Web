@@ -55,7 +55,7 @@ const SignupGenre = () => {
               onClick={() => setSelectedId(g.id)}
             >
               <img className="bg" src={g.iconUrl} alt={g.title} />
-              <div className="content">
+              <div className="textbox">
                 <div className="genreTitle">{g.title}</div>
                 <div className="genreSub" style={{ color: g.color }}>
                   {g.subTitle}
