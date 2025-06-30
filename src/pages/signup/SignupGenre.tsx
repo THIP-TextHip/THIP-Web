@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container } from './Signup.styled';
-import Header from './Header';
 import leftarrow from '../../assets/leftArrow.svg';
+import TitleHeader from '../../components/common/TitleHeader';
 
 interface Genre {
   id: string;
@@ -35,7 +35,7 @@ const SignupGenre = () => {
 
   return (
     <>
-      <Header
+      <TitleHeader
         leftIcon={<img src={leftarrow} alt="뒤로가기" />}
         title="설정 2/2"
         rightButton={<div className="next">다음</div>}

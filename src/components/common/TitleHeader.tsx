@@ -70,7 +70,7 @@ type HeaderProps = {
   onRightClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
-const Header = ({
+const TitleHeader = ({
   leftIcon,
   title,
   rightButton,
@@ -95,4 +95,4 @@ const Header = ({
   </HeaderWrapper>
 );
 
-export default Header;
+export default TitleHeader;

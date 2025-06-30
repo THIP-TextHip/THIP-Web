@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, InputBox, StyledInput, CharCount } from './Signup.styled';
-import Header from './Header';
+import Header from '../../components/common/TitleHeader';
 
 const SignupNickname = () => {
   const [nickname, setNickname] = useState('');

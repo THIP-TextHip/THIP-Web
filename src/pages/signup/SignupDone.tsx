@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import Header from './Header';
 import { Container } from './Signup.styled';
 import leftarrow from '../../assets/leftArrow.svg';
 import art from '../../assets/genre/art.svg';
+import TitleHeader from '../../components/common/TitleHeader';
 
 const SignupDone = () => {
   const navigate = useNavigate();
@@ -16,7 +16,10 @@ const SignupDone = () => {
 
   return (
     <Container>
-      <Header leftIcon={<img src={leftarrow} alt="뒤로가기" />} onLeftClick={handleBackClick} />
+      <TitleHeader
+        leftIcon={<img src={leftarrow} alt="뒤로가기" />}
+        onLeftClick={handleBackClick}
+      />
       <div className="title">안녕하세요, 희용희용님</div>
       <div className="subtitle">이제 Thip에서 활동할 준비를 모두 마쳤어요!</div>
       <div className="content">
