@@ -10,29 +10,6 @@ const HeaderWrapper = styled.div`
   max-width: 767px;
   margin: 0 auto;
   padding: 16px 20px;
-
-  .title {
-    color: #fefefe;
-    font-size: 22px;
-    font-style: normal;
-    font-weight: 700;
-  }
-  /* 
-  .next {
-    width: 49px;
-    height: 28px;
-    padding: 4px 12px;
-    align-items: center;
-    border-radius: 20px;
-    background: #888;
-
-    color: #fefefe;
-    text-align: center;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: 20px;
-  } */
 `;
 
 const NextButton = styled.div<{ active: boolean }>`
@@ -53,12 +30,23 @@ const NextButton = styled.div<{ active: boolean }>`
 `;
 
 const InnerHeader = styled.div`
-  width: 100%;
   height: 56px;
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+
+  .title {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #fefefe;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 700;
+  }
 `;
 
 type HeaderProps = {
