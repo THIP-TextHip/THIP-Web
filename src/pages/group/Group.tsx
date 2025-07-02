@@ -1,5 +1,5 @@
 import MainHeader from '@/components/common/MainHeader';
-import { Wrapper } from '../login/Login';
+import { Wrapper } from '@/components/common/Wrapper';
 
 const Group = () => {
   return (
