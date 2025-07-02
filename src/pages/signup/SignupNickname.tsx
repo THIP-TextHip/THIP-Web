@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, InputBox, StyledInput, CharCount } from './Signup.styled';
-import Header from './Header';
+import Header from '../../components/common/TitleHeader';
 
 const SignupNickname = () => {
   const [nickname, setNickname] = useState('');
@@ -20,7 +20,9 @@ const SignupNickname = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(e.target.value);
+    const inputValue = e.target.value;
+    const filteredValue = inputValue.replace(/[^ㄱ-ㅎ가-힣a-zA-Z0-9]/g, '');
+    setNickname(filteredValue);
   };
 
   return (
@@ -30,6 +32,7 @@ const SignupNickname = () => {
         rightButton={<div className="next">다음</div>}
         onLeftClick={handleBackClick}
         onRightClick={handleNextClick}
+        isNextActive={isNextActive}
       />
       <Container>
         <div className="title">닉네임(필수)</div>
