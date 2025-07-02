@@ -377,3 +377,11 @@ export const globalStyles = css`
 
   ${designTokens}
 `;
+
+// 레이아웃 공통 속성
+export const layoutContainer = css`
+  min-width: ${breakpoints.mobile.standard};
+  max-width: ${breakpoints.mobile.max};
+  margin: 0 auto;
+  background-color: var(--color-black-main);
+`;
