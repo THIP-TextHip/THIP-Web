@@ -3,6 +3,7 @@ import groupDoneLogo from '../../assets/header/group-done.svg';
 import findUserLogo from '../../assets/header/findUser.svg';
 import bellLogo from '../../assets/header/bell.svg';
 import styled from '@emotion/styled';
+import { IconButton } from './IconButton';
 
 interface MainHeaderProps {
   type: 'home' | 'group';
@@ -30,12 +31,6 @@ const Actions = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
-`;
-
-const IconButton = styled.img`
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
 `;
 
 const MainHeader = ({ type }: MainHeaderProps) => {
