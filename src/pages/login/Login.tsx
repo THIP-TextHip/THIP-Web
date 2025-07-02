@@ -3,7 +3,7 @@ import logo from '../../assets/login/logo.svg';
 import KaKao from '../../assets/login/kakao.svg';
 import Google from '../../assets/login/google.svg';
 
-const Wrapper = styled.div`
+export const Wrapper = styled.div`
   display: flex;
   position: relative;
   flex-direction: column;

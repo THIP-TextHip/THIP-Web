@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container } from './Signup.styled';
-import leftarrow from '../../assets/leftArrow.svg';
+import leftarrow from '../../assets/common/leftArrow.svg';
 import TitleHeader from '../../components/common/TitleHeader';
 
 interface Genre {

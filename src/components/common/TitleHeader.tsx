@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 const HeaderWrapper = styled.div`
-  background-color: #121212;
+  background-color: var(--color-black-main);
   position: fixed;
   top: 0;
   left: 0;

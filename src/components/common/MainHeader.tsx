@@ -1,5 +1,56 @@
-const MainHeader = () => {
-  return <div>MainHeader</div>;
+import headerLogo from '../../assets/header/header-logo.svg';
+import groupDoneLogo from '../../assets/header/group-done.svg';
+import findUserLogo from '../../assets/header/findUser.svg';
+import bellLogo from '../../assets/header/bell.svg';
+import styled from '@emotion/styled';
+
+interface MainHeaderProps {
+  type: 'home' | 'group';
+}
+
+const HeaderWrapper = styled.div`
+  background-color: var(--color-black-main);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  max-width: 767px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const LogoImg = styled.img`
+  height: 24px;
+`;
+
+const Actions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`;
+
+const IconButton = styled.img`
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+`;
+
+const MainHeader = ({ type }: MainHeaderProps) => {
+  return (
+    <HeaderWrapper>
+      <LogoImg src={headerLogo} alt="headerLogo" />
+      <Actions>
+        <IconButton
+          src={type === 'group' ? groupDoneLogo : findUserLogo}
+          alt={type === 'group' ? '모임 완료 아이콘' : '사용자 찾기 아이콘'}
+        />
+        <IconButton src={bellLogo} alt="알림 아이콘" />
+      </Actions>
+    </HeaderWrapper>
+  );
 };
 
 export default MainHeader;
