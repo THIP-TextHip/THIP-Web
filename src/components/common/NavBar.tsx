@@ -1,13 +1,13 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
-import FeedIcon from '../assets/navbar/feed.svg';
-import GroupIcon from '../assets/navbar/group.svg';
-import SearchIcon from '../assets/navbar/search.svg';
-import MyIcon from '../assets/navbar/my.svg';
-import FeedIconActive from '../assets/navbar/feed-active.svg';
-import GroupIconActive from '../assets/navbar/group-active.svg';
-import SearchIconActive from '../assets/navbar/search-active.svg';
-import MyIconActive from '../assets/navbar/my-active.svg';
+import FeedIcon from '../../assets/navbar/feed.svg';
+import GroupIcon from '../../assets/navbar/group.svg';
+import SearchIcon from '../../assets/navbar/search.svg';
+import MyIcon from '../../assets/navbar/my.svg';
+import FeedIconActive from '../../assets/navbar/feed-active.svg';
+import GroupIconActive from '../../assets/navbar/group-active.svg';
+import SearchIconActive from '../../assets/navbar/search-active.svg';
+import MyIconActive from '../../assets/navbar/my-active.svg';
 
 const NavWrapper = styled.div`
   position: fixed;
@@ -15,7 +15,7 @@ const NavWrapper = styled.div`
   left: 0;
   right: 0;
   display: flex;
-  min-width: 360px;
+  min-width: 320px;
   max-width: 767px;
   height: 75px;
   margin: 0 auto;
