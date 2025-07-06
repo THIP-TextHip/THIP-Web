@@ -13,3 +13,12 @@ export interface PostData {
   images?: string[];
   tags?: string[];
 }
+
+export interface FeedListProps {
+  showHeader: boolean;
+  posts: PostData[];
+}
+
+export interface FeedPostProps extends PostData {
+  showHeader: boolean;
+}
