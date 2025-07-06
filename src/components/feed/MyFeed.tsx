@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import MyProfile from './MyProfile';
 import FeedPost from './FeedPost';
-import type { PostData } from '../../types/post';
+import type { FeedListProps } from '../../types/post';
 
 const Container = styled.div`
   padding-top: 136px;
@@ -9,17 +9,12 @@ const Container = styled.div`
   background-color: var(--color-black-main);
 `;
 
-export type MyFeedProps = {
-  showHeader: boolean;
-  posts: PostData[];
-};
-
-const MyFeed = ({ showHeader, posts = [] }: MyFeedProps) => {
+const MyFeed = ({ showHeader, posts = [] }: FeedListProps) => {
   return (
     <Container>
       <MyProfile />
       {posts.map(post => (
-        <FeedPost key={post.postId} {...post} showHeader={showHeader} />
+        <FeedPost key={post.postId} showHeader={showHeader} {...post} />
       ))}
     </Container>
   );

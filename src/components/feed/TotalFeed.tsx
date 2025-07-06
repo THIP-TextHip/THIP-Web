@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import FollowList from './FollowList';
 import FeedPost from './FeedPost';
-import type { PostData } from '../../types/post';
+import type { FeedListProps } from '../../types/post';
 
 const Container = styled.div`
   padding-top: 136px;
@@ -9,12 +9,7 @@ const Container = styled.div`
   background-color: var(--color-black-main);
 `;
 
-export type TotalFeedProps = {
-  showHeader: boolean;
-  posts: PostData[];
-};
-
-const TotalFeed = ({ showHeader, posts = [] }: TotalFeedProps) => {
+const TotalFeed = ({ showHeader, posts = [] }: FeedListProps) => {
   return (
     <Container>
       <FollowList />

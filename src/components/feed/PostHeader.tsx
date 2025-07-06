@@ -48,7 +48,7 @@ const Container = styled.div`
   }
 `;
 
-interface HeaderProps {
+interface PostHeaderProps {
   profileImgUrl: string;
   userName: string;
   userTitle: string;
@@ -56,7 +56,13 @@ interface HeaderProps {
   createdAt: string;
 }
 
-const PostHeader = ({ profileImgUrl, userName, userTitle, titleColor, createdAt }: HeaderProps) => {
+const PostHeader = ({
+  profileImgUrl,
+  userName,
+  userTitle,
+  titleColor,
+  createdAt,
+}: PostHeaderProps) => {
   return (
     <Container>
       <div className="headerInfo">
