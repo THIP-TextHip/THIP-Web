@@ -20,7 +20,7 @@ const Container = styled.div<{ hasImage: boolean }>`
 
     .left {
       overflow: hidden;
-      width: 340px;
+      max-width: 340px;
       white-space: nowrap;
       color: var(--color-text-primary_white, #fefefe);
       text-overflow: ellipsis;

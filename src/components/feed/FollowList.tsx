@@ -23,11 +23,12 @@ const Contianer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
+  width: 100%;
   min-width: 320px;
   max-width: 500px;
-  height: 82px;
   padding: 0 20px;
   margin: 0 auto;
+  padding-top: 20px;
   background-color: var(--color-black-main);
 
   .title {
@@ -88,7 +89,7 @@ const Contianer = styled.div`
           height: 36px;
           flex-shrink: 0;
           border-radius: 36px;
-          border: 0.5px solid var(--color-button-color_line-button_line_grey02, #888);
+          border: 0.5px solid #888;
           cursor: pointer;
         }
       }

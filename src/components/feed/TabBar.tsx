@@ -1,13 +1,17 @@
 import styled from '@emotion/styled';
 
 const Container = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: row;
   min-width: 320px;
   max-width: 767px;
   margin: 0 auto;
   gap: 20px;
-  padding: 88px 20px 20px 20px;
+  padding: 88px 20px 0 20px;
   background-color: var(--color-black-main);
 `;
 

@@ -1,22 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NavBar from '../../components/common/NavBar';
 import TabBar from '../../components/feed/TabBar';
-import FollowList from '../../components/feed/FollowList';
-import { Container, FeedSection } from '../../pages/feed/Feed.styled';
-import FeedPost from '@/components/feed/FeedPost';
+import { Container } from '../../pages/feed/Feed.styled';
+import MyFeed from '../../components/feed/MyFeed';
+import TotalFeed from '../../components/feed/TotalFeed';
+import type { PostData } from '../../types/post';
+
+const mockPosts: PostData[] = [
+  {
+    profileImgUrl: 'https://placehold.co/24x24',
+    userName: 'userName',
+    userTitle: 'userTitle',
+    titleColor: '#FF8BAC',
+    createdAt: '12시간 전',
+    bookTitle: '제목입니다',
+    bookAuthor: '작가입니다',
+    postContent: '내용입니다…',
+    postId: '55',
+    initialLikeCount: 125,
+    commentCount: 125,
+    images: ['https://placehold.co/100x100', 'https://placehold.co/100x100'],
+  },
+  {
+    profileImgUrl: 'https://placehold.co/24x24',
+    userName: 'userName',
+    userTitle: 'userTitle',
+    titleColor: '#FF8BAC',
+    createdAt: '12시간 전',
+    bookTitle: '제목입니다제목입니다제목입니다',
+    bookAuthor: '작가입니다',
+    postContent:
+      '내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다',
+    postId: '55',
+    initialLikeCount: 125,
+    commentCount: 125,
+  },
+  // …다른 포스트들…
+];
 
 const Feed = () => {
   const [activeTab, setActiveTab] = useState<'피드' | '내 피드'>('피드');
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeTab]);
 
   return (
     <Container>
       {/* MainHeader.tsx */}
       <TabBar activeTab={activeTab} onTabClick={setActiveTab} />
-      <FollowList />
-      <FeedSection>
-        {activeTab === '피드' && <FeedPost />}
-        {activeTab === '내 피드' && <div>내 피드 내용</div>}
-      </FeedSection>
+      {activeTab === '피드' ? (
+        <TotalFeed showHeader={true} posts={mockPosts} />
+      ) : (
+        <MyFeed showHeader={false} posts={mockPosts} />
+      )}
       <NavBar />
     </Container>
   );
