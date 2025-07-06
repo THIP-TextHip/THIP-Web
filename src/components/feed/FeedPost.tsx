@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import PostBody from './PostBody';
 import PostFooter from './PostFooter';
 import PostHeader from './PostHeader';
-import type { PostData } from '../../types/post';
+import type { FeedPostProps } from '../../types/post';
 
 const Container = styled.div`
   display: flex;
@@ -10,7 +10,7 @@ const Container = styled.div`
   margin: 0 auto;
   background-color: var(--color-black-main);
   width: 100%;
-  max-width: 500px;
+  max-width: 540px;
   height: auto;
   padding: 40px 20px;
   flex-direction: column;
@@ -23,10 +23,6 @@ const BorderBottom = styled.div`
   height: 10px;
   background-color: #282828;
 `;
-
-export type FeedPostProps = PostData & {
-  showHeader: boolean;
-};
 
 const FeedPost = ({ showHeader, ...postData }: FeedPostProps) => {
   return (

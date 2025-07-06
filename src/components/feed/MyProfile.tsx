@@ -7,7 +7,7 @@ const Container = styled.div`
   flex-direction: column;
   width: 100%;
   min-width: 320px;
-  max-width: 500px;
+  max-width: 540px;
   padding: 0 20px;
   margin: 0 auto;
   height: 200px;
@@ -16,35 +16,53 @@ const Container = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
     padding-top: 32px;
-
-    img {
-      width: 54px;
-      height: 54px;
-      border-radius: 54px;
-      border: 0.5px solid #fefefe;
-    }
 
     .userInfo {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      align-items: center;
       gap: 4px;
 
-      .username {
-        color: var(--color-text-primary_white, #fefefe);
-        font-size: var(--string-size-large01, 18px);
-        font-weight: var(--string-weight-semibold, 600);
-        line-height: 24px;
-        letter-spacing: 0.018px;
+      img {
+        width: 54px;
+        height: 54px;
+        border-radius: 54px;
+        border: 0.5px solid #fefefe;
       }
 
-      .usertitle {
-        color: var(--color-text-literature_mint, #a0f8e8);
-        font-size: var(--string-size-medium01, 14px);
-        font-weight: var(--string-weight-regular, 400);
-        line-height: 20px;
+      .user {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .username {
+          color: var(--color-text-primary_white, #fefefe);
+          font-size: var(--string-size-large01, 18px);
+          font-weight: var(--string-weight-semibold, 600);
+          line-height: 24px;
+          letter-spacing: 0.018px;
+        }
+
+        .usertitle {
+          color: var(--color-text-literature_mint, #a0f8e8);
+          font-size: var(--string-size-medium01, 14px);
+          font-weight: var(--string-weight-regular, 400);
+          line-height: 20px;
+        }
       }
+    }
+
+    .followbutton {
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid #888;
+
+      color: var(--color-text-secondary_grey00, #dadada);
+      font-size: var(--string-size-medium01, 14px);
+      font-weight: var(--string-weight-medium, 500);
+      line-height: normal;
     }
   }
 
@@ -82,6 +100,15 @@ const Container = styled.div`
         }
       }
     }
+
+    .right {
+      img {
+        width: 24px;
+        height: 24px;
+        border-radius: 24px;
+        border: 0.5px solid #888;
+      }
+    }
   }
 
   .totalBar {
@@ -108,11 +135,14 @@ const MyProfile = () => {
   return (
     <Container>
       <div className="userProfile">
-        <img src="https://placehold.co/54x54" />
         <div className="userInfo">
-          <div className="username">userName</div>
-          <div className="usertitle">userTitle</div>
+          <img src="https://placehold.co/54x54" />
+          <div className="user">
+            <div className="username">userName</div>
+            <div className="usertitle">userTitle</div>
+          </div>
         </div>
+        {/* <div className="followbutton">구독</div> */}
       </div>
       <div className="myFollower">
         <div className="left">

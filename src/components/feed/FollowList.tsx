@@ -25,7 +25,7 @@ const Container = styled.div`
   gap: 4px;
   width: 100%;
   min-width: 320px;
-  max-width: 500px;
+  max-width: 540px;
   padding: 0 20px;
   margin: 0 auto;
   padding-top: 20px;
@@ -45,7 +45,6 @@ const Container = styled.div`
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
 
     &.empty {
       display: flex;
@@ -59,7 +58,6 @@ const Container = styled.div`
     .followerList {
       display: flex;
       flex-direction: row;
-      flex: 1;
       overflow-x: auto;
       overflow-y: hidden;
       gap: 12px;
