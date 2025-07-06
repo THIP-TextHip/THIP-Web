@@ -19,7 +19,7 @@ const followerData = {
   ],
 };
 
-const Contianer = styled.div`
+const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -103,7 +103,7 @@ const FollowList = () => {
   const visible = hasFollowers ? followers.slice(0, 10) : [];
 
   return (
-    <Contianer>
+    <Container>
       <div className="title">
         <img src={people} />
         <div>내 구독</div>
@@ -132,7 +132,7 @@ const FollowList = () => {
           </>
         )}
       </div>
-    </Contianer>
+    </Container>
   );
 };
 
