@@ -33,7 +33,7 @@ export const GroupCard = forwardRef<HTMLDivElement, GroupCardProps>(({ group }, 
 });
 
 const Card = styled.div`
-  flex: 0 0 75%;
+  flex: 0 0 90%;
   scroll-snap-align: center;
   background: linear-gradient(to right, #fff 0%, #989898 100%);
   border-radius: 12px;

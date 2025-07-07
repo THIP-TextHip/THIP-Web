@@ -4,6 +4,7 @@ import SearchBar from '@/components/common/SearchBar';
 import { Wrapper } from '@/components/common/Wrapper';
 import type { Group as GroupType } from '@/components/group/MyGroup';
 import { MyGroup } from '../../components/group/MyGroup';
+import Blank from '@/components/common/Blank';
 
 const dummyMyGroups: GroupType[] = [
   {
@@ -41,6 +42,7 @@ const Group = () => {
       <MainHeader type="group" />
       <SearchBar placeholder="모임방 참여할 사람!" />
       <MyGroup groups={dummyMyGroups}></MyGroup>
+      <Blank height={'10px'} margin={'32px 0'}></Blank>
       <NavBar />
     </Wrapper>
   );

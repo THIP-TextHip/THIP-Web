@@ -82,9 +82,8 @@ const MoreButton = styled.button`
 
 const Carousel = styled.div`
   display: flex;
-  gap: 12px;
+  padding: 0 40px;
   width: 100%;
-  padding: 0 24px;
   overflow-x: auto;
   scroll-behavior: smooth;
   &::-webkit-scrollbar {
@@ -96,7 +95,7 @@ const Dots = styled.div`
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 30px;
+  margin: 30px 0;
 `;
 
 const Dot = styled.div<{ active: boolean }>`
