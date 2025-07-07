@@ -24,7 +24,7 @@ export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>(({ group
             {group.userName}님의 진행도 <Percent>{group.progress}%</Percent>
           </ProgressText>
           <Bar>
-            <Fill width={group.progress} />
+            <Fill width={group.progress || 0} />
           </Bar>
         </div>
       </Info>
@@ -105,7 +105,7 @@ const Bar = styled.div`
   margin-top: 4px;
 `;
 
-const Fill = styled.div<{ width?: number }>`
+const Fill = styled.div<{ width: number }>`
   width: ${({ width }) => width}%;
   height: 100%;
   background-color: var(--color-purple-main);
