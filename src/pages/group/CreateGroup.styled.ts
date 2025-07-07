@@ -13,42 +13,48 @@ export const Container = styled.div`
   box-sizing: border-box;
 `;
 
-export const Section = styled.div`
+export const Section = styled.div<{ showDivider?: boolean }>`
   margin-bottom: 32px;
+  ${({ showDivider }) =>
+    showDivider &&
+    `
+    border-bottom: 1px solid ${colors.darkgrey.dark};
+  `}
 `;
 
 export const SectionTitle = styled.div`
   color: ${semanticColors.text.primary};
   font-size: ${typography.fontSize.lg};
   font-weight: ${typography.fontWeight.semibold};
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 `;
 
 export const SearchBox = styled.div`
   display: flex;
   align-items: center;
-  background-color: ${semanticColors.background.cardDark};
+  justify-content: center;
+  background-color: ${semanticColors.background.primary};
+  border: 1px solid ${colors.grey[300]};
   border-radius: 12px;
   padding: 12px 16px;
-  gap: 12px;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  span {
+    font-size: ${typography.fontSize.base};
+    font-weight: ${typography.fontWeight.medium};
+  }
 `;
 
 export const SearchIcon = styled.div`
-  font-size: ${typography.fontSize.base};
-  color: ${semanticColors.text.ghost};
-`;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-export const SearchInput = styled.input`
-  background: none;
-  border: none;
-  outline: none;
-  color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize.base};
-  flex: 1;
-
-  &::placeholder {
-    color: ${semanticColors.text.ghost};
-    font-size: ${typography.fontSize.base};
+  img {
+    width: 24px;
+    height: 24px;
   }
 `;
 

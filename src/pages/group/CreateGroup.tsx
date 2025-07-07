@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
+import BookSearchBottomSheet from '../../components/common/BookSearchBottomSheet';
 import leftarrow from '../../assets/leftArrow.svg';
+import searchIcon from '../../assets/group/search.svg';
 import { semanticColors, typography } from '../../styles/global/global';
 import {
   Container,
   Section,
   SectionTitle,
   SearchBox,
-  SearchInput,
   SearchIcon,
   GenreButtonGroup,
   GenreButton,
@@ -31,6 +32,7 @@ import {
 const CreateGroup = () => {
   const navigate = useNavigate();
   const [bookTitle, setBookTitle] = useState('');
+  const [selectedBook, setSelectedBook] = useState<any>(null);
   const [selectedGenre, setSelectedGenre] = useState('');
   const [description, setDescription] = useState('');
   const [introduction, setIntroduction] = useState('');
@@ -38,6 +40,7 @@ const CreateGroup = () => {
   const [endDate, setEndDate] = useState({ year: 2025, month: 1, day: 1 });
   const [memberLimit, setMemberLimit] = useState(1);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -48,9 +51,22 @@ const CreateGroup = () => {
     console.log('모임 생성 완료');
   };
 
+  const handleBookSearchOpen = () => {
+    setIsBookSearchOpen(true);
+  };
+
+  const handleBookSearchClose = () => {
+    setIsBookSearchOpen(false);
+  };
+
+  const handleBookSelect = (book: any) => {
+    setSelectedBook(book);
+    setBookTitle(book.title);
+  };
+
   const genres = ['문학', '과학·IT', '사회과학', '인문학', '예술'];
 
-  const isFormValid = bookTitle.trim() !== '' && selectedGenre !== '';
+  const isFormValid = (selectedBook || bookTitle.trim() !== '') && selectedGenre !== '';
 
   return (
     <>
@@ -65,15 +81,19 @@ const CreateGroup = () => {
       <Container>
         <Section>
           <SectionTitle>책 선택</SectionTitle>
-          <SearchBox>
-            <SearchIcon>🔍</SearchIcon>
-            <SearchInput
-              placeholder="검색해서 찾기"
-              value={bookTitle}
-              onChange={e => setBookTitle(e.target.value)}
-            />
+          <SearchBox onClick={handleBookSearchOpen}>
+            <SearchIcon>
+              <img src={searchIcon} alt="검색" />
+            </SearchIcon>
+            {selectedBook ? (
+              <span style={{ color: semanticColors.text.primary }}>{selectedBook.title}</span>
+            ) : (
+              <span style={{ color: semanticColors.text.secondary }}>검색해서 찾기</span>
+            )}
           </SearchBox>
         </Section>
+
+        <Section showDivider></Section>
 
         <Section>
           <SectionTitle>책 장르</SectionTitle>
@@ -191,6 +211,12 @@ const CreateGroup = () => {
             </ToggleSwitch>
           </PrivacyToggleContainer>
         </Section>
+
+        <BookSearchBottomSheet
+          isOpen={isBookSearchOpen}
+          onClose={handleBookSearchClose}
+          onSelectBook={handleBookSelect}
+        />
       </Container>
     </>
   );
