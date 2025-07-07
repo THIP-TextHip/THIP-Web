@@ -14,4 +14,5 @@ export default Blank;
 
 const Wrapper = styled.div`
   width: 100%;
+  min-height: 10px;
 `;

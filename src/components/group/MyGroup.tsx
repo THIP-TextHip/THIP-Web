@@ -1,4 +1,4 @@
-import { GroupCard } from './GroupCard';
+import { MyGroupCard } from './MyGroupCard';
 import { useInfiniteCarousel } from '../../hooks/useInfiniteCarousel';
 import styled from '@emotion/styled';
 import rightChevron from '../../assets/common/right-Chevron.svg';
@@ -7,9 +7,12 @@ export interface Group {
   id: string;
   title: string;
   participants: number;
-  userName: string;
-  progress: number;
+  maximumParticipants?: number;
+  userName?: string;
+  progress?: number;
   coverUrl: string;
+  deadLine?: number;
+  genre?: string;
 }
 
 interface MyGroupProps {
@@ -27,10 +30,9 @@ export function MyGroup({ groups }: MyGroupProps) {
           <img src={rightChevron} alt="내 모임방 버튼" />
         </MoreButton>
       </Header>
-
       <Carousel ref={scrollRef}>
         {infiniteGroups.map((g, i) => (
-          <GroupCard
+          <MyGroupCard
             key={`${g.id}-${i}`}
             group={g}
             ref={el => {
@@ -39,7 +41,6 @@ export function MyGroup({ groups }: MyGroupProps) {
           />
         ))}
       </Carousel>
-
       <Dots>
         {groups.map((_, i) => (
           <Dot key={i} active={i === current} />
@@ -59,7 +60,7 @@ const Container = styled.div`
 const Header = styled.div`
   display: flex;
   align-items: center;
-  margin: 36px 16px 20px;
+  margin: 20px 16px;
 `;
 
 const Title = styled.h2`
@@ -82,13 +83,14 @@ const MoreButton = styled.button`
 
 const Carousel = styled.div`
   display: flex;
-  padding: 0 40px;
+  padding: 0;
   width: 100%;
   overflow-x: auto;
   scroll-behavior: smooth;
   &::-webkit-scrollbar {
     display: none;
   }
+  scroll-snap-type: x mandatory;
 `;
 
 const Dots = styled.div`

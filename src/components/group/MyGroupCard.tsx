@@ -3,11 +3,11 @@ import styled from '@emotion/styled';
 import peopleImg from '../../assets/common/people.svg';
 import type { Group } from './MyGroup';
 
-interface GroupCardProps {
+interface MyGroupCardProps {
   group: Group;
 }
 
-export const GroupCard = forwardRef<HTMLDivElement, GroupCardProps>(({ group }, ref) => {
+export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>(({ group }, ref) => {
   return (
     <Card ref={ref}>
       <Thumbnail src={group.coverUrl} alt="책 표지" />
@@ -33,7 +33,7 @@ export const GroupCard = forwardRef<HTMLDivElement, GroupCardProps>(({ group }, 
 });
 
 const Card = styled.div`
-  flex: 0 0 90%;
+  flex: 0 0 80%;
   scroll-snap-align: center;
   background: linear-gradient(to right, #fff 0%, #989898 100%);
   border-radius: 12px;
@@ -105,7 +105,7 @@ const Bar = styled.div`
   margin-top: 4px;
 `;
 
-const Fill = styled.div<{ width: number }>`
+const Fill = styled.div<{ width?: number }>`
   width: ${({ width }) => width}%;
   height: 100%;
   background-color: var(--color-purple-main);
