@@ -9,6 +9,23 @@ interface MainHeaderProps {
   type: 'home' | 'group';
 }
 
+const MainHeader = ({ type }: MainHeaderProps) => {
+  return (
+    <HeaderWrapper>
+      <LogoImg src={headerLogo} alt="headerLogo" />
+      <Actions>
+        <IconButton
+          src={type === 'group' ? groupDoneLogo : findUserLogo}
+          alt={type === 'group' ? '모임 완료 아이콘' : '사용자 찾기 아이콘'}
+        />
+        <IconButton src={bellLogo} alt="알림 아이콘" />
+      </Actions>
+    </HeaderWrapper>
+  );
+};
+
+export default MainHeader;
+
 const HeaderWrapper = styled.div`
   background-color: var(--color-black-main);
   position: fixed;
@@ -32,20 +49,3 @@ const Actions = styled.div`
   align-items: center;
   gap: 20px;
 `;
-
-const MainHeader = ({ type }: MainHeaderProps) => {
-  return (
-    <HeaderWrapper>
-      <LogoImg src={headerLogo} alt="headerLogo" />
-      <Actions>
-        <IconButton
-          src={type === 'group' ? groupDoneLogo : findUserLogo}
-          alt={type === 'group' ? '모임 완료 아이콘' : '사용자 찾기 아이콘'}
-        />
-        <IconButton src={bellLogo} alt="알림 아이콘" />
-      </Actions>
-    </HeaderWrapper>
-  );
-};
-
-export default MainHeader;

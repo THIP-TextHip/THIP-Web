@@ -6,6 +6,17 @@ interface SearchBarProps {
   placeholder: string;
 }
 
+const SearchBar = ({ placeholder }: SearchBarProps) => {
+  return (
+    <SearchBarWrapper>
+      <Input placeholder={placeholder} />
+      <IconButton src={searchIcon} alt="검색" />
+    </SearchBarWrapper>
+  );
+};
+
+export default SearchBar;
+
 const SearchBarWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -35,14 +46,3 @@ const Input = styled.input`
     outline: none;
   }
 `;
-
-const SearchBar = ({ placeholder }: SearchBarProps) => {
-  return (
-    <SearchBarWrapper>
-      <Input placeholder={placeholder} />
-      <IconButton src={searchIcon} alt="검색" />
-    </SearchBarWrapper>
-  );
-};
-
-export default SearchBar;

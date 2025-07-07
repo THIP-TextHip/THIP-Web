@@ -65,13 +65,15 @@ const Title = styled.h2`
 
 const TabContainer = styled.div`
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 4px;
   justify-content: center;
   margin-bottom: 24px;
 `;
 
 const Tab = styled.button<{ selected?: boolean }>`
-  padding: 6px 16px;
+  white-space: nowrap;
+  padding: 8px 12px;
   font-size: var(--font-size-small03);
   font-weight: var(--font-weight-regular);
   border: none;
