@@ -40,7 +40,7 @@ const Input = styled.input`
   box-sizing: border-box;
 
   &::placeholder {
-    color: var(--color-grey.300);
+    color: var(--color-grey-300);
   }
   &:focus {
     outline: none;
