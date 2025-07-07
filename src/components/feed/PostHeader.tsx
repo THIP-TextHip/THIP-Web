@@ -17,7 +17,7 @@ const Container = styled.div`
       width: 36px;
       height: 36px;
       border-radius: 36px;
-      border: 0.5px solid #888;
+      border: 0.5px solid var(--color-grey-300);
     }
 
     .infoBox {
@@ -27,23 +27,23 @@ const Container = styled.div`
       gap: 4px;
       .username {
         color: var(--color-white);
-        font-size: var(--string-size-medium01, 14px);
-        font-weight: var(--string-weight-medium, 500);
+        font-size: var(--font-size-sm);
+        font-weight: 500;
         line-height: normal;
       }
       .usertitle {
-        color: var(--color-text-art_pink, #ff8bac);
-        font-size: var(--string-size-small03, 12px);
-        font-weight: var(--string-weight-regular, 400);
+        color: var(--color-character-pink);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-regular);
         line-height: normal;
       }
     }
   }
 
   .timestamp {
-    color: var(--color-text-tertiary_grey01, #adadad);
-    font-size: var(--string-size-small02, 11px);
-    font-weight: var(--string-weight-regular, 400);
+    color: var(--color-grey-200);
+    font-size: 11px;
+    font-weight: var(--font-weight-regular);
     line-height: normal;
   }
 `;

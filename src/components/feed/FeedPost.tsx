@@ -6,22 +6,20 @@ import type { FeedPostProps } from '../../types/post';
 
 const Container = styled.div`
   display: flex;
-  min-width: 320px;
-  margin: 0 auto;
-  background-color: var(--color-black-main);
-  width: 100%;
-  max-width: 540px;
-  height: auto;
-  padding: 40px 20px;
   flex-direction: column;
-  align-items: center;
+  width: 100%;
+  min-width: 320px;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 40px 20px;
   gap: 16px;
+  background-color: var(--color-black-main);
 `;
 
 const BorderBottom = styled.div`
   width: 100%;
   height: 10px;
-  background-color: #282828;
+  background-color: var(--color-darkgrey-dark);
 `;
 
 const FeedPost = ({ showHeader, ...postData }: FeedPostProps) => {

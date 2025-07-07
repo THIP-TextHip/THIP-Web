@@ -28,7 +28,7 @@ const Container = styled.div`
       display: flex;
       flex-direction: row;
       align-items: center;
-      color: var(--color-text-primary_white, #fefefe);
+      color: var(--color-white);
       font-size: var(--string-size-small03, 12px);
       font-weight: var(--string-weight-medium, 500);
       line-height: normal;

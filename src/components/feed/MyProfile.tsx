@@ -8,16 +8,16 @@ const Container = styled.div`
   width: 100%;
   min-width: 320px;
   max-width: 540px;
-  padding: 0 20px;
-  margin: 0 auto;
   height: 200px;
+  padding: 0 20px;
+  padding-top: 32px;
+  margin: 0 auto;
 
   .userProfile {
     display: flex;
     flex-direction: row;
-    align-items: center;
     justify-content: space-between;
-    padding-top: 32px;
+    align-items: center;
 
     .userInfo {
       display: flex;
@@ -29,7 +29,7 @@ const Container = styled.div`
         width: 54px;
         height: 54px;
         border-radius: 54px;
-        border: 0.5px solid #fefefe;
+        border: 0.5px solid var(--color-white);
       }
 
       .user {
@@ -38,7 +38,7 @@ const Container = styled.div`
         gap: 4px;
 
         .username {
-          color: var(--color-text-primary_white, #fefefe);
+          color: var(--color-white);
           font-size: var(--string-size-large01, 18px);
           font-weight: var(--string-weight-semibold, 600);
           line-height: 24px;
@@ -85,16 +85,16 @@ const Container = styled.div`
         gap: 2px;
 
         .followerNum {
-          color: var(--color-text-primary_white, #fefefe);
-          font-size: var(--string-size-small03, 12px);
+          color: var(--color-white);
+          font-size: var(--font-size-xs);
           font-weight: var(--string-weight-semibold, 600);
           line-height: normal;
         }
 
         .disc {
-          color: var(--color-text-secondary_grey00, #dadada);
-          font-size: var(--string-size-small03, 12px);
-          font-weight: var(--string-weight-medium, 500);
+          color: var(--color-grey-100);
+          font-size: var(--font-size-xs);
+          font-weight: var(--font-weight-semibold);
           line-height: normal;
           letter-spacing: 0.012px;
         }
@@ -106,7 +106,7 @@ const Container = styled.div`
         width: 24px;
         height: 24px;
         border-radius: 24px;
-        border: 0.5px solid #888;
+        border: 0.5px solid var(--color-grey-300);
       }
     }
   }
@@ -114,13 +114,13 @@ const Container = styled.div`
   .totalBar {
     display: flex;
     flex-direction: row;
-    gap: 2px;
-    color: var(--color-text-secondary_grey00, #dadada);
-    font-size: var(--string-size-medium01, 14px);
-    font-weight: var(--string-weight-medium, 500);
-    line-height: var(--string-lineheight-height24, 24px);
     padding-bottom: 4px;
     border-bottom: 1px solid #282828;
+    gap: 2px;
+    color: var(--color-grey-100);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: 24px;
 
     .total {
     }

@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
+import styled from '@emotion/styled';
 import NavBar from '../../components/common/NavBar';
 import TabBar from '../../components/feed/TabBar';
-import { Container } from '../../pages/feed/Feed.styled';
 import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import type { PostData } from '../../types/post';
+
+const Container = styled.div`
+  min-width: 320px;
+  max-width: 767px;
+  margin: 0 auto;
+`;
 
 const mockPosts: PostData[] = [
   {
@@ -31,7 +37,7 @@ const mockPosts: PostData[] = [
     bookAuthor: '작가입니다',
     postContent:
       '내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다',
-    postId: '55',
+    postId: '56',
     initialLikeCount: 125,
     commentCount: 125,
   },

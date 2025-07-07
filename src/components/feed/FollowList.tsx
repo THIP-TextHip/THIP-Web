@@ -26,18 +26,18 @@ const Container = styled.div`
   width: 100%;
   min-width: 320px;
   max-width: 540px;
-  padding: 0 20px;
   margin: 0 auto;
+  padding: 0 20px;
   padding-top: 20px;
   background-color: var(--color-black-main);
 
   .title {
     display: flex;
     flex-direction: row;
-    color: var(--color-text-primary_white, #fefefe);
-    font-size: var(--string-size-small02, 11px);
-    font-weight: var(--string-weight-medium, 500);
-    line-height: var(--string-lineheight-feedcontent_height20, 20px);
+    color: var(--color-white);
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+    line-height: 20px;
   }
 
   .followContainer {

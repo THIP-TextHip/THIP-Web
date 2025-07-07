@@ -22,7 +22,7 @@ const Container = styled.div<{ hasImage: boolean }>`
       overflow: hidden;
       max-width: 340px;
       white-space: nowrap;
-      color: var(--color-text-primary_white, #fefefe);
+      color: var(--color-white);
       text-overflow: ellipsis;
       font-size: var(--string-size-medium02, 16px);
       font-weight: var(--string-weight-semibold, 600);
@@ -99,7 +99,7 @@ const Container = styled.div<{ hasImage: boolean }>`
       border-radius: 20px;
       border: 1px solid var(--color-button-color_line-button_line_lightgrey01, #adadad);
 
-      color: var(--color-text-primary_white, #fefefe);
+      color: var(--color-white);
       font-size: var(--string-size-small03, 12px);
       font-weight: var(--string-weight-regular, 400);
       line-height: normal;
