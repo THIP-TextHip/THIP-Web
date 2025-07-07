@@ -1,9 +1,10 @@
 import styled from '@emotion/styled';
+import { colors, typography, semanticColors } from '../../styles/global/global';
 
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: #121212;
+  background-color: ${semanticColors.background.primary};
   min-width: 360px;
   max-width: 767px;
   min-height: 100vh;
@@ -17,37 +18,37 @@ export const Section = styled.div`
 `;
 
 export const SectionTitle = styled.div`
-  color: #fefefe;
-  font-size: 18px;
-  font-weight: 600;
+  color: ${semanticColors.text.primary};
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
   margin-bottom: 16px;
 `;
 
 export const SearchBox = styled.div`
   display: flex;
   align-items: center;
-  background-color: #282828;
+  background-color: ${semanticColors.background.cardDark};
   border-radius: 12px;
   padding: 12px 16px;
   gap: 12px;
 `;
 
 export const SearchIcon = styled.div`
-  font-size: 16px;
-  color: #888;
+  font-size: ${typography.fontSize.base};
+  color: ${semanticColors.text.ghost};
 `;
 
 export const SearchInput = styled.input`
   background: none;
   border: none;
   outline: none;
-  color: #fefefe;
-  font-size: 16px;
+  color: ${semanticColors.text.primary};
+  font-size: ${typography.fontSize.base};
   flex: 1;
 
   &::placeholder {
-    color: #888;
-    font-size: 16px;
+    color: ${semanticColors.text.ghost};
+    font-size: ${typography.fontSize.base};
   }
 `;
 
@@ -58,20 +59,21 @@ export const GenreButtonGroup = styled.div`
 `;
 
 export const GenreButton = styled.button<{ active: boolean }>`
-  background-color: ${({ active }) => (active ? '#3D3D3D' : '#282828')};
+  background-color: ${({ active }) =>
+    active ? semanticColors.background.card : semanticColors.background.cardDark};
   border: none;
   border-radius: 20px;
   padding: 8px 16px;
-  color: ${({ active }) => (active ? '#FEFEFE' : '#888')};
-  font-size: 14px;
-  font-weight: 500;
+  color: ${({ active }) => (active ? semanticColors.text.primary : semanticColors.text.ghost)};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.medium};
   cursor: pointer;
   transition: all 0.2s;
 `;
 
 export const TextAreaBox = styled.div`
   position: relative;
-  background-color: #282828;
+  background-color: ${semanticColors.background.cardDark};
   border-radius: 12px;
   padding: 12px 16px;
 `;
@@ -80,15 +82,15 @@ export const TextArea = styled.textarea`
   background: none;
   border: none;
   outline: none;
-  color: #fefefe;
-  font-size: 16px;
+  color: ${semanticColors.text.primary};
+  font-size: ${typography.fontSize.base};
   width: 100%;
   resize: none;
-  font-family: inherit;
+  font-family: ${typography.fontFamily.primary};
 
   &::placeholder {
-    color: #888;
-    font-size: 16px;
+    color: ${semanticColors.text.ghost};
+    font-size: ${typography.fontSize.base};
   }
 `;
 
@@ -96,12 +98,12 @@ export const CharacterCount = styled.div`
   position: absolute;
   bottom: 12px;
   right: 16px;
-  color: #888;
-  font-size: 12px;
+  color: ${semanticColors.text.ghost};
+  font-size: ${typography.fontSize.xs};
 `;
 
 export const DatePickerContainer = styled.div`
-  color: #fefefe;
+  color: ${semanticColors.text.primary};
 `;
 
 export const DatePickerRow = styled.div`
@@ -117,9 +119,9 @@ export const DateSelector = styled.div`
 `;
 
 export const DateText = styled.span`
-  color: #fefefe;
-  font-size: 16px;
-  font-weight: 500;
+  color: ${semanticColors.text.primary};
+  font-size: ${typography.fontSize.base};
+  font-weight: ${typography.fontWeight.medium};
 `;
 
 export const MemberLimitContainer = styled.div`
@@ -129,15 +131,15 @@ export const MemberLimitContainer = styled.div`
 `;
 
 export const MemberNumber = styled.span`
-  color: #fefefe;
+  color: ${semanticColors.text.primary};
   font-size: 32px;
-  font-weight: 600;
+  font-weight: ${typography.fontWeight.semibold};
 `;
 
 export const MemberText = styled.span`
-  color: #fefefe;
-  font-size: 16px;
-  font-weight: 400;
+  color: ${semanticColors.text.primary};
+  font-size: ${typography.fontSize.base};
+  font-weight: ${typography.fontWeight.regular};
 `;
 
 export const PrivacyToggleContainer = styled.div`
@@ -147,15 +149,16 @@ export const PrivacyToggleContainer = styled.div`
 `;
 
 export const PrivacyLabel = styled.span`
-  color: #fefefe;
-  font-size: 16px;
-  font-weight: 500;
+  color: ${semanticColors.text.primary};
+  font-size: ${typography.fontSize.base};
+  font-weight: ${typography.fontWeight.medium};
 `;
 
 export const ToggleSwitch = styled.div<{ active: boolean }>`
   width: 48px;
   height: 28px;
-  background-color: ${({ active }) => (active ? '#6868FF' : '#3D3D3D')};
+  background-color: ${({ active }) =>
+    active ? semanticColors.button.fill.primary : semanticColors.background.card};
   border-radius: 14px;
   position: relative;
   cursor: pointer;
@@ -165,7 +168,7 @@ export const ToggleSwitch = styled.div<{ active: boolean }>`
 export const ToggleSlider = styled.div<{ active: boolean }>`
   width: 20px;
   height: 20px;
-  background-color: #fefefe;
+  background-color: ${semanticColors.text.primary};
   border-radius: 50%;
   position: absolute;
   top: 4px;

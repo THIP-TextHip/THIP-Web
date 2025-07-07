@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import leftarrow from '../../assets/leftArrow.svg';
+import { semanticColors, typography } from '../../styles/global/global';
 import {
   Container,
   Section,
@@ -25,7 +26,7 @@ import {
   PrivacyLabel,
   ToggleSwitch,
   ToggleSlider,
-} from './CreateGroup.styled.ts';
+} from './CreateGroup.styled';
 
 const CreateGroup = () => {
   const navigate = useNavigate();
@@ -87,7 +88,13 @@ const CreateGroup = () => {
               </GenreButton>
             ))}
           </GenreButtonGroup>
-          <div style={{ color: '#A7FFB4', fontSize: '12px', marginTop: '12px' }}>
+          <div
+            style={{
+              color: semanticColors.text.point.green,
+              fontSize: typography.fontSize.xs,
+              marginTop: '12px',
+            }}
+          >
             책을 가장 잘 설명하는 장르를 하나 골라주세요.
           </div>
         </Section>
@@ -140,7 +147,13 @@ const CreateGroup = () => {
                 <DateText>일</DateText>
               </DateSelector>
             </DatePickerRow>
-            <DateText style={{ marginTop: '12px', fontSize: '12px', color: '#A7FFB4' }}>
+            <DateText
+              style={{
+                marginTop: '12px',
+                fontSize: typography.fontSize.xs,
+                color: semanticColors.text.point.green,
+              }}
+            >
               모임 활동기간은 최대 3개월까지 설정가능합니다.
             </DateText>
           </DatePickerContainer>
@@ -151,12 +164,20 @@ const CreateGroup = () => {
           <MemberLimitContainer>
             <MemberNumber>30</MemberNumber>
             <div>
-              <MemberNumber style={{ fontSize: '16px' }}>1</MemberNumber>
+              <MemberNumber style={{ fontSize: typography.fontSize.base }}>1</MemberNumber>
               <MemberText>명의 독서메이트를 모집합니다.</MemberText>
-              <MemberNumber style={{ fontSize: '16px', marginLeft: '8px' }}>2</MemberNumber>
+              <MemberNumber style={{ fontSize: typography.fontSize.base, marginLeft: '8px' }}>
+                2
+              </MemberNumber>
             </div>
           </MemberLimitContainer>
-          <MemberText style={{ marginTop: '12px', fontSize: '12px', color: '#A7FFB4' }}>
+          <MemberText
+            style={{
+              marginTop: '12px',
+              fontSize: typography.fontSize.xs,
+              color: semanticColors.text.point.green,
+            }}
+          >
             모임 인원은 최대 30명까지 신청받을 수 있습니다.
           </MemberText>
         </Section>
