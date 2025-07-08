@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
-import BookSearchBottomSheet from '../../components/common/BookSearchBottomSheet';
+import BookSearchBottomSheet from '../../components/common/BookSearchBottomSheet/BookSearchBottomSheet';
 import leftarrow from '../../assets/leftArrow.svg';
 import searchIcon from '../../assets/group/search.svg';
 import { semanticColors, typography } from '../../styles/global/global';
