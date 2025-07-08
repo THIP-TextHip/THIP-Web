@@ -141,6 +141,10 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     e.currentTarget.style.display = 'none';
   };
 
+  const handleClearSearch = () => {
+    setSearchQuery('');
+  };
+
   return (
     <Overlay isVisible={isOpen} onClick={handleOverlayClick}>
       <BottomSheetContainer isVisible={isOpen}>
@@ -156,7 +160,7 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
               />
             </SearchInputWrapper>
             <ButtonGroup>
-              <IconButton onClick={onClose}>
+              <IconButton onClick={handleClearSearch}>
                 <img src={closeIcon} alt="닫기" />
               </IconButton>
               <IconButton onClick={handleSearch}>
