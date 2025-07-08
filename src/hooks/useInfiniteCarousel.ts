@@ -1,5 +1,5 @@
 import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
-import type { Group } from '../components/group/MyGroup';
+import type { Group } from '../components/group/MyGroupBox';
 
 const CLONE_COUNT = 10;
 

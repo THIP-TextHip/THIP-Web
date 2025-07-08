@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import styled from '@emotion/styled';
 import peopleImg from '../../assets/common/people.svg';
-import type { Group } from './MyGroup';
+import type { Group } from './MyGroupBox';
 
 interface MyGroupCardProps {
   group: Group;

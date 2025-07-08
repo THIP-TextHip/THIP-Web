@@ -10,6 +10,7 @@ import SignupGenre from './signup/SignupGenre';
 import SignupNickname from './signup/SignupNickname';
 import SignupDone from './signup/SignupDone';
 import Group from './group/Group';
+import MyGroup from './group/MyGroup';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -21,7 +22,9 @@ const Router = () => {
           <Route path="genre" element={<SignupGenre />} />
         </Route>
         <Route path="signupdone" element={<SignupDone />} />
-        <Route path="group" element={<Group />} />
+        <Route path="group" element={<Group />}>
+          <Route path="mygroup" element={<MyGroup />} />
+        </Route>
       </>,
     ),
   );

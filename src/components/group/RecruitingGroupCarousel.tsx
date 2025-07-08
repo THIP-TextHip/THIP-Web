@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
-import type { Group } from './MyGroup';
-import { RecruitingGroup } from './RecruitingGroup';
+import type { Group } from './MyGroupBox';
+import { RecruitingGroupBox } from './RecruitingGroupBox';
 
 export interface Section {
   title: string;
@@ -65,7 +65,7 @@ export function RecruitingGroupCarousel({ sections }: Props) {
             itemRefs.current[i] = el;
           }}
         >
-          <RecruitingGroup groups={sec.groups} title={sec.title} />
+          <RecruitingGroupBox groups={sec.groups} title={sec.title} />
         </Item>
       ))}
     </ScrollWrapper>

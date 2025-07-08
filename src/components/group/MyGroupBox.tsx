@@ -19,7 +19,7 @@ interface MyGroupProps {
   groups: Group[];
 }
 
-export function MyGroup({ groups }: MyGroupProps) {
+export function MyGroupBox({ groups }: MyGroupProps) {
   const { scrollRef, cardRefs, infiniteGroups, current } = useInfiniteCarousel(groups);
 
   return (

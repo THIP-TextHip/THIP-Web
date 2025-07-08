@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import styled from '@emotion/styled';
-import type { Group } from './MyGroup';
+import type { Group } from './MyGroupBox';
 import { GroupCard } from './GroupCard';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 
 const GENRE = ['문학', '과학·IT', '사회과학', '인문학', '예술'];
 
-export function RecruitingGroup({ groups, title }: Props) {
+export function RecruitingGroupBox({ groups, title }: Props) {
   const [selected, setSelected] = useState<string>('문학');
 
   const filtered = useMemo(() => groups.filter(g => g.genre === selected), [groups, selected]);

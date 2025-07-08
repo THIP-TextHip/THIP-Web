@@ -1,8 +1,8 @@
 import MainHeader from '@/components/common/MainHeader';
 import NavBar from '@/components/common/NavBar';
 import SearchBar from '@/components/common/SearchBar';
-import type { Group as GroupType } from '@/components/group/MyGroup';
-import { MyGroup } from '../../components/group/MyGroup';
+import type { Group as GroupType } from '@/components/group/MyGroupBox';
+import { MyGroupBox } from '../../components/group/MyGroupBox';
 import Blank from '@/components/common/Blank';
 import styled from '@emotion/styled';
 import { RecruitingGroupCarousel, type Section } from '@/components/group/RecruitingGroupCarousel';
@@ -117,7 +117,7 @@ const Group = () => {
     <Wrapper>
       <MainHeader type="group" />
       <SearchBar placeholder="모임방 참여할 사람!" />
-      <MyGroup groups={dummyMyGroups}></MyGroup>
+      <MyGroupBox groups={dummyMyGroups}></MyGroupBox>
       <Blank height={'10px'} margin={'32px 0'}></Blank>
       <RecruitingGroupCarousel sections={sections} />
       <NavBar />
