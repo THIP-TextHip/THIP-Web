@@ -16,6 +16,6 @@ export const MemberWheelContainer = styled.div`
 
 export const MemberText = styled.span`
   color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize.sm};
+  font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.regular};
 `;

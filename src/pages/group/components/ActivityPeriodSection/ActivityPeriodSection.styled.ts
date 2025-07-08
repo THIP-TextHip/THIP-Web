@@ -91,7 +91,7 @@ export const WheelItem = styled.div<{ isSelected: boolean }>`
 
 export const DateUnitText = styled.div`
   color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize.sm};
+  font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.regular};
   margin-right: 6px;
 `;

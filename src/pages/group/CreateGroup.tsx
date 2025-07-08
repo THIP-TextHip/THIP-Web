@@ -102,13 +102,11 @@ const CreateGroup = () => {
 
         <Section showDivider />
 
-        <MemberLimitSection memberLimit={memberLimit} />
+        <MemberLimitSection memberLimit={memberLimit} onMemberLimitChange={setMemberLimit} />
 
         <Section showDivider />
 
         <PrivacySettingSection isPrivate={isPrivate} onToggle={handlePrivacyToggle} />
-
-        <Section showDivider />
 
         <BookSearchBottomSheet
           isOpen={isBookSearchOpen}

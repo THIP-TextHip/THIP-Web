@@ -9,8 +9,8 @@ export const PrivacyToggleContainer = styled.div`
 
 export const PrivacyLabel = styled.span`
   color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize.base};
-  font-weight: ${typography.fontWeight.medium};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
 `;
 
 export const ToggleSwitch = styled.div<{ active: boolean }>`
