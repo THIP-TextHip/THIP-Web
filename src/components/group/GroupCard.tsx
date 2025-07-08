@@ -5,9 +5,10 @@ import type { Group } from './MyGroup';
 
 interface Props {
   group: Group;
+  type: 'recruiting' | 'ongoing';
 }
 
-export const RecruitingGroupCard = forwardRef<HTMLDivElement, Props>(({ group }, ref) => {
+export const GroupCard = forwardRef<HTMLDivElement, Props>(({ group, type }, ref) => {
   return (
     <Card ref={ref}>
       <Cover src={group.coverUrl} alt="cover" />
@@ -19,7 +20,11 @@ export const RecruitingGroupCard = forwardRef<HTMLDivElement, Props>(({ group },
             <p>{group.participants}</p>
             <MaximumParticipants>/ {group.maximumParticipants}명</MaximumParticipants>
           </Participant>
-          <Deadline>{group.deadLine}일 뒤 모집 마감</Deadline>
+          {type === 'recruiting' ? (
+            <RecruitingDeadline>{group.deadLine}일 뒤 모집 마감</RecruitingDeadline>
+          ) : (
+            <OngoingDeadline>{group.deadLine}일 뒤 종료</OngoingDeadline>
+          )}
         </Bottom>
       </Info>
     </Card>
@@ -89,8 +94,14 @@ const MaximumParticipants = styled.div`
   font-size: var(--font-size-small03);
 `;
 
-const Deadline = styled.div`
+const RecruitingDeadline = styled.div`
   font-size: var(--font-size-small03);
   font-weight: var(--font-weight-semibold);
   color: var(--color-red);
+`;
+
+const OngoingDeadline = styled.div`
+  font-size: var(--font-size-small03);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
 `;

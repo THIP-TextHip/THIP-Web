@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import type { Group } from './MyGroup';
-import { RecruitingGroupCard } from './RecruitingGroupCard';
+import { GroupCard } from './GroupCard';
 
 interface Props {
   groups: Group[];
@@ -27,7 +27,7 @@ export function RecruitingGroup({ groups, title }: Props) {
       </TabContainer>
       <Grid>
         {filtered.map(group => (
-          <RecruitingGroupCard key={group.id} group={group} />
+          <GroupCard key={group.id} group={group} type={'recruiting'} />
         ))}
       </Grid>
     </Container>
