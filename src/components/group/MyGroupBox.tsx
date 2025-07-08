@@ -13,20 +13,22 @@ export interface Group {
   coverUrl: string;
   deadLine?: number;
   genre?: string;
+  isOnGoing?: boolean;
 }
 
 interface MyGroupProps {
   groups: Group[];
+  onMyGroupsClick: () => void;
 }
 
-export function MyGroupBox({ groups }: MyGroupProps) {
+export function MyGroupBox({ groups, onMyGroupsClick }: MyGroupProps) {
   const { scrollRef, cardRefs, infiniteGroups, current } = useInfiniteCarousel(groups);
 
   return (
     <Container>
       <Header>
         <Title>내 모임방</Title>
-        <MoreButton onClick={() => {}}>
+        <MoreButton onClick={onMyGroupsClick}>
           <img src={rightChevron} alt="내 모임방 버튼" />
         </MoreButton>
       </Header>

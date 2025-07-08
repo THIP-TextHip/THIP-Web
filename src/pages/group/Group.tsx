@@ -6,6 +6,9 @@ import { MyGroupBox } from '../../components/group/MyGroupBox';
 import Blank from '@/components/common/Blank';
 import styled from '@emotion/styled';
 import { RecruitingGroupCarousel, type Section } from '@/components/group/RecruitingGroupCarousel';
+import { useState } from 'react';
+import { MyGroupModal } from '@/components/group/MyGroupModal';
+import CompletedGroupModal from '@/components/group/CompletedGroupModal';
 
 const dummyMyGroups: GroupType[] = [
   {
@@ -113,11 +116,21 @@ const sections: Section[] = [
 ];
 
 const Group = () => {
+  const [isMyGroupModalOpen, setIsMyGroupModalOpen] = useState(false);
+  const [isCompletedGroupModalOpen, setIsCompletedGroupModalOpen] = useState(false);
+
+  const openMyGroupModal = () => setIsMyGroupModalOpen(true);
+  const closeMyGroupModal = () => setIsMyGroupModalOpen(false);
+
+  const openCompletedGroupModal = () => setIsCompletedGroupModalOpen(true);
+  const closeCompletedGroupModal = () => setIsCompletedGroupModalOpen(false);
   return (
     <Wrapper>
-      <MainHeader type="group" />
+      {isMyGroupModalOpen && <MyGroupModal onClose={closeMyGroupModal} />}
+      {isCompletedGroupModalOpen && <CompletedGroupModal onClose={closeCompletedGroupModal} />}
+      <MainHeader type="group" leftButtonClick={openCompletedGroupModal} />
       <SearchBar placeholder="모임방 참여할 사람!" />
-      <MyGroupBox groups={dummyMyGroups}></MyGroupBox>
+      <MyGroupBox groups={dummyMyGroups} onMyGroupsClick={openMyGroupModal}></MyGroupBox>
       <Blank height={'10px'} margin={'32px 0'}></Blank>
       <RecruitingGroupCarousel sections={sections} />
       <NavBar />
