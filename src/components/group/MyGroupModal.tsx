@@ -1,4 +1,3 @@
-// components/group/MyGroupModal.tsx
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import TitleHeader from '../common/TitleHeader';

@@ -5,7 +5,7 @@ import type { Group } from './MyGroupBox';
 
 interface Props {
   group: Group;
-  type: 'recruiting' | 'ongoing';
+  type?: 'recruiting' | 'ongoing';
 }
 
 export const GroupCard = forwardRef<HTMLDivElement, Props>(({ group, type }, ref) => {
