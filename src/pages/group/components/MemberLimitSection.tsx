@@ -1,34 +1,34 @@
-import { semanticColors, typography } from '../../../styles/global/global';
 import { Section, SectionTitle } from '../CommonSection.styled';
-import { MemberLimitContainer, MemberNumber, MemberText } from './MemberLimitSection.styled';
+import DateWheel from './ActivityPeriodSection/DateWheel';
+import {
+  MemberLimitContainer,
+  MemberWheelContainer,
+  MemberText,
+} from './MemberLimitSection.styled';
 
 interface MemberLimitSectionProps {
   memberLimit: number;
+  onMemberLimitChange: (limit: number) => void;
 }
 
-const MemberLimitSection = ({ memberLimit }: MemberLimitSectionProps) => {
+const MemberLimitSection = ({ memberLimit, onMemberLimitChange }: MemberLimitSectionProps) => {
+  // 1부터 30까지의 배열 생성
+  const memberNumbers = Array.from({ length: 30 }, (_, i) => i + 1);
+
   return (
     <Section>
       <SectionTitle>인원 제한</SectionTitle>
       <MemberLimitContainer>
-        <MemberNumber>30</MemberNumber>
-        <div>
-          <MemberNumber style={{ fontSize: typography.fontSize.base }}>{memberLimit}</MemberNumber>
+        <MemberWheelContainer>
+          <DateWheel
+            values={memberNumbers}
+            selectedValue={memberLimit}
+            onChange={onMemberLimitChange}
+            width={24}
+          />
           <MemberText>명의 독서메이트를 모집합니다.</MemberText>
-          <MemberNumber style={{ fontSize: typography.fontSize.base, marginLeft: '8px' }}>
-            {memberLimit + 1}
-          </MemberNumber>
-        </div>
+        </MemberWheelContainer>
       </MemberLimitContainer>
-      <MemberText
-        style={{
-          marginTop: '12px',
-          fontSize: typography.fontSize.xs,
-          color: semanticColors.text.point.green,
-        }}
-      >
-        모임 인원은 최대 30명까지 신청받을 수 있습니다.
-      </MemberText>
     </Section>
   );
 };
