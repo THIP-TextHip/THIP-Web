@@ -14,5 +14,5 @@ export const SectionTitle = styled.div`
   color: ${semanticColors.text.primary};
   font-size: ${typography.fontSize.lg};
   font-weight: ${typography.fontWeight.semibold};
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 `;

@@ -5,7 +5,7 @@ import BookSearchBottomSheet from '../../components/common/BookSearchBottomSheet
 import BookSelectionSection from './components/BookSelectionSection';
 import GenreSelectionSection from './components/GenreSelectionSection';
 import RoomInfoSection from './components/RoomInfoSection';
-import ActivityPeriodSection from './components/ActivityPeriodSection';
+import ActivityPeriodSection from './components/ActivityPeriodSection/ActivityPeriodSection';
 import MemberLimitSection from './components/MemberLimitSection';
 import PrivacySettingSection from './components/PrivacySettingSection';
 import leftarrow from '../../assets/leftArrow.svg';
@@ -93,11 +93,22 @@ const CreateGroup = () => {
 
         <Section showDivider />
 
-        <ActivityPeriodSection startDate={startDate} endDate={endDate} />
+        <ActivityPeriodSection
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+        />
+
+        <Section showDivider />
 
         <MemberLimitSection memberLimit={memberLimit} />
 
+        <Section showDivider />
+
         <PrivacySettingSection isPrivate={isPrivate} onToggle={handlePrivacyToggle} />
+
+        <Section showDivider />
 
         <BookSearchBottomSheet
           isOpen={isBookSearchOpen}
