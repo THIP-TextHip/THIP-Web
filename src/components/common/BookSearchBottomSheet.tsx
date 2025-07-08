@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { semanticColors, typography } from '../../styles/global/global';
+import { colors, semanticColors, typography } from '../../styles/global/global';
+import closeIcon from '../../assets/group/close.svg';
+import searchIcon from '../../assets/group/search.svg';
+import whitesearchIcon from '../../assets/group/search_white.svg';
 
 const Overlay = styled.div<{ isVisible: boolean }>`
   position: fixed;
@@ -24,21 +27,13 @@ const BottomSheetContainer = styled.div<{ isVisible: boolean }>`
   right: 0;
   max-width: 767px;
   margin: 0 auto;
-  background-color: ${semanticColors.background.primary};
+  background-color: ${colors.darkgrey.main};
   border-radius: 20px 20px 0 0;
   z-index: 1001;
   transform: translateY(${({ isVisible }) => (isVisible ? '0' : '100%')});
   transition: transform 0.3s ease;
   max-height: 80vh;
   overflow: hidden;
-`;
-
-const Handle = styled.div`
-  width: 32px;
-  height: 4px;
-  background-color: ${semanticColors.text.ghost};
-  border-radius: 2px;
-  margin: 12px auto 0;
 `;
 
 const Content = styled.div`
@@ -50,16 +45,19 @@ const Content = styled.div`
 const SearchContainer = styled.div`
   display: flex;
   align-items: center;
-  background-color: ${semanticColors.background.cardDark};
+  background-color: ${colors.darkgrey.dark};
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: 8px 12px;
   gap: 12px;
   margin-bottom: 20px;
+  position: relative;
 `;
 
-const SearchIcon = styled.div`
-  font-size: ${typography.fontSize.base};
-  color: ${semanticColors.text.ghost};
+const SearchInputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
 `;
 
 const SearchInput = styled.input`
@@ -69,6 +67,7 @@ const SearchInput = styled.input`
   color: ${semanticColors.text.primary};
   font-size: ${typography.fontSize.base};
   flex: 1;
+  caret-color: ${semanticColors.text.point.green};
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
@@ -76,36 +75,43 @@ const SearchInput = styled.input`
   }
 `;
 
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: ${semanticColors.text.ghost};
-  font-size: 20px;
-  cursor: pointer;
-  padding: 4px;
-  margin-left: 8px;
+const ButtonGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
 `;
 
-const SearchButton = styled.button`
+const IconButton = styled.button`
   background: none;
   border: none;
-  color: ${semanticColors.text.ghost};
-  font-size: 18px;
   cursor: pointer;
-  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 0;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 `;
 
 const BookList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
 `;
 
 const BookItem = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 12px 0;
+  padding: 16px 0;
   border-bottom: 1px solid ${semanticColors.background.card};
   cursor: pointer;
 
@@ -116,7 +122,8 @@ const BookItem = styled.div`
   &:hover {
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
-    padding: 12px 8px;
+    margin: 0 -8px;
+    padding: 16px 8px;
   }
 `;
 
@@ -225,18 +232,24 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
   return (
     <Overlay isVisible={isOpen} onClick={handleOverlayClick}>
       <BottomSheetContainer isVisible={isOpen}>
-        <Handle />
         <Content>
           <SearchContainer>
-            <SearchIcon>🔍</SearchIcon>
-            <SearchInput
-              placeholder="인풋 텍스트"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              onKeyPress={handleKeyPress}
-            />
-            <CloseButton onClick={onClose}>✕</CloseButton>
-            <SearchButton onClick={handleSearch}>🔍</SearchButton>
+            <SearchInputWrapper>
+              <SearchInput
+                placeholder="책 제목, 작가명을 검색해보세요."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
+              />
+            </SearchInputWrapper>
+            <ButtonGroup>
+              <IconButton onClick={onClose}>
+                <img src={closeIcon} alt="닫기" />
+              </IconButton>
+              <IconButton onClick={handleSearch}>
+                <img src={whitesearchIcon} alt="검색" />
+              </IconButton>
+            </ButtonGroup>
           </SearchContainer>
 
           <BookList>
