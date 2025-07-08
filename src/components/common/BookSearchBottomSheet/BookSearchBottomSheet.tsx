@@ -153,7 +153,7 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
           <SearchContainer>
             <SearchInputWrapper>
               <SearchInput
-                placeholder="책 제목, 작가명을 검색해보세요."
+                placeholder="책 제목을 검색해보세요."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyPress={handleKeyPress}

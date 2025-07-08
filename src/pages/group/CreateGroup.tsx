@@ -11,6 +11,12 @@ import {
   SectionTitle,
   SearchBox,
   SearchIcon,
+  SelectedBookContainer,
+  SelectedBookCover,
+  SelectedBookInfo,
+  SelectedBookTitle,
+  SelectedBookAuthor,
+  ChangeButton,
   GenreButtonGroup,
   GenreButton,
   TextAreaBox,
@@ -51,7 +57,7 @@ const CreateGroup = () => {
     console.log('모임 생성 완료');
   };
 
-  const handleBookSearchOpen = () => {
+  const handleChangeBook = () => {
     setIsBookSearchOpen(true);
   };
 
@@ -81,14 +87,30 @@ const CreateGroup = () => {
       <Container>
         <Section>
           <SectionTitle>책 선택</SectionTitle>
-          <SearchBox onClick={handleBookSearchOpen}>
-            <SearchIcon>
-              <img src={searchIcon} alt="검색" />
-            </SearchIcon>
+          <SearchBox
+            hasSelectedBook={!!selectedBook}
+            onClick={selectedBook ? undefined : () => setIsBookSearchOpen(true)}
+          >
             {selectedBook ? (
-              <span style={{ color: semanticColors.text.primary }}>{selectedBook.title}</span>
+              <>
+                <SelectedBookContainer>
+                  <SelectedBookCover>
+                    <img src={selectedBook.cover} alt={selectedBook.title} />
+                  </SelectedBookCover>
+                  <SelectedBookInfo>
+                    <SelectedBookTitle>{selectedBook.title}</SelectedBookTitle>
+                    <SelectedBookAuthor>{selectedBook.author} 저</SelectedBookAuthor>
+                  </SelectedBookInfo>
+                </SelectedBookContainer>
+                <ChangeButton onClick={handleChangeBook}>변경</ChangeButton>
+              </>
             ) : (
-              <span style={{ color: semanticColors.text.secondary }}>검색해서 찾기</span>
+              <>
+                <SearchIcon>
+                  <img src={searchIcon} alt="검색" />
+                </SearchIcon>
+                <span style={{ color: semanticColors.text.secondary }}>검색해서 찾기</span>
+              </>
             )}
           </SearchBox>
         </Section>
