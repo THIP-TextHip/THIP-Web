@@ -91,6 +91,8 @@ const CreateGroup = () => {
           onRoomDescriptionChange={setRoomDescription}
         />
 
+        <Section showDivider />
+
         <ActivityPeriodSection startDate={startDate} endDate={endDate} />
 
         <MemberLimitSection memberLimit={memberLimit} />

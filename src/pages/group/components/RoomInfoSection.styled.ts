@@ -3,9 +3,9 @@ import { typography, semanticColors } from '../../../styles/global/global';
 
 export const TextAreaBox = styled.div`
   position: relative;
-  background-color: ${semanticColors.background.cardDark};
-  border-radius: 12px;
-  padding: 12px 16px;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
 `;
 
 export const TextArea = styled.textarea`
@@ -17,17 +17,19 @@ export const TextArea = styled.textarea`
   width: 100%;
   resize: none;
   font-family: ${typography.fontFamily.primary};
+  font-weight: ${typography.fontWeight.regular};
+  padding: 0;
+  margin: 0;
 
   &::placeholder {
-    color: ${semanticColors.text.ghost};
-    font-size: ${typography.fontSize.base};
+    color: ${semanticColors.text.primary};
+    font-size: ${typography.fontSize.sm};
   }
 `;
 
 export const CharacterCount = styled.div`
-  position: absolute;
-  bottom: 12px;
-  right: 16px;
-  color: ${semanticColors.text.ghost};
+  color: ${semanticColors.text.point.green};
   font-size: ${typography.fontSize.xs};
+  text-align: right;
+  margin-top: 8px;
 `;
