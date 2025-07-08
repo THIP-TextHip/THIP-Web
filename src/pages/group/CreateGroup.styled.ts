@@ -35,7 +35,7 @@ export const SearchBox = styled.div<{ hasSelectedBook?: boolean }>`
   background-color: ${semanticColors.background.primary};
   border: ${({ hasSelectedBook }) => (hasSelectedBook ? 'none' : `1px solid ${colors.grey[300]}`)};
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: ${({ hasSelectedBook }) => (hasSelectedBook ? '0' : '12px 16px')};
   gap: 16px;
   cursor: ${({ hasSelectedBook }) => (hasSelectedBook ? 'default' : 'pointer')};
   transition: background-color 0.2s;
@@ -119,13 +119,13 @@ export const GenreButtonGroup = styled.div`
 
 export const GenreButton = styled.button<{ active: boolean }>`
   background-color: ${({ active }) =>
-    active ? semanticColors.background.card : semanticColors.background.cardDark};
+    active ? semanticColors.button.fill.primary : colors.grey[400]};
   border: none;
   border-radius: 20px;
-  padding: 8px 16px;
-  color: ${({ active }) => (active ? semanticColors.text.primary : semanticColors.text.ghost)};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.medium};
+  padding: 8px 12px;
+  color: ${semanticColors.text.primary};
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.regular};
   cursor: pointer;
   transition: all 0.2s;
 `;

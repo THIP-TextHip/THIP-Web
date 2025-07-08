@@ -135,11 +135,16 @@ const CreateGroup = () => {
               color: semanticColors.text.point.green,
               fontSize: typography.fontSize.xs,
               marginTop: '12px',
+              textAlign: 'right',
             }}
           >
-            책을 가장 잘 설명하는 장르를 하나 골라주세요.
+            {selectedGenre
+              ? '1개만 선택 가능합니다.'
+              : '책을 가장 잘 설명하는 장르를 하나 골라주세요.'}
           </div>
         </Section>
+
+        <Section showDivider></Section>
 
         <Section>
           <SectionTitle>방 제목</SectionTitle>
