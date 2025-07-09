@@ -15,31 +15,32 @@ const NavWrapper = styled.div`
   left: 0;
   right: 0;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto;
+
   min-width: 320px;
   max-width: 767px;
   height: 75px;
-  margin: 0 auto;
-
-  border-radius: 12px 12px 0px 0px;
-  border-top: 1px solid #888;
-  border-right: 1px solid #888;
-  border-left: 1px solid #888;
-  background: #121212;
   padding: 16px 32px;
-  justify-content: space-between;
-  align-items: center;
+
+  border-top: 1px solid var(--color-grey-300);
+  border-left: 1px solid var(--color-grey-300);
+  border-right: 1px solid var(--color-grey-300);
+  border-radius: 12px 12px 0px 0px;
+  background-color: var(--color-black-main);
 `;
 
 const NavItem = styled.div<{ active?: boolean }>`
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: 5px;
-  color: ${({ active }) => (active ? '#6868FF' : '#888')};
-  font-size: 12px;
   cursor: pointer;
+  font-size: 12px;
+  color: ${({ active }) => (active ? 'var(--color-purple-main)' : 'var(--color-grey-300)')};
 
   svg {
     display: flex;
