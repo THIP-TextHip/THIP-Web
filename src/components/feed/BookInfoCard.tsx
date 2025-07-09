@@ -8,8 +8,9 @@ const BookContainer = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  border-radius: var(--number-radius-button, 12px);
-  background: var(--color-button-color_fill-button_fill_tertiary01_darkgrey, #3d3d3d);
+  border-radius: 12px;
+  background: var(--color-darkgrey-main);
+  cursor: pointer;
 
   .left {
     overflow: hidden;
@@ -17,9 +18,9 @@ const BookContainer = styled.div`
     white-space: nowrap;
     color: var(--color-white);
     text-overflow: ellipsis;
-    font-size: var(--string-size-medium02, 16px);
-    font-weight: var(--string-weight-semibold, 600);
-    line-height: var(--string-lineheight-height24, 24px);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    line-height: 24px;
   }
 
   .right {
@@ -27,23 +28,19 @@ const BookContainer = styled.div`
     flex-direction: row;
     gap: 4px;
     overflow: hidden;
-    color: var(--color-text-secondary_grey00, #dadada);
+    color: var(--color-grey-100);
     text-align: right;
     text-overflow: ellipsis;
-    font-size: var(--string-size-small03, 12px);
+    font-size: var(--font-size-xs);
     font-style: normal;
-    font-weight: var(--string-weight-regular, 400);
-    line-height: var(--string-lineheight-height24, 24px);
+    font-weight: var(--font-weight-regular);
+    line-height: 24px;
 
     .name {
       max-width: 100px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      color: var(--color-text-secondary_grey00, #dadada);
-      font-size: var(--string-size-small03, 12px);
-      font-weight: var(--string-weight-regular, 400);
-      line-height: var(--string-lineheight-height24, 24px);
     }
   }
 `;

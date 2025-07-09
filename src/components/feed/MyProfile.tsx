@@ -1,6 +1,27 @@
 import styled from '@emotion/styled';
-import people from '../../assets/feed/people.svg';
-import rightArrow from '../../assets/feed/rightArrow.svg';
+import MyFollower from './MyFollower';
+
+const MyProfile = () => {
+  return (
+    <Container>
+      <UserProfile>
+        <div className="userInfo">
+          <img src="https://placehold.co/54x54" />
+          <div className="user">
+            <div className="username">userName</div>
+            <div className="usertitle">userTitle</div>
+          </div>
+        </div>
+        {/* <div className="followbutton">구독</div> */}
+      </UserProfile>
+      <MyFollower />
+      <TotalBar>
+        <div className="total">전체</div>
+        <div className="count">4</div>
+      </TotalBar>
+    </Container>
+  );
+};
 
 const Container = styled.div`
   display: flex;
@@ -12,157 +33,78 @@ const Container = styled.div`
   padding: 0 20px;
   padding-top: 32px;
   margin: 0 auto;
+`;
 
-  .userProfile {
+const UserProfile = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  .userInfo {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
+    gap: 4px;
 
-    .userInfo {
+    img {
+      width: 54px;
+      height: 54px;
+      border-radius: 54px;
+      border: 0.5px solid var(--color-white);
+    }
+
+    .user {
       display: flex;
-      flex-direction: row;
-      align-items: center;
+      flex-direction: column;
       gap: 4px;
 
-      img {
-        width: 54px;
-        height: 54px;
-        border-radius: 54px;
-        border: 0.5px solid var(--color-white);
+      .username {
+        color: var(--color-white);
+        font-size: var(--string-size-large01, 18px);
+        font-weight: var(--string-weight-semibold, 600);
+        line-height: 24px;
+        letter-spacing: 0.018px;
       }
 
-      .user {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-
-        .username {
-          color: var(--color-white);
-          font-size: var(--string-size-large01, 18px);
-          font-weight: var(--string-weight-semibold, 600);
-          line-height: 24px;
-          letter-spacing: 0.018px;
-        }
-
-        .usertitle {
-          color: var(--color-text-literature_mint, #a0f8e8);
-          font-size: var(--string-size-medium01, 14px);
-          font-weight: var(--string-weight-regular, 400);
-          line-height: 20px;
-        }
-      }
-    }
-
-    .followbutton {
-      padding: 8px 12px;
-      border-radius: 20px;
-      border: 1px solid #888;
-
-      color: var(--color-text-secondary_grey00, #dadada);
-      font-size: var(--string-size-medium01, 14px);
-      font-weight: var(--string-weight-medium, 500);
-      line-height: normal;
-    }
-  }
-
-  .myFollower {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 0 40px 0;
-
-    .left {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 2px;
-
-      .textContainer {
-        display: flex;
-        flex-direction: row;
-        gap: 2px;
-
-        .followerNum {
-          color: var(--color-white);
-          font-size: var(--font-size-xs);
-          font-weight: var(--string-weight-semibold, 600);
-          line-height: normal;
-        }
-
-        .disc {
-          color: var(--color-grey-100);
-          font-size: var(--font-size-xs);
-          font-weight: var(--font-weight-semibold);
-          line-height: normal;
-          letter-spacing: 0.012px;
-        }
-      }
-    }
-
-    .right {
-      img {
-        width: 24px;
-        height: 24px;
-        border-radius: 24px;
-        border: 0.5px solid var(--color-grey-300);
+      .usertitle {
+        color: var(--color-text-literature_mint, #a0f8e8);
+        font-size: var(--string-size-medium01, 14px);
+        font-weight: var(--string-weight-regular, 400);
+        line-height: 20px;
       }
     }
   }
 
-  .totalBar {
-    display: flex;
-    flex-direction: row;
-    padding-bottom: 4px;
-    border-bottom: 1px solid #282828;
-    gap: 2px;
-    color: var(--color-grey-100);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    line-height: 24px;
+  .followbutton {
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #888;
 
-    .total {
-    }
-
-    .count {
-      text-align: right;
-    }
+    color: var(--color-text-secondary_grey00, #dadada);
+    font-size: var(--string-size-medium01, 14px);
+    font-weight: var(--string-weight-medium, 500);
+    line-height: normal;
   }
 `;
 
-const MyProfile = () => {
-  return (
-    <Container>
-      <div className="userProfile">
-        <div className="userInfo">
-          <img src="https://placehold.co/54x54" />
-          <div className="user">
-            <div className="username">userName</div>
-            <div className="usertitle">userTitle</div>
-          </div>
-        </div>
-        {/* <div className="followbutton">구독</div> */}
-      </div>
-      <div className="myFollower">
-        <div className="left">
-          <img src={people} />
-          <div className="textContainer">
-            <div className="followerNum">22명</div>
-            <div className="disc">이 구독중</div>
-          </div>
-        </div>
-        <div className="right">
-          <img />
-          <img src={rightArrow} />
-        </div>
-      </div>
-      <div className="totalBar">
-        <div className="total">전체</div>
-        <div className="count">4</div>
-      </div>
-    </Container>
-  );
-};
+const TotalBar = styled.div`
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #282828;
+  gap: 2px;
+  color: var(--color-grey-100);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 24px;
+
+  .total {
+  }
+
+  .count {
+    text-align: right;
+  }
+`;
 
 export default MyProfile;

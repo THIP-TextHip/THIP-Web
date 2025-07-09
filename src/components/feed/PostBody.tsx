@@ -7,6 +7,7 @@ const Container = styled.div`
   flex-direction: column;
   width: 100%;
   gap: 16px;
+  cursor: pointer;
 `;
 
 const PostContent = styled.div<{ hasImage: boolean }>`

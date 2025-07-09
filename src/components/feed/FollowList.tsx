@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import people from '../../assets/feed/people.svg';
+import character from '../../assets/feed/character.svg';
 
 const followerData = {
   followers: [
@@ -17,6 +18,39 @@ const followerData = {
     { src: 'https://placehold.co/36x36', username: 'user11' },
     { src: 'https://placehold.co/36x36', username: 'user12' },
   ],
+};
+
+const FollowList = () => {
+  const { followers } = followerData;
+  const hasFollowers = followers.length > 0;
+  const visible = hasFollowers ? followers.slice(0, 10) : [];
+
+  return (
+    <Container>
+      <div className="title">
+        <img src={people} />
+        <div>내 구독</div>
+      </div>
+      {hasFollowers ? (
+        <FollowContainer>
+          <div className="followerList">
+            {visible.map(({ src, username }) => (
+              <div className="followers" key={username}>
+                <img src={src} />
+                <div className="username">{username}</div>
+              </div>
+            ))}
+          </div>
+          <img src={rightArrow} alt="더보기" />
+        </FollowContainer>
+      ) : (
+        <EmptyFollowerContainer>
+          <div>관심있는 독서메이트를 찾아보세요!</div>
+          <img src={character} alt="더보기" />
+        </EmptyFollowerContainer>
+      )}
+    </Container>
+  );
 };
 
 const Container = styled.div`
@@ -39,99 +73,70 @@ const Container = styled.div`
     font-weight: var(--font-weight-medium);
     line-height: 20px;
   }
+`;
 
-  .followContainer {
+const FollowContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  img {
+    cursor: pointer;
+  }
+
+  .followerList {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 12px;
 
-    &.empty {
+    .followers {
       display: flex;
-      flex-direction: row;
-      height: 58px;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      color: #ffffff;
-    }
+      gap: 2px;
+      cursor: pointer;
 
-    .followerList {
-      display: flex;
-      flex-direction: row;
-      overflow-x: auto;
-      overflow-y: hidden;
-      gap: 12px;
+      .username {
+        width: 36px;
+        overflow: hidden;
+        color: #fff;
+        text-overflow: ellipsis;
+        text-align: center;
+        white-space: nowrap;
+        font-size: var(--string-size-small02, 11px);
+        font-weight: var(--string-weight-regular, 400);
+        line-height: 20px;
+      }
 
-      .followers {
+      img {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-        cursor: pointer;
-
-        .username {
-          width: 36px;
-          overflow: hidden;
-          color: #fff;
-          text-overflow: ellipsis;
-          text-align: center;
-          white-space: nowrap;
-          font-size: var(--string-size-small02, 11px);
-          font-weight: var(--string-weight-regular, 400);
-          line-height: 20px;
-        }
-
-        img {
-          display: flex;
-          width: 36px;
-          height: 36px;
-          flex-shrink: 0;
-          border-radius: 36px;
-          border: 0.5px solid #888;
-          cursor: pointer;
-        }
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+        border-radius: 36px;
+        border: 0.5px solid #888;
       }
     }
   }
 `;
 
-const FollowList = () => {
-  const { followers } = followerData;
-  const hasFollowers = followers.length > 0;
-  const visible = hasFollowers ? followers.slice(0, 10) : [];
+const EmptyFollowerContainer = styled.div`
+  display: flex;
+  width: 100%;
+  padding: 0 12px;
+  margin: 12px 0;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+  background-color: var(--color-darkgrey-dark);
 
-  return (
-    <Container>
-      <div className="title">
-        <img src={people} />
-        <div>내 구독</div>
-      </div>
-      <div className={`followContainer ${hasFollowers ? '' : 'empty'}`}>
-        {hasFollowers ? (
-          <>
-            <div className="followerList">
-              {visible.map(({ src, username }) => (
-                <div className="followers" key={username}>
-                  <img src={src} />
-                  <div className="username">{username}</div>
-                </div>
-              ))}
-            </div>
-            <img src={rightArrow} alt="더보기" />
-          </>
-        ) : (
-          <>
-            <div>
-              아직 구독한 독서메이트가 없어요.
-              <br />
-              마음에드는 런닝메이트를 구독해보세요!
-            </div>
-            <img src={rightArrow} alt="더보기" />
-          </>
-        )}
-      </div>
-    </Container>
-  );
-};
+  color: var(--color-grey-100);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+`;
 
 export default FollowList;
