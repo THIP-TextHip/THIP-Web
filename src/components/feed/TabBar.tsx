@@ -24,6 +24,7 @@ const TabButton = styled.div`
   text-align: center;
   padding: 8px 4px;
   font-size: var(--font-size-lg);
+  cursor: pointer;
 
   &.active {
     color: var(--color-white);
@@ -40,25 +41,23 @@ const TabButton = styled.div`
 `;
 
 interface TabProps {
-  activeTab: '피드' | '내 피드';
-  onTabClick: (tab: '피드' | '내 피드') => void;
+  tabs: string[];
+  activeTab: string;
+  onTabClick: (tab: string) => void;
 }
 
-const TabBar = ({ activeTab, onTabClick }: TabProps) => {
+const TabBar = ({ tabs, activeTab, onTabClick }: TabProps) => {
   return (
     <Container>
-      <TabButton
-        className={activeTab === '피드' ? 'active' : 'inactive'}
-        onClick={() => onTabClick('피드')}
-      >
-        피드
-      </TabButton>
-      <TabButton
-        className={activeTab === '내 피드' ? 'active' : 'inactive'}
-        onClick={() => onTabClick('내 피드')}
-      >
-        내 피드
-      </TabButton>
+      {tabs.map(tab => (
+        <TabButton
+          key={tab}
+          className={activeTab === tab ? 'active' : 'inactive'}
+          onClick={() => onTabClick(tab)}
+        >
+          {tab}
+        </TabButton>
+      ))}
     </Container>
   );
 };

@@ -44,8 +44,10 @@ const mockPosts: PostData[] = [
   // …다른 포스트들…
 ];
 
+const tabs = ['피드', '내 피드'];
+
 const Feed = () => {
-  const [activeTab, setActiveTab] = useState<'피드' | '내 피드'>('피드');
+  const [activeTab, setActiveTab] = useState(tabs[0]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -54,7 +56,7 @@ const Feed = () => {
   return (
     <Container>
       {/* MainHeader.tsx */}
-      <TabBar activeTab={activeTab} onTabClick={setActiveTab} />
+      <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {activeTab === '피드' ? (
         <TotalFeed showHeader={true} posts={mockPosts} />
       ) : (
