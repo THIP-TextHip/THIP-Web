@@ -43,7 +43,7 @@ interface PostFooterProps {
   commentCount: number;
   postId: string;
   isMyFeed: boolean;
-  isPublic: boolean;
+  isPublic?: boolean;
 }
 
 const PostFooter = ({

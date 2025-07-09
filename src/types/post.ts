@@ -12,7 +12,7 @@ export interface PostData {
   commentCount: number;
   images?: string[];
   tags?: string[];
-  isPublic: boolean;
+  isPublic?: boolean;
 }
 
 export interface FeedListProps {
