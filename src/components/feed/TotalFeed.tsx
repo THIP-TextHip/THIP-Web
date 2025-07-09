@@ -9,12 +9,12 @@ const Container = styled.div`
   background-color: var(--color-black-main);
 `;
 
-const TotalFeed = ({ showHeader, posts = [] }: FeedListProps) => {
+const TotalFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
   return (
     <Container>
       <FollowList />
       {posts.map(post => (
-        <FeedPost key={post.postId} {...post} showHeader={showHeader} />
+        <FeedPost key={post.postId} showHeader={showHeader} isMyFeed={isMyFeed} {...post} />
       ))}
     </Container>
   );

@@ -26,6 +26,7 @@ const mockPosts: PostData[] = [
     initialLikeCount: 125,
     commentCount: 125,
     images: ['https://placehold.co/100x100', 'https://placehold.co/100x100'],
+    isPublic: true,
   },
   {
     profileImgUrl: 'https://placehold.co/24x24',
@@ -40,6 +41,7 @@ const mockPosts: PostData[] = [
     postId: '56',
     initialLikeCount: 125,
     commentCount: 125,
+    isPublic: false,
   },
   // …다른 포스트들…
 ];
@@ -58,9 +60,9 @@ const Feed = () => {
       {/* MainHeader.tsx */}
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {activeTab === '피드' ? (
-        <TotalFeed showHeader={true} posts={mockPosts} />
+        <TotalFeed showHeader={true} posts={mockPosts} isMyFeed={false} />
       ) : (
-        <MyFeed showHeader={false} posts={mockPosts} />
+        <MyFeed showHeader={false} posts={mockPosts} isMyFeed={true} />
       )}
       <NavBar />
     </Container>

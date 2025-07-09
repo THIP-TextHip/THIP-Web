@@ -9,12 +9,12 @@ const Container = styled.div`
   background-color: var(--color-black-main);
 `;
 
-const MyFeed = ({ showHeader, posts = [] }: FeedListProps) => {
+const MyFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
   return (
     <Container>
       <MyProfile />
       {posts.map(post => (
-        <FeedPost key={post.postId} showHeader={showHeader} {...post} />
+        <FeedPost key={post.postId} showHeader={showHeader} isMyFeed={isMyFeed} {...post} />
       ))}
     </Container>
   );

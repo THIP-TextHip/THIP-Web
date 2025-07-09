@@ -22,13 +22,13 @@ const BorderBottom = styled.div`
   background-color: var(--color-darkgrey-dark);
 `;
 
-const FeedPost = ({ showHeader, ...postData }: FeedPostProps) => {
+const FeedPost = ({ showHeader, isMyFeed, ...postData }: FeedPostProps) => {
   return (
     <>
       <Container>
         {showHeader && <PostHeader {...postData} />}
         <PostBody {...postData} />
-        <PostFooter {...postData} />
+        <PostFooter isMyFeed={isMyFeed} {...postData} />
       </Container>
       <BorderBottom />
       {/* 페이징 처리에서 마지막 게시글인 경우 BorderBottom 안보이게 처리해야함 */}

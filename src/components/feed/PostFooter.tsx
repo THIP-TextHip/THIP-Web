@@ -6,6 +6,7 @@ import activeLike from '../../assets/feed/activeLike.svg';
 import comment from '../../assets/feed/comment.svg';
 import save from '../../assets/feed/save.svg';
 import activeSave from '../../assets/feed/activeSave.svg';
+import lockIcon from '../../assets/feed/lockIcon.svg';
 
 const Container = styled.div`
   width: 100%;
@@ -41,9 +42,17 @@ interface PostFooterProps {
   initialLikeCount: number;
   commentCount: number;
   postId: string;
+  isMyFeed: boolean;
+  isPublic: boolean;
 }
 
-const PostFooter = ({ initialLikeCount, commentCount, postId }: PostFooterProps) => {
+const PostFooter = ({
+  initialLikeCount,
+  commentCount,
+  postId,
+  isMyFeed,
+  isPublic,
+}: PostFooterProps) => {
   const navigate = useNavigate();
 
   const [liked, setLiked] = useState(false);
@@ -75,7 +84,17 @@ const PostFooter = ({ initialLikeCount, commentCount, postId }: PostFooterProps)
           <div>{commentCount}</div>
         </div>
       </div>
-      <img src={saved ? activeSave : save} onClick={handleSave} />
+      <div className="right">
+        {isMyFeed ? (
+          isPublic ? (
+            <div style={{ width: 24, height: 24 }} />
+          ) : (
+            <img src={lockIcon} alt="비공개" />
+          )
+        ) : (
+          <img src={saved ? activeSave : save} onClick={handleSave} alt="저장" />
+        )}
+      </div>
     </Container>
   );
 };
