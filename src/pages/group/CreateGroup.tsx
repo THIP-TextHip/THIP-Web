@@ -23,6 +23,7 @@ const CreateGroup = () => {
   const [endDate, setEndDate] = useState({ year: 2025, month: 1, day: 1 });
   const [memberLimit, setMemberLimit] = useState(1);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [password, setPassword] = useState('');
   const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
 
   const handleBackClick = () => {
@@ -57,6 +58,18 @@ const CreateGroup = () => {
 
   const handlePrivacyToggle = () => {
     setIsPrivate(!isPrivate);
+    // 비공개 설정을 끄면 비밀번호도 초기화
+    if (isPrivate) {
+      setPassword('');
+    }
+  };
+
+  const handlePasswordChange = (newPassword: string) => {
+    setPassword(newPassword);
+  };
+
+  const handlePasswordClose = () => {
+    setPassword('');
   };
 
   const isFormValid = (selectedBook || bookTitle.trim() !== '') && selectedGenre !== '';
@@ -106,7 +119,13 @@ const CreateGroup = () => {
 
         <Section showDivider />
 
-        <PrivacySettingSection isPrivate={isPrivate} onToggle={handlePrivacyToggle} />
+        <PrivacySettingSection
+          isPrivate={isPrivate}
+          password={password}
+          onToggle={handlePrivacyToggle}
+          onPasswordChange={handlePasswordChange}
+          onPasswordClose={handlePasswordClose}
+        />
 
         <BookSearchBottomSheet
           isOpen={isBookSearchOpen}
