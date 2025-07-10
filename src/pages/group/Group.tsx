@@ -9,6 +9,7 @@ import { RecruitingGroupCarousel, type Section } from '@/components/group/Recrui
 import { useState } from 'react';
 import { MyGroupModal } from '@/components/group/MyGroupModal';
 import CompletedGroupModal from '@/components/group/CompletedGroupModal';
+import makegroupfab from '../../assets/common/makegroupfab.svg';
 
 const dummyMyGroups: GroupType[] = [
   {
@@ -133,7 +134,7 @@ const Group = () => {
       <MyGroupBox groups={dummyMyGroups} onMyGroupsClick={openMyGroupModal}></MyGroupBox>
       <Blank height={'10px'} margin={'32px 0'}></Blank>
       <RecruitingGroupCarousel sections={sections} />
-      <NavBar />
+      <NavBar src={makegroupfab} path="/group/create" />
     </Wrapper>
   );
 };
