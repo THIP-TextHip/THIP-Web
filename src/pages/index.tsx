@@ -9,6 +9,7 @@ import Signup from './signup/Signup';
 import SignupGenre from './signup/SignupGenre';
 import SignupNickname from './signup/SignupNickname';
 import SignupDone from './signup/SignupDone';
+import CreateGroup from './group/CreateGroup';
 import Group from './group/Group';
 import Feed from './feed/Feed';
 
@@ -22,6 +23,7 @@ const Router = () => {
           <Route path="genre" element={<SignupGenre />} />
         </Route>
         <Route path="signupdone" element={<SignupDone />} />
+        <Route path="group/create" element={<CreateGroup />} />
         <Route path="group" element={<Group />} />
         <Route path="feed" element={<Feed />} />
       </>,
