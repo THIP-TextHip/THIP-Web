@@ -7,7 +7,7 @@ import GenreSelectionSection from './components/GenreSelectionSection';
 import RoomInfoSection from './components/RoomInfoSection';
 import ActivityPeriodSection from './components/ActivityPeriodSection/ActivityPeriodSection';
 import MemberLimitSection from './components/MemberLimitSection';
-import PrivacySettingSection from './components/PrivacySettingSection';
+import PrivacySettingSection from './components/PrivacySettingSection/PrivacySettingSection';
 import leftarrow from '../../assets/leftArrow.svg';
 import { Container } from './CreateGroup.styled';
 import { Section } from './CommonSection.styled';
