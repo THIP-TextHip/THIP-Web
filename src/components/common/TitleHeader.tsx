@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 
 const HeaderWrapper = styled.div`
-  background-color: var(--colors-black-main);
   position: fixed;
   top: 0;
   left: 0;
@@ -10,6 +9,7 @@ const HeaderWrapper = styled.div`
   max-width: 767px;
   margin: 0 auto;
   padding: 16px 20px;
+  background-color: var(--color-black-main);
 `;
 
 const NextButton = styled.div<{ active: boolean }>`
@@ -17,16 +17,14 @@ const NextButton = styled.div<{ active: boolean }>`
   width: 49px;
   height: 28px;
   padding: 4px 12px;
-  align-items: center;
   border-radius: 20px;
-  background: ${({ active }) => (active ? '#6868FF' : '#888')};
-
-  color: #fefefe;
-  text-align: center;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 600;
+  background-color: ${({ active }) =>
+    active ? 'var(--color-purple-main)' : 'var(--color-grey-300)'};
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   line-height: 20px;
+  text-align: center;
 `;
 
 const InnerHeader = styled.div`
@@ -35,18 +33,17 @@ const InnerHeader = styled.div`
   height: 56px;
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 
   .title {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    color: #fefefe;
-    font-size: 22px;
-    font-style: normal;
-    font-weight: 700;
+    color: var(--color-white);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
   }
 `;
 

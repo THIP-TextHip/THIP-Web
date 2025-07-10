@@ -8,31 +8,29 @@ const ButtonBox = styled.div`
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 129.75px;
+  bottom: 130px;
   align-items: center;
   gap: 20px;
   width: 100%;
   padding: 0 20px;
-  color: #121212;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 600;
+  color: var(--color-black-main);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
   line-height: 24px;
 `;
 
 const SocialButton = styled.div<{ bg: string }>`
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
   padding: 10px 12px;
   border-radius: 12px;
-  background-color: ${({ bg }) => bg};
   gap: 8px;
-
-  color: #121212;
-  font-size: 16px;
-  font-weight: 600;
+  background-color: ${({ bg }) => bg};
+  color: var(--color-black-main);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
   line-height: 24px;
   cursor: pointer;
 `;
