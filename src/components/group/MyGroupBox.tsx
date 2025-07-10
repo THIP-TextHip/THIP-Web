@@ -62,7 +62,7 @@ const Container = styled.div`
 const Header = styled.div`
   display: flex;
   align-items: center;
-  margin: 20px 16px;
+  margin: 20px;
 `;
 
 const Title = styled.h2`

@@ -1,5 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
+import Fab from './Fab';
+import type { FabProps } from '../../types/fab';
 import FeedIcon from '../../assets/navbar/feed.svg';
 import GroupIcon from '../../assets/navbar/group.svg';
 import SearchIcon from '../../assets/navbar/search.svg';
@@ -10,6 +12,10 @@ import SearchIconActive from '../../assets/navbar/search-active.svg';
 import MyIconActive from '../../assets/navbar/my-active.svg';
 
 const NavWrapper = styled.div`
+  position: relative;
+`;
+
+const NavContainer = styled.div`
   position: fixed;
   bottom: 0;
   left: 0;
@@ -66,23 +72,26 @@ const items: RouteItem[] = [
   { path: '/my', label: '내 정보', icon: MyIcon, activeIcon: MyIconActive },
 ];
 
-const NavBar = () => {
+const NavBar = ({ src, path }: FabProps) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
   return (
     <NavWrapper>
-      {items.map(item => {
-        const isActive = pathname === item.path;
-        const src = isActive ? item.activeIcon : item.icon;
+      <NavContainer>
+        {items.map(item => {
+          const isActive = pathname === item.path;
+          const src = isActive ? item.activeIcon : item.icon;
 
-        return (
-          <NavItem key={item.path} active={isActive} onClick={() => navigate(item.path)}>
-            <img src={src} alt={item.label} />
-            <div>{item.label}</div>
-          </NavItem>
-        );
-      })}
+          return (
+            <NavItem key={item.path} active={isActive} onClick={() => navigate(item.path)}>
+              <img src={src} alt={item.label} />
+              <div>{item.label}</div>
+            </NavItem>
+          );
+        })}
+        <Fab src={src} path={path} />
+      </NavContainer>
     </NavWrapper>
   );
 };
