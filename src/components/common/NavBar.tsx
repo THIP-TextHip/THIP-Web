@@ -81,11 +81,11 @@ const NavBar = ({ src, path }: FabProps) => {
       <NavContainer>
         {items.map(item => {
           const isActive = pathname === item.path;
-          const src = isActive ? item.activeIcon : item.icon;
+          const iconSrc = isActive ? item.activeIcon : item.icon;
 
           return (
             <NavItem key={item.path} active={isActive} onClick={() => navigate(item.path)}>
-              <img src={src} alt={item.label} />
+              <img src={iconSrc} alt={item.label} />
               <div>{item.label}</div>
             </NavItem>
           );

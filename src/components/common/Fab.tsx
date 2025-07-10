@@ -21,7 +21,7 @@ const Fab = ({ src, path }: FabProps) => {
   };
   return (
     <Button onClick={handleClick}>
-      <img src={src} />
+      <img src={src} alt="FAB" />
     </Button>
   );
 };
