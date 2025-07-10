@@ -2,19 +2,7 @@ import styled from '@emotion/styled';
 import logo from '../../assets/login/logo.svg';
 import KaKao from '../../assets/login/kakao.svg';
 import Google from '../../assets/login/google.svg';
-
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 0 auto;
-  min-width: 320px;
-  max-width: 767px;
-  height: 100vh;
-  background-color: var(--color-black-main);
-`;
+import { Wrapper } from '@/components/common/Wrapper';
 
 const ButtonBox = styled.div`
   display: flex;
