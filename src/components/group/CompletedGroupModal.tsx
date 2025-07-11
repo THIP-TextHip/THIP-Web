@@ -3,7 +3,7 @@ import leftArrow from '../../assets/common/leftArrow.svg';
 import type { Group } from './MyGroupBox';
 import { GroupCard } from './GroupCard';
 import TitleHeader from '../common/TitleHeader';
-import { Modal, Overlay } from './modal.styles';
+import { Modal, Overlay } from './Modal.styles';
 
 interface CompletedGroupModalProps {
   onClose: () => void;

@@ -1,15 +1,18 @@
 import styled from '@emotion/styled';
 import searchIcon from '../../assets/searchBar/search.svg';
 import { IconButton } from './IconButton';
+import deleteIcon from '../../assets/searchBar/delete.svg';
 
 interface SearchBarProps {
   placeholder: string;
+  onClick?: () => void;
 }
 
-const SearchBar = ({ placeholder }: SearchBarProps) => {
+const SearchBar = ({ placeholder, onClick }: SearchBarProps) => {
   return (
-    <SearchBarWrapper>
+    <SearchBarWrapper onClick={onClick}>
       <Input placeholder={placeholder} />
+      <IconButton src={deleteIcon} alt="삭제" />
       <IconButton src={searchIcon} alt="검색" />
     </SearchBarWrapper>
   );

@@ -1,3 +1,4 @@
+import { colors } from '@/styles/global/global';
 import styled from '@emotion/styled';
 
 export const Overlay = styled.div`
@@ -9,14 +10,14 @@ export const Overlay = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 1);
+  background: ${colors.black.main};
   z-index: 110;
 `;
 
 export const Modal = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: var(--color-main-black);
+  background: ${colors.black.main};
   width: 100%;
   max-width: 767px;
   height: 100vh;

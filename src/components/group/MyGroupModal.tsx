@@ -4,7 +4,7 @@ import TitleHeader from '../common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import type { Group } from './MyGroupBox';
 import { GroupCard } from './GroupCard';
-import { Modal, Overlay } from './modal.styles';
+import { Modal, Overlay } from './Modal.styles';
 
 interface MyGroupModalProps {
   onClose: () => void;
