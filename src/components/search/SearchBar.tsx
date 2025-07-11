@@ -6,8 +6,8 @@ import { IconButton } from '../common/IconButton';
 
 interface SearchBarProps {
   placeholder?: string;
-  value: string;
-  onChange: (v: string) => void;
+  value?: string;
+  onChange?: (v: string) => void;
   onClick?: () => void;
   onSearch?: () => void;
 }
@@ -18,7 +18,7 @@ const SearchBar = ({ placeholder, value, onChange, onClick, onSearch }: SearchBa
       <Input
         placeholder={placeholder}
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={e => onChange?.(e.target.value)}
         onKeyDown={e => {
           if (e.key === 'Enter') {
             onSearch?.();
@@ -26,7 +26,7 @@ const SearchBar = ({ placeholder, value, onChange, onClick, onSearch }: SearchBa
         }}
       />
       <IconButtonContainer>
-        {value && <IconButton src={deleteIcon} alt="입력 지우기" onClick={() => onChange('')} />}
+        {value && <IconButton src={deleteIcon} alt="입력 지우기" onClick={() => onChange?.('')} />}
         <IconButton src={searchIcon} alt="검색" onClick={() => onSearch?.()} />
       </IconButtonContainer>
     </SearchBarWrapper>

@@ -47,7 +47,7 @@ const GroupSearch = () => {
           onSearch={() => {
             if (searchTerm.trim()) handleSearch(searchTerm.trim());
           }}
-        />{' '}
+        />
         <RecentSearchTabs
           recentSearches={recentSearches}
           handleDelete={handleDelete}

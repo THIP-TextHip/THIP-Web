@@ -13,12 +13,16 @@ const RecentSearchTabs = ({ recentSearches, handleDelete }: RecentSearchTabsProp
     <Container>
       <Title>최근 검색어</Title>
       <TabContainer>
-        {recentSearches.map(recentSearch => (
-          <Tab key={recentSearch}>
-            <Text>{recentSearch}</Text>
-            <IconButton src={tabDeleteIcon} onClick={() => handleDelete(recentSearch)} />
-          </Tab>
-        ))}
+        {recentSearches.length === 0 ? (
+          <Text>최근 검색어가 아직 없어요.</Text>
+        ) : (
+          recentSearches.map(recentSearch => (
+            <Tab key={recentSearch}>
+              <Text>{recentSearch}</Text>
+              <IconButton src={tabDeleteIcon} onClick={() => handleDelete(recentSearch)} />
+            </Tab>
+          ))
+        )}
       </TabContainer>
     </Container>
   );
