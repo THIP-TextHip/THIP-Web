@@ -1,6 +1,6 @@
 import MainHeader from '@/components/common/MainHeader';
 import NavBar from '@/components/common/NavBar';
-import SearchBar from '@/components/common/SearchBar';
+import SearchBar from '@/components/search/SearchBar';
 import type { Group as GroupType } from '@/components/group/MyGroupBox';
 import { MyGroupBox } from '../../components/group/MyGroupBox';
 import Blank from '@/components/common/Blank';
