@@ -29,6 +29,10 @@ const GroupSearch = () => {
     setRecentSearches(prev => prev.filter(t => t !== recentSearch));
   };
 
+  const handleRecentSearchClick = (recentSearch: string) => {
+    setSearchTerm(recentSearch);
+  };
+
   const handleBackButton = () => {
     navigate('/group');
   };
@@ -51,6 +55,7 @@ const GroupSearch = () => {
         <RecentSearchTabs
           recentSearches={recentSearches}
           handleDelete={handleDelete}
+          handleRecentSearchClick={handleRecentSearchClick}
         ></RecentSearchTabs>
       </Modal>
     </Overlay>

@@ -64,7 +64,7 @@ const Input = styled.input`
   background: transparent;
   color: #ffffff;
   font-size: 14px;
-  padding: 8px 12px;
+  padding: 8px 0;
   box-sizing: border-box;
 
   &::placeholder {

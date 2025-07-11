@@ -6,9 +6,14 @@ import { IconButton } from '../common/IconButton';
 interface RecentSearchTabsProps {
   recentSearches: string[];
   handleDelete: (term: string) => void;
+  handleRecentSearchClick: (term: string) => void;
 }
 
-const RecentSearchTabs = ({ recentSearches, handleDelete }: RecentSearchTabsProps) => {
+const RecentSearchTabs = ({
+  recentSearches,
+  handleDelete,
+  handleRecentSearchClick,
+}: RecentSearchTabsProps) => {
   return (
     <Container>
       <Title>최근 검색어</Title>
@@ -18,7 +23,7 @@ const RecentSearchTabs = ({ recentSearches, handleDelete }: RecentSearchTabsProp
         ) : (
           recentSearches.map(recentSearch => (
             <Tab key={recentSearch}>
-              <Text>{recentSearch}</Text>
+              <Text onClick={() => handleRecentSearchClick(recentSearch)}>{recentSearch}</Text>
               <IconButton src={tabDeleteIcon} onClick={() => handleDelete(recentSearch)} />
             </Tab>
           ))
