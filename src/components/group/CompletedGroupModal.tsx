@@ -3,6 +3,7 @@ import leftArrow from '../../assets/common/leftArrow.svg';
 import type { Group } from './MyGroupBox';
 import { GroupCard } from './GroupCard';
 import TitleHeader from '../common/TitleHeader';
+import { Modal, Overlay } from './modal.styles';
 
 interface CompletedGroupModalProps {
   onClose: () => void;
@@ -100,28 +101,6 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
 };
 
 export default CompletedGroupModal;
-
-const Overlay = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 1);
-  z-index: 110;
-`;
-
-const Modal = styled.div`
-  display: flex;
-  flex-direction: column;
-  background-color: var(--color-main-black);
-  width: 100%;
-  max-width: 767px;
-  height: 100vh;
-`;
 
 const Text = styled.p`
   font-size: var(--font-size-medium01);

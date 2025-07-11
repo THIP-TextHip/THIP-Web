@@ -4,6 +4,7 @@ import TitleHeader from '../common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import type { Group } from './MyGroupBox';
 import { GroupCard } from './GroupCard';
+import { Modal, Overlay } from './modal.styles';
 
 interface MyGroupModalProps {
   onClose: () => void;
@@ -124,28 +125,6 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     </Overlay>
   );
 };
-
-const Overlay = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 1);
-  z-index: 110;
-`;
-
-const Modal = styled.div`
-  display: flex;
-  flex-direction: column;
-  background-color: var(--color-main-black);
-  width: 100%;
-  max-width: 767px;
-  height: 100vh;
-`;
 
 const TabContainer = styled.div`
   display: flex;
