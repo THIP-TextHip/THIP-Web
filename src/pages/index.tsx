@@ -12,6 +12,7 @@ import SignupDone from './signup/SignupDone';
 import CreateGroup from './group/CreateGroup';
 import Group from './group/Group';
 import Feed from './feed/Feed';
+import FollowerListPage from './feed/FollowerListPage';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -26,6 +27,8 @@ const Router = () => {
         <Route path="group/create" element={<CreateGroup />} />
         <Route path="group" element={<Group />} />
         <Route path="feed" element={<Feed />} />
+        <Route path="feed/followerlist" element={<FollowerListPage />} />
+        <Route path="feed/followlist" element={<FollowerListPage />} />
       </>,
     ),
   );
