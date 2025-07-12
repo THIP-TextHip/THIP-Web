@@ -1,15 +1,26 @@
 import styled from '@emotion/styled';
 import MyFollower from './MyFollower';
 
+const mockProfile = {
+  profileImgUrl: 'https://placehold.co/54x54',
+  userName: '문학하는 고래',
+  userTitle: '문학가',
+  titleColor: '#a1d5ff',
+};
+
 const MyProfile = () => {
+  const { profileImgUrl, userName, userTitle, titleColor } = mockProfile;
+
   return (
     <Container>
       <UserProfile>
         <div className="userInfo">
-          <img src="https://placehold.co/54x54" />
+          <img src={profileImgUrl} />
           <div className="user">
-            <div className="username">userName</div>
-            <div className="usertitle">userTitle</div>
+            <div className="username">{userName}</div>
+            <div className="usertitle" style={{ color: titleColor }}>
+              {userTitle}
+            </div>
           </div>
         </div>
         {/* <div className="followbutton">구독</div> */}
@@ -18,6 +29,7 @@ const MyProfile = () => {
       <TotalBar>
         <div className="total">전체</div>
         <div className="count">4</div>
+        {/* 피드 글 개수에 맞춰서 count 세야할듯 */}
       </TotalBar>
     </Container>
   );
@@ -61,17 +73,16 @@ const UserProfile = styled.div`
 
       .username {
         color: var(--color-white);
-        font-size: var(--string-size-large01, 18px);
-        font-weight: var(--string-weight-semibold, 600);
-        line-height: 24px;
-        letter-spacing: 0.018px;
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-medium);
+        line-height: normal;
       }
 
       .usertitle {
-        color: var(--color-text-literature_mint, #a0f8e8);
-        font-size: var(--string-size-medium01, 14px);
+        color: var(--color-text-humanities_skyblue, #a1d5ff);
+        font-size: var(--font-size-xs);
         font-weight: var(--string-weight-regular, 400);
-        line-height: 20px;
+        line-height: normal;
       }
     }
   }

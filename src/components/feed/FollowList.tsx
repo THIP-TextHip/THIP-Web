@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { useNavigate } from 'react-router-dom';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import people from '../../assets/feed/people.svg';
 import character from '../../assets/feed/character.svg';
@@ -21,9 +22,18 @@ const followerData = {
 };
 
 const FollowList = () => {
+  const navigate = useNavigate();
   const { followers } = followerData;
   const hasFollowers = followers.length > 0;
   const visible = hasFollowers ? followers.slice(0, 10) : [];
+
+  const handleFindClick = () => {
+    navigate('/feed/usersearch');
+  };
+
+  const handleMoreClick = () => {
+    navigate('/feed/followerlist');
+  };
 
   return (
     <Container>
@@ -41,10 +51,10 @@ const FollowList = () => {
               </div>
             ))}
           </div>
-          <img src={rightArrow} alt="더보기" />
+          <img src={rightArrow} alt="더보기" onClick={handleMoreClick} />
         </FollowContainer>
       ) : (
-        <EmptyFollowerContainer>
+        <EmptyFollowerContainer onClick={handleFindClick}>
           <div>관심있는 독서메이트를 찾아보세요!</div>
           <img src={character} alt="더보기" />
         </EmptyFollowerContainer>
@@ -137,6 +147,7 @@ const EmptyFollowerContainer = styled.div`
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   line-height: 20px;
+  cursor: pointer;
 `;
 
 export default FollowList;
