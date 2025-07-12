@@ -95,6 +95,12 @@ const SearchResult = () => {
     } else setSelected(tab);
   };
 
+  const isEmptyShowGroup = () => {
+    if (showGroup.length === 0) {
+      return true;
+    } else return false;
+  };
+
   return (
     <>
       <TabContainer>
@@ -113,14 +119,21 @@ const SearchResult = () => {
         ></Filter>
       </GroupCardHeader>
       <Content>
-        {showGroup.map(group => (
-          <GroupCard
-            key={group.id}
-            group={group}
-            isOngoing={group.isOnGoing ? true : false}
-            type={'search'}
-          />
-        ))}
+        {isEmptyShowGroup() ? (
+          <EmptyContent>
+            <EmptyMainText>해당하는 모임방이 없어요</EmptyMainText>
+            <EmptySubText>직접 모임방을 만들어보세요.</EmptySubText>
+          </EmptyContent>
+        ) : (
+          showGroup.map(group => (
+            <GroupCard
+              key={group.id}
+              group={group}
+              isOngoing={group.isOnGoing ? true : false}
+              type={'search'}
+            />
+          ))
+        )}
       </Content>
     </>
   );
@@ -170,4 +183,28 @@ const GroupNum = styled.span`
   color: ${colors.grey[100]};
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.medium};
+`;
+
+const EmptyContent = styled.div`
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+`;
+
+const EmptyMainText = styled.p`
+  color: ${colors.white};
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
+  text-align: center;
+  justify-self: center;
+`;
+const EmptySubText = styled.p`
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
+  text-align: center;
+  justify-self: center;
 `;
