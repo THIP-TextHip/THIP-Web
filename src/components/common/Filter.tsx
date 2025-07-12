@@ -76,4 +76,5 @@ const Modal = styled.div`
   left: -20px;
   border: solid 1px ${colors.grey[200]};
   border-radius: 16px;
+  background: ${colors.black.main};
 `;

@@ -5,10 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import SearchBar from '@/components/search/SearchBar';
 import { useState } from 'react';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
+import SearchResult from '@/components/search/SearchResult';
 
 const GroupSearch = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   const [recentSearches, setRecentSearches] = useState<string[]>([
     '딸기12',
@@ -19,6 +21,8 @@ const GroupSearch = () => {
   ]);
 
   const handleSearch = (term: string) => {
+    setIsSearching(true);
+
     setRecentSearches(prev => {
       const filtered = prev.filter(t => t !== term);
       return [term, ...filtered].slice(0, 5);
@@ -52,11 +56,15 @@ const GroupSearch = () => {
             if (searchTerm.trim()) handleSearch(searchTerm.trim());
           }}
         />
-        <RecentSearchTabs
-          recentSearches={recentSearches}
-          handleDelete={handleDelete}
-          handleRecentSearchClick={handleRecentSearchClick}
-        ></RecentSearchTabs>
+        {isSearching ? (
+          <SearchResult></SearchResult>
+        ) : (
+          <RecentSearchTabs
+            recentSearches={recentSearches}
+            handleDelete={handleDelete}
+            handleRecentSearchClick={handleRecentSearchClick}
+          ></RecentSearchTabs>
+        )}
       </Modal>
     </Overlay>
   );
