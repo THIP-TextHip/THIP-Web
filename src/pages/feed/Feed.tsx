@@ -5,7 +5,8 @@ import TabBar from '../../components/feed/TabBar';
 import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import type { PostData } from '../../types/post';
-
+import MainHeader from '@/components/common/MainHeader';
+import writefab from '../../assets/common/writefab.svg';
 const Container = styled.div`
   min-width: 320px;
   max-width: 767px;
@@ -57,14 +58,14 @@ const Feed = () => {
 
   return (
     <Container>
-      {/* MainHeader.tsx */}
+      <MainHeader type="home" />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {activeTab === '피드' ? (
         <TotalFeed showHeader={true} posts={mockPosts} isMyFeed={false} />
       ) : (
         <MyFeed showHeader={false} posts={mockPosts} isMyFeed={true} />
       )}
-      <NavBar />
+      <NavBar src={writefab} path="/" />
     </Container>
   );
 };
