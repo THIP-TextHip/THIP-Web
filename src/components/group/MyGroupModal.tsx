@@ -117,7 +117,8 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
             <GroupCard
               key={group.id}
               group={group}
-              type={group.isOnGoing ? 'ongoing' : 'recruiting'}
+              isOngoing={group.isOnGoing ? true : false}
+              type={'modal'}
             />
           ))}
         </Content>

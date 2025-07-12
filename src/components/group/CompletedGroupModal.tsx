@@ -92,7 +92,7 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
         <Text>{userName}님이 참여했던 모임방들을 확인해보세요.</Text>
         <Content>
           {dummyCompletedGroups.map(group => (
-            <GroupCard key={group.id} group={group}></GroupCard>
+            <GroupCard key={group.id} group={group} type={'modal'}></GroupCard>
           ))}
         </Content>
       </Modal>
