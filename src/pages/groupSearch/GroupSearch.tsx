@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import SearchBar from '@/components/search/SearchBar';
 import { useState } from 'react';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
-import SearchResult from '@/components/search/SearchResult';
+import GroupSearchResult from '@/components/search/GroupSearchResult';
 
 const GroupSearch = () => {
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ const GroupSearch = () => {
           }}
         />
         {isSearching ? (
-          <SearchResult></SearchResult>
+          <GroupSearchResult></GroupSearchResult>
         ) : (
           <RecentSearchTabs
             recentSearches={recentSearches}
