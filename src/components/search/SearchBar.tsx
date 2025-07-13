@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import searchIcon from '../../assets/searchBar/search.svg';
-
 import deleteIcon from '../../assets/searchBar/delete.svg';
 import { IconButton } from '../common/IconButton';
 

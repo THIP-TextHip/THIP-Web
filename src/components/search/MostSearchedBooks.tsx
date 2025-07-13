@@ -48,15 +48,22 @@ export default function MostSearchedBooks() {
         {/* 서버 응답 포맷을 모르기에 우선 하드 코딩 */}
         <DateText>01.12. 기준</DateText>
       </Header>
-      <BookList>
-        {dummyBooks.map((book, index) => (
-          <BookItem key={book.id}>
-            <Rank>{index + 1}.</Rank>
-            <Cover src={book.coverUrl} alt={`${book.title} 커버`} />
-            <BookTitle>{book.title}</BookTitle>
-          </BookItem>
-        ))}
-      </BookList>
+      {dummyBooks.length === 0 ? (
+        <EmptyMessage>
+          <MainText>아직 순위가 집계되지 않았어요.</MainText>
+          <SubText>조금만 기다려주세요!</SubText>
+        </EmptyMessage>
+      ) : (
+        <BookList>
+          {dummyBooks.map((book, index) => (
+            <BookItem key={book.id}>
+              <Rank>{index + 1}.</Rank>
+              <Cover src={book.coverUrl} alt={`${book.title} 커버`} />
+              <BookTitle>{book.title}</BookTitle>
+            </BookItem>
+          ))}
+        </BookList>
+      )}
     </Container>
   );
 }
@@ -121,4 +128,25 @@ const BookTitle = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   margin-left: 8px;
+`;
+
+const EmptyMessage = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+`;
+
+const MainText = styled.div`
+  font-size: ${typography.fontSize.lg};
+  color: ${colors.white};
+  font-weight: ${typography.fontWeight.semibold};
+  margin-bottom: 8px;
+`;
+
+const SubText = styled.div`
+  font-size: ${typography.fontSize.sm};
+  color: ${colors.grey[100]};
+  font-weight: ${typography.fontWeight.regular};
 `;
