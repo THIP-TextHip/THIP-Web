@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import EmptyState from './components/EmptyState';
-import MessageList from './components/MessageList';
+import MessageList from './components/MessageList/MessageList';
 import MessageInput from './components/MessageInput';
 import leftarrow from '../../assets/common/leftArrow.svg';
 import { Container, ContentArea } from './TodayWords.styled';
@@ -37,6 +37,7 @@ const TodayWords = () => {
         .replace(/\. /g, '.')
         .replace('.', ''),
       timeAgo: '방금 전',
+      createdAt: new Date(),
     };
 
     setMessages(prev => [...prev, newMessage]);

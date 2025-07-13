@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { semanticColors, typography } from '../../../styles/global/global';
+import { semanticColors, typography } from '../../../../styles/global/global';
 
 export const MessageList = styled.div`
   display: flex;
