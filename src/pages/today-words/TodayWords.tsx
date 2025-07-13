@@ -26,9 +26,33 @@ const TodayWords = () => {
   const handleSendMessage = () => {
     if (inputValue.trim() === '') return;
 
-    // MessageList의 addMessage 함수 호출
-    if (messageListRef.current) {
-      messageListRef.current.addMessage(inputValue.trim());
+    // 빈 상태에서 메시지를 보낼 때 실제 messages 상태를 업데이트
+    if (!showMessages) {
+      // 새 메시지 생성
+      const now = new Date();
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        user: 'user.01',
+        content: inputValue.trim(),
+        timestamp: now
+          .toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          })
+          .replace(/\. /g, '.')
+          .replace('.', ''),
+        timeAgo: '방금 전',
+        createdAt: now,
+      };
+
+      // 실제 messages 상태에 추가
+      setMessages(prevMessages => [...prevMessages, newMessage]);
+    } else {
+      // MessageList의 addMessage 함수 호출 (더미 데이터 상태일 때)
+      if (messageListRef.current) {
+        messageListRef.current.addMessage(inputValue.trim());
+      }
     }
 
     setInputValue('');
@@ -39,6 +63,7 @@ const TodayWords = () => {
     }, 100);
   };
 
+  // 실제 메시지가 있으면 실제 메시지를, 더미 모드면 더미 메시지를 표시
   const displayMessages = showMessages ? dummyMessages : messages;
 
   return (
@@ -61,7 +86,13 @@ const TodayWords = () => {
 
         {/* 개발용 토글 버튼 */}
         <button
-          onClick={() => setShowMessages(!showMessages)}
+          onClick={() => {
+            setShowMessages(!showMessages);
+            // 더미 모드에서 실제 모드로 전환할 때 메시지 초기화
+            if (showMessages) {
+              setMessages([]);
+            }
+          }}
           style={{
             position: 'fixed',
             top: '200px',
