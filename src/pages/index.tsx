@@ -12,6 +12,7 @@ import SignupDone from './signup/SignupDone';
 import CreateGroup from './group/CreateGroup';
 import Group from './group/Group';
 import Feed from './feed/Feed';
+import GroupSearch from './groupSearch/groupSearch';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -25,6 +26,7 @@ const Router = () => {
         <Route path="signupdone" element={<SignupDone />} />
         <Route path="group/create" element={<CreateGroup />} />
         <Route path="group" element={<Group />} />
+        <Route path="groupsearch" element={<GroupSearch />} />
         <Route path="feed" element={<Feed />} />
       </>,
     ),

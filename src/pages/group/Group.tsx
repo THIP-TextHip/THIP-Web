@@ -1,6 +1,6 @@
 import MainHeader from '@/components/common/MainHeader';
 import NavBar from '@/components/common/NavBar';
-import SearchBar from '@/components/common/SearchBar';
+import SearchBar from '@/components/search/SearchBar';
 import type { Group as GroupType } from '@/components/group/MyGroupBox';
 import { MyGroupBox } from '../../components/group/MyGroupBox';
 import Blank from '@/components/common/Blank';
@@ -9,6 +9,7 @@ import { RecruitingGroupCarousel, type Section } from '@/components/group/Recrui
 import { useState } from 'react';
 import { MyGroupModal } from '@/components/group/MyGroupModal';
 import CompletedGroupModal from '@/components/group/CompletedGroupModal';
+import { useNavigate } from 'react-router-dom';
 import makegroupfab from '../../assets/common/makegroupfab.svg';
 
 const dummyMyGroups: GroupType[] = [
@@ -117,6 +118,7 @@ const sections: Section[] = [
 ];
 
 const Group = () => {
+  const navigate = useNavigate();
   const [isMyGroupModalOpen, setIsMyGroupModalOpen] = useState(false);
   const [isCompletedGroupModalOpen, setIsCompletedGroupModalOpen] = useState(false);
 
@@ -125,12 +127,16 @@ const Group = () => {
 
   const openCompletedGroupModal = () => setIsCompletedGroupModalOpen(true);
   const closeCompletedGroupModal = () => setIsCompletedGroupModalOpen(false);
+
+  const handleSearchBarClick = () => {
+    navigate('/groupSearch');
+  };
   return (
     <Wrapper>
       {isMyGroupModalOpen && <MyGroupModal onClose={closeMyGroupModal} />}
       {isCompletedGroupModalOpen && <CompletedGroupModal onClose={closeCompletedGroupModal} />}
       <MainHeader type="group" leftButtonClick={openCompletedGroupModal} />
-      <SearchBar placeholder="모임방 참여할 사람!" />
+      <SearchBar placeholder="모임방 참여할 사람!" onClick={handleSearchBarClick} />
       <MyGroupBox groups={dummyMyGroups} onMyGroupsClick={openMyGroupModal}></MyGroupBox>
       <Blank height={'10px'} margin={'32px 0'}></Blank>
       <RecruitingGroupCarousel sections={sections} />

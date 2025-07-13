@@ -2,53 +2,60 @@ import { forwardRef } from 'react';
 import styled from '@emotion/styled';
 import peopleIcon from '@/assets/common/darkPeople.svg';
 import type { Group } from './MyGroupBox';
+import { colors, typography } from '@/styles/global/global';
 
 interface Props {
   group: Group;
-  type?: 'recruiting' | 'ongoing';
+  isOngoing?: boolean;
+  type?: 'main' | 'search' | 'modal';
 }
 
-export const GroupCard = forwardRef<HTMLDivElement, Props>(({ group, type }, ref) => {
-  return (
-    <Card ref={ref}>
-      <Cover src={group.coverUrl} alt="cover" />
-      <Info>
-        <Title>{group.title}</Title>
-        <Bottom>
-          <Participant>
-            <img src={peopleIcon} alt="people" />
-            <p>{group.participants}</p>
-            <MaximumParticipants>/ {group.maximumParticipants}명</MaximumParticipants>
-          </Participant>
-          {type === 'recruiting' ? (
-            <RecruitingDeadline>{group.deadLine}일 뒤 모집 마감</RecruitingDeadline>
-          ) : (
-            <OngoingDeadline>{group.deadLine}일 뒤 종료</OngoingDeadline>
-          )}
-        </Bottom>
-      </Info>
-    </Card>
-  );
-});
+export const GroupCard = forwardRef<HTMLDivElement, Props>(
+  ({ group, isOngoing, type = 'main' }, ref) => {
+    return (
+      <Card ref={ref} cardType={type}>
+        <Cover src={group.coverUrl} alt="cover" cardType={type} />
+        <Info>
+          <Title>{group.title}</Title>
+          <Bottom>
+            <Participant>
+              <img src={peopleIcon} alt="people" />
+              <p>{group.participants}</p>
+              <MaximumParticipants>/ {group.maximumParticipants}명</MaximumParticipants>
+            </Participant>
+            {isOngoing === true ? (
+              <RecruitingDeadline>{group.deadLine}일 뒤 모집 마감</RecruitingDeadline>
+            ) : (
+              <OngoingDeadline>{group.deadLine}일 뒤 종료</OngoingDeadline>
+            )}
+          </Bottom>
+        </Info>
+      </Card>
+    );
+  },
+);
 
-const Card = styled.div`
+const Card = styled.div<{ cardType: 'main' | 'search' | 'modal' }>`
   display: flex;
   align-items: center;
-  background: var(--color-darkgrey-main);
-  border-radius: 12px;
+  background: ${({ cardType }) =>
+    cardType === 'search' ? 'var(--color-black-main)' : 'var(--color-darkgrey-main)'};
+  border-radius: ${({ cardType }) => (cardType === 'search' ? `none` : '12px')};
   box-sizing: border-box;
-  padding: 12px;
+  padding: ${({ cardType }) => (cardType === 'search' ? '24px 12px 12px 12px' : '12px')};
   gap: 12px;
   width: 100%;
-  border: 1px solid var(--color-grey-300);
+  border: ${({ cardType }) => (cardType === 'main' ? '1px solid var(--color-grey-300)' : 'none')};
+  border-top: ${({ cardType }) =>
+    cardType === 'search' ? `1px solid ${colors.darkgrey.dark}` : ''};
 `;
 
-const Cover = styled.img`
-  width: 80px;
-  height: 107px;
-  border-radius: 6px;
+const Cover = styled.img<{ cardType: 'main' | 'search' | 'modal' }>`
   object-fit: cover;
   flex-shrink: 0;
+
+  width: ${({ cardType }) => (cardType === 'search' ? '60px' : '80px')};
+  height: ${({ cardType }) => (cardType === 'search' ? '80px' : '107px')};
 `;
 
 const Info = styled.div`
@@ -59,8 +66,8 @@ const Info = styled.div`
 `;
 
 const Title = styled.h3`
-  font-size: var(--font-size-large01);
-  font-weight: var(--font-weight-bold);
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
   color: #ffffff;
   margin-bottom: 10px;
   line-height: 1.4;

@@ -1,14 +1,13 @@
-import { useState } from 'react';
 import styled from '@emotion/styled';
-import TitleHeader from '../common/TitleHeader';
-import leftArrow from '../../assets/common/leftArrow.svg';
-import type { Group } from './MyGroupBox';
-import { GroupCard } from './GroupCard';
-import { Modal, Overlay } from './Modal.styles';
+import { useState } from 'react';
+import type { Group } from '../group/MyGroupBox';
+import { GroupCard } from '../group/GroupCard';
+import { colors, typography } from '@/styles/global/global';
+import { Filter } from '../common/Filter';
 
-interface MyGroupModalProps {
-  onClose: () => void;
-}
+const GENRE = ['문학', '과학·IT', '사회과학', '인문학', '예술'];
+
+const FILTER = ['마감임박순', '인기순'];
 
 const dummyMyGroups: Group[] = [
   {
@@ -85,59 +84,76 @@ const dummyMyGroups: Group[] = [
   },
 ];
 
-export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
-  const [selected, setSelected] = useState<'진행중' | '모집중' | ''>('');
+const SearchResult = () => {
+  const [selected, setSelected] = useState<string>('');
+  const [showGroup, setShowGroup] = useState<Group[]>(dummyMyGroups);
+  const [selectedFilter, setSelectedFilter] = useState<string>('마감임박순');
 
-  const filtered = selected
-    ? dummyMyGroups.filter(g => (selected === '진행중' ? g.isOnGoing : !g.isOnGoing))
-    : dummyMyGroups;
+  const handleSelectTab = (tab: string) => {
+    if (selected === tab) {
+      setSelected('');
+    } else setSelected(tab);
+  };
+
+  const isEmptyShowGroup = () => {
+    if (showGroup.length === 0) {
+      return true;
+    } else return false;
+  };
+
   return (
-    <Overlay>
-      <Modal>
-        <TitleHeader
-          title="내 모임방"
-          leftIcon={<img src={leftArrow} alt="뒤로 가기" />}
-          onLeftClick={onClose}
-        />
-
-        <TabContainer>
-          {(['진행중', '모집중'] as const).map(tab => (
-            <Tab
-              key={tab}
-              selected={tab === selected}
-              onClick={() => setSelected(prev => (prev === tab ? '' : tab))}
-            >
-              {tab}
-            </Tab>
-          ))}
-        </TabContainer>
-
-        <Content>
-          {filtered.map(group => (
+    <>
+      <TabContainer>
+        {GENRE.map(tab => (
+          <Tab key={tab} selected={tab === selected} onClick={() => handleSelectTab(tab)}>
+            {tab}
+          </Tab>
+        ))}
+      </TabContainer>
+      <GroupCardHeader>
+        <GroupNum>전체 {showGroup.length}</GroupNum>
+        <Filter
+          filters={FILTER}
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+        ></Filter>
+      </GroupCardHeader>
+      <Content>
+        {isEmptyShowGroup() ? (
+          <EmptyContent>
+            <EmptyMainText>해당하는 모임방이 없어요</EmptyMainText>
+            <EmptySubText>직접 모임방을 만들어보세요.</EmptySubText>
+          </EmptyContent>
+        ) : (
+          showGroup.map(group => (
             <GroupCard
               key={group.id}
               group={group}
               isOngoing={group.isOnGoing ? true : false}
-              type={'modal'}
+              type={'search'}
             />
-          ))}
-        </Content>
-      </Modal>
-    </Overlay>
+          ))
+        )}
+      </Content>
+    </>
   );
 };
 
+export default SearchResult;
+
 const TabContainer = styled.div`
   display: flex;
-  gap: 8px;
-  margin: 76px 20px 20px 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 20px;
+  margin-bottom: 24px;
 `;
 
-const Tab = styled.button<{ selected: boolean }>`
+const Tab = styled.button<{ selected?: boolean }>`
   white-space: nowrap;
-  padding: 6px 12px;
-  font-size: var(--font-size-small03);
-  font-weight: var(--font-weight-regular);
+  padding: 8px 12px;
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.regular};
   border: none;
   border-radius: 16px;
   background: ${({ selected }) =>
@@ -147,14 +163,48 @@ const Tab = styled.button<{ selected: boolean }>`
 `;
 
 const Content = styled.div`
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
   overflow-y: auto;
   padding: 0 20px;
+`;
 
-  grid-template-columns: 1fr;
+const GroupCardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  margin-bottom: 10px;
+`;
 
-  @media (min-width: 584px) {
-    grid-template-columns: 1fr 1fr;
-  }
+const GroupNum = styled.span`
+  display: flex;
+  align-items: center;
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.medium};
+`;
+
+const EmptyContent = styled.div`
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+`;
+
+const EmptyMainText = styled.p`
+  color: ${colors.white};
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
+  text-align: center;
+  justify-self: center;
+`;
+const EmptySubText = styled.p`
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
+  text-align: center;
+  justify-self: center;
 `;
