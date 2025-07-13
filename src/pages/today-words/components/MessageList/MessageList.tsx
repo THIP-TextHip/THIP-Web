@@ -1,4 +1,4 @@
-import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
 import moreIcon from '../../../../assets/common/more.svg';
 import type { Message } from '../../types';
 import MessageActionBottomSheet from './MessageActionBottomSheet';
@@ -21,6 +21,8 @@ import {
 interface MessageListProps {
   messages: Message[];
   currentUserId?: string;
+  onMessageDelete?: (messageId: string) => void;
+  isRealTimeMode?: boolean;
 }
 
 export interface MessageListRef {
@@ -28,9 +30,21 @@ export interface MessageListRef {
 }
 
 const MessageList = forwardRef<MessageListRef, MessageListProps>(
-  ({ messages: initialMessages, currentUserId = 'user.01' }, ref) => {
+  (
+    {
+      messages: initialMessages,
+      currentUserId = 'user.01',
+      onMessageDelete,
+      isRealTimeMode = false,
+    },
+    ref,
+  ) => {
     const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
     const [messages, setMessages] = useState(initialMessages);
+
+    useEffect(() => {
+      setMessages(initialMessages);
+    }, [initialMessages]);
 
     const addMessage = (content: string) => {
       const now = new Date();
@@ -94,9 +108,15 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
 
     const handleDelete = () => {
       if (selectedMessageId) {
-        setMessages(prevMessages =>
-          prevMessages.filter(message => message.id !== selectedMessageId),
-        );
+        if (isRealTimeMode && onMessageDelete) {
+          // 실시간 모드일 때는 부모 컴포넌트의 상태를 업데이트
+          onMessageDelete(selectedMessageId);
+        } else {
+          // 더미 모드일 때는 내부 상태만 업데이트
+          setMessages(prevMessages =>
+            prevMessages.filter(message => message.id !== selectedMessageId),
+          );
+        }
         console.log(`메시지 ID ${selectedMessageId} 삭제됨`);
       }
       setSelectedMessageId(null);

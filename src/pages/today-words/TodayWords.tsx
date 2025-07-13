@@ -63,6 +63,13 @@ const TodayWords = () => {
     }, 100);
   };
 
+  // MessageList에서 메시지가 삭제되었을 때 호출될 콜백
+  const handleMessageDelete = (messageId: string) => {
+    if (!showMessages) {
+      setMessages(prevMessages => prevMessages.filter(message => message.id !== messageId));
+    }
+  };
+
   // 실제 메시지가 있으면 실제 메시지를, 더미 모드면 더미 메시지를 표시
   const displayMessages = showMessages ? dummyMessages : messages;
 
@@ -78,7 +85,12 @@ const TodayWords = () => {
           {displayMessages.length === 0 ? (
             <EmptyState />
           ) : (
-            <MessageList ref={messageListRef} messages={displayMessages} />
+            <MessageList
+              ref={messageListRef}
+              messages={displayMessages}
+              onMessageDelete={handleMessageDelete}
+              isRealTimeMode={!showMessages}
+            />
           )}
         </ContentArea>
 
