@@ -51,6 +51,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 20px;
+  margin-bottom: 72px;
 `;
 
 const List = styled.div`

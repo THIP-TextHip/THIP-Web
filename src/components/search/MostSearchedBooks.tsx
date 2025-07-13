@@ -73,6 +73,7 @@ const Container = styled.div`
   flex-direction: column;
   padding: 36px 20px 0 20px;
   background-color: var(--color-black-main);
+  margin-bottom: 72px;
 `;
 
 const Header = styled.div`
