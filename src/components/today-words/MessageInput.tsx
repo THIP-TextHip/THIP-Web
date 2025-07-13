@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import sendIcon from '../../assets/common/send.svg';
 import {
   InputContainer,
@@ -15,6 +15,7 @@ interface MessageInputProps {
 
 const MessageInput = ({ value, onChange, onSend }: MessageInputProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [isComposing, setIsComposing] = useState(false); // IME 조합 상태
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
@@ -26,8 +27,23 @@ const MessageInput = ({ value, onChange, onSend }: MessageInputProps) => {
     }
   };
 
+  // IME 조합 시작
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  // IME 조합 끝
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
+      // IME 조합 중이면 Enter 처리를 하지 않음
+      if (isComposing) {
+        return;
+      }
+
       e.preventDefault();
       onSend();
     }
@@ -46,6 +62,8 @@ const MessageInput = ({ value, onChange, onSend }: MessageInputProps) => {
           value={value}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
           rows={1}
         />
         <SendButton
