@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import sendIcon from '../../../assets/common/send.svg';
+import sendIcon from '../../assets/common/send.svg';
 import {
   InputContainer,
   MessageInputWrapper,

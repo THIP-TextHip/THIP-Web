@@ -1,14 +1,14 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
-import EmptyState from './components/EmptyState';
-import MessageList from './components/MessageList/MessageList';
-import type { MessageListRef } from './components/MessageList/MessageList';
-import MessageInput from './components/MessageInput';
+import EmptyState from '../../components/today-words/EmptyState';
+import MessageList from '../../components/today-words/MessageList/MessageList';
+import type { MessageListRef } from '../../components/today-words/MessageList/MessageList';
+import MessageInput from '../../components/today-words/MessageInput';
 import leftarrow from '../../assets/common/leftArrow.svg';
 import { Container, ContentArea } from './TodayWords.styled';
-import type { Message } from './types';
-import { dummyMessages } from './constants';
+import type { Message } from '../../types/today';
+import { dummyMessages } from '../../constants/today-constants';
 
 const TodayWords = () => {
   const navigate = useNavigate();

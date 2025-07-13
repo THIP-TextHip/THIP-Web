@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { typography, semanticColors, colors } from '../../../../styles/global/global';
+import { typography, semanticColors, colors } from '../../../styles/global/global';
 
 export const DatePickerContainer = styled.div`
   color: ${semanticColors.text.primary};

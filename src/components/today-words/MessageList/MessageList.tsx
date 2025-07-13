@@ -1,6 +1,6 @@
 import { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
-import moreIcon from '../../../../assets/common/more.svg';
-import type { Message } from '../../types';
+import moreIcon from '../../../assets/common/more.svg';
+import type { Message } from '../../../types/today';
 import MessageActionBottomSheet from './MessageActionBottomSheet';
 import {
   MessageList as StyledMessageList,

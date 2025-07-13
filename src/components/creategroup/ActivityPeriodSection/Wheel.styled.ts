@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { colors, semanticColors, typography } from '../../../../styles/global/global';
+import { colors, semanticColors, typography } from '../../../styles/global/global';
 
 export const WheelContainer = styled.div`
   display: block;
