@@ -162,6 +162,9 @@ const Header = styled.div`
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  max-width: 767px;
+  margin: 0 auto;
   color: ${colors.white};
   font-size: ${typography.fontSize['2xl']};
   font-weight: ${typography.fontWeight['bold']};
@@ -171,10 +174,12 @@ const Header = styled.div`
 `;
 
 const SearchBarContainer = styled.div`
-  width: 100%;
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  max-width: 767px;
+  margin: 0 auto;
   background: ${colors.black.main};
 `;
 
