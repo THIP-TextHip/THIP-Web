@@ -145,20 +145,27 @@ export const InputContainer = styled.div`
   right: 0;
   max-width: 767px;
   margin: 0 auto;
-  background-color: ${semanticColors.background.primary};
-  padding: 16px 20px 32px 20px;
+  background-color: ${semanticColors.background.cardDark};
+  padding: 10px 20px;
   display: flex;
   align-items: flex-end;
-  gap: 12px;
-  border-top: 1px solid #3d3d3d;
+`;
+
+export const MessageInputWrapper = styled.div`
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: ${semanticColors.background.card};
+  border-radius: 20px;
+  padding-right: 8px;
 `;
 
 export const MessageInput = styled.textarea`
   flex: 1;
-  background-color: #282828;
+  background: none;
   border: none;
-  border-radius: 20px;
-  padding: 12px 16px;
+  padding: 10px 13px;
   color: ${semanticColors.text.primary};
   font-size: 14px;
   font-weight: ${typography.fontWeight.regular};
@@ -171,7 +178,7 @@ export const MessageInput = styled.textarea`
   overflow-y: auto;
 
   &::placeholder {
-    color: ${semanticColors.text.tertiary};
+    color: ${semanticColors.text.ghost};
   }
 
   /* 스크롤바 숨기기 */
@@ -183,11 +190,11 @@ export const MessageInput = styled.textarea`
 `;
 
 export const SendButton = styled.button<{ active: boolean }>`
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 42px;
+  height: 28px;
+  border-radius: 20px;
   border: none;
-  background-color: ${({ active }) => (active ? semanticColors.button.fill.primary : '#525252')};
+  background-color: ${({ active }) => (active ? semanticColors.button.fill.primary : '#888888')};
   cursor: ${({ active }) => (active ? 'pointer' : 'default')};
   display: flex;
   align-items: center;
@@ -196,8 +203,8 @@ export const SendButton = styled.button<{ active: boolean }>`
   transition: background-color 0.2s;
 
   img {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     opacity: ${({ active }) => (active ? 1 : 0.5)};
   }
 

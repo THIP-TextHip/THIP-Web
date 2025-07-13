@@ -20,6 +20,7 @@ import {
   DateDivider,
   MoreButton,
   InputContainer,
+  MessageInputWrapper,
   MessageInput,
   SendButton,
 } from './TodayWords.styled';
@@ -198,21 +199,23 @@ const TodayWords = () => {
         </ContentArea>
 
         <InputContainer>
-          <MessageInput
-            ref={inputRef}
-            placeholder="메이트들과 간단한 인사를 나눠보세요!"
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            rows={1}
-          />
-          <SendButton
-            onClick={handleSendMessage}
-            disabled={inputValue.trim() === ''}
-            active={inputValue.trim() !== ''}
-          >
-            <img src={sendIcon} alt="전송" />
-          </SendButton>
+          <MessageInputWrapper>
+            <MessageInput
+              ref={inputRef}
+              placeholder="메이트들과 간단한 인사를 나눠보세요!"
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              rows={1}
+            />
+            <SendButton
+              onClick={handleSendMessage}
+              disabled={inputValue.trim() === ''}
+              active={inputValue.trim() !== ''}
+            >
+              <img src={sendIcon} alt="전송" />
+            </SendButton>
+          </MessageInputWrapper>
         </InputContainer>
 
         {/* 개발용 토글 버튼 */}
