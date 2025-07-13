@@ -41,7 +41,7 @@ const TodayWords = () => {
             day: '2-digit',
           })
           .replace(/\. /g, '.')
-          .replace('.', ''),
+          .replace(/\.$/, ''),
         timeAgo: '방금 전',
         createdAt: now,
       };
