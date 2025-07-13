@@ -9,9 +9,17 @@ interface SearchBarProps {
   onChange?: (v: string) => void;
   onClick?: () => void;
   onSearch?: () => void;
+  isSearched?: boolean;
 }
 
-const SearchBar = ({ placeholder, value, onChange, onClick, onSearch }: SearchBarProps) => {
+const SearchBar = ({
+  placeholder,
+  value,
+  onChange,
+  onClick,
+  onSearch,
+  isSearched,
+}: SearchBarProps) => {
   return (
     <SearchBarWrapper onClick={onClick}>
       <Input
@@ -25,7 +33,9 @@ const SearchBar = ({ placeholder, value, onChange, onClick, onSearch }: SearchBa
         }}
       />
       <IconButtonContainer>
-        {value && <IconButton src={deleteIcon} alt="입력 지우기" onClick={() => onChange?.('')} />}
+        {value && !isSearched && (
+          <IconButton src={deleteIcon} alt="입력 지우기" onClick={() => onChange?.('')} />
+        )}
         <IconButton src={searchIcon} alt="검색" onClick={() => onSearch?.()} />
       </IconButtonContainer>
     </SearchBarWrapper>
