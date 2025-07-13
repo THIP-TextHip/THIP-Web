@@ -12,7 +12,7 @@ import SignupDone from './signup/SignupDone';
 import CreateGroup from './group/CreateGroup';
 import Group from './group/Group';
 import Feed from './feed/Feed';
-import GroupSearch from './groupSearch/groupSearch';
+import GroupSearch from './groupSearch/GroupSearch';
 
 const Router = () => {
   const router = createBrowserRouter(
