@@ -13,6 +13,8 @@ import CreateGroup from './group/CreateGroup';
 import Group from './group/Group';
 import Feed from './feed/Feed';
 import GroupSearch from './groupSearch/GroupSearch';
+import Search from './search/Search';
+import ApplyBook from './search/ApplyBook';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -28,6 +30,8 @@ const Router = () => {
         <Route path="group" element={<Group />} />
         <Route path="groupsearch" element={<GroupSearch />} />
         <Route path="feed" element={<Feed />} />
+        <Route path="search" element={<Search />} />
+        <Route path="search/applybook" element={<ApplyBook />} />
       </>,
     ),
   );
