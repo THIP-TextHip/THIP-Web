@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 import moreIcon from '../../../../assets/common/more.svg';
 import type { Message } from '../../types';
 import MessageActionBottomSheet from './MessageActionBottomSheet';
@@ -23,106 +23,139 @@ interface MessageListProps {
   currentUserId?: string;
 }
 
-const MessageList = ({
-  messages: initialMessages,
-  currentUserId = 'user.01',
-}: MessageListProps) => {
-  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
-  const [messages, setMessages] = useState(initialMessages);
+export interface MessageListRef {
+  addMessage: (content: string) => void;
+}
 
-  // 먼저 모든 메시지를 시간순으로 정렬
-  const sortedMessages = messages.sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-  );
+const MessageList = forwardRef<MessageListRef, MessageListProps>(
+  ({ messages: initialMessages, currentUserId = 'user.01' }, ref) => {
+    const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+    const [messages, setMessages] = useState(initialMessages);
 
-  // 날짜별로 메시지 그룹화
-  const groupedMessages = sortedMessages.reduce(
-    (groups, message) => {
-      const date = message.timestamp;
-      if (!groups[date]) {
-        groups[date] = [];
+    const addMessage = (content: string) => {
+      const now = new Date();
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        user: currentUserId,
+        content: content,
+        timestamp: now
+          .toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          })
+          .replace(/\. /g, '.')
+          .replace('.', ''),
+        timeAgo: '방금 전',
+        createdAt: now,
+      };
+
+      setMessages(prevMessages => [...prevMessages, newMessage]);
+    };
+
+    // ref를 통해 외부에서 addMessage 함수에 접근할 수 있도록 함
+    useImperativeHandle(ref, () => ({
+      addMessage,
+    }));
+
+    // 먼저 모든 메시지를 시간순으로 정렬
+    const sortedMessages = messages.sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
+
+    // 날짜별로 메시지 그룹화
+    const groupedMessages = sortedMessages.reduce(
+      (groups, message) => {
+        const date = message.timestamp;
+        if (!groups[date]) {
+          groups[date] = [];
+        }
+        groups[date].push(message);
+        return groups;
+      },
+      {} as Record<string, Message[]>,
+    );
+
+    // 날짜를 최신순으로 정렬
+    const sortedDates = Object.keys(groupedMessages).sort((a, b) => a.localeCompare(b));
+
+    const handleMoreClick = (messageId: string) => {
+      setSelectedMessageId(messageId);
+    };
+
+    const handleCloseBottomSheet = () => {
+      setSelectedMessageId(null);
+    };
+
+    const handleEdit = () => {
+      console.log('메시지 수정');
+      setSelectedMessageId(null);
+    };
+
+    const handleDelete = () => {
+      if (selectedMessageId) {
+        setMessages(prevMessages =>
+          prevMessages.filter(message => message.id !== selectedMessageId),
+        );
+        console.log(`메시지 ID ${selectedMessageId} 삭제됨`);
       }
-      groups[date].push(message);
-      return groups;
-    },
-    {} as Record<string, Message[]>,
-  );
+      setSelectedMessageId(null);
+    };
 
-  // 날짜를 최신순으로 정렬
-  const sortedDates = Object.keys(groupedMessages).sort((a, b) => a.localeCompare(b));
+    const handleReport = () => {
+      console.log('메시지 신고');
+      setSelectedMessageId(null);
+    };
 
-  const handleMoreClick = (messageId: string) => {
-    setSelectedMessageId(messageId);
-  };
+    const selectedMessage = messages.find(msg => msg.id === selectedMessageId);
+    const isMyMessage = selectedMessage?.user === currentUserId;
 
-  const handleCloseBottomSheet = () => {
-    setSelectedMessageId(null);
-  };
+    return (
+      <>
+        <StyledMessageList>
+          {sortedDates.map((date, groupIndex) => (
+            <div key={date}>
+              <DateDividerContainer>
+                <DateDivider>{date}</DateDivider>
+              </DateDividerContainer>
 
-  const handleEdit = () => {
-    console.log('메시지 수정');
-    setSelectedMessageId(null);
-  };
+              <DateGroup>
+                {groupedMessages[date].map(message => (
+                  <MessageItem key={message.id}>
+                    <UserInfo>
+                      <UserAvatar />
+                      <UserDetails>
+                        <UserName>{message.user}</UserName>
+                        <TimeStamp>{message.timeAgo}</TimeStamp>
+                      </UserDetails>
+                      <MoreButton onClick={() => handleMoreClick(message.id)}>
+                        <img src={moreIcon} alt="더보기" />
+                      </MoreButton>
+                    </UserInfo>
+                    <MessageContent>{message.content}</MessageContent>
+                  </MessageItem>
+                ))}
+              </DateGroup>
 
-  const handleDelete = () => {
-    if (selectedMessageId) {
-      setMessages(prevMessages => prevMessages.filter(message => message.id !== selectedMessageId));
-      console.log(`메시지 ID ${selectedMessageId} 삭제됨`);
-    }
-    setSelectedMessageId(null);
-  };
+              {/* 마지막 그룹이 아닐 때만 구분선 표시 */}
+              {groupIndex < sortedDates.length - 1 && <Separator />}
+            </div>
+          ))}
+        </StyledMessageList>
 
-  const handleReport = () => {
-    console.log('메시지 신고');
-    setSelectedMessageId(null);
-  };
+        <MessageActionBottomSheet
+          isOpen={!!selectedMessageId}
+          isMyMessage={isMyMessage}
+          onClose={handleCloseBottomSheet}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onReport={handleReport}
+        />
+      </>
+    );
+  },
+);
 
-  const selectedMessage = messages.find(msg => msg.id === selectedMessageId);
-  const isMyMessage = selectedMessage?.user === currentUserId;
-
-  return (
-    <>
-      <StyledMessageList>
-        {sortedDates.map((date, groupIndex) => (
-          <div key={date}>
-            <DateDividerContainer>
-              <DateDivider>{date}</DateDivider>
-            </DateDividerContainer>
-
-            <DateGroup>
-              {groupedMessages[date].map(message => (
-                <MessageItem key={message.id}>
-                  <UserInfo>
-                    <UserAvatar />
-                    <UserDetails>
-                      <UserName>{message.user}</UserName>
-                      <TimeStamp>{message.timeAgo}</TimeStamp>
-                    </UserDetails>
-                    <MoreButton onClick={() => handleMoreClick(message.id)}>
-                      <img src={moreIcon} alt="더보기" />
-                    </MoreButton>
-                  </UserInfo>
-                  <MessageContent>{message.content}</MessageContent>
-                </MessageItem>
-              ))}
-            </DateGroup>
-
-            {/* 마지막 그룹이 아닐 때만 구분선 표시 */}
-            {groupIndex < sortedDates.length - 1 && <Separator />}
-          </div>
-        ))}
-      </StyledMessageList>
-
-      <MessageActionBottomSheet
-        isOpen={!!selectedMessageId}
-        isMyMessage={isMyMessage}
-        onClose={handleCloseBottomSheet}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onReport={handleReport}
-      />
-    </>
-  );
-};
+MessageList.displayName = 'MessageList';
 
 export default MessageList;

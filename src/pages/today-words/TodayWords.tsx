@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import EmptyState from './components/EmptyState';
 import MessageList from './components/MessageList/MessageList';
+import type { MessageListRef } from './components/MessageList/MessageList';
 import MessageInput from './components/MessageInput';
 import leftarrow from '../../assets/common/leftArrow.svg';
 import { Container, ContentArea } from './TodayWords.styled';
@@ -11,6 +12,7 @@ import { dummyMessages } from './constants';
 
 const TodayWords = () => {
   const navigate = useNavigate();
+  const messageListRef = useRef<MessageListRef>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
 
@@ -24,23 +26,11 @@ const TodayWords = () => {
   const handleSendMessage = () => {
     if (inputValue.trim() === '') return;
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      user: 'user.01',
-      content: inputValue.trim(),
-      timestamp: new Date()
-        .toLocaleDateString('ko-KR', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        })
-        .replace(/\. /g, '.')
-        .replace('.', ''),
-      timeAgo: '방금 전',
-      createdAt: new Date(),
-    };
+    // MessageList의 addMessage 함수 호출
+    if (messageListRef.current) {
+      messageListRef.current.addMessage(inputValue.trim());
+    }
 
-    setMessages(prev => [...prev, newMessage]);
     setInputValue('');
 
     // 자동으로 스크롤을 아래로 이동
@@ -63,7 +53,7 @@ const TodayWords = () => {
           {displayMessages.length === 0 ? (
             <EmptyState />
           ) : (
-            <MessageList messages={displayMessages} />
+            <MessageList ref={messageListRef} messages={displayMessages} />
           )}
         </ContentArea>
 
