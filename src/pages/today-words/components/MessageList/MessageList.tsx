@@ -23,8 +23,12 @@ interface MessageListProps {
   currentUserId?: string;
 }
 
-const MessageList = ({ messages, currentUserId = 'user.01' }: MessageListProps) => {
+const MessageList = ({
+  messages: initialMessages,
+  currentUserId = 'user.01',
+}: MessageListProps) => {
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [messages, setMessages] = useState(initialMessages);
 
   // 먼저 모든 메시지를 시간순으로 정렬
   const sortedMessages = messages.sort(
@@ -61,7 +65,10 @@ const MessageList = ({ messages, currentUserId = 'user.01' }: MessageListProps) 
   };
 
   const handleDelete = () => {
-    console.log('메시지 삭제');
+    if (selectedMessageId) {
+      setMessages(prevMessages => prevMessages.filter(message => message.id !== selectedMessageId));
+      console.log(`메시지 ID ${selectedMessageId} 삭제됨`);
+    }
     setSelectedMessageId(null);
   };
 
