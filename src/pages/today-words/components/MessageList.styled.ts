@@ -4,29 +4,25 @@ import { semanticColors, typography } from '../../../styles/global/global';
 export const MessageList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding-top: 20px;
 `;
 
-export const TopBorderText = styled.div`
-  color: #888;
-  font-size: 14px;
-  text-align: center;
-  padding: 20px 0;
-  border-bottom: 1px dashed #3d3d3d;
-  margin-bottom: 20px;
+export const DateGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin-bottom: 24px;
 `;
 
 export const MessageItem = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 `;
 
 export const UserInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
 `;
 
 export const UserAvatar = styled.div`
@@ -38,16 +34,23 @@ export const UserAvatar = styled.div`
   flex-shrink: 0;
 `;
 
+export const UserDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+`;
+
 export const UserName = styled.div`
   color: ${semanticColors.text.primary};
-  font-size: 14px;
+  font-size: 12px;
   font-weight: ${typography.fontWeight.semibold};
-  margin-bottom: 2px;
+  margin-bottom: 5px;
 `;
 
 export const TimeStamp = styled.div`
   color: ${semanticColors.text.tertiary};
-  font-size: 12px;
+  font-size: 11px;
   font-weight: ${typography.fontWeight.regular};
 `;
 
@@ -56,36 +59,30 @@ export const MessageContent = styled.div`
   font-size: 14px;
   font-weight: ${typography.fontWeight.regular};
   line-height: 1.4;
-  margin-left: 48px;
+`;
+
+export const DateDividerContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
 `;
 
 export const DateDivider = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 32px 0;
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: #3d3d3d;
-    z-index: 1;
-  }
-
-  background-color: #525252;
-  color: ${semanticColors.text.primary};
-  font-size: 12px;
+  background-color: ${semanticColors.background.cardDark};
+  color: ${semanticColors.text.point.green};
+  font-size: 14px;
   font-weight: ${typography.fontWeight.regular};
-  padding: 8px 16px;
+  padding: 15px 16px;
   border-radius: 16px;
-  position: relative;
-  z-index: 2;
-  align-self: center;
+  margin-bottom: 20px;
+  width: fit-content;
+`;
+
+export const Separator = styled.div`
+  width: calc(100% + 40px);
+  height: 10px;
+  background-color: #282828;
+  margin: 20px -20px;
 `;
 
 export const MoreButton = styled.button`
@@ -93,13 +90,13 @@ export const MoreButton = styled.button`
   border: none;
   cursor: pointer;
   margin-left: auto;
-  padding: 4px;
+  padding: 0px;
   display: flex;
   align-items: center;
   justify-content: center;
 
   img {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
   }
 `;
