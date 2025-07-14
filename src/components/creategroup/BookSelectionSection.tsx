@@ -1,6 +1,6 @@
-import { semanticColors } from '../../../styles/global/global';
-import searchIcon from '../../../assets/group/search.svg';
-import { Section, SectionTitle } from '../CommonSection.styled';
+import { semanticColors } from '../../styles/global/global';
+import searchIcon from '../../assets/group/search.svg';
+import { Section, SectionTitle } from '../../pages/group/CommonSection.styled';
 import {
   SearchBox,
   SearchIcon,

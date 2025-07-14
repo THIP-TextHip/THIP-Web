@@ -4,7 +4,7 @@ import {
   PasswordInput,
   CloseButton,
 } from './PasswordInputSection.styled';
-import closeIcon from '../../../../assets/group/close.svg';
+import closeIcon from '../../../assets/group/close.svg';
 
 interface PasswordInputSectionProps {
   password: string;

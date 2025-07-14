@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { typography, semanticColors } from '../../../styles/global/global';
+import { typography, semanticColors } from '../../styles/global/global';
 
 export const MemberLimitContainer = styled.div`
   display: flex;
