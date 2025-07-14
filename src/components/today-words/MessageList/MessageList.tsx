@@ -101,11 +101,6 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
       setSelectedMessageId(null);
     };
 
-    const handleEdit = () => {
-      console.log('메시지 수정');
-      setSelectedMessageId(null);
-    };
-
     const handleDelete = () => {
       if (selectedMessageId) {
         if (isRealTimeMode && onMessageDelete) {
@@ -167,7 +162,6 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
           isOpen={!!selectedMessageId}
           isMyMessage={isMyMessage}
           onClose={handleCloseBottomSheet}
-          onEdit={handleEdit}
           onDelete={handleDelete}
           onReport={handleReport}
         />
