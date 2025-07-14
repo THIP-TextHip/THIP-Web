@@ -30,12 +30,12 @@ export const BottomSheet = styled.div<{ isOpen: boolean }>`
   transition: transform 0.3s ease-in-out;
 `;
 
-export const ActionItem = styled.button`
+export const DeleteActionItem = styled.button`
   width: 100%;
   background: none;
   border: none;
   padding: 13px 12px;
-  color: ${semanticColors.text.primary};
+  color: ${semanticColors.text.warning};
   font-size: ${typography.fontSize.base};
   font-weight: ${typography.fontWeight.medium};
   text-align: left;
@@ -46,17 +46,18 @@ export const ActionItem = styled.button`
   }
 `;
 
-export const DeleteActionItem = styled(ActionItem)`
-  color: ${semanticColors.text.warning};
-`;
-
-export const Divider = styled.div`
+export const ReportActionItem = styled.button`
   width: 100%;
-  height: 1px;
-  background-color: #525252;
-  margin: 8px 0;
-`;
-
-export const ReportActionItem = styled(ActionItem)`
+  background: none;
+  border: none;
+  padding: 13px 12px;
   color: ${semanticColors.text.warning};
+  font-size: ${typography.fontSize.base};
+  font-weight: ${typography.fontWeight.medium};
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${semanticColors.background.card};
+  }
 `;

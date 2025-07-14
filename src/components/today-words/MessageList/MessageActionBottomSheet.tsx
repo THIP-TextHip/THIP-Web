@@ -1,17 +1,14 @@
 import {
   Overlay,
   BottomSheet,
-  ActionItem,
   DeleteActionItem,
   ReportActionItem,
-  Divider,
 } from './MessageActionBottomSheet.styled';
 
 interface MessageActionBottomSheetProps {
   isOpen: boolean;
   isMyMessage: boolean;
   onClose: () => void;
-  onEdit?: () => void;
   onDelete?: () => void;
   onReport?: () => void;
 }
@@ -20,7 +17,6 @@ const MessageActionBottomSheet = ({
   isOpen,
   isMyMessage,
   onClose,
-  onEdit,
   onDelete,
   onReport,
 }: MessageActionBottomSheetProps) => {
@@ -36,14 +32,10 @@ const MessageActionBottomSheet = ({
     <Overlay isOpen={isOpen} onClick={handleOverlayClick}>
       <BottomSheet isOpen={isOpen}>
         {isMyMessage ? (
-          // 내 댓글인 경우
-          <>
-            <ActionItem onClick={onEdit}>수정하기</ActionItem>
-            <Divider />
-            <DeleteActionItem onClick={onDelete}>삭제하기</DeleteActionItem>
-          </>
+          // 내 댓글인 경우 - 삭제하기만 표시
+          <DeleteActionItem onClick={onDelete}>삭제하기</DeleteActionItem>
         ) : (
-          // 타인의 댓글인 경우
+          // 타인의 댓글인 경우 - 신고하기만 표시
           <ReportActionItem onClick={onReport}>신고하기</ReportActionItem>
         )}
       </BottomSheet>
