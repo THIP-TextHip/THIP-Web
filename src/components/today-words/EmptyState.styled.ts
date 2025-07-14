@@ -13,13 +13,13 @@ export const EmptyStateContainer = styled.div`
 
 export const EmptyMessage = styled.div`
   color: ${semanticColors.text.primary};
-  font-size: 18px;
+  font-size: ${typography.fontSize.lg};
   font-weight: ${typography.fontWeight.semibold};
   margin-bottom: 8px;
 `;
 
 export const EmptySubMessage = styled.div`
   color: ${semanticColors.text.secondary};
-  font-size: 14px;
+  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
 `;

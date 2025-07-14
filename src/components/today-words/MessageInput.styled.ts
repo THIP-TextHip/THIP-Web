@@ -30,7 +30,7 @@ export const MessageInput = styled.textarea`
   border: none;
   padding: 10px 13px;
   color: ${semanticColors.text.primary};
-  font-size: 14px;
+  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
   line-height: 1.4;

@@ -43,7 +43,7 @@ export const UserDetails = styled.div`
 
 export const UserName = styled.div`
   color: ${semanticColors.text.primary};
-  font-size: 12px;
+  font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.semibold};
   margin-bottom: 5px;
 `;
@@ -56,7 +56,7 @@ export const TimeStamp = styled.div`
 
 export const MessageContent = styled.div`
   color: ${semanticColors.text.primary};
-  font-size: 14px;
+  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   line-height: 1.4;
 `;
@@ -70,7 +70,7 @@ export const DateDividerContainer = styled.div`
 export const DateDivider = styled.div`
   background-color: ${semanticColors.background.cardDark};
   color: ${semanticColors.text.point.green};
-  font-size: 14px;
+  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   padding: 15px 16px;
   border-radius: 16px;
