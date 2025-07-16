@@ -27,7 +27,7 @@ export function RecruitingGroupBox({ groups, title }: Props) {
       </TabContainer>
       <Grid>
         {filtered.map(group => (
-          <GroupCard key={group.id} group={group} type={'recruiting'} />
+          <GroupCard key={group.id} group={group} type={'main'} />
         ))}
       </Grid>
     </Container>
