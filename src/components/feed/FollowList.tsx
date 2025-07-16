@@ -35,6 +35,10 @@ const FollowList = () => {
     navigate('/feed/followerlist');
   };
 
+  const handleProfileClick = () => {
+    navigate(`/feed/{userId`);
+  };
+
   return (
     <Container>
       <div className="title">
@@ -43,7 +47,7 @@ const FollowList = () => {
       </div>
       {hasFollowers ? (
         <FollowContainer>
-          <div className="followerList">
+          <div className="followerList" onClick={handleProfileClick}>
             {visible.map(({ src, username }) => (
               <div className="followers" key={username}>
                 <img src={src} />
