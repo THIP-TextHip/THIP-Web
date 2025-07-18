@@ -1,50 +1,64 @@
 import styled from '@emotion/styled';
+import { useNavigate } from 'react-router-dom';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import people from '../../assets/feed/people.svg';
 import character from '../../assets/feed/character.svg';
 
 const followerData = {
   followers: [
-    { src: 'https://placehold.co/36x36', username: 'user1' },
-    { src: 'https://placehold.co/36x36', username: 'user2' },
-    { src: 'https://placehold.co/36x36', username: 'user3' },
-    { src: 'https://placehold.co/36x36', username: 'user4' },
-    { src: 'https://placehold.co/36x36', username: 'user5' },
-    { src: 'https://placehold.co/36x36', username: 'user6' },
-    { src: 'https://placehold.co/36x36', username: 'user7' },
-    { src: 'https://placehold.co/36x36', username: 'user8' },
-    { src: 'https://placehold.co/36x36', username: 'user9' },
-    { src: 'https://placehold.co/36x36', username: 'user10' },
-    { src: 'https://placehold.co/36x36', username: 'user11' },
-    { src: 'https://placehold.co/36x36', username: 'user12' },
+    { userId: 1, src: 'https://placehold.co/36x36', username: 'user1' },
+    { userId: 2, src: 'https://placehold.co/36x36', username: 'user2' },
+    { userId: 3, src: 'https://placehold.co/36x36', username: 'user3' },
+    { userId: 4, src: 'https://placehold.co/36x36', username: 'user4' },
+    { userId: 5, src: 'https://placehold.co/36x36', username: 'user5' },
+    { userId: 6, src: 'https://placehold.co/36x36', username: 'user6' },
+    { userId: 7, src: 'https://placehold.co/36x36', username: 'user7' },
+    { userId: 8, src: 'https://placehold.co/36x36', username: 'user8' },
+    { userId: 9, src: 'https://placehold.co/36x36', username: 'user9' },
+    { userId: 10, src: 'https://placehold.co/36x36', username: 'user10' },
+    { userId: 11, src: 'https://placehold.co/36x36', username: 'user11' },
+    { userId: 12, src: 'https://placehold.co/36x36', username: 'user12' },
   ],
 };
 
 const FollowList = () => {
+  const navigate = useNavigate();
   const { followers } = followerData;
   const hasFollowers = followers.length > 0;
   const visible = hasFollowers ? followers.slice(0, 10) : [];
+
+  const handleFindClick = () => {
+    navigate('/feed/usersearch');
+  };
+
+  const handleMoreClick = () => {
+    navigate('/feed/followlist');
+  };
+
+  const handleProfileClick = (userId: number) => {
+    navigate(`/otherfeed/${userId}`);
+  };
 
   return (
     <Container>
       <div className="title">
         <img src={people} />
-        <div>내 구독</div>
+        <div>내 띱</div>
       </div>
       {hasFollowers ? (
         <FollowContainer>
           <div className="followerList">
-            {visible.map(({ src, username }) => (
-              <div className="followers" key={username}>
+            {visible.map(({ userId, src, username }) => (
+              <div className="followers" key={username} onClick={() => handleProfileClick(userId)}>
                 <img src={src} />
                 <div className="username">{username}</div>
               </div>
             ))}
           </div>
-          <img src={rightArrow} alt="더보기" />
+          <img src={rightArrow} alt="더보기" onClick={handleMoreClick} />
         </FollowContainer>
       ) : (
-        <EmptyFollowerContainer>
+        <EmptyFollowerContainer onClick={handleFindClick}>
           <div>관심있는 독서메이트를 찾아보세요!</div>
           <img src={character} alt="더보기" />
         </EmptyFollowerContainer>
@@ -137,6 +151,7 @@ const EmptyFollowerContainer = styled.div`
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   line-height: 20px;
+  cursor: pointer;
 `;
 
 export default FollowList;

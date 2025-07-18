@@ -12,6 +12,8 @@ import SignupDone from './signup/SignupDone';
 import CreateGroup from './group/CreateGroup';
 import Group from './group/Group';
 import Feed from './feed/Feed';
+import OtherFeedPage from './feed/OtherFeedPage';
+import FollowerListPage from './feed/FollowerListPage';
 import GroupSearch from './groupSearch/GroupSearch';
 import TodayWords from './today-words/TodayWords';
 
@@ -29,6 +31,8 @@ const Router = () => {
         <Route path="group" element={<Group />} />
         <Route path="groupsearch" element={<GroupSearch />} />
         <Route path="feed" element={<Feed />} />
+        <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
+        <Route path="feed/:type" element={<FollowerListPage />} />
         <Route path="today-words" element={<TodayWords />} />
       </>,
     ),

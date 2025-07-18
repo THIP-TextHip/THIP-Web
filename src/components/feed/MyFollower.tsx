@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import people from '../../assets/feed/people.svg';
 import rightArrow from '../../assets/feed/rightArrow.svg';
@@ -41,6 +42,7 @@ const Container = styled.div`
     flex-direction: row;
     align-items: center;
     gap: 4px;
+    cursor: pointer;
 
     .profileImg {
       width: 24px;
@@ -51,8 +53,14 @@ const Container = styled.div`
   }
 `;
 
+interface Follower {
+  id: string;
+  profileImageUrl: string;
+}
+
 const MyFollower = () => {
-  const followers = [
+  const navigate = useNavigate();
+  const followers: Follower[] = [
     { id: '1', profileImageUrl: 'https://placehold.co/24x24' },
     { id: '2', profileImageUrl: 'https://placehold.co/24x24' },
     { id: '3', profileImageUrl: 'https://placehold.co/24x24' },
@@ -60,6 +68,10 @@ const MyFollower = () => {
     { id: '5', profileImageUrl: 'https://placehold.co/24x24' },
     { id: '6', profileImageUrl: 'https://placehold.co/24x24' },
   ];
+
+  const handleMoreClick = () => {
+    navigate('/feed/followerlist');
+  };
 
   return (
     <Container>
@@ -70,12 +82,14 @@ const MyFollower = () => {
           <div className="disc">이 구독중</div>
         </div>
       </div>
-      <div className="right">
-        {followers.slice(0, 5).map(f => (
-          <img className="profileImg" key={f.id} src={f.profileImageUrl} alt="구독자" />
-        ))}
-        <img src={rightArrow} />
-      </div>
+      {followers.length > 0 && (
+        <div className="right" onClick={handleMoreClick}>
+          {followers.slice(0, 5).map(f => (
+            <img className="profileImg" key={f.id} src={f.profileImageUrl} alt="구독자" />
+          ))}
+          <img src={rightArrow} />
+        </div>
+      )}
     </Container>
   );
 };
