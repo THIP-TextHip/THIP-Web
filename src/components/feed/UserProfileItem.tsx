@@ -11,6 +11,7 @@ export interface UserProfileItemProps {
   followerCount?: number;
   isFollowed?: boolean;
   userId: number;
+  isLast?: boolean;
 }
 
 const UserProfileItem = ({
@@ -21,6 +22,7 @@ const UserProfileItem = ({
   followerCount,
   isFollowed = false,
   userId,
+  isLast,
 }: UserProfileItemProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -47,7 +49,7 @@ const UserProfileItem = ({
   };
 
   return (
-    <Wrapper onClick={handleProfileClick}>
+    <Wrapper onClick={handleProfileClick} isLast={isLast}>
       <UserProfile>
         <div className="userInfo">
           <img src={profileImgUrl} />
@@ -74,11 +76,11 @@ const UserProfileItem = ({
   );
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ isLast?: boolean }>`
   width: 100%;
   height: 78px;
   padding: 20px 0;
-  border-bottom: 1px solid var(--color-darkgrey-dark);
+  border-bottom: ${({ isLast }) => (isLast ? 'none' : '1px solid var(--color-darkgrey-dark)')};
   background-color: var(--color-black-main);
 `;
 

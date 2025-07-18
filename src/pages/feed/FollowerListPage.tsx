@@ -56,7 +56,7 @@ const FollowerListPage = () => {
       <TotalBar>전체 {totalCount}</TotalBar>
       <UserProfileList>
         {mockUserList.map((user, index) => (
-          <UserProfileItem key={index} {...user} />
+          <UserProfileItem key={index} {...user} isLast={index === mockUserList.length - 1} />
         ))}
       </UserProfileList>
     </Wrapper>
