@@ -20,9 +20,7 @@ export const Filter = ({ filters, selectedFilter, setSelectedFilter }: FilterPro
   };
 
   const handleModalClick = () => {
-    if (!isOpenModal) {
-      setIsOpenModal(true);
-    }
+    setIsOpenModal(!isOpenModal);
   };
 
   return (

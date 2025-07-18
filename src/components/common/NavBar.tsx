@@ -90,7 +90,7 @@ const NavBar = ({ src, path }: FabProps) => {
             </NavItem>
           );
         })}
-        <Fab src={src} path={path} />
+        {path && <Fab src={src} path={path} />}
       </NavContainer>
     </NavWrapper>
   );
