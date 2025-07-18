@@ -3,6 +3,7 @@ import Profile from './Profile';
 import FeedPost from './FeedPost';
 import type { FeedListProps } from '../../types/post';
 import { colors, typography } from '../../styles/global/global';
+import TotalBar from './TotalBar';
 
 const Container = styled.div`
   padding-top: 56px;
@@ -26,10 +27,12 @@ const EmptyState = styled.div`
 
 const OtherFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
   const hasPosts = posts.length > 0;
+  const postCount = posts.length;
 
   return (
     <Container>
       <Profile showFollowButton={true} isFollowed={false} />
+      <TotalBar count={postCount} />
       {hasPosts ? (
         posts.map(post => (
           <FeedPost key={post.postId} showHeader={showHeader} isMyFeed={isMyFeed} {...post} />

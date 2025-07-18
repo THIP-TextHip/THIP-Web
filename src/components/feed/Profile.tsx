@@ -33,11 +33,6 @@ const Profile = ({ showFollowButton, isFollowed }: ProfileProps) => {
         )}
       </UserProfile>
       <MyFollower />
-      <TotalBar>
-        <div className="total">전체</div>
-        <div className="count">4</div>
-        {/* 피드 글 개수에 맞춰서 count 세야할듯 */}
-      </TotalBar>
     </Container>
   );
 };
@@ -48,7 +43,7 @@ const Container = styled.div`
   width: 100%;
   min-width: 320px;
   max-width: 540px;
-  height: 200px;
+  height: 166px;
   padding: 0 20px;
   padding-top: 32px;
   margin: 0 auto;
@@ -103,25 +98,6 @@ const UserProfile = styled.div`
     font-size: var(--string-size-medium01, 14px);
     font-weight: var(--string-weight-medium, 500);
     line-height: normal;
-  }
-`;
-
-const TotalBar = styled.div`
-  display: flex;
-  flex-direction: row;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #282828;
-  gap: 2px;
-  color: var(--color-grey-100);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: 24px;
-
-  .total {
-  }
-
-  .count {
-    text-align: right;
   }
 `;
 
