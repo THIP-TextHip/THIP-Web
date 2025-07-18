@@ -1,5 +1,5 @@
-import { semanticColors, typography } from '../../../styles/global/global';
-import { Section, SectionTitle } from '../CommonSection.styled';
+import { semanticColors, typography } from '../../styles/global/global';
+import { Section, SectionTitle } from '../../pages/group/CommonSection.styled';
 import { GenreButtonGroup, GenreButton } from './GenreSelectionSection.styled';
 
 interface GenreSelectionSectionProps {

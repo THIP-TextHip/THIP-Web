@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { colors, semanticColors, typography } from '../../../../styles/global/global';
+import { colors, semanticColors, typography } from '../../../styles/global/global';
 
 export const WheelContainer = styled.div`
   display: block;
@@ -56,7 +56,7 @@ export const WheelShadowBottom = styled.div<{ radius: number }>`
 
 export const WheelLabel = styled.div<{ radius: number }>`
   font-weight: ${typography.fontWeight.regular};
-  font-size: 12px;
+  font-size: ${typography.fontSize.xs};
   line-height: 1;
   margin-top: 1px;
   margin-left: 5px;
@@ -75,7 +75,7 @@ export const WheelSlide = styled.div<{ isSelected?: boolean }>`
   position: absolute;
   justify-content: center;
   color: ${semanticColors.text.primary};
-  font-size: 12px;
+  font-size: ${typography.fontSize.xs};
   background-color: ${({ isSelected }) => (isSelected ? colors.darkgrey.main : 'transparent')};
   border-radius: ${({ isSelected }) => (isSelected ? '4px' : '0')};
   transition: all 0.2s ease;

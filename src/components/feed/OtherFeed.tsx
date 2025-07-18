@@ -2,11 +2,11 @@ import styled from '@emotion/styled';
 import Profile from './Profile';
 import FeedPost from './FeedPost';
 import type { FeedListProps } from '../../types/post';
-import { colors, typography } from '@/styles/global/global';
+import { colors, typography } from '../../styles/global/global';
 import TotalBar from './TotalBar';
 
 const Container = styled.div`
-  padding-top: 136px;
+  padding-top: 56px;
   padding-bottom: 155px;
   background-color: var(--color-black-main);
 `;
@@ -25,13 +25,13 @@ const EmptyState = styled.div`
   letter-spacing: 0.018px;
 `;
 
-const MyFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
+const OtherFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
   const hasPosts = posts.length > 0;
   const postCount = posts.length;
 
   return (
     <Container>
-      <Profile showFollowButton={false} />
+      <Profile showFollowButton={true} isFollowed={false} />
       <TotalBar count={postCount} />
       {hasPosts ? (
         posts.map(post => (
@@ -39,11 +39,11 @@ const MyFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
         ))
       ) : (
         <EmptyState>
-          <div>피드에 글을 작성해 보세요</div>
+          <div>피드에 작성된 글이 없어요</div>
         </EmptyState>
       )}
     </Container>
   );
 };
 
-export default MyFeed;
+export default OtherFeed;

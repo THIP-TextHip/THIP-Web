@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { colors, typography, semanticColors } from '../../../styles/global/global';
+import { colors, typography, semanticColors } from '../../styles/global/global';
 
 export const GenreButtonGroup = styled.div`
   display: flex;

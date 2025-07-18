@@ -4,7 +4,7 @@ import {
   PasswordInput,
   CloseButton,
 } from './PasswordInputSection.styled';
-import closeIcon from '../../../../assets/group/close.svg';
+import closeIcon from '../../../assets/group/close.svg';
 
 interface PasswordInputSectionProps {
   password: string;
@@ -12,11 +12,7 @@ interface PasswordInputSectionProps {
   onClose: () => void;
 }
 
-const PasswordInputSection = ({
-  password,
-  onPasswordChange,
-  onClose,
-}: PasswordInputSectionProps) => {
+const PasswordInputSection = ({ password, onPasswordChange }: PasswordInputSectionProps) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     // 숫자만 허용하고 최대 4자리까지만 입력 가능

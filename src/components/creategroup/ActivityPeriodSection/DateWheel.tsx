@@ -32,8 +32,6 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
   const startIndex = useRef(0);
 
   const wheelSize = 15;
-  const slideDegree = 360 / wheelSize;
-  const slidesPerView = 2;
   const slides = values.length;
 
   useEffect(() => {
@@ -147,7 +145,6 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
   const slideValues = () => {
     if (!sliderState || !sliderState.slides) return [];
 
-    const offset = 0;
     const valuesArray = [];
 
     for (let i = 0; i < slides; i++) {

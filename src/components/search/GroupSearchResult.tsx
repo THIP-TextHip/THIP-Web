@@ -86,7 +86,7 @@ const dummyMyGroups: Group[] = [
 
 const GroupSearchResult = () => {
   const [selected, setSelected] = useState<string>('');
-  const [showGroup, setShowGroup] = useState<Group[]>(dummyMyGroups);
+  const [showGroup] = useState<Group[]>(dummyMyGroups);
   const [selectedFilter, setSelectedFilter] = useState<string>('마감임박순');
 
   const handleSelectTab = (tab: string) => {

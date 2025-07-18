@@ -1,4 +1,4 @@
-import { Section, SectionTitle } from '../CommonSection.styled';
+import { Section, SectionTitle } from '../../pages/group/CommonSection.styled';
 import { TextAreaBox, TextArea, CharacterCount } from './RoomInfoSection.styled';
 
 interface RoomInfoSectionProps {
