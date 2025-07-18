@@ -8,7 +8,12 @@ const mockProfile = {
   titleColor: '#a1d5ff',
 };
 
-const MyProfile = () => {
+export interface ProfileProps {
+  showFollowButton?: boolean;
+  isFollowed?: boolean;
+}
+
+const Profile = ({ showFollowButton, isFollowed }: ProfileProps) => {
   const { profileImgUrl, userName, userTitle, titleColor } = mockProfile;
 
   return (
@@ -23,7 +28,9 @@ const MyProfile = () => {
             </div>
           </div>
         </div>
-        {/* <div className="followbutton">구독</div> */}
+        {showFollowButton && (
+          <div className="followbutton">{isFollowed ? '구독 취소' : '구독'}</div>
+        )}
       </UserProfile>
       <MyFollower />
       <TotalBar>
@@ -118,4 +125,4 @@ const TotalBar = styled.div`
   }
 `;
 
-export default MyProfile;
+export default Profile;

@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
-import FollowList from './FollowList';
+import Profile from './Profile';
 import FeedPost from './FeedPost';
 import type { FeedListProps } from '../../types/post';
-import { colors, typography } from '@/styles/global/global';
+import { colors, typography } from '../../styles/global/global';
 
 const Container = styled.div`
-  padding-top: 136px;
+  padding-top: 56px;
   padding-bottom: 155px;
   background-color: var(--color-black-main);
 `;
@@ -24,12 +24,12 @@ const EmptyState = styled.div`
   letter-spacing: 0.018px;
 `;
 
-const TotalFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
+const OtherFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
   const hasPosts = posts.length > 0;
 
   return (
     <Container>
-      <FollowList />
+      <Profile showFollowButton={true} isFollowed={false} />
       {hasPosts ? (
         posts.map(post => (
           <FeedPost key={post.postId} showHeader={showHeader} isMyFeed={isMyFeed} {...post} />
@@ -43,4 +43,4 @@ const TotalFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
   );
 };
 
-export default TotalFeed;
+export default OtherFeed;
