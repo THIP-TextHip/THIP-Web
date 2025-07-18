@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -43,6 +43,8 @@ const mockUserList: UserProfileItemProps[] = [
 
 const FollowerListPage = () => {
   const navigate = useNavigate();
+  const { type } = useParams();
+  const title = type === 'followerlist' ? '띱 목록' : '내 띱 목록';
   const handleBackClick = () => {
     navigate(-1);
   };
@@ -50,11 +52,7 @@ const FollowerListPage = () => {
 
   return (
     <Wrapper>
-      <TitleHeader
-        leftIcon={<img src={leftArrow} />}
-        onLeftClick={handleBackClick}
-        title="내 구독 리스트"
-      />
+      <TitleHeader leftIcon={<img src={leftArrow} />} onLeftClick={handleBackClick} title={title} />
       <TotalBar>전체 {totalCount}</TotalBar>
       <UserProfileList>
         {mockUserList.map((user, index) => (

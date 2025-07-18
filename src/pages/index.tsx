@@ -30,8 +30,7 @@ const Router = () => {
         <Route path="group" element={<Group />} />
         <Route path="groupsearch" element={<GroupSearch />} />
         <Route path="feed" element={<Feed />} />
-        <Route path="feed/followerlist" element={<FollowerListPage />} />
-        <Route path="feed/followlist" element={<FollowerListPage />} />
+        <Route path="feed/:type" element={<FollowerListPage />} />
         <Route path="today-words" element={<TodayWords />} />
       </>,
     ),

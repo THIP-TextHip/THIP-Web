@@ -32,11 +32,11 @@ const FollowList = () => {
   };
 
   const handleMoreClick = () => {
-    navigate('/feed/followerlist');
+    navigate('/feed/followlist');
   };
 
   const handleProfileClick = () => {
-    navigate(`/feed/{userId`);
+    navigate(`/feed/{userId}`);
   };
 
   return (
