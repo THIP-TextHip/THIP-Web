@@ -6,18 +6,18 @@ import character from '../../assets/feed/character.svg';
 
 const followerData = {
   followers: [
-    { src: 'https://placehold.co/36x36', username: 'user1' },
-    { src: 'https://placehold.co/36x36', username: 'user2' },
-    { src: 'https://placehold.co/36x36', username: 'user3' },
-    { src: 'https://placehold.co/36x36', username: 'user4' },
-    { src: 'https://placehold.co/36x36', username: 'user5' },
-    { src: 'https://placehold.co/36x36', username: 'user6' },
-    { src: 'https://placehold.co/36x36', username: 'user7' },
-    { src: 'https://placehold.co/36x36', username: 'user8' },
-    { src: 'https://placehold.co/36x36', username: 'user9' },
-    { src: 'https://placehold.co/36x36', username: 'user10' },
-    { src: 'https://placehold.co/36x36', username: 'user11' },
-    { src: 'https://placehold.co/36x36', username: 'user12' },
+    { userId: 1, src: 'https://placehold.co/36x36', username: 'user1' },
+    { userId: 2, src: 'https://placehold.co/36x36', username: 'user2' },
+    { userId: 3, src: 'https://placehold.co/36x36', username: 'user3' },
+    { userId: 4, src: 'https://placehold.co/36x36', username: 'user4' },
+    { userId: 5, src: 'https://placehold.co/36x36', username: 'user5' },
+    { userId: 6, src: 'https://placehold.co/36x36', username: 'user6' },
+    { userId: 7, src: 'https://placehold.co/36x36', username: 'user7' },
+    { userId: 8, src: 'https://placehold.co/36x36', username: 'user8' },
+    { userId: 9, src: 'https://placehold.co/36x36', username: 'user9' },
+    { userId: 10, src: 'https://placehold.co/36x36', username: 'user10' },
+    { userId: 11, src: 'https://placehold.co/36x36', username: 'user11' },
+    { userId: 12, src: 'https://placehold.co/36x36', username: 'user12' },
   ],
 };
 
@@ -35,21 +35,21 @@ const FollowList = () => {
     navigate('/feed/followlist');
   };
 
-  const handleProfileClick = () => {
-    navigate(`/feed/{userId}`);
+  const handleProfileClick = (userId: number) => {
+    navigate(`/otherfeed/${userId}`);
   };
 
   return (
     <Container>
       <div className="title">
         <img src={people} />
-        <div>내 구독</div>
+        <div>내 띱</div>
       </div>
       {hasFollowers ? (
         <FollowContainer>
-          <div className="followerList" onClick={handleProfileClick}>
-            {visible.map(({ src, username }) => (
-              <div className="followers" key={username}>
+          <div className="followerList">
+            {visible.map(({ userId, src, username }) => (
+              <div className="followers" key={username} onClick={() => handleProfileClick(userId)}>
                 <img src={src} />
                 <div className="username">{username}</div>
               </div>
