@@ -7,7 +7,7 @@ const ReplyList = ({ commentList }: ReplyListProps) => {
   return (
     <Container>
       {commentList.map(comment => (
-        <div key={comment.commentId}>
+        <div className="comment-group" key={comment.commentId}>
           <Reply {...comment} />
           {comment.replyCommentList.map(sub => (
             <SubReply key={sub.replyCommentId} {...sub} />
@@ -26,6 +26,13 @@ const Container = styled.div`
   max-width: 540px;
   padding: 40px 20px;
   margin: 0 auto;
+  gap: 24px;
+
+  .comment-group {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
 `;
 
 export default ReplyList;

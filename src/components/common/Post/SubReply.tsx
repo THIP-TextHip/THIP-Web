@@ -54,7 +54,6 @@ const SubReply = ({
 const Container = styled.div`
   display: flex;
   flex-direction: row;
-  margin-bottom: 24px;
   width: 100%;
   gap: 8px;
 `;

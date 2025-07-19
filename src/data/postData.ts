@@ -10,7 +10,8 @@ export const mockFeedPost: FeedPostProps = {
   createdAt: '2025.01.12',
   bookTitle: '채식주의자',
   bookAuthor: '한강',
-  postContent: '정말 인상 깊게 읽은 책이에요.',
+  postContent:
+    '정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.',
   postId: '1',
   initialLikeCount: 15,
   commentCount: 2,
@@ -27,7 +28,8 @@ export const mockCommentList: ReplyDataProps[] = [
     userTitle: '독서가',
     titleColor: '#FF8BAC',
     createdAt: '2025.01.12',
-    replyContent: '이 책 정말 좋죠!',
+    replyContent:
+      '이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!',
     initialLikeCount: 1,
     replyCommentList: [
       {
@@ -37,7 +39,8 @@ export const mockCommentList: ReplyDataProps[] = [
         userTitle: '북러버',
         titleColor: '#A0F8E8',
         createdAt: '2025.01.13',
-        subreplyContent: '맞아요, 저도 너무 좋았어요!',
+        subreplyContent:
+          '맞아요, 저도 너무 좋았어요!맞아요, 저도 너무 좋았어요!맞아요, 저도 너무 좋았어요!맞아요, 저도 너무 좋았어요!',
         initialLikeCount: 2,
       },
       {
