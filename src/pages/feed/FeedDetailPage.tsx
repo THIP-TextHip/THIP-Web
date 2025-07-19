@@ -33,7 +33,6 @@ const Wrapper = styled.div`
   position: relative;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   min-width: 320px;
   max-width: 767px;
   min-height: 100vh;
