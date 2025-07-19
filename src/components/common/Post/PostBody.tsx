@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
-import BookInfoCard from './BookInfoCard';
+import BookInfoCard from '../../feed/BookInfoCard';
 
 const Container = styled.div`
   display: flex;

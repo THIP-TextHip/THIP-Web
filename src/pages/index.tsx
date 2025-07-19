@@ -16,6 +16,7 @@ import OtherFeedPage from './feed/OtherFeedPage';
 import FollowerListPage from './feed/FollowerListPage';
 import GroupSearch from './groupSearch/GroupSearch';
 import TodayWords from './today-words/TodayWords';
+import FeedDetailPage from './feed/FeedDetailPage';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -31,8 +32,9 @@ const Router = () => {
         <Route path="group" element={<Group />} />
         <Route path="groupsearch" element={<GroupSearch />} />
         <Route path="feed" element={<Feed />} />
+        <Route path="feed/:feedId" element={<FeedDetailPage />} />
         <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
-        <Route path="feed/:type" element={<FollowerListPage />} />
+        <Route path="follow/:type" element={<FollowerListPage />} />
         <Route path="today-words" element={<TodayWords />} />
       </>,
     ),

@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
-import PostBody from './PostBody';
-import PostFooter from './PostFooter';
-import PostHeader from './PostHeader';
+import PostBody from '../common/Post/PostBody';
+import PostFooter from '../common/Post/PostFooter';
+import PostHeader from '../common/Post/PostHeader';
 import type { FeedPostProps } from '../../types/post';
 
 const Container = styled.div`
@@ -28,7 +28,7 @@ const FeedPost = ({ showHeader, isMyFeed, ...postData }: FeedPostProps) => {
       <Container>
         {showHeader && <PostHeader {...postData} />}
         <PostBody {...postData} />
-        <PostFooter isMyFeed={isMyFeed} {...postData} />
+        <PostFooter isMyFeed={!!isMyFeed} {...postData} />
       </Container>
       <BorderBottom />
       {/* 페이징 처리에서 마지막 게시글인 경우 BorderBottom 안보이게 처리해야함 */}

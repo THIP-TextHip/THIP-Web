@@ -32,7 +32,6 @@ const TotalBar = ({ count }: TotalBarProps) => {
     <Container>
       <div className="total">전체</div>
       <div className="count">{count}</div>
-      {/* 피드 글 개수에 맞춰서 count 세야할듯 */}
     </Container>
   );
 };
