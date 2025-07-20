@@ -33,9 +33,12 @@ export const Header = styled.div`
   padding: 16px 20px;
   justify-content: space-between;
   width: 100%;
+  min-width: 320px;
+  max-width: 767px;
   top: 0;
   left: 0;
   right: 0;
+  margin: 0 auto;
   background: linear-gradient(
     0deg,
     rgba(0, 0, 0, 0) 0%,
@@ -208,7 +211,10 @@ export const BottomButton = styled.button`
   position: fixed;
   bottom: 0;
   left: 0;
+  right: 0;
   width: 100%;
+  min-width: 320px;
+  max-width: 767px;
   margin: 0 auto;
   height: 50px;
   background-color: ${colors.purple.main};
