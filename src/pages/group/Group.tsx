@@ -129,7 +129,7 @@ const Group = () => {
   const closeCompletedGroupModal = () => setIsCompletedGroupModalOpen(false);
 
   const handleSearchBarClick = () => {
-    navigate('/groupSearch');
+    navigate('/groupsearch');
   };
   return (
     <Wrapper>

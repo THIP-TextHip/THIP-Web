@@ -84,7 +84,7 @@ const dummyMyGroups: Group[] = [
   },
 ];
 
-const SearchResult = () => {
+const GroupSearchResult = () => {
   const [selected, setSelected] = useState<string>('');
   const [showGroup] = useState<Group[]>(dummyMyGroups);
   const [selectedFilter, setSelectedFilter] = useState<string>('마감임박순');
@@ -139,7 +139,7 @@ const SearchResult = () => {
   );
 };
 
-export default SearchResult;
+export default GroupSearchResult;
 
 const TabContainer = styled.div`
   display: flex;
