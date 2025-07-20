@@ -50,7 +50,7 @@ export const UserName = styled.div`
 
 export const TimeStamp = styled.div`
   color: ${semanticColors.text.tertiary};
-  font-size: 11px;
+  font-size: ${typography.fontSize['2xs']};
   font-weight: ${typography.fontWeight.regular};
 `;
 

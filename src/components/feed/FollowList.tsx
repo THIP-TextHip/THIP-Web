@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import people from '../../assets/feed/people.svg';
 import character from '../../assets/feed/character.svg';
+import { typography } from '@/styles/global/global';
 
 const followerData = {
   followers: [
@@ -83,7 +84,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: row;
     color: var(--color-white);
-    font-size: 11px;
+    font-size: ${typography.fontSize['2xs']};
     font-weight: var(--font-weight-medium);
     line-height: 20px;
   }
@@ -120,7 +121,7 @@ const FollowContainer = styled.div`
         text-overflow: ellipsis;
         text-align: center;
         white-space: nowrap;
-        font-size: var(--string-size-small02, 11px);
+        font-size: ${typography.fontSize['2xs']};
         font-weight: var(--string-weight-regular, 400);
         line-height: 20px;
       }

@@ -1,3 +1,4 @@
+import { typography } from '@/styles/global/global';
 import styled from '@emotion/styled';
 
 const Container = styled.div`
@@ -43,7 +44,7 @@ const Container = styled.div`
 
   .timestamp {
     color: var(--color-grey-200);
-    font-size: 11px;
+    font-size: ${typography.fontSize['2xs']};
     font-weight: var(--font-weight-regular);
     line-height: normal;
   }
