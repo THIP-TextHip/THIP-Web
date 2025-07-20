@@ -134,7 +134,7 @@ export const Tag = styled.div`
 `;
 
 export const TagGenre = styled.span`
-  color: #b5b35d;
+  color: ${colors.character.orange};
 `;
 
 export const BookSection = styled.section`
@@ -142,7 +142,7 @@ export const BookSection = styled.section`
   flex-direction: column;
   width: 94%;
   gap: 24px;
-  background: #1c1c1c;
+  background: ${colors.darkgrey.dark};
   margin: 10px 20px 0 20px;
   padding: 20px;
   border-radius: 16px;

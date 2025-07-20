@@ -15,7 +15,7 @@ export const GroupCard = forwardRef<HTMLDivElement, Props>(
   ({ group, isOngoing, type = 'main', isRecommend = false }, ref) => {
     return (
       <Card ref={ref} cardType={type}>
-        <Cover src={group.coverUrl} alt="cover" cardType={type} isRecommend={true} />
+        <Cover src={group.coverUrl} alt="cover" cardType={type} isRecommend={isRecommend} />
         <Info>
           <Title isRecommend={isRecommend}>{group.title}</Title>
           <Bottom>
