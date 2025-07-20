@@ -152,6 +152,7 @@ const Wrapper = styled.div`
 `;
 
 const TopBackground = styled.div<{ genre: string }>`
+  width: 100%;
   background:
     linear-gradient(
       172deg,
@@ -271,6 +272,7 @@ const TagGenre = styled.span`
 const BookSection = styled.section`
   display: flex;
   flex-direction: column;
+  width: 94%;
   gap: 24px;
   background: #1c1c1c;
   margin: 10px 20px 0 20px;
