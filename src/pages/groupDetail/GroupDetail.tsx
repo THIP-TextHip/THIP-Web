@@ -102,7 +102,6 @@ const GroupDetail = () => {
           </TagRow>
         </BannerSection>
       </TopBackground>
-
       <BookSection>
         <BookHeader>
           <h3>{book.title}</h3>

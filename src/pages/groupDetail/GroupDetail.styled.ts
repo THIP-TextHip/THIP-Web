@@ -172,6 +172,7 @@ export const BookDetails = styled.div`
   font-weight: ${typography.fontWeight.medium};
   gap: 20px;
   color: ${colors.white};
+  margin: auto 0;
 `;
 
 export const BookIntro = styled.div`
