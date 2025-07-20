@@ -19,6 +19,7 @@ import OtherFeedPage from './feed/OtherFeedPage';
 import FollowerListPage from './feed/FollowerListPage';
 import TodayWords from './today-words/TodayWords';
 import FeedDetailPage from './feed/FeedDetailPage';
+import ScrollToTop from '@/components/common/ScrollToTop';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -43,7 +44,12 @@ const Router = () => {
       </>,
     ),
   );
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <ScrollToTop />
+      <RouterProvider router={router} />
+    </>
+  );
 };
 
 export default Router;
