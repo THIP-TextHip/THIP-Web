@@ -18,6 +18,7 @@ import ApplyBook from './search/ApplyBook';
 import OtherFeedPage from './feed/OtherFeedPage';
 import FollowerListPage from './feed/FollowerListPage';
 import TodayWords from './today-words/TodayWords';
+import GroupDetail from './groupDetail/GroupDetail';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -29,9 +30,10 @@ const Router = () => {
           <Route path="genre" element={<SignupGenre />} />
         </Route>
         <Route path="signupdone" element={<SignupDone />} />
-        <Route path="group/create" element={<CreateGroup />} />
         <Route path="group" element={<Group />} />
-        <Route path="groupsearch" element={<GroupSearch />} />
+        <Route path="group/create" element={<CreateGroup />} />
+        <Route path="group/search" element={<GroupSearch />} />
+        <Route path="group/detail" element={<GroupDetail />} />
         <Route path="feed" element={<Feed />} />
         <Route path="search" element={<Search />} />
         <Route path="search/applybook" element={<ApplyBook />} />

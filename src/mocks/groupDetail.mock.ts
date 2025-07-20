@@ -16,7 +16,8 @@ export const mockGroupDetail = {
   book: {
     title: '심장보다 단단한 토마토 한 알',
     author: '고선경 저 · 림',
-    coverUrl: 'https://image.kyobobook.co.kr/images/book/large/123/l9791165344123.jpg',
+    coverUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5hmuOQ-2kEsWIyO7-COfdycw9LZt6c01v2A&s',
     description:
       '유머와 재미, 솔직한 고백 속에서 빛나는 진심, 용기와 사랑을 여전히 간직한 채로 어쩌고저쩌고...',
   },
@@ -24,23 +25,29 @@ export const mockGroupDetail = {
     {
       id: 1,
       title: '방제목입니다다 방 제목입...',
-      members: '22 / 30명',
-      dday: '3일 뒤 모집 마감',
-      thumbnail: '',
+      participants: 22,
+      maximumParticipants: 30,
+      deadLine: 3,
+      coverUrl:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5hmuOQ-2kEsWIyO7-COfdycw9LZt6c01v2A&s',
     },
     {
       id: 2,
-      title: '3월 독서 모임',
-      members: '18 / 30명',
-      dday: '5일 뒤 모집 마감',
-      thumbnail: '',
+      title: '방제목입니다다 방 제목입...',
+      participants: 22,
+      maximumParticipants: 30,
+      deadLine: 3,
+      coverUrl:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5hmuOQ-2kEsWIyO7-COfdycw9LZt6c01v2A&s',
     },
     {
       id: 3,
-      title: '서로 읽어주는 책방',
-      members: '30 / 30명',
-      dday: '모집 완료',
-      thumbnail: '',
+      title: '방제목입니다다 방 제목입...',
+      participants: 22,
+      maximumParticipants: 30,
+      deadLine: 3,
+      coverUrl:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5hmuOQ-2kEsWIyO7-COfdycw9LZt6c01v2A&s',
     },
   ],
 };
