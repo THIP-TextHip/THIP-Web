@@ -11,12 +11,14 @@ import plusIcon from '../../assets/common/plus.svg';
 import { Filter } from '@/components/common/Filter';
 import { useState } from 'react';
 import FeedPost from '@/components/feed/FeedPost';
+import { IntroModal } from '@/components/search/IntroModal';
 
 const FILTER = ['최신순', '인기순'];
 
 const SearchBook = () => {
   const { title, author, introduction, coverUrl, recruitGroups, posts } = mockSearchBook;
   const [selectedFilter, setSelectedFilter] = useState<string>('인기순');
+  const [showIntroModal, setShowIntroModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -24,13 +26,20 @@ const SearchBook = () => {
     navigate(-1);
   };
 
+  const handleIntroClick = () => setShowIntroModal(true);
+
+  const handleCloseIntroModal = () => setShowIntroModal(false);
+
   const handleMoreButton = () => {};
 
-  const handleRecruitingGroupButton = () => {};
+  const handleRecruitingGroupButton = () => {
+    navigate('./group');
+  };
 
   const handleWritePostButton = () => {};
 
   const handleSaveButton = () => {};
+
   return (
     <Wrapper>
       <TopBackground bookImgUrl={coverUrl} />
@@ -43,7 +52,7 @@ const SearchBook = () => {
           <BookTitle>{title}</BookTitle>
           <Author>{author}</Author>
         </BookInfo>
-        <Intro>
+        <Intro onClick={handleIntroClick}>
           <SubTitle>소개</SubTitle>
           <SubText>{introduction}</SubText>
         </Intro>
@@ -78,6 +87,9 @@ const SearchBook = () => {
         ))}
         ;
       </FeedSection>
+      {showIntroModal && (
+        <IntroModal title="소개" content={introduction} onClose={handleCloseIntroModal} />
+      )}
     </Wrapper>
   );
 };
