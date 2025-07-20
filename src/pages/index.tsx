@@ -18,6 +18,7 @@ import ApplyBook from './search/ApplyBook';
 import OtherFeedPage from './feed/OtherFeedPage';
 import FollowerListPage from './feed/FollowerListPage';
 import TodayWords from './today-words/TodayWords';
+import SearchBook from './searchBook/SearchBook';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -35,6 +36,7 @@ const Router = () => {
         <Route path="feed" element={<Feed />} />
         <Route path="search" element={<Search />} />
         <Route path="search/applybook" element={<ApplyBook />} />
+        <Route path="search/book" element={<SearchBook />} />
         <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
         <Route path="feed/:type" element={<FollowerListPage />} />
         <Route path="today-words" element={<TodayWords />} />

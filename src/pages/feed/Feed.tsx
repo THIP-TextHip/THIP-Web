@@ -7,6 +7,7 @@ import TotalFeed from '../../components/feed/TotalFeed';
 import type { PostData } from '../../types/post';
 import MainHeader from '@/components/common/MainHeader';
 import writefab from '../../assets/common/writefab.svg';
+
 const Container = styled.div`
   min-width: 320px;
   max-width: 767px;
