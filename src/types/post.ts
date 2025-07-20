@@ -1,10 +1,12 @@
 export interface PostData {
   profileImgUrl: string;
   userName: string;
+  userId: number;
   userTitle: string;
   titleColor: string;
   createdAt: string;
   bookTitle: string;
+  isbn: number;
   bookAuthor: string;
   postContent: string;
   postId: string;
@@ -26,11 +28,17 @@ export interface FeedPostProps extends PostData {
   isMyFeed?: boolean;
 }
 
+export type PostBodyProps = Pick<
+  PostData,
+  'bookTitle' | 'bookAuthor' | 'postContent' | 'postId' | 'images' | 'tags' | 'isbn'
+>;
+
 // 대댓글(SubReply)
 export interface SubReplyDataProps {
   replyCommentId: number;
   profileImgUrl: string;
   userName: string;
+  userId: number;
   userTitle: string;
   titleColor: string;
   createdAt: string;
@@ -43,6 +51,7 @@ export interface ReplyDataProps {
   commentId: number;
   profileImgUrl: string;
   userName: string;
+  userId: number;
   userTitle: string;
   titleColor: string;
   createdAt: string;

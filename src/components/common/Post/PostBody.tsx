@@ -1,13 +1,13 @@
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 import BookInfoCard from '../../feed/BookInfoCard';
+import type { PostBodyProps } from '@/types/post';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
   gap: 16px;
-  cursor: pointer;
 `;
 
 const PostContent = styled.div<{ hasImage: boolean }>`
@@ -76,17 +76,9 @@ const TagContainer = styled.div`
   }
 `;
 
-interface PostBodyProps {
-  bookTitle: string;
-  bookAuthor: string;
-  postContent: string;
-  postId: string;
-  images?: string[];
-  tags?: string[];
-}
-
 const PostBody = ({
   bookTitle,
+  isbn,
   bookAuthor,
   postContent,
   postId,
@@ -98,13 +90,14 @@ const PostBody = ({
   const hasTag = tags.length > 0;
 
   const handlePostContent = () => {
+    // if (!isClickable) return;
     navigate(`/feed/${postId}`);
     // API 연동시 경로 수정 필요
   };
 
   return (
     <Container>
-      <BookInfoCard bookTitle={bookTitle} bookAuthor={bookAuthor} />
+      <BookInfoCard bookTitle={bookTitle} bookAuthor={bookAuthor} isbn={isbn} />
       <PostContent hasImage={hasImage} onClick={handlePostContent}>
         <div className="content">{postContent}</div>
         {hasImage && (
