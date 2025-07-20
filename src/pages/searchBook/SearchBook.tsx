@@ -40,6 +40,8 @@ const SearchBook = () => {
 
   const handleSaveButton = () => {};
 
+  const hasFeeds = mockSearchBook.posts.length > 0;
+
   return (
     <Wrapper>
       <TopBackground bookImgUrl={coverUrl} />
@@ -80,13 +82,23 @@ const SearchBook = () => {
             filters={FILTER}
             selectedFilter={selectedFilter}
             setSelectedFilter={setSelectedFilter}
-          ></Filter>
+          />
         </FilterContainer>
-        {posts.map(post => (
-          <FeedPost showHeader={true} isMyFeed={false} {...post}></FeedPost>
-        ))}
-        ;
+
+        {hasFeeds ? (
+          <>
+            {posts.map(post => (
+              <FeedPost showHeader={true} isMyFeed={false} {...post} />
+            ))}
+          </>
+        ) : (
+          <EmptyState>
+            <EmptyTitle>이 책으로 작성된 피드가 없어요.</EmptyTitle>
+            <EmptySubText>첫 번째 피드를 작성해보세요!</EmptySubText>
+          </EmptyState>
+        )}
       </FeedSection>
+
       {showIntroModal && (
         <IntroModal title="소개" content={introduction} onClose={handleCloseIntroModal} />
       )}
@@ -259,6 +271,7 @@ const SaveButton = styled.button`
 
 const FeedSection = styled.section`
   display: flex;
+  width: 96%;
   flex-direction: column;
   margin-top: 20px;
 `;
@@ -277,4 +290,28 @@ const FilterContainer = styled.div`
   margin: 0 20px;
   padding: 0 0 10px 0;
   border-bottom: 1px solid ${colors.darkgrey.dark};
+`;
+
+const EmptyState = styled.div`
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  margin-bottom: 70px;
+  color: ${colors.grey[100]};
+`;
+
+const EmptyTitle = styled.p`
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
+  margin-bottom: 8px;
+  color: ${colors.white};
+`;
+
+const EmptySubText = styled.p`
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
+  color: ${colors.grey[100]};
 `;
