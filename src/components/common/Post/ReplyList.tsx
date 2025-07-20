@@ -36,6 +36,7 @@ const Container = styled.div`
   max-width: 540px;
   padding: 40px 20px;
   margin: 0 auto;
+  margin-bottom: 56px;
   gap: 24px;
   flex: 1;
 
@@ -56,6 +57,7 @@ const EmptyState = styled.div`
   max-width: 540px;
   padding: 40px 20px;
   margin: 0 auto;
+  margin-bottom: 56px;
   gap: 8px;
   flex: 1;
 

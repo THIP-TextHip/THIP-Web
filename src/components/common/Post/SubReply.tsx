@@ -35,6 +35,7 @@ const SubReply = ({
           userTitle={userTitle}
           titleColor={titleColor}
           createdAt={createdAt}
+          type="reply"
         />
         <ReplySection>
           <div className="left">
