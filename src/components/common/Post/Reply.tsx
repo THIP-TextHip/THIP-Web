@@ -9,6 +9,7 @@ import activeLike from '../../../assets/feed/activeLike.svg';
 const Reply = ({
   profileImgUrl,
   userName,
+  userId,
   userTitle,
   titleColor,
   createdAt,
@@ -30,6 +31,7 @@ const Reply = ({
         userTitle={userTitle}
         titleColor={titleColor}
         createdAt={createdAt}
+        userId={userId}
         type="reply"
       />
       <ReplySection>

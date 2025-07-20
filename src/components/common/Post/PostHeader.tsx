@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 
 interface PostHeaderProps {
@@ -6,6 +7,7 @@ interface PostHeaderProps {
   userTitle: string;
   titleColor: string;
   createdAt: string;
+  userId: number;
   type?: 'post' | 'reply';
 }
 
@@ -15,10 +17,16 @@ const PostHeader = ({
   userTitle,
   titleColor,
   createdAt,
+  userId,
   type = 'post',
 }: PostHeaderProps) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/otherfeed/${userId}`);
+  };
   return (
-    <Container type={type}>
+    <Container type={type} onClick={handleClick}>
       <div className="headerInfo">
         <img src={profileImgUrl} alt="칭호 이미지" />
         <div className="infoBox">

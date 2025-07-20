@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import rightArrow from '../../assets/common/rightArrow.svg';
 
@@ -48,11 +49,18 @@ const BookContainer = styled.div`
 interface BookInfoCardProps {
   bookTitle: string;
   bookAuthor: string;
+  isbn: number;
 }
 
-const BookInfoCard = ({ bookTitle, bookAuthor }: BookInfoCardProps) => {
+const BookInfoCard = ({ bookTitle, bookAuthor, isbn }: BookInfoCardProps) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/book/${isbn}`);
+  };
+
   return (
-    <BookContainer>
+    <BookContainer onClick={handleClick}>
       <div className="left">{bookTitle}</div>
       <div className="right">
         <div className="name">{bookAuthor}</div>

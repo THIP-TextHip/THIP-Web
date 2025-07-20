@@ -10,6 +10,7 @@ import replyIcon from '../../../assets/feed/replyIcon.svg';
 const SubReply = ({
   profileImgUrl,
   userName,
+  userId,
   userTitle,
   titleColor,
   createdAt,
@@ -35,6 +36,7 @@ const SubReply = ({
           userTitle={userTitle}
           titleColor={titleColor}
           createdAt={createdAt}
+          userId={userId}
           type="reply"
         />
         <ReplySection>
