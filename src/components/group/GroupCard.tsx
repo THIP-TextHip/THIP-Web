@@ -8,25 +8,30 @@ interface Props {
   group: Group;
   isOngoing?: boolean;
   type?: 'main' | 'search' | 'modal';
+  isRecommend?: boolean;
 }
 
 export const GroupCard = forwardRef<HTMLDivElement, Props>(
-  ({ group, isOngoing, type = 'main' }, ref) => {
+  ({ group, isOngoing, type = 'main', isRecommend = false }, ref) => {
     return (
       <Card ref={ref} cardType={type}>
-        <Cover src={group.coverUrl} alt="cover" cardType={type} />
+        <Cover src={group.coverUrl} alt="cover" cardType={type} isRecommend={true} />
         <Info>
-          <Title>{group.title}</Title>
+          <Title isRecommend={isRecommend}>{group.title}</Title>
           <Bottom>
-            <Participant>
+            <Participant isRecommend={isRecommend}>
               <img src={peopleIcon} alt="people" />
               <p>{group.participants}</p>
               <MaximumParticipants>/ {group.maximumParticipants}명</MaximumParticipants>
             </Participant>
             {isOngoing === true ? (
-              <RecruitingDeadline>{group.deadLine}일 뒤 모집 마감</RecruitingDeadline>
+              <RecruitingDeadline isRecommend={isRecommend}>
+                {group.deadLine}일 뒤 모집 마감
+              </RecruitingDeadline>
             ) : (
-              <OngoingDeadline>{group.deadLine}일 뒤 종료</OngoingDeadline>
+              <OngoingDeadline isRecommend={isRecommend}>
+                {group.deadLine}일 뒤 종료
+              </OngoingDeadline>
             )}
           </Bottom>
         </Info>
@@ -39,23 +44,23 @@ const Card = styled.div<{ cardType: 'main' | 'search' | 'modal' }>`
   display: flex;
   align-items: center;
   background: ${({ cardType }) =>
-    cardType === 'search' ? 'var(--color-black-main)' : 'var(--color-darkgrey-main)'};
+    cardType === 'search' ? colors.black.main : colors.darkgrey.main};
+  border-top: ${({ cardType }) =>
+    cardType === 'search' ? `1px solid ${colors.darkgrey.dark}` : 'none'};
+  border: ${({ cardType }) => (cardType === 'main' ? `1px solid ${colors.grey[300]}` : 'none')};
   border-radius: ${({ cardType }) => (cardType === 'search' ? `none` : '12px')};
   box-sizing: border-box;
   padding: ${({ cardType }) => (cardType === 'search' ? '24px 12px 12px 12px' : '12px')};
   gap: 12px;
   width: 100%;
-  border: ${({ cardType }) => (cardType === 'main' ? '1px solid var(--color-grey-300)' : 'none')};
-  border-top: ${({ cardType }) =>
-    cardType === 'search' ? `1px solid ${colors.darkgrey.dark}` : ''};
 `;
 
-const Cover = styled.img<{ cardType: 'main' | 'search' | 'modal' }>`
+const Cover = styled.img<{ cardType: 'main' | 'search' | 'modal'; isRecommend?: boolean }>`
   object-fit: cover;
   flex-shrink: 0;
-
-  width: ${({ cardType }) => (cardType === 'search' ? '60px' : '80px')};
-  height: ${({ cardType }) => (cardType === 'search' ? '80px' : '107px')};
+  width: ${({ cardType, isRecommend }) => (cardType === 'search' || isRecommend ? '60px' : '80px')};
+  height: ${({ cardType, isRecommend }) =>
+    cardType === 'search' || isRecommend ? '80px' : '107px'};
 `;
 
 const Info = styled.div`
@@ -65,8 +70,9 @@ const Info = styled.div`
   flex: 1;
 `;
 
-const Title = styled.h3`
-  font-size: ${typography.fontSize.lg};
+const Title = styled.h3<{ isRecommend: boolean }>`
+  font-size: ${({ isRecommend }) =>
+    isRecommend ? typography.fontSize.sm : typography.fontSize.lg};
   font-weight: ${typography.fontWeight.semibold};
   color: #ffffff;
   margin-bottom: 10px;
@@ -84,31 +90,32 @@ const Bottom = styled.div`
   gap: 6px;
 `;
 
-const Participant = styled.div`
+const Participant = styled.div<{ isRecommend: boolean }>`
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--color-white);
-  font-size: var(--font-size-small03);
-  font-weight: var(--font-weight-medium);
+  color: ${colors.white};
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.medium};
   img {
     width: 16px;
     height: 16px;
   }
 `;
+
 const MaximumParticipants = styled.div`
-  color: var(--color-grey-100);
-  font-size: var(--font-size-small03);
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.xs};
 `;
 
-const RecruitingDeadline = styled.div`
-  font-size: var(--font-size-small03);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-red);
+const RecruitingDeadline = styled.div<{ isRecommend: boolean }>`
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.medium};
+  color: ${colors.red};
 `;
 
-const OngoingDeadline = styled.div`
-  font-size: var(--font-size-small03);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-white);
+const OngoingDeadline = styled.div<{ isRecommend: boolean }>`
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.medium};
+  color: ${colors.white};
 `;
