@@ -116,7 +116,7 @@ const TopBackground = styled.div<{ bookImgUrl: string }>`
   left: 0;
   right: 0;
   width: 100%;
-  height: 50vh;
+  height: 45vh;
   background:
     linear-gradient(
       172deg,
@@ -260,6 +260,7 @@ const SaveButton = styled.button`
 const FeedSection = styled.section`
   display: flex;
   flex-direction: column;
+  margin-top: 20px;
 `;
 
 const FeedTitle = styled.h2`
