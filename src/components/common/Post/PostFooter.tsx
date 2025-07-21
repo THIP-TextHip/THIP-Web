@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
-import like from '../../assets/feed/like.svg';
-import activeLike from '../../assets/feed/activeLike.svg';
-import comment from '../../assets/feed/comment.svg';
-import save from '../../assets/feed/save.svg';
-import activeSave from '../../assets/feed/activeSave.svg';
-import lockIcon from '../../assets/feed/lockIcon.svg';
+import like from '../../../assets/feed/like.svg';
+import activeLike from '../../../assets/feed/activeLike.svg';
+import comment from '../../../assets/feed/comment.svg';
+import save from '../../../assets/feed/save.svg';
+import activeSave from '../../../assets/feed/activeSave.svg';
+import lockIcon from '../../../assets/feed/lockIcon.svg';
 
 const Container = styled.div`
   width: 100%;

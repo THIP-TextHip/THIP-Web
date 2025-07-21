@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import MyFollower from './MyFollower';
 
@@ -15,6 +16,17 @@ export interface ProfileProps {
 
 const Profile = ({ showFollowButton, isFollowed }: ProfileProps) => {
   const { profileImgUrl, userName, userTitle, titleColor } = mockProfile;
+  const [followed, setFollowed] = useState(isFollowed);
+
+  const toggleFollow = () => {
+    if (followed) {
+      // await axios.delete(`/api/unfollow/${userName}`);
+    } else {
+      // await axios.post(`/api/follow/${userName}`);
+    }
+    setFollowed(prev => !prev);
+    console.log(`${userName} - ${followed ? '띱 취소' : '띱 요청'}`);
+  };
 
   return (
     <Container>
@@ -29,7 +41,9 @@ const Profile = ({ showFollowButton, isFollowed }: ProfileProps) => {
           </div>
         </div>
         {showFollowButton && (
-          <div className="followbutton">{isFollowed ? '구독 취소' : '구독'}</div>
+          <div className="followbutton" onClick={toggleFollow}>
+            {followed ? '띱 취소' : '띱 하기'}
+          </div>
         )}
       </UserProfile>
       <MyFollower />
@@ -98,6 +112,7 @@ const UserProfile = styled.div`
     font-size: var(--string-size-medium01, 14px);
     font-weight: var(--string-weight-medium, 500);
     line-height: normal;
+    cursor: pointer;
   }
 `;
 

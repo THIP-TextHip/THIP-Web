@@ -94,7 +94,12 @@ const TodayWords = () => {
           )}
         </ContentArea>
 
-        <MessageInput value={inputValue} onChange={setInputValue} onSend={handleSendMessage} />
+        <MessageInput
+          value={inputValue}
+          onChange={setInputValue}
+          onSend={handleSendMessage}
+          placeholder="메이트들과 간단한 인사를 나눠보세요!"
+        />
 
         {/* 개발용 토글 버튼 */}
         <button

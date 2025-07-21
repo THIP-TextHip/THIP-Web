@@ -107,6 +107,13 @@ const FollowContainer = styled.div`
     overflow-y: hidden;
     gap: 12px;
 
+    /* ✅ 스크롤바 숨기기 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE, Edge */
+    .followerList::-webkit-scrollbar {
+      display: none; /* Chrome, Safari */
+    }
+
     .followers {
       display: flex;
       flex-direction: column;

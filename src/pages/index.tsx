@@ -19,6 +19,8 @@ import OtherFeedPage from './feed/OtherFeedPage';
 import FollowerListPage from './feed/FollowerListPage';
 import TodayWords from './today-words/TodayWords';
 import GroupDetail from './groupDetail/GroupDetail';
+import FeedDetailPage from './feed/FeedDetailPage';
+import ScrollToTop from '@/components/common/ScrollToTop';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -35,15 +37,21 @@ const Router = () => {
         <Route path="group/search" element={<GroupSearch />} />
         <Route path="group/detail" element={<GroupDetail />} />
         <Route path="feed" element={<Feed />} />
+        <Route path="feed/:feedId" element={<FeedDetailPage />} />
         <Route path="search" element={<Search />} />
         <Route path="search/applybook" element={<ApplyBook />} />
         <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
-        <Route path="feed/:type" element={<FollowerListPage />} />
+        <Route path="follow/:type" element={<FollowerListPage />} />
         <Route path="today-words" element={<TodayWords />} />
       </>,
     ),
   );
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <ScrollToTop />
+      <RouterProvider router={router} />
+    </>
+  );
 };
 
 export default Router;
