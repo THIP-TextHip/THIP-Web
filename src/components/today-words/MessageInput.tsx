@@ -11,9 +11,10 @@ interface MessageInputProps {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
+  placeholder: string;
 }
 
-const MessageInput = ({ value, onChange, onSend }: MessageInputProps) => {
+const MessageInput = ({ value, onChange, onSend, placeholder }: MessageInputProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState(false); // IME 조합 상태
 
@@ -43,14 +44,23 @@ const MessageInput = ({ value, onChange, onSend }: MessageInputProps) => {
       if (isComposing) {
         return;
       }
-
+      if (value.trim() === '') return; // 공백 메세지 전송 방지
       e.preventDefault();
       onSend();
+      // 전송 후 채팅창 높이 초기화
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto';
+      }
     }
   };
 
   const handleSendClick = () => {
+    if (value.trim() === '') return; // 공백 메세지 전송 방지
     onSend();
+    // 전송 후 채팅창 높이 초기화
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
   };
 
   return (
@@ -58,7 +68,7 @@ const MessageInput = ({ value, onChange, onSend }: MessageInputProps) => {
       <MessageInputWrapper>
         <StyledMessageInput
           ref={inputRef}
-          placeholder="메이트들과 간단한 인사를 나눠보세요!"
+          placeholder={placeholder}
           value={value}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}

@@ -50,6 +50,7 @@ const InnerHeader = styled.div`
 type HeaderProps = {
   title?: string;
   leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
   rightButton?: React.ReactNode;
   isNextActive?: boolean;
   onLeftClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -58,6 +59,7 @@ type HeaderProps = {
 
 const TitleHeader = ({
   leftIcon,
+  rightIcon,
   title,
   rightButton,
   isNextActive = false,
@@ -70,7 +72,11 @@ const TitleHeader = ({
         {leftIcon}
       </div>
       <div className="title">{title}</div>
-      {rightButton ? (
+      {rightIcon ? (
+        <div onClick={onRightClick} style={{ cursor: onRightClick ? 'pointer' : 'default' }}>
+          {rightIcon}
+        </div>
+      ) : rightButton ? (
         <NextButton onClick={onRightClick} active={isNextActive}>
           {rightButton}
         </NextButton>
