@@ -8,6 +8,7 @@ import MainHeader from '@/components/common/MainHeader';
 import writefab from '../../assets/common/writefab.svg';
 import { mockPosts } from '@/data/postData';
 
+
 const Container = styled.div`
   min-width: 320px;
   max-width: 767px;
