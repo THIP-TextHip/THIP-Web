@@ -20,6 +20,7 @@ import FollowerListPage from './feed/FollowerListPage';
 import TodayWords from './today-words/TodayWords';
 import SearchBook from './searchBook/SearchBook';
 import SearchBookGroup from './searchBook/SearchBookGroup';
+import GroupDetail from './groupDetail/GroupDetail';
 import FeedDetailPage from './feed/FeedDetailPage';
 import ScrollToTop from '@/components/common/ScrollToTop';
 
@@ -33,9 +34,10 @@ const Router = () => {
           <Route path="genre" element={<SignupGenre />} />
         </Route>
         <Route path="signupdone" element={<SignupDone />} />
-        <Route path="group/create" element={<CreateGroup />} />
         <Route path="group" element={<Group />} />
-        <Route path="groupsearch" element={<GroupSearch />} />
+        <Route path="group/create" element={<CreateGroup />} />
+        <Route path="group/search" element={<GroupSearch />} />
+        <Route path="group/detail" element={<GroupDetail />} />
         <Route path="feed" element={<Feed />} />
         <Route path="feed/:feedId" element={<FeedDetailPage />} />
         <Route path="search" element={<Search />} />
