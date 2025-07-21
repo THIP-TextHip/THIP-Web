@@ -8,15 +8,32 @@ import moreIcon from '../../assets/common/more.svg';
 import ReplyList from '@/components/common/Post/ReplyList';
 import { mockFeedPost, mockCommentList } from '@/data/postData';
 import MessageInput from '@/components/today-words/MessageInput';
+import { useModalStore } from '@/stores/useModalStore';
 
 const FeedDetailPage = () => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
+
   const handleBackClick = () => {
     navigate(-1);
   };
-  const handleMoreClick = () => {};
 
+  const handleMoreClick = () => {
+    openModal('moremenu', {
+      onEdit: () => {
+        console.log('수정하기 클릭');
+      },
+      onDelete: () => {
+        console.log('삭제하기 클릭');
+        openModal('confirm', {
+          title: '이 피드를 삭제하시겠어요?',
+          disc: '삭제 후에는 되돌릴 수 없어요',
+          onConfirm: () => console.log('확인 클릭'),
+        });
+      },
+    });
+  };
   const handleSend = () => {
     if (!message.trim()) return;
     console.log('작성한 댓글 내용:', message);
