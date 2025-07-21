@@ -53,7 +53,7 @@ const SearchBarWrapper = styled.div`
   border-radius: 12px;
   width: calc(100% - 40px);
   margin: 76px 20px 16px 20px;
-  padding: 16px 20px;
+  padding: 8px 12px;
   box-sizing: border-box;
 
   .delete-btn {
@@ -75,6 +75,7 @@ const Input = styled.input`
   font-size: 14px;
   padding: 8px 0;
   box-sizing: border-box;
+  caret-color: var(--color-neongreen);
 
   &::placeholder {
     color: var(--color-grey-300);
