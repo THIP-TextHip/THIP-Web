@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import rightArrow from '../../assets/feed/rightArrow.svg';
+import { typography } from '@/styles/global/global';
 
 export interface UserProfileItemProps {
   profileImgUrl: string;
@@ -143,7 +144,7 @@ const UserProfile = styled.div`
     align-items: center;
     gap: 2px;
     color: var(--color-white);
-    font-size: 11px;
+    font-size: ${typography.fontSize['2xs']};
     font-weight: var(--font-weight-regular);
     line-height: 20px;
   }

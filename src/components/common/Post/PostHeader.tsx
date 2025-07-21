@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
-
 interface PostHeaderProps {
   profileImgUrl: string;
   userName: string;
