@@ -1,0 +1,137 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import TitleHeader from '../../components/common/TitleHeader';
+import BookSearchBottomSheet from '../../components/common/BookSearchBottomSheet/BookSearchBottomSheet';
+import BookSelectionSection from '../../components/creategroup/BookSelectionSection';
+import PostContentSection from '../../components/createpost/PostContentSection';
+import PhotoSection from '../../components/createpost/PhotoSection';
+import PrivacySettingSection from '../../components/creategroup/PrivacySettingSection/PrivacySettingSection';
+import TagSelectionSection from '../../components/createpost/TagSelectionSection';
+import leftarrow from '../../assets/common/leftArrow.svg';
+import { Container } from './CreatePost.styled';
+import { Section } from '../group/CommonSection.styled';
+
+const CreatePost = () => {
+  const navigate = useNavigate();
+  const [selectedBook, setSelectedBook] = useState<any>(null);
+  const [postContent, setPostContent] = useState('');
+  const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [password, setPassword] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
+
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
+  const handleCompleteClick = () => {
+    // 완료 로직 추후 구현
+    console.log('글 작성 완료');
+    console.log('선택된 책:', selectedBook);
+    console.log('글 내용:', postContent);
+    console.log('선택된 사진:', selectedPhotos);
+    console.log('비공개 설정:', isPrivate);
+    console.log('선택된 태그:', selectedTags);
+  };
+
+  const handleBookSearchOpen = () => {
+    setIsBookSearchOpen(true);
+  };
+
+  const handleChangeBook = () => {
+    setIsBookSearchOpen(true);
+  };
+
+  const handleBookSearchClose = () => {
+    setIsBookSearchOpen(false);
+  };
+
+  const handleBookSelect = (book: any) => {
+    setSelectedBook(book);
+  };
+
+  const handlePhotoAdd = (files: File[]) => {
+    setSelectedPhotos(prev => [...prev, ...files].slice(0, 3)); // 최대 3개까지
+  };
+
+  const handlePhotoRemove = (index: number) => {
+    setSelectedPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handlePrivacyToggle = () => {
+    setIsPrivate(!isPrivate);
+    // 비공개 설정을 끄면 비밀번호도 초기화
+    if (isPrivate) {
+      setPassword('');
+    }
+  };
+
+  const handlePasswordChange = (newPassword: string) => {
+    setPassword(newPassword);
+  };
+
+  const handlePasswordClose = () => {
+    setPassword('');
+  };
+
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags(prev => (prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]));
+  };
+
+  const isFormValid = selectedBook && postContent.trim() !== '';
+
+  return (
+    <>
+      <TitleHeader
+        leftIcon={<img src={leftarrow} alt="뒤로가기" />}
+        title="새 글"
+        rightButton="완료"
+        onLeftClick={handleBackClick}
+        onRightClick={handleCompleteClick}
+        isNextActive={isFormValid}
+      />
+      <Container>
+        <BookSelectionSection
+          selectedBook={selectedBook}
+          onSearchClick={handleBookSearchOpen}
+          onChangeClick={handleChangeBook}
+        />
+
+        <Section showDivider />
+
+        <PostContentSection content={postContent} onContentChange={setPostContent} />
+
+        <Section showDivider />
+
+        <PhotoSection
+          photos={selectedPhotos}
+          onPhotoAdd={handlePhotoAdd}
+          onPhotoRemove={handlePhotoRemove}
+        />
+
+        <Section showDivider />
+
+        <PrivacySettingSection
+          isPrivate={isPrivate}
+          password={password}
+          onToggle={handlePrivacyToggle}
+          onPasswordChange={handlePasswordChange}
+          onPasswordClose={handlePasswordClose}
+        />
+
+        <Section showDivider />
+
+        <TagSelectionSection selectedTags={selectedTags} onTagToggle={handleTagToggle} />
+
+        <BookSearchBottomSheet
+          isOpen={isBookSearchOpen}
+          onClose={handleBookSearchClose}
+          onSelectBook={handleBookSelect}
+        />
+      </Container>
+    </>
+  );
+};
+
+export default CreatePost;
