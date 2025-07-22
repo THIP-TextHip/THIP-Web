@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import rightChevron from '../../assets/common/right-Chevron.svg';
 
 export interface Group {
-  id: string;
+  id: number | string;
   title: string;
   participants: number;
   maximumParticipants?: number;
