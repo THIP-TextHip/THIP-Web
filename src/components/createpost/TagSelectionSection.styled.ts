@@ -32,8 +32,8 @@ export const GenreButton = styled.button<{ active: boolean }>`
 `;
 
 export const SubTagGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 `;
 
@@ -50,6 +50,8 @@ export const SubTagButton = styled.button<{ active: boolean; disabled: boolean }
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: all 0.2s;
   opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
+  white-space: nowrap;
+  width: auto;
 
   &:hover:not(:disabled) {
     border-color: ${semanticColors.button.fill.primary};
@@ -92,6 +94,14 @@ export const SelectedTagItem = styled.button`
   font-weight: ${typography.fontWeight.regular};
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  img {
+    width: 12px;
+    height: 12px;
+  }
 
   &:hover {
     background-color: rgba(104, 104, 255, 0.1);

@@ -12,6 +12,7 @@ import {
   SelectedTagItem,
   TagCount,
 } from './TagSelectionSection.styled';
+import closeIcon from '../../assets/post/close.svg';
 
 interface TagSelectionSectionProps {
   selectedTags: string[];
@@ -96,7 +97,8 @@ const TagSelectionSection = ({ selectedTags, onTagToggle }: TagSelectionSectionP
             <SelectedTagList>
               {selectedTags.map(tag => (
                 <SelectedTagItem key={tag} onClick={() => handleSelectedTagRemove(tag)}>
-                  #{tag} ×
+                  #{tag}
+                  <img src={closeIcon} alt="삭제" />
                 </SelectedTagItem>
               ))}
             </SelectedTagList>
