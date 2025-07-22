@@ -26,13 +26,24 @@ const CreatePost = () => {
   };
 
   const handleCompleteClick = () => {
-    // 완료 로직 추후 구현
+    // 필수 항목 검증
+    if (!isFormValid) {
+      console.log('필수 항목을 입력해주세요.');
+      return;
+    }
+
+    // 글 작성 완료 로직
     console.log('글 작성 완료');
-    console.log('선택된 책:', selectedBook);
-    console.log('글 내용:', postContent);
-    console.log('선택된 사진:', selectedPhotos);
-    console.log('비공개 설정:', isPrivate);
-    console.log('선택된 태그:', selectedTags);
+    console.log('필수 - 선택된 책:', selectedBook);
+    console.log('필수 - 글 내용:', postContent);
+    console.log('선택 - 선택된 사진:', selectedPhotos);
+    console.log('선택 - 비공개 설정:', isPrivate);
+    console.log('선택 - 비밀번호:', password);
+    console.log('선택 - 선택된 태그:', selectedTags);
+
+    // TODO: API 호출하여 글 등록
+    // 완료 후 이전 페이지로 이동
+    navigate(-1);
   };
 
   const handleBookSearchOpen = () => {
@@ -79,6 +90,7 @@ const CreatePost = () => {
     setSelectedTags(prev => (prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]));
   };
 
+  // 책 선택과 글 내용만 필수, 나머지는 선택사항
   const isFormValid = selectedBook && postContent.trim() !== '';
 
   return (
