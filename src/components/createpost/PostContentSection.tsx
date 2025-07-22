@@ -14,7 +14,7 @@ const PostContentSection = ({ content, onContentChange }: PostContentSectionProp
       <SectionTitle>글 작성</SectionTitle>
       <TextAreaBox>
         <TextArea
-          placeholder="...한 생각이 들었어요😶"
+          placeholder="...한 생각이 들었어요. 🤔"
           value={content}
           onChange={e => onContentChange(e.target.value)}
           maxLength={maxLength}

@@ -10,30 +10,24 @@ export const TextAreaBox = styled.div`
 export const TextArea = styled.textarea`
   width: 100%;
   min-height: 100px;
-  padding: 16px;
   background-color: ${semanticColors.background.primary};
-  border: 1px solid ${colors.grey[300]};
-  border-radius: 12px;
-  color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize.base};
+  color: ${semanticColors.text.secondary};
+  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
   resize: none;
   outline: none;
+  border: none;
 
   &::placeholder {
-    color: ${semanticColors.text.secondary};
-  }
-
-  &:focus {
-    border-color: ${semanticColors.text.primary};
+    color: ${semanticColors.text.ghost};
   }
 `;
 
 export const CharacterCount = styled.div`
   align-self: flex-end;
-  margin-top: 8px;
-  color: ${semanticColors.text.tertiary};
+  margin-top: 12px;
+  color: ${semanticColors.text.point.green};
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.regular};
 `;
