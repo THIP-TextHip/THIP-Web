@@ -20,7 +20,7 @@ interface TagSelectionSectionProps {
 }
 
 // 상위 장르와 하위 태그 매핑
-const genreTagsMap = {
+const genreTagsMap: Record<string, string[]> = {
   문학: ['소설', '시', '에세이', '인문학', '철학'],
   '과학·IT': ['기술', '과학', 'AI', '데이터'],
   사회과학: ['정치', '경제', '사회학', '심리학', '역사'],
