@@ -5,7 +5,7 @@ import BookSearchBottomSheet from '../../components/common/BookSearchBottomSheet
 import BookSelectionSection from '../../components/creategroup/BookSelectionSection';
 import PostContentSection from '../../components/createpost/PostContentSection';
 import PhotoSection from '../../components/createpost/PhotoSection';
-import PrivacySettingSection from '../../components/creategroup/PrivacySettingSection/PrivacySettingSection';
+import PrivacyToggleSection from '../../components/createpost/PrivacyToggleSection';
 import TagSelectionSection from '../../components/createpost/TagSelectionSection';
 import leftarrow from '../../assets/common/leftArrow.svg';
 import { Container } from './CreatePost.styled';
@@ -17,7 +17,6 @@ const CreatePost = () => {
   const [postContent, setPostContent] = useState('');
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
-  const [password, setPassword] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
 
@@ -37,8 +36,7 @@ const CreatePost = () => {
     console.log('필수 - 선택된 책:', selectedBook);
     console.log('필수 - 글 내용:', postContent);
     console.log('선택 - 선택된 사진:', selectedPhotos);
-    console.log('선택 - 비공개 설정:', isPrivate);
-    console.log('선택 - 비밀번호:', password);
+    console.log('선택 - 공개 설정:', isPrivate ? '비공개' : '공개');
     console.log('선택 - 선택된 태그:', selectedTags);
 
     // TODO: API 호출하여 글 등록
@@ -72,18 +70,6 @@ const CreatePost = () => {
 
   const handlePrivacyToggle = () => {
     setIsPrivate(!isPrivate);
-    // 비공개 설정을 끄면 비밀번호도 초기화
-    if (isPrivate) {
-      setPassword('');
-    }
-  };
-
-  const handlePasswordChange = (newPassword: string) => {
-    setPassword(newPassword);
-  };
-
-  const handlePasswordClose = () => {
-    setPassword('');
   };
 
   const handleTagToggle = (tag: string) => {
@@ -124,13 +110,7 @@ const CreatePost = () => {
 
         <Section showDivider />
 
-        <PrivacySettingSection
-          isPrivate={isPrivate}
-          password={password}
-          onToggle={handlePrivacyToggle}
-          onPasswordChange={handlePasswordChange}
-          onPasswordClose={handlePasswordClose}
-        />
+        <PrivacyToggleSection isPrivate={isPrivate} onToggle={handlePrivacyToggle} />
 
         <Section showDivider />
 
