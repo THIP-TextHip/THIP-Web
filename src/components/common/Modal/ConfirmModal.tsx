@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
-import type { ConfirmModalProps } from '@/stores/useModalStore';
+import type { ConfirmModalProps } from '@/stores/usePopupStore';
 
 const ConfirmModal = ({ title, disc, onConfirm, onClose }: ConfirmModalProps) => {
   return (
