@@ -11,9 +11,16 @@ import leftarrow from '../../assets/common/leftArrow.svg';
 import { Container } from './CreatePost.styled';
 import { Section } from '../group/CommonSection.styled';
 
+interface Book {
+  id: number;
+  title: string;
+  author: string;
+  cover: string;
+}
+
 const CreatePost = () => {
   const navigate = useNavigate();
-  const [selectedBook, setSelectedBook] = useState<any>(null);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [postContent, setPostContent] = useState('');
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
@@ -56,7 +63,7 @@ const CreatePost = () => {
     setIsBookSearchOpen(false);
   };
 
-  const handleBookSelect = (book: any) => {
+  const handleBookSelect = (book: Book) => {
     setSelectedBook(book);
   };
 
@@ -77,7 +84,7 @@ const CreatePost = () => {
   };
 
   // 책 선택과 글 내용만 필수, 나머지는 선택사항
-  const isFormValid = selectedBook && postContent.trim() !== '';
+  const isFormValid = !!selectedBook && postContent.trim() !== '';
 
   return (
     <>
