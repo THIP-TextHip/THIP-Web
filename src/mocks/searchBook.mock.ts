@@ -51,6 +51,7 @@ export const mockSearchBook = {
       commentCount: 125,
       images: ['https://placehold.co/100x100', 'https://placehold.co/100x100'],
       isPublic: true,
+      feedId: 80,
     },
     {
       userId: 2,
@@ -68,6 +69,7 @@ export const mockSearchBook = {
       initialLikeCount: 125,
       commentCount: 125,
       isPublic: false,
+      feedId: 90,
     },
   ],
 };
