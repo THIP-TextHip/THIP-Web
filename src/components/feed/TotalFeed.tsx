@@ -32,7 +32,7 @@ const TotalFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
       <FollowList />
       {hasPosts ? (
         posts.map(post => (
-          <FeedPost key={post.postId} showHeader={showHeader} isMyFeed={isMyFeed} {...post} />
+          <FeedPost key={post.feedId} showHeader={showHeader} isMyFeed={isMyFeed} {...post} />
         ))
       ) : (
         <EmptyState>

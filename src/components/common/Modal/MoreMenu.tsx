@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
-import type { MoreMenuProps } from '@/stores/useModalStore';
+import type { MoreMenuProps } from '@/stores/usePopupStore';
 
 const MoreMenu = ({ onEdit, onDelete, onClose }: MoreMenuProps) => {
   return (
@@ -18,6 +18,7 @@ const MoreMenu = ({ onEdit, onDelete, onClose }: MoreMenuProps) => {
 };
 
 const Overlay = styled.div`
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;

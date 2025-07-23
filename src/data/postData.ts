@@ -13,7 +13,7 @@ export const mockPosts: PostData[] = [
     bookAuthor: '작가입니다',
     isbn: 111155544,
     postContent: '내용입니다…',
-    postId: '55',
+    feedId: 55,
     initialLikeCount: 125,
     commentCount: 125,
     images: ['https://placehold.co/100x100', 'https://placehold.co/100x100'],
@@ -31,7 +31,7 @@ export const mockPosts: PostData[] = [
     isbn: 111152544,
     postContent:
       '내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다',
-    postId: '56',
+    feedId: 56,
     initialLikeCount: 125,
     commentCount: 125,
     isPublic: false,
@@ -52,7 +52,7 @@ export const mockFeedPost: FeedPostProps = {
   bookAuthor: '한강',
   postContent:
     '정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.',
-  postId: '1',
+  feedId: 1,
   initialLikeCount: 15,
   commentCount: 2,
   showHeader: true,

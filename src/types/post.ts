@@ -9,7 +9,7 @@ export interface PostData {
   isbn: number;
   bookAuthor: string;
   postContent: string;
-  postId: string;
+  feedId: number;
   initialLikeCount: number;
   commentCount: number;
   images?: string[];
@@ -30,7 +30,7 @@ export interface FeedPostProps extends PostData {
 
 export type PostBodyProps = Pick<
   PostData,
-  'bookTitle' | 'bookAuthor' | 'postContent' | 'postId' | 'images' | 'tags' | 'isbn'
+  'bookTitle' | 'bookAuthor' | 'postContent' | 'feedId' | 'images' | 'tags' | 'isbn'
 >;
 
 // 대댓글(SubReply)
