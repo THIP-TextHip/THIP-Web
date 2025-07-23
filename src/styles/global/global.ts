@@ -59,6 +59,7 @@ export const typography = {
     secondary: 'Paperlogy',
   },
   fontSize: {
+    '2xs': '11px',
     xs: '12px', // small text
     sm: '14px', // body small
     base: '16px', // body base
@@ -183,6 +184,7 @@ export const coreDesignTokens = css`
     --font-family-primary: ${typography.fontFamily.primary};
     --font-family-secondary: ${typography.fontFamily.secondary};
 
+    --font-size-2xs: ${typography.fontSize['2xs']};
     --font-size-xs: ${typography.fontSize.xs};
     --font-size-sm: ${typography.fontSize.sm};
     --font-size-base: ${typography.fontSize.base};

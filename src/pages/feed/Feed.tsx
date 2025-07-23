@@ -9,6 +9,7 @@ import writefab from '../../assets/common/writefab.svg';
 import { mockPosts } from '@/data/postData';
 import { useNavigate } from 'react-router-dom';
 
+
 const Container = styled.div`
   min-width: 320px;
   max-width: 767px;

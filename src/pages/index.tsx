@@ -18,6 +18,9 @@ import ApplyBook from './search/ApplyBook';
 import OtherFeedPage from './feed/OtherFeedPage';
 import FollowerListPage from './feed/FollowerListPage';
 import TodayWords from './today-words/TodayWords';
+import SearchBook from './searchBook/SearchBook';
+import SearchBookGroup from './searchBook/SearchBookGroup';
+import GroupDetail from './groupDetail/GroupDetail';
 import FeedDetailPage from './feed/FeedDetailPage';
 import ScrollToTop from '@/components/common/ScrollToTop';
 import UserSearch from './feed/UserSearch';
@@ -32,14 +35,17 @@ const Router = () => {
           <Route path="genre" element={<SignupGenre />} />
         </Route>
         <Route path="signupdone" element={<SignupDone />} />
-        <Route path="group/create" element={<CreateGroup />} />
         <Route path="group" element={<Group />} />
-        <Route path="groupsearch" element={<GroupSearch />} />
+        <Route path="group/create" element={<CreateGroup />} />
+        <Route path="group/search" element={<GroupSearch />} />
+        <Route path="group/detail" element={<GroupDetail />} />
         <Route path="feed" element={<Feed />} />
         <Route path="feed/search" element={<UserSearch />} />
         <Route path="feed/:feedId" element={<FeedDetailPage />} />
         <Route path="search" element={<Search />} />
         <Route path="search/applybook" element={<ApplyBook />} />
+        <Route path="search/book" element={<SearchBook />} />
+        <Route path="search/book/group" element={<SearchBookGroup />} />
         <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
         <Route path="follow/:type" element={<FollowerListPage />} />
         <Route path="today-words" element={<TodayWords />} />
