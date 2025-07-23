@@ -35,7 +35,7 @@ const OtherFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
       <TotalBar count={postCount} />
       {hasPosts ? (
         posts.map(post => (
-          <FeedPost key={post.postId} showHeader={showHeader} isMyFeed={isMyFeed} {...post} />
+          <FeedPost key={post.feedId} showHeader={showHeader} isMyFeed={isMyFeed} {...post} />
         ))
       ) : (
         <EmptyState>
