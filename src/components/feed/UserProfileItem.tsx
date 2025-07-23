@@ -3,6 +3,7 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import type { UserProfileItemProps } from '@/types/user';
+import { typography } from '@/styles/global/global';
 
 const UserProfileItem = ({
   profileImgUrl,
