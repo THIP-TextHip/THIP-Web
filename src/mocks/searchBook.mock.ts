@@ -36,6 +36,8 @@ export const mockSearchBook = {
   ],
   posts: [
     {
+      userId: 1,
+      isbn: 3,
       profileImgUrl: 'https://placehold.co/24x24',
       userName: 'userName',
       userTitle: 'userTitle',
@@ -51,6 +53,8 @@ export const mockSearchBook = {
       isPublic: true,
     },
     {
+      userId: 2,
+      isbn: 3,
       profileImgUrl: 'https://placehold.co/24x24',
       userName: 'userName',
       userTitle: 'userTitle',
