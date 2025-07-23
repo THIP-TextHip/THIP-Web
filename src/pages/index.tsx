@@ -35,7 +35,6 @@ const Router = () => {
           <Route path="genre" element={<SignupGenre />} />
         </Route>
         <Route path="signupdone" element={<SignupDone />} />
-        <Route path="group/create" element={<CreateGroup />} />
         <Route path="post/create" element={<CreatePost />} />
         <Route path="group" element={<Group />} />
         <Route path="group/create" element={<CreateGroup />} />
