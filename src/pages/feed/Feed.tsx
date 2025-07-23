@@ -7,6 +7,7 @@ import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
 import writefab from '../../assets/common/writefab.svg';
 import { mockPosts } from '@/data/postData';
+import { useNavigate } from 'react-router-dom';
 
 
 const Container = styled.div`
@@ -18,7 +19,12 @@ const Container = styled.div`
 const tabs = ['피드', '내 피드'];
 
 const Feed = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(tabs[0]);
+
+  const handleSearchButton = () => {
+    navigate('/feed/search');
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -26,7 +32,7 @@ const Feed = () => {
 
   return (
     <Container>
-      <MainHeader type="home" />
+      <MainHeader type="home" leftButtonClick={handleSearchButton} />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {activeTab === '피드' ? (
         <TotalFeed showHeader={true} posts={mockPosts} isMyFeed={false} />

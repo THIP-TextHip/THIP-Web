@@ -23,6 +23,7 @@ import SearchBookGroup from './searchBook/SearchBookGroup';
 import GroupDetail from './groupDetail/GroupDetail';
 import FeedDetailPage from './feed/FeedDetailPage';
 import ScrollToTop from '@/components/common/ScrollToTop';
+import UserSearch from './feed/UserSearch';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -39,6 +40,7 @@ const Router = () => {
         <Route path="group/search" element={<GroupSearch />} />
         <Route path="group/detail" element={<GroupDetail />} />
         <Route path="feed" element={<Feed />} />
+        <Route path="feed/search" element={<UserSearch />} />
         <Route path="feed/:feedId" element={<FeedDetailPage />} />
         <Route path="search" element={<Search />} />
         <Route path="search/applybook" element={<ApplyBook />} />

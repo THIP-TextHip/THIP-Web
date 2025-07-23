@@ -1,19 +1,8 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import rightArrow from '../../assets/feed/rightArrow.svg';
-import { typography } from '@/styles/global/global';
-
-export interface UserProfileItemProps {
-  profileImgUrl: string;
-  userName: string;
-  userTitle: string;
-  titleColor: string;
-  followerCount?: number;
-  isFollowed?: boolean;
-  userId: number;
-  isLast?: boolean;
-}
+import type { UserProfileItemProps } from '@/types/user';
 
 const UserProfileItem = ({
   profileImgUrl,
@@ -24,13 +13,13 @@ const UserProfileItem = ({
   isFollowed = false,
   userId,
   isLast,
+  type = 'followlist',
 }: UserProfileItemProps) => {
-  const { pathname } = useLocation();
   const navigate = useNavigate();
   const [followed, setFollowed] = useState(isFollowed);
 
   const handleProfileClick = () => {
-    navigate(`/feed/${userId}`);
+    navigate(`/otherfeed/${userId}`);
   };
 
   const toggleFollow = (e: React.MouseEvent) => {
@@ -42,11 +31,6 @@ const UserProfileItem = ({
     }
     setFollowed(prev => !prev);
     console.log(`${userName} - ${followed ? '팔로우 취소' : '팔로우 요청'}`);
-  };
-
-  const handleFollowerListClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/feed/followerlist/${userId}`);
   };
 
   return (
@@ -61,13 +45,13 @@ const UserProfileItem = ({
             </div>
           </div>
         </div>
-        {pathname === '/feed/followlist' && (
+        {type === 'followlist' && (
           <div className="followbutton" onClick={toggleFollow}>
             {followed ? '띱 취소' : '띱 하기'}
           </div>
         )}
-        {pathname === '/feed/followerlist' && (
-          <div className="followlistbutton" onClick={handleFollowerListClick}>
+        {type === 'followerlist' && (
+          <div className="followlistbutton">
             <div>{followerCount}명이 띱하는 중</div>
             <img src={rightArrow} />
           </div>

@@ -70,7 +70,7 @@ const MyFollower = () => {
   ];
 
   const handleMoreClick = () => {
-    navigate('/feed/followerlist');
+    navigate('/follow/followerlist');
   };
 
   return (

@@ -3,47 +3,12 @@ import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import UserProfileItem from '@/components/feed/UserProfileItem';
-import type { UserProfileItemProps } from '@/components/feed/UserProfileItem';
-
-const mockUserList: UserProfileItemProps[] = [
-  {
-    profileImgUrl: 'https://placehold.co/36x36',
-    userName: 'ThipOther',
-    userTitle: '칭호칭호',
-    titleColor: '#FF8BAC',
-    followerCount: 15,
-    userId: 1,
-  },
-  {
-    profileImgUrl: 'https://placehold.co/36x36',
-    userName: '하위',
-    userTitle: '칭호칭호',
-    titleColor: '#FF8BAC',
-    followerCount: 15,
-    userId: 1,
-    isFollowed: true,
-  },
-  {
-    profileImgUrl: 'https://placehold.co/36x36',
-    userName: '책읽으러왔음',
-    userTitle: '공식 인플루언서',
-    titleColor: '#A0F8E8',
-    userId: 2,
-    isFollowed: false,
-  },
-  {
-    profileImgUrl: 'https://placehold.co/36x36',
-    userName: 'thip01',
-    userTitle: '작가',
-    titleColor: '#A0F8E8',
-    followerCount: 7,
-    userId: 3,
-  },
-];
+import { mockUserList } from '@/data/userData';
+import type { UserProfileType } from '@/types/user';
 
 const FollowerListPage = () => {
   const navigate = useNavigate();
-  const { type } = useParams();
+  const { type } = useParams<{ type: UserProfileType }>();
   const title = type === 'followerlist' ? '띱 목록' : '내 띱 목록';
   const handleBackClick = () => {
     navigate(-1);
@@ -56,7 +21,12 @@ const FollowerListPage = () => {
       <TotalBar>전체 {totalCount}</TotalBar>
       <UserProfileList>
         {mockUserList.map((user, index) => (
-          <UserProfileItem key={index} {...user} isLast={index === mockUserList.length - 1} />
+          <UserProfileItem
+            key={index}
+            {...user}
+            type={type as UserProfileType}
+            isLast={index === mockUserList.length - 1}
+          />
         ))}
       </UserProfileList>
     </Wrapper>
