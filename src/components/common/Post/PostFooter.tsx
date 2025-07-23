@@ -34,6 +34,7 @@ const Container = styled.div`
       font-weight: var(--string-weight-medium, 500);
       line-height: normal;
       letter-spacing: 0.012px;
+      gap: 2px;
     }
   }
 `;
@@ -41,7 +42,7 @@ const Container = styled.div`
 interface PostFooterProps {
   initialLikeCount: number;
   commentCount: number;
-  postId: string;
+  feedId: number;
   isMyFeed: boolean;
   isPublic?: boolean;
 }
@@ -49,7 +50,7 @@ interface PostFooterProps {
 const PostFooter = ({
   initialLikeCount,
   commentCount,
-  postId,
+  feedId,
   isMyFeed,
   isPublic,
 }: PostFooterProps) => {
@@ -69,7 +70,7 @@ const PostFooter = ({
   };
 
   const handleComment = () => {
-    navigate(`/feed/${postId}`);
+    navigate(`/feed/${feedId}`);
   };
 
   return (

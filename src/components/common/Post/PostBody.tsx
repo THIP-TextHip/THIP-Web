@@ -81,7 +81,7 @@ const PostBody = ({
   isbn,
   bookAuthor,
   postContent,
-  postId,
+  feedId,
   images = [],
   tags = [],
 }: PostBodyProps) => {
@@ -91,7 +91,7 @@ const PostBody = ({
 
   const handlePostContent = () => {
     // if (!isClickable) return;
-    navigate(`/feed/${postId}`);
+    navigate(`/feed/${feedId}`);
     // API 연동시 경로 수정 필요
   };
 
