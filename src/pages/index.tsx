@@ -10,6 +10,7 @@ import SignupGenre from './signup/SignupGenre';
 import SignupNickname from './signup/SignupNickname';
 import SignupDone from './signup/SignupDone';
 import CreateGroup from './group/CreateGroup';
+import CreatePost from './post/CreatePost';
 import Group from './group/Group';
 import Feed from './feed/Feed';
 import GroupSearch from './groupSearch/GroupSearch';
@@ -35,6 +36,7 @@ const Router = () => {
           <Route path="genre" element={<SignupGenre />} />
         </Route>
         <Route path="signupdone" element={<SignupDone />} />
+        <Route path="post/create" element={<CreatePost />} />
         <Route path="group" element={<Group />} />
         <Route path="group/create" element={<CreateGroup />} />
         <Route path="group/search" element={<GroupSearch />} />

@@ -37,7 +37,7 @@ interface BookSearchBottomSheetProps {
 type TabType = 'saved' | 'group';
 
 // Mock Data
-const mockBooks: Book[] = [
+const mockSavedBooks: Book[] = [
   {
     id: 1,
     title: '토마토 컵라면',
@@ -56,51 +56,53 @@ const mockBooks: Book[] = [
     author: '작가명',
     cover: '/src/assets/books/hormone.svg',
   },
+];
+
+const mockGroupBooks: Book[] = [
   {
     id: 4,
-    title: '토마토 컵라면',
+    title: '단 한번의 삶',
     author: '작가명',
-    cover: '/src/assets/books/tomato.svg',
+    cover: '/src/assets/books/life.svg',
   },
   {
     id: 5,
-    title: '사슴',
-    author: '작가명',
-    cover: '/src/assets/books/deer.svg',
-  },
-  {
-    id: 6,
     title: '호르몬 체인지',
     author: '작가명',
     cover: '/src/assets/books/hormone.svg',
   },
   {
-    id: 7,
-    title: '단 한번의 삶',
+    id: 6,
+    title: '토마토 컵라면',
     author: '작가명',
-    cover: '/src/assets/books/life.svg',
+    cover: '/src/assets/books/tomato.svg',
   },
 ];
 
 const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBottomSheetProps) => {
   // State
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredBooks, setFilteredBooks] = useState<Book[]>(mockBooks);
+  const [filteredBooks, setFilteredBooks] = useState<Book[]>(mockSavedBooks);
   const [activeTab, setActiveTab] = useState<TabType>('saved');
 
   // Effects
   useEffect(() => {
+    // 현재 활성화된 탭의 책 목록 가져오기
+    const currentTabBooks = activeTab === 'saved' ? mockSavedBooks : mockGroupBooks;
+
     if (searchQuery.trim() === '') {
-      setFilteredBooks(mockBooks);
+      // 검색어가 없을 때는 선택된 탭의 전체 목록 표시
+      setFilteredBooks(currentTabBooks);
     } else {
-      const filtered = mockBooks.filter(
+      // 검색어가 있을 때는 선택된 탭 내에서만 검색
+      const filtered = currentTabBooks.filter(
         book =>
           book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           book.author.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredBooks(filtered);
     }
-  }, [searchQuery]);
+  }, [searchQuery, activeTab]);
 
   useEffect(() => {
     if (isOpen) {
@@ -145,6 +147,26 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     setSearchQuery('');
   };
 
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    // 탭 변경 시 현재 검색어로 새로운 탭에서 다시 검색
+    const newTabBooks = tab === 'saved' ? mockSavedBooks : mockGroupBooks;
+
+    if (searchQuery.trim() === '') {
+      setFilteredBooks(newTabBooks);
+    } else {
+      const filtered = newTabBooks.filter(
+        book =>
+          book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          book.author.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setFilteredBooks(filtered);
+    }
+  };
+
+  // 검색어가 없을 때만 탭 표시
+  const showTabs = searchQuery.trim() === '';
+
   return (
     <Overlay isVisible={isOpen} onClick={handleOverlayClick}>
       <BottomSheetContainer isVisible={isOpen}>
@@ -169,15 +191,17 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
             </ButtonGroup>
           </SearchContainer>
 
-          {/* 탭 영역 */}
-          <TabContainer>
-            <Tab active={activeTab === 'saved'} onClick={() => setActiveTab('saved')}>
-              저장한 책
-            </Tab>
-            <Tab active={activeTab === 'group'} onClick={() => setActiveTab('group')}>
-              모임 책
-            </Tab>
-          </TabContainer>
+          {/* 탭 영역 - 검색어가 없을 때만 표시 */}
+          {showTabs && (
+            <TabContainer>
+              <Tab active={activeTab === 'saved'} onClick={() => handleTabChange('saved')}>
+                저장한 책
+              </Tab>
+              <Tab active={activeTab === 'group'} onClick={() => handleTabChange('group')}>
+                모임 책
+              </Tab>
+            </TabContainer>
+          )}
 
           {/* 책 목록 영역 */}
           <BookListContainer>
