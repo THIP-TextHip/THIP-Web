@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 interface ReplyState {
   isReplying: boolean;
-  targetUserName?: string;
+  targetUserName: string;
   parentId: number | null;
   replyContent: string;
 
@@ -20,7 +20,8 @@ export const useReplyStore = create<ReplyState>(set => ({
 
   startReply: (userName, parentId) => set({ isReplying: true, targetUserName: userName, parentId }),
 
-  cancelReply: () => set({ isReplying: false, targetUserName: '', parentId: null }),
+  cancelReply: () =>
+    set({ isReplying: false, targetUserName: '', parentId: null, replyContent: '' }),
 
   setReplyContent: (content: string) => set({ replyContent: content }),
 
