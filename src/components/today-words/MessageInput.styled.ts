@@ -27,7 +27,6 @@ export const MessageInputWrapper = styled.div`
   align-items: flex-end;
   background-color: ${semanticColors.background.card};
   border-radius: 20px;
-  padding-right: 8px;
 `;
 
 export const ReplyContainer = styled.div`
@@ -35,7 +34,6 @@ export const ReplyContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-
   .left {
     display: flex;
     flex-direction: row;
@@ -55,6 +53,7 @@ export const ReplyContainer = styled.div`
         font-size: ${typography.fontSize.xs};
         font-weight: ${typography.fontWeight.regular};
         line-height: 24px;
+        cursor: pointer;
       }
     }
   }
@@ -64,7 +63,7 @@ export const MessageInput = styled.textarea`
   flex: 1;
   background: none;
   border: none;
-  padding: 10px 13px;
+  padding: 10px 58px 10px 12px;
   color: ${semanticColors.text.primary};
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
@@ -76,6 +75,7 @@ export const MessageInput = styled.textarea`
   height: 40px;
   max-height: 100px;
   overflow-y: auto;
+  caret-color: var(--color-neongreen);
 
   &::placeholder {
     color: ${semanticColors.text.ghost};

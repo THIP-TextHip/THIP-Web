@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
 import FeedDetailPost from '@/components/feed/FeedDetailPost';
@@ -9,30 +8,14 @@ import ReplyList from '@/components/common/Post/ReplyList';
 import { mockFeedPost, mockCommentList } from '@/data/postData';
 import MessageInput from '@/components/today-words/MessageInput';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import { useReplyActions } from '@/hooks/useReplyActions';
 
 const FeedDetailPage = () => {
-  const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const { openMoreMenu, openConfirm, openSnackbar, closePopup } = usePopupActions();
-
-  // onst { feedId } = useParams<{ feedId: number }>();
-  // const [feedData, setFeedData] = useState<PostData | null>(null);
-
-  // useEffect(() => {
-  //   const fetchFeedDetail = async () => {
-  //     try {
-  //       const res = await fetch(`/api/feeds/${feedId}`);
-  //       const data = await res.json();
-  //       setFeedData(data);
-  //     } catch (error) {
-  //       console.error('피드 상세 조회 실패:', error);
-  //     }
-  //   };
-
-  //   if (feedId) fetchFeedDetail();
-  // }, [feedId]);
-
-  // if (!feedData) return <div>로딩중...</div>;
+  const { isReplying, targetUserName, replyContent, setReplyContent, submitComment, cancelReply } =
+    useReplyActions();
+  const feedId = mockFeedPost.feedId;
 
   const handleMoreClick = () => {
     openMoreMenu({
@@ -61,13 +44,6 @@ const FeedDetailPage = () => {
     navigate(-1);
   };
 
-  const handleSend = () => {
-    if (!message.trim()) return;
-    console.log('작성한 댓글 내용:', message);
-    // 댓글 등록 API 호출 추가
-    setMessage('');
-  };
-
   return (
     <Wrapper>
       <TitleHeader
@@ -79,10 +55,15 @@ const FeedDetailPage = () => {
       <FeedDetailPost {...mockFeedPost} />
       <ReplyList commentList={mockCommentList} />
       <MessageInput
-        placeholder="여러분의 생각을 남겨주세요"
-        value={message}
-        onChange={setMessage}
-        onSend={handleSend}
+        value={replyContent}
+        onChange={setReplyContent}
+        onSend={() => {
+          submitComment({ postId: feedId, postType: 'feed' });
+        }}
+        placeholder="댓글을 입력하세요"
+        isReplying={isReplying}
+        targetUserName={targetUserName}
+        onCancelReply={cancelReply}
       />
     </Wrapper>
   );
