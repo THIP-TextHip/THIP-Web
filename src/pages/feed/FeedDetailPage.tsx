@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
-import FeedPost from '@/components/feed/FeedPost';
+import FeedDetailPost from '@/components/feed/FeedDetailPost';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
 import ReplyList from '@/components/common/Post/ReplyList';
@@ -14,6 +14,25 @@ const FeedDetailPage = () => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const { openMoreMenu, openConfirm, openSnackbar, closePopup } = usePopupActions();
+
+  // onst { feedId } = useParams<{ feedId: number }>();
+  // const [feedData, setFeedData] = useState<PostData | null>(null);
+
+  // useEffect(() => {
+  //   const fetchFeedDetail = async () => {
+  //     try {
+  //       const res = await fetch(`/api/feeds/${feedId}`);
+  //       const data = await res.json();
+  //       setFeedData(data);
+  //     } catch (error) {
+  //       console.error('피드 상세 조회 실패:', error);
+  //     }
+  //   };
+
+  //   if (feedId) fetchFeedDetail();
+  // }, [feedId]);
+
+  // if (!feedData) return <div>로딩중...</div>;
 
   const handleMoreClick = () => {
     openMoreMenu({
@@ -57,7 +76,7 @@ const FeedDetailPage = () => {
         rightIcon={<img src={moreIcon} alt="더보기" />}
         onRightClick={handleMoreClick}
       />
-      <FeedPost {...mockFeedPost} />
+      <FeedDetailPost {...mockFeedPost} />
       <ReplyList commentList={mockCommentList} />
       <MessageInput
         placeholder="여러분의 생각을 남겨주세요"

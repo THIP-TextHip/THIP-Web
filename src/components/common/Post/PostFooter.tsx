@@ -8,7 +8,7 @@ import save from '../../../assets/feed/save.svg';
 import activeSave from '../../../assets/feed/activeSave.svg';
 import lockIcon from '../../../assets/feed/lockIcon.svg';
 
-const Container = styled.div`
+const Container = styled.div<{ isDetail: boolean }>`
   width: 100%;
   height: 24px;
   display: flex;
@@ -24,7 +24,6 @@ const Container = styled.div`
     display: flex;
     flex-direction: row;
     gap: 12px;
-
     .count {
       display: flex;
       flex-direction: row;
@@ -35,6 +34,10 @@ const Container = styled.div`
       line-height: normal;
       letter-spacing: 0.012px;
       gap: 2px;
+
+      &.comment img {
+        cursor: ${({ isDetail }) => (isDetail ? 'default' : 'pointer')};
+      }
     }
   }
 `;
@@ -45,6 +48,7 @@ interface PostFooterProps {
   feedId: number;
   isMyFeed: boolean;
   isPublic?: boolean;
+  isDetail?: boolean;
 }
 
 const PostFooter = ({
@@ -53,6 +57,7 @@ const PostFooter = ({
   feedId,
   isMyFeed,
   isPublic,
+  isDetail = false,
 }: PostFooterProps) => {
   const navigate = useNavigate();
 
@@ -70,17 +75,18 @@ const PostFooter = ({
   };
 
   const handleComment = () => {
+    if (isDetail) return;
     navigate(`/feed/${feedId}`);
   };
 
   return (
-    <Container>
+    <Container isDetail={isDetail}>
       <div className="left">
         <div className="count">
           <img src={liked ? activeLike : like} onClick={handleLike} />
           <div>{likeCount}</div>
         </div>
-        <div className="count">
+        <div className="count comment">
           <img src={comment} onClick={handleComment} />
           <div>{commentCount}</div>
         </div>
