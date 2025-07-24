@@ -1,10 +1,14 @@
 import { useRef, useState } from 'react';
 import sendIcon from '../../assets/common/send.svg';
+import replyIcon from '../../assets/feed/replyIcon.svg';
+import closeIcon from '../../assets/common/closeIcon.svg';
 import {
+  Wrapper,
   InputContainer,
   MessageInputWrapper,
   MessageInput as StyledMessageInput,
   SendButton,
+  ReplyContainer,
 } from './MessageInput.styled';
 
 interface MessageInputProps {
@@ -64,27 +68,39 @@ const MessageInput = ({ value, onChange, onSend, placeholder }: MessageInputProp
   };
 
   return (
-    <InputContainer>
-      <MessageInputWrapper>
-        <StyledMessageInput
-          ref={inputRef}
-          placeholder={placeholder}
-          value={value}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onCompositionStart={handleCompositionStart}
-          onCompositionEnd={handleCompositionEnd}
-          rows={1}
-        />
-        <SendButton
-          onClick={handleSendClick}
-          disabled={value.trim() === ''}
-          active={value.trim() !== ''}
-        >
-          <img src={sendIcon} alt="전송" />
-        </SendButton>
-      </MessageInputWrapper>
-    </InputContainer>
+    <Wrapper>
+      <ReplyContainer>
+        <div className="left">
+          <img src={replyIcon} />
+          <div className="notice">
+            <div className="userName">@사용자</div>
+            <div className="disc">님에게 답글작성</div>
+          </div>
+        </div>
+        <img src={closeIcon} />
+      </ReplyContainer>
+      <InputContainer>
+        <MessageInputWrapper>
+          <StyledMessageInput
+            ref={inputRef}
+            placeholder={placeholder}
+            value={value}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
+            rows={1}
+          />
+          <SendButton
+            onClick={handleSendClick}
+            disabled={value.trim() === ''}
+            active={value.trim() !== ''}
+          >
+            <img src={sendIcon} alt="전송" />
+          </SendButton>
+        </MessageInputWrapper>
+      </InputContainer>
+    </Wrapper>
   );
 };
 
