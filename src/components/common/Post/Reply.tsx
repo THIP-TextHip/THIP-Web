@@ -5,49 +5,60 @@ import PostHeader from './PostHeader';
 import type { ReplyDataProps } from '@/types/post';
 import like from '../../../assets/feed/like.svg';
 import activeLike from '../../../assets/feed/activeLike.svg';
+import { useReplyActions } from '@/hooks/useReplyActions';
 
 const Reply = ({
-  profileImgUrl,
-  userName,
+  commentId,
   userId,
+  imageUrl,
+  nickName,
   userTitle,
   titleColor,
-  createdAt,
-  initialLikeCount,
-  replyContent,
+  postDate,
+  content,
+  isLike,
+  likeCount: initialLikeCount,
 }: ReplyDataProps) => {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(isLike);
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
+
+  const { startReply } = useReplyActions();
+
   const handleLike = () => {
-    setLiked(!liked);
+    setLiked(prev => !prev);
     setLikeCount(prev => (liked ? prev - 1 : prev + 1));
+  };
+
+  const handleReplyClick = () => {
+    startReply(nickName, commentId);
   };
 
   return (
     <Container>
       <PostHeader
-        profileImgUrl={profileImgUrl}
-        userName={userName}
+        profileImgUrl={imageUrl}
+        userName={nickName}
         userTitle={userTitle}
         titleColor={titleColor}
-        createdAt={createdAt}
+        createdAt={postDate}
         userId={userId}
         type="reply"
       />
       <ReplySection>
         <div className="left">
-          <div className="reply">{replyContent}</div>
-          <div className="sub-reply">답글작성</div>
+          <div className="reply">{content}</div>
+          <div className="sub-reply" onClick={handleReplyClick}>
+            답글작성
+          </div>
         </div>
         <div className="right">
-          <img src={liked ? activeLike : like} onClick={handleLike} />
+          <img src={liked ? activeLike : like} onClick={handleLike} alt="좋아요" />
           <div className="count">{likeCount}</div>
         </div>
       </ReplySection>
     </Container>
   );
 };
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;
