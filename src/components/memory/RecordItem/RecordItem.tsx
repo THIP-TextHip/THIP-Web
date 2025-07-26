@@ -1,6 +1,8 @@
-import type { Record } from '../../pages/memory/Memory';
-import heartIcon from '../../assets/memory/heart.svg';
-import commentIcon from '../../assets/memory/comment.svg';
+import type { Record } from '../../../pages/memory/Memory';
+import TextRecord from './TextRecord';
+import PollRecord from './PollRecord';
+import heartIcon from '../../../assets/memory/heart.svg';
+import commentIcon from '../../../assets/memory/comment.svg';
 import {
   Container,
   UserSection,
@@ -10,16 +12,6 @@ import {
   UserPoints,
   TimeStamp,
   ContentSection,
-  TextContent,
-  PollSection,
-  PollQuestion,
-  PollOptions,
-  PollOption,
-  PollNumber,
-  PollText,
-  PollPercentage,
-  PollBar,
-  PollBarFill,
   ActionSection,
   ActionButton,
 } from './RecordItem.styled';
@@ -44,23 +36,9 @@ const RecordItem = ({ record }: RecordItemProps) => {
 
       <ContentSection>
         {type === 'text' ? (
-          <TextContent>{content}</TextContent>
+          <TextRecord content={content} />
         ) : (
-          <PollSection>
-            <PollQuestion>{content}</PollQuestion>
-            <PollOptions>
-              {pollOptions?.map(option => (
-                <PollOption key={option.id} isHighest={option.isHighest}>
-                  <PollNumber>{option.id}</PollNumber>
-                  <PollText>{option.text}</PollText>
-                  <PollPercentage>{option.percentage}%</PollPercentage>
-                  <PollBar>
-                    <PollBarFill percentage={option.percentage} isHighest={option.isHighest} />
-                  </PollBar>
-                </PollOption>
-              ))}
-            </PollOptions>
-          </PollSection>
+          <PollRecord content={content} pollOptions={pollOptions || []} />
         )}
       </ContentSection>
 

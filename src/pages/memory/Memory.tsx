@@ -5,7 +5,7 @@ import RecordTabs from '../../components/memory/RecordTabs';
 import RecordFilters from '../../components/memory/RecordFilters/RecordFilters';
 import RecordInfoMessage from '../../components/memory/RecordInfoMessage';
 import EmptyRecord from '../../components/memory/EmptyRecord';
-import RecordItem from '../../components/memory/RecordItem';
+import RecordItem from '../../components/memory/RecordItem/RecordItem';
 import Snackbar from '../../components/common/Modal/Snackbar';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import addFab from '../../assets/common/makegroupfab.svg';
