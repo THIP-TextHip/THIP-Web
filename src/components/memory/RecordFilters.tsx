@@ -24,7 +24,6 @@ interface RecordFiltersProps {
   onFilterChange: (filter: FilterType) => void;
   selectedPageRange?: { start: number; end: number } | null;
   onPageRangeClear?: () => void;
-  onPageRangeSelect?: (startPage: number, endPage: number) => void;
 }
 
 const RecordFilters = ({
@@ -32,7 +31,6 @@ const RecordFilters = ({
   onFilterChange,
   selectedPageRange,
   onPageRangeClear,
-  onPageRangeSelect,
 }: RecordFiltersProps) => {
   const [startPage, setStartPage] = useState('');
   const [endPage, setEndPage] = useState('');
