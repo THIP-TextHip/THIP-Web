@@ -6,13 +6,16 @@ export const FilterSection = styled.div`
   gap: 16px;
 `;
 
-export const FilterButton = styled.button<{ active: boolean }>`
-  background-color: ${({ active }) =>
-    active ? semanticColors.button.fill.primary : semanticColors.background.card};
+export const FilterButton = styled.button<{ active: boolean; $disabled?: boolean }>`
+  background-color: ${({ active, $disabled }) => {
+    if ($disabled) return semanticColors.background.card;
+    return active ? semanticColors.button.fill.primary : semanticColors.background.card;
+  }};
   border: none;
   border-radius: 20px;
   padding: 7px 12px;
-  color: ${semanticColors.text.primary};
+  color: ${({ $disabled }) =>
+    $disabled ? semanticColors.text.tertiary : semanticColors.text.primary};
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   cursor: pointer;
@@ -21,6 +24,7 @@ export const FilterButton = styled.button<{ active: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
+  opacity: ${({ $disabled }) => ($disabled ? 0.5 : 1)};
 
   img {
     width: 24px;
@@ -29,7 +33,7 @@ export const FilterButton = styled.button<{ active: boolean }>`
   }
 
   &:hover {
-    opacity: 0.8;
+    opacity: ${({ $disabled }) => ($disabled ? 0.5 : 0.8)};
   }
 `;
 

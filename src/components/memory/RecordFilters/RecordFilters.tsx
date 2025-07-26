@@ -6,6 +6,7 @@ import { Container } from './RecordFilters.styled';
 
 interface RecordFiltersProps {
   activeFilter: FilterType | null;
+  readingProgress: number;
   onFilterChange: (filter: FilterType) => void;
   selectedPageRange?: { start: number; end: number } | null;
   onPageRangeClear?: () => void;
@@ -13,6 +14,7 @@ interface RecordFiltersProps {
 
 const RecordFilters = ({
   activeFilter,
+  readingProgress,
   onFilterChange,
   selectedPageRange,
   onPageRangeClear,
@@ -86,6 +88,7 @@ const RecordFilters = ({
         <FilterButtons
           activeFilter={activeFilter}
           showInputMode={showInputMode}
+          readingProgress={readingProgress}
           onPageFilterClick={handlePageFilterClick}
           onOverallFilterClick={handleOverallFilterClick}
         />

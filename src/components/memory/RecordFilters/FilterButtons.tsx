@@ -11,6 +11,7 @@ import {
 interface FilterButtonsProps {
   activeFilter: FilterType | null;
   showInputMode: boolean;
+  readingProgress: number;
   onPageFilterClick: () => void;
   onOverallFilterClick: () => void;
 }
@@ -18,9 +19,12 @@ interface FilterButtonsProps {
 const FilterButtons = ({
   activeFilter,
   showInputMode,
+  readingProgress,
   onPageFilterClick,
   onOverallFilterClick,
 }: FilterButtonsProps) => {
+  const isOverallEnabled = readingProgress >= 80;
+
   return (
     <>
       <FilterSection>
@@ -28,7 +32,11 @@ const FilterButtons = ({
           페이지별 보기{' '}
           {activeFilter === 'page' && !showInputMode && <img src={xIcon} alt="초기화" />}
         </FilterButton>
-        <FilterButton active={activeFilter === 'overall'} onClick={onOverallFilterClick}>
+        <FilterButton
+          active={activeFilter === 'overall'}
+          $disabled={!isOverallEnabled}
+          onClick={onOverallFilterClick}
+        >
           총평 보기
         </FilterButton>
       </FilterSection>

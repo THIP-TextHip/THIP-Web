@@ -6,6 +6,7 @@ export const Container = styled.div`
   align-items: center;
   gap: 8px;
   padding: 0 4px;
+  margin-bottom: 32px;
 `;
 
 export const InfoIcon = styled.div`

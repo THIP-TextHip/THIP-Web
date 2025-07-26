@@ -147,6 +147,7 @@ const Memory = () => {
           <>
             <RecordFilters
               activeFilter={activeFilter}
+              readingProgress={readingProgress}
               onFilterChange={handleFilterChange}
               selectedPageRange={selectedPageRange}
               onPageRangeClear={handlePageRangeClear}
