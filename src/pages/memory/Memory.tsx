@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import RecordTabs from '../../components/memory/RecordTabs';
 import RecordFilters from '../../components/memory/RecordFilters/RecordFilters';
+import RecordInfoMessage from '../../components/memory/RecordInfoMessage';
 import EmptyRecord from '../../components/memory/EmptyRecord';
 import RecordItem from '../../components/memory/RecordItem';
 import Snackbar from '../../components/common/Modal/Snackbar';
@@ -143,12 +144,16 @@ const Memory = () => {
 
         {/* 그룹 기록일 때만 필터 표시 */}
         {activeTab === 'group' && (
-          <RecordFilters
-            activeFilter={activeFilter}
-            onFilterChange={handleFilterChange}
-            selectedPageRange={selectedPageRange}
-            onPageRangeClear={handlePageRangeClear}
-          />
+          <>
+            <RecordFilters
+              activeFilter={activeFilter}
+              onFilterChange={handleFilterChange}
+              selectedPageRange={selectedPageRange}
+              onPageRangeClear={handlePageRangeClear}
+            />
+            {/* 기록이 있을 때만 안내 메시지 표시 */}
+            {records.length > 0 && <RecordInfoMessage />}
+          </>
         )}
 
         {/* 기록이 없을 때 빈 상태 표시 */}
