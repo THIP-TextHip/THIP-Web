@@ -10,22 +10,23 @@ export const Container = styled.div`
 
 export const FilterSection = styled.div`
   display: flex;
-  gap: 12px;
+  gap: 16px;
 `;
 
 export const FilterButton = styled.button<{ active: boolean; disabled?: boolean }>`
   background-color: ${({ active, disabled }) => {
-    if (disabled) return colors.grey[400];
+    if (disabled) return semanticColors.background.card;
     return active ? semanticColors.button.fill.primary : colors.grey[400];
   }};
   border: none;
   border-radius: 20px;
-  padding: 8px 16px;
-  color: ${({ disabled }) => (disabled ? colors.grey[300] : semanticColors.text.primary)};
+  padding: 6px 12px;
+  color: ${semanticColors.text.primary};
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: all 0.2s;
+  line-height: 24px;
 
   &:hover:not(:disabled) {
     opacity: 0.8;
@@ -40,13 +41,13 @@ export const SortSection = styled.div`
 export const SortButton = styled.button`
   background: none;
   border: none;
-  color: ${semanticColors.text.primary};
+  color: ${semanticColors.text.tertiary};
   font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
+  font-weight: ${typography.fontWeight.medium};
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 `;
 
 export const DropdownIcon = styled.div`
@@ -54,5 +55,5 @@ export const DropdownIcon = styled.div`
   height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-top: 4px solid ${semanticColors.text.primary};
+  border-top: 4px solid ${semanticColors.text.tertiary};
 `;

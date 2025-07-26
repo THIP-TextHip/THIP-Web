@@ -35,7 +35,7 @@ export interface PollOption {
 const Memory = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<RecordType>('group');
-  const [activeFilter, setActiveFilter] = useState<FilterType>('page');
+  const [activeFilter, setActiveFilter] = useState<FilterType | null>(null);
   const [showPageRangeModal, setShowPageRangeModal] = useState(false);
   const [readingProgress] = useState(70); // 독서 진행도 (임시)
 

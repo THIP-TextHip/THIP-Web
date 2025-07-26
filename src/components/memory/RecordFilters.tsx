@@ -9,7 +9,7 @@ import {
 } from './RecordFilters.styled';
 
 interface RecordFiltersProps {
-  activeFilter: FilterType;
+  activeFilter: FilterType | null;
   onFilterChange: (filter: FilterType) => void;
   canViewOverall: boolean;
 }
