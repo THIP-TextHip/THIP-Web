@@ -1,15 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TitleHeader from '../../components/common/TitleHeader';
-import RecordTabs from '../../components/memory/RecordTabs';
-import RecordFilters from '../../components/memory/RecordFilters/RecordFilters';
-import RecordInfoMessage from '../../components/memory/RecordInfoMessage';
-import EmptyRecord from '../../components/memory/EmptyRecord';
-import RecordItem from '../../components/memory/RecordItem/RecordItem';
+import MemoryHeader from './MemoryHeader/MemoryHeader';
+import MemoryContent from './MemoryContent/MemoryContent';
+import MemoryAddButton from './/MemoryAddButton/MemoryAddButton';
 import Snackbar from '../../components/common/Modal/Snackbar';
-import leftArrow from '../../assets/common/leftArrow.svg';
-import addFab from '../../assets/common/makegroupfab.svg';
-import { Container, Content, RecordList, AddButton, DevButton } from './Memory.styled';
+import { Container } from './Memory.styled';
 
 export type RecordType = 'group' | 'my';
 export type FilterType = 'page' | 'overall';
@@ -144,54 +139,22 @@ const Memory = () => {
 
   return (
     <Container>
-      <TitleHeader
-        leftIcon={<img src={leftArrow} alt="뒤로가기" />}
-        onLeftClick={handleBackClick}
-        title="기록장"
+      <MemoryHeader onBackClick={handleBackClick} />
+
+      <MemoryContent
+        activeTab={activeTab}
+        activeFilter={activeFilter}
+        readingProgress={readingProgress}
+        records={records}
+        selectedPageRange={selectedPageRange}
+        hasRecords={hasRecords}
+        onTabChange={handleTabChange}
+        onFilterChange={handleFilterChange}
+        onPageRangeClear={handlePageRangeClear}
+        onToggleRecords={toggleRecords}
       />
 
-      <Content>
-        {/* 개발용 버튼 */}
-        <DevButton onClick={toggleRecords}>{hasRecords ? '기록 숨기기' : '기록 보이기'}</DevButton>
-
-        <RecordTabs activeTab={activeTab} onTabChange={handleTabChange} />
-
-        {/* 그룹 기록일 때만 필터 표시 */}
-        {activeTab === 'group' && (
-          <>
-            <RecordFilters
-              activeFilter={activeFilter}
-              readingProgress={readingProgress}
-              onFilterChange={handleFilterChange}
-              selectedPageRange={selectedPageRange}
-              onPageRangeClear={handlePageRangeClear}
-            />
-            {/* 기록이 있을 때만 안내 메시지 표시 */}
-            {records.length > 0 && <RecordInfoMessage />}
-          </>
-        )}
-
-        {/* 기록이 없을 때 빈 상태 표시 */}
-        {records.length === 0 && <EmptyRecord type={activeTab} />}
-
-        {/* 기록 목록 */}
-        {records.length > 0 && (
-          <RecordList>
-            {records.map(record => (
-              <RecordItem
-                key={record.id}
-                record={record}
-                shouldBlur={record.recordType === 'overall' && readingProgress < 80}
-              />
-            ))}
-          </RecordList>
-        )}
-      </Content>
-
-      {/* 기록 추가 버튼 */}
-      <AddButton onClick={handleAddRecord}>
-        <img src={addFab} alt="기록 추가" />
-      </AddButton>
+      <MemoryAddButton onAddRecord={handleAddRecord} />
 
       {/* 스낵바 */}
       {showSnackbar && (
