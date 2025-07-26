@@ -4,7 +4,6 @@ import TitleHeader from '../../components/common/TitleHeader';
 import RecordTabs from '../../components/memory/RecordTabs';
 import RecordFilters from '../../components/memory/RecordFilters';
 import EmptyRecord from '../../components/memory/EmptyRecord';
-import PageRangeModal from '../../components/memory/PageRangeModal';
 import RecordItem from '../../components/memory/RecordItem';
 import Snackbar from '../../components/common/Modal/Snackbar';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -37,9 +36,11 @@ const Memory = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<RecordType>('group');
   const [activeFilter, setActiveFilter] = useState<FilterType | null>(null);
-  const [showPageRangeModal, setShowPageRangeModal] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
-  const [readingProgress] = useState(70); // 독서 진행도 (임시)
+  const [readingProgress] = useState(70);
+  const [selectedPageRange, setSelectedPageRange] = useState<{ start: number; end: number } | null>(
+    null,
+  );
 
   // 개발용 상태 - 기록 유무 전환
   const [hasRecords, setHasRecords] = useState(false);
@@ -95,13 +96,15 @@ const Memory = () => {
 
   const handleFilterChange = (filter: FilterType) => {
     if (filter === 'page') {
-      setShowPageRangeModal(true);
+      // 페이지별 보기 클릭 - 인라인 입력 모드로 전환
+      setActiveFilter(filter);
     } else if (filter === 'overall') {
       if (readingProgress < 80) {
         setShowSnackbar(true);
         return;
       }
       setActiveFilter(filter);
+      setSelectedPageRange(null); // 총평 보기 선택 시 페이지 범위 초기화
     }
   };
 
@@ -111,9 +114,13 @@ const Memory = () => {
 
   const handlePageRangeSelect = (startPage: number, endPage: number) => {
     setActiveFilter('page');
-    setShowPageRangeModal(false);
-    // 페이지 범위에 따른 기록 필터링 로직 추가
+    setSelectedPageRange({ start: startPage, end: endPage });
     console.log(`페이지 ${startPage}-${endPage} 기록 조회`);
+  };
+
+  const handlePageRangeClear = () => {
+    setActiveFilter(null);
+    setSelectedPageRange(null);
   };
 
   const handleAddRecord = () => {
@@ -142,7 +149,13 @@ const Memory = () => {
 
         {/* 그룹 기록일 때만 필터 표시 */}
         {activeTab === 'group' && (
-          <RecordFilters activeFilter={activeFilter} onFilterChange={handleFilterChange} />
+          <RecordFilters
+            activeFilter={activeFilter}
+            onFilterChange={handleFilterChange}
+            selectedPageRange={selectedPageRange}
+            onPageRangeClear={handlePageRangeClear}
+            onPageRangeSelect={handlePageRangeSelect}
+          />
         )}
 
         {/* 기록이 없을 때 빈 상태 표시 */}
@@ -162,14 +175,6 @@ const Memory = () => {
       <AddButton onClick={handleAddRecord}>
         <img src={addFab} alt="기록 추가" />
       </AddButton>
-
-      {/* 페이지 범위 선택 모달 */}
-      {showPageRangeModal && (
-        <PageRangeModal
-          onClose={() => setShowPageRangeModal(false)}
-          onSelect={handlePageRangeSelect}
-        />
-      )}
 
       {/* 스낵바 */}
       {showSnackbar && (
