@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import BookInfoCard from './BookInfoCard';
+import ImageViewer from '../common/Modal/ImageViewer';
 import type { PostBodyProps } from '@/types/post';
 
 const Container = styled.div`
@@ -32,6 +34,8 @@ const PostContent = styled.div<{ hasImage: boolean }>`
       width: 100px;
       height: 100px;
       flex-shrink: 0; //고정사이즈
+      object-fit: cover; //비율 유지하며 이미지 채우기
+      cursor: pointer;
     }
   }
 `;
@@ -76,8 +80,20 @@ const FeedDetailPostBody = ({
   images = [],
   tags = [],
 }: PostBodyProps) => {
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
   const hasImage = images.length > 0;
   const hasTag = tags.length > 0;
+
+  const handleImageClick = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsImageViewerOpen(true);
+  };
+
+  const handleCloseImageViewer = () => {
+    setIsImageViewerOpen(false);
+  };
 
   return (
     <Container>
@@ -87,7 +103,7 @@ const FeedDetailPostBody = ({
         {hasImage && (
           <div className="imgContainer">
             {images.map((src, i) => (
-              <img key={i} src={src} />
+              <img key={i} src={src} alt={`이미지 ${i + 1}`} onClick={() => handleImageClick(i)} />
             ))}
           </div>
         )}
@@ -104,6 +120,14 @@ const FeedDetailPostBody = ({
           </TagContainer>
         )}
       </PostContent>
+      {isImageViewerOpen && (
+        <ImageViewer
+          images={images}
+          initialIndex={selectedImageIndex}
+          isOpen={isImageViewerOpen}
+          onClose={handleCloseImageViewer}
+        />
+      )}
     </Container>
   );
 };
