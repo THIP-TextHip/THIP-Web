@@ -13,9 +13,11 @@ export const Container = styled.div`
 `;
 
 export const Content = styled.div`
+  display: flex;
+  flex-direction: column;
   flex: 1;
   padding: 0 20px;
-  padding-bottom: 100px; // 하단 FAB 공간 확보
+  padding-bottom: 100px;
 `;
 
 export const RecordList = styled.div`
@@ -58,8 +60,9 @@ export const DevButton = styled.button`
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.medium};
   cursor: pointer;
-  margin-bottom: 16px;
+  margin: 16px 0;
   align-self: flex-start;
+  z-index: 1000;
 
   &:hover {
     opacity: 0.8;
