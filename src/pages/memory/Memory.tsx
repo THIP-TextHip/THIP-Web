@@ -140,7 +140,10 @@ const Memory = () => {
 
         <RecordTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
-        <RecordFilters activeFilter={activeFilter} onFilterChange={handleFilterChange} />
+        {/* 그룹 기록일 때만 필터 표시 */}
+        {activeTab === 'group' && (
+          <RecordFilters activeFilter={activeFilter} onFilterChange={handleFilterChange} />
+        )}
 
         {/* 기록이 없을 때 빈 상태 표시 */}
         {records.length === 0 && <EmptyRecord type={activeTab} />}
