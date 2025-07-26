@@ -51,7 +51,7 @@ export const ContentSection = styled.div`
 
 export const ActionSection = styled.div`
   display: flex;
-  gap: 16px;
+  gap: 12px;
 `;
 
 export const ActionButton = styled.button`
@@ -59,17 +59,18 @@ export const ActionButton = styled.button`
   border: none;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   cursor: pointer;
+  padding: 0;
 
   img {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
   }
 
   span {
-    color: ${semanticColors.text.secondary};
-    font-size: ${typography.fontSize.sm};
-    font-weight: ${typography.fontWeight.regular};
+    color: ${semanticColors.text.primary};
+    font-size: ${typography.fontSize.xs};
+    font-weight: ${typography.fontWeight.medium};
   }
 `;

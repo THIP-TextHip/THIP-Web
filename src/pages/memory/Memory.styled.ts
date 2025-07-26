@@ -23,8 +23,8 @@ export const Content = styled.div`
 export const RecordList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  margin-top: 20px;
+  gap: 32px;
+  margin-top: 32px;
 `;
 
 export const AddButton = styled.button`
