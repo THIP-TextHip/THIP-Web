@@ -1,4 +1,4 @@
-import addFab from '../../../assets/common/makegroupfab.svg';
+import plusIcon from '../../../assets/memory/plus.svg';
 import { AddButton } from './MemoryAddButton.styled';
 
 interface MemoryAddButtonProps {
@@ -8,7 +8,7 @@ interface MemoryAddButtonProps {
 const MemoryAddButton = ({ onAddRecord }: MemoryAddButtonProps) => {
   return (
     <AddButton onClick={onAddRecord}>
-      <img src={addFab} alt="기록 추가" />
+      <img src={plusIcon} alt="기록 추가" />
     </AddButton>
   );
 };
