@@ -25,6 +25,7 @@ import GroupDetail from './groupDetail/GroupDetail';
 import FeedDetailPage from './feed/FeedDetailPage';
 import ScrollToTop from '@/components/common/ScrollToTop';
 import UserSearch from './feed/UserSearch';
+import Notice from './notice/Notice';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -51,6 +52,7 @@ const Router = () => {
         <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
         <Route path="follow/:type" element={<FollowerListPage />} />
         <Route path="today-words" element={<TodayWords />} />
+        <Route path="notice" element={<Notice />} />
       </>,
     ),
   );
