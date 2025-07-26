@@ -3,8 +3,8 @@ import { typography, semanticColors } from '../../styles/global/global';
 
 export const Container = styled.div`
   display: flex;
-  gap: 24px;
-  margin-top: 24px;
+  gap: 20px;
+  margin-top: 20px;
   margin-bottom: 20px;
 `;
 
