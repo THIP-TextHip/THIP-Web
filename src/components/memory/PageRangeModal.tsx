@@ -64,7 +64,7 @@ const PageRangeModal = ({ onClose, onSelect }: PageRangeModalProps) => {
     }
   };
 
-  const isValid = startPage && endPage && parseInt(startPage) <= parseInt(endPage);
+  const isValid = startPage !== '' && endPage !== '' && parseInt(startPage) <= parseInt(endPage);
 
   return (
     <Overlay onClick={onClose}>
