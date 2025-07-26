@@ -11,21 +11,16 @@ import {
 interface RecordFiltersProps {
   activeFilter: FilterType | null;
   onFilterChange: (filter: FilterType) => void;
-  canViewOverall: boolean;
 }
 
-const RecordFilters = ({ activeFilter, onFilterChange, canViewOverall }: RecordFiltersProps) => {
+const RecordFilters = ({ activeFilter, onFilterChange }: RecordFiltersProps) => {
   return (
     <Container>
       <FilterSection>
         <FilterButton active={activeFilter === 'page'} onClick={() => onFilterChange('page')}>
           페이지별 보기
         </FilterButton>
-        <FilterButton
-          active={activeFilter === 'overall'}
-          disabled={!canViewOverall}
-          onClick={() => onFilterChange('overall')}
-        >
+        <FilterButton active={activeFilter === 'overall'} onClick={() => onFilterChange('overall')}>
           총평 보기
         </FilterButton>
       </FilterSection>

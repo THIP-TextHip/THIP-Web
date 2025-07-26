@@ -13,22 +13,20 @@ export const FilterSection = styled.div`
   gap: 16px;
 `;
 
-export const FilterButton = styled.button<{ active: boolean; disabled?: boolean }>`
-  background-color: ${({ active, disabled }) => {
-    if (disabled) return semanticColors.background.card;
-    return active ? semanticColors.button.fill.primary : colors.grey[400];
-  }};
+export const FilterButton = styled.button<{ active: boolean }>`
+  background-color: ${({ active }) =>
+    active ? semanticColors.button.fill.primary : colors.grey[400]};
   border: none;
   border-radius: 20px;
   padding: 6px 12px;
   color: ${semanticColors.text.primary};
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  cursor: pointer;
   transition: all 0.2s;
   line-height: 24px;
 
-  &:hover:not(:disabled) {
+  &:hover {
     opacity: 0.8;
   }
 `;

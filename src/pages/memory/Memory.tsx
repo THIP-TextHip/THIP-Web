@@ -6,6 +6,7 @@ import RecordFilters from '../../components/memory/RecordFilters';
 import EmptyRecord from '../../components/memory/EmptyRecord';
 import PageRangeModal from '../../components/memory/PageRangeModal';
 import RecordItem from '../../components/memory/RecordItem';
+import Snackbar from '../../components/common/Modal/Snackbar';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import addFab from '../../assets/common/makegroupfab.svg';
 import { Container, Content, RecordList, AddButton, DevButton } from './Memory.styled';
@@ -37,6 +38,7 @@ const Memory = () => {
   const [activeTab, setActiveTab] = useState<RecordType>('group');
   const [activeFilter, setActiveFilter] = useState<FilterType | null>(null);
   const [showPageRangeModal, setShowPageRangeModal] = useState(false);
+  const [showSnackbar, setShowSnackbar] = useState(false);
   const [readingProgress] = useState(70); // 독서 진행도 (임시)
 
   // 개발용 상태 - 기록 유무 전환
@@ -96,12 +98,15 @@ const Memory = () => {
       setShowPageRangeModal(true);
     } else if (filter === 'overall') {
       if (readingProgress < 80) {
-        // 독서 진행도 80% 미만일 때 알림
-        alert('독서 진행도 80% 이상부터 총평을 볼 수 있습니다.');
+        setShowSnackbar(true);
         return;
       }
       setActiveFilter(filter);
     }
+  };
+
+  const handleSnackbarClose = () => {
+    setShowSnackbar(false);
   };
 
   const handlePageRangeSelect = (startPage: number, endPage: number) => {
@@ -121,8 +126,6 @@ const Memory = () => {
     setHasRecords(!hasRecords);
   };
 
-  const canViewOverall = readingProgress >= 80;
-
   return (
     <Container>
       <TitleHeader
@@ -137,11 +140,7 @@ const Memory = () => {
 
         <RecordTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
-        <RecordFilters
-          activeFilter={activeFilter}
-          onFilterChange={handleFilterChange}
-          canViewOverall={canViewOverall}
-        />
+        <RecordFilters activeFilter={activeFilter} onFilterChange={handleFilterChange} />
 
         {/* 기록이 없을 때 빈 상태 표시 */}
         {records.length === 0 && <EmptyRecord type={activeTab} />}
@@ -166,6 +165,15 @@ const Memory = () => {
         <PageRangeModal
           onClose={() => setShowPageRangeModal(false)}
           onSelect={handlePageRangeSelect}
+        />
+      )}
+
+      {/* 스낵바 */}
+      {showSnackbar && (
+        <Snackbar
+          message="독서 진행도 80% 이상부터 총평을 볼 수 있어요."
+          variant="top"
+          onClose={handleSnackbarClose}
         />
       )}
     </Container>

@@ -50,14 +50,6 @@ const PageRangeModal = ({ onClose, onSelect }: PageRangeModalProps) => {
     }
   };
 
-  const handleBackspace = () => {
-    if (activeInput === 'start') {
-      setStartPage(prev => prev.slice(0, -1));
-    } else if (activeInput === 'end') {
-      setEndPage(prev => prev.slice(0, -1));
-    }
-  };
-
   const handleReset = () => {
     setStartPage('');
     setEndPage('');
