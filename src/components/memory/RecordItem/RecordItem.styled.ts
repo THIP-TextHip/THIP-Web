@@ -1,8 +1,11 @@
 import styled from '@emotion/styled';
 import { colors, typography, semanticColors } from '../../../styles/global/global';
 
-export const Container = styled.div`
+export const Container = styled.div<{ shouldBlur?: boolean }>`
   background-color: none;
+  filter: ${({ shouldBlur }) => (shouldBlur ? 'blur(2px)' : 'none')};
+  transition: filter 0.3s ease;
+  pointer-events: ${({ shouldBlur }) => (shouldBlur ? 'none' : 'auto')};
 `;
 
 export const UserSection = styled.div`

@@ -23,6 +23,7 @@ export interface Record {
   commentCount: number;
   timeAgo: string;
   type: 'text' | 'poll';
+  recordType?: 'page' | 'overall';
   pollOptions?: PollOption[];
 }
 
@@ -58,6 +59,7 @@ const Memory = () => {
       commentCount: 123,
       timeAgo: '12시간 전',
       type: 'text',
+      recordType: 'page',
     },
     {
       id: '2',
@@ -68,6 +70,7 @@ const Memory = () => {
       commentCount: 123,
       timeAgo: '12시간 전',
       type: 'poll',
+      recordType: 'page',
       pollOptions: [
         {
           id: '1.',
@@ -82,6 +85,17 @@ const Memory = () => {
           isHighest: false,
         },
       ],
+    },
+    {
+      id: '3',
+      user: 'user.02',
+      userPoints: 89,
+      content: '공백 포함 글자 입력입니다.',
+      likeCount: 45,
+      commentCount: 23,
+      timeAgo: '8시간 전',
+      type: 'text',
+      recordType: 'overall',
     },
   ];
 
@@ -164,7 +178,11 @@ const Memory = () => {
         {records.length > 0 && (
           <RecordList>
             {records.map(record => (
-              <RecordItem key={record.id} record={record} />
+              <RecordItem
+                key={record.id}
+                record={record}
+                shouldBlur={record.recordType === 'overall' && readingProgress < 80}
+              />
             ))}
           </RecordList>
         )}

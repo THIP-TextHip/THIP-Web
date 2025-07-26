@@ -20,9 +20,10 @@ import {
 
 interface RecordItemProps {
   record: Record;
+  shouldBlur?: boolean;
 }
 
-const RecordItem = ({ record }: RecordItemProps) => {
+const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   const { user, userPoints, content, likeCount, commentCount, timeAgo, type, pollOptions } = record;
 
   // 좋아요 상태 관리
@@ -42,7 +43,7 @@ const RecordItem = ({ record }: RecordItemProps) => {
   };
 
   return (
-    <Container>
+    <Container shouldBlur={shouldBlur}>
       <UserSection>
         <UserAvatar />
         <UserInfo>
