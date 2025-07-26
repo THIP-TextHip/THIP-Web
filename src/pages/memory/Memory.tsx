@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import RecordTabs from '../../components/memory/RecordTabs';
-import RecordFilters from '../../components/memory/RecordFilters';
+import RecordFilters from '../../components/memory/RecordFilters/RecordFilters';
 import EmptyRecord from '../../components/memory/EmptyRecord';
 import RecordItem from '../../components/memory/RecordItem';
 import Snackbar from '../../components/common/Modal/Snackbar';
@@ -112,12 +112,6 @@ const Memory = () => {
     setShowSnackbar(false);
   };
 
-  const handlePageRangeSelect = (startPage: number, endPage: number) => {
-    setActiveFilter('page');
-    setSelectedPageRange({ start: startPage, end: endPage });
-    console.log(`페이지 ${startPage}-${endPage} 기록 조회`);
-  };
-
   const handlePageRangeClear = () => {
     setActiveFilter(null);
     setSelectedPageRange(null);
@@ -154,7 +148,6 @@ const Memory = () => {
             onFilterChange={handleFilterChange}
             selectedPageRange={selectedPageRange}
             onPageRangeClear={handlePageRangeClear}
-            onPageRangeSelect={handlePageRangeSelect}
           />
         )}
 
