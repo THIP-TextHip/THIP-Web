@@ -4,8 +4,8 @@ import { typography, semanticColors } from '../../styles/global/global';
 export const Container = styled.div`
   display: flex;
   gap: 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 28px;
+  margin-bottom: 28px;
 `;
 
 export const TabButton = styled.button<{ active: boolean }>`
@@ -14,7 +14,8 @@ export const TabButton = styled.button<{ active: boolean }>`
   padding: 0;
   color: ${({ active }) => (active ? semanticColors.text.primary : semanticColors.text.tertiary)};
   font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
+  font-weight: ${({ active }) =>
+    active ? typography.fontWeight.semibold : typography.fontWeight.medium};
   cursor: pointer;
   position: relative;
 
