@@ -3,10 +3,9 @@ import { Container, MainMessage, SubMessage } from './EmptyRecord.styled';
 
 interface EmptyRecordProps {
   type: RecordType;
-  message: string;
 }
 
-const EmptyRecord = ({ type, message }: EmptyRecordProps) => {
+const EmptyRecord = ({ type }: EmptyRecordProps) => {
   return (
     <Container>
       <MainMessage>아직 기록이 없어요.</MainMessage>

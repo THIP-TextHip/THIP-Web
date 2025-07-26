@@ -144,16 +144,7 @@ const Memory = () => {
         />
 
         {/* 기록이 없을 때 빈 상태 표시 */}
-        {records.length === 0 && (
-          <EmptyRecord
-            type={activeTab}
-            message={
-              activeTab === 'group'
-                ? '아직 기록이 없어요.\n우리 모임의 첫번째 기록을 남겨보세요'
-                : '아직 기록이 없어요.\n나의 첫번째 기록을 남겨보세요'
-            }
-          />
-        )}
+        {records.length === 0 && <EmptyRecord type={activeTab} />}
 
         {/* 기록 목록 */}
         {records.length > 0 && (
