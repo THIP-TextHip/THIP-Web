@@ -44,7 +44,7 @@ const Memory = () => {
   );
 
   // 개발용 상태 - 기록 유무 전환
-  const [hasRecords, setHasRecords] = useState(false);
+  const [hasRecords, setHasRecords] = useState(true);
 
   // 더미 데이터 - 실제로는 API에서 가져올 데이터
   const dummyRecords: Record[] = [
