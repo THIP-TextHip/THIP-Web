@@ -141,8 +141,8 @@ const ModalOverlay = styled.div`
   max-width: 767px;
   margin: 0 auto; */
   /* background-color: ${colors.black.main}; */
-  background-color: rgba(18, 18, 18, 0.1);
-  backdrop-filter: blur(2.5px);
+  background-color: rgba(18, 18, 18, 0.8);
+  backdrop-filter: blur(1.5px);
   display: flex;
   align-items: center;
   justify-content: center;
