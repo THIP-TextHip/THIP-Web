@@ -4,10 +4,11 @@ import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { colors, typography } from '@/styles/global/global';
+import { mockNotifications } from '@/mocks/notification.mock';
 
 const Notice = () => {
-  const [selected, setSelected] = useState<string>(''); // ''이면 전체
-  const [notifications, setNotifications] = useState(dummyNotifications); // 알림 상태화
+  const [selected, setSelected] = useState<string>('');
+  const [notifications, setNotifications] = useState(mockNotifications);
   const navigate = useNavigate();
 
   const handleBackButton = () => {
@@ -15,7 +16,7 @@ const Notice = () => {
   };
 
   const handleSelectTab = (tab: string) => {
-    setSelected(prev => (prev === tab ? '' : tab)); // 동일한 탭이면 해제
+    setSelected(prev => (prev === tab ? '' : tab));
   };
 
   const handleReadNotification = (index: number) => {
@@ -71,87 +72,6 @@ const Notice = () => {
 };
 
 export default Notice;
-
-const dummyNotifications = [
-  {
-    category: '모임',
-    title: '같이 읽기를 시작했어요!ㄹㅁㄴㅇㄹㅁㄴㅇㄹㄴㅇㅁㄹㄴㅁㄹㅇㄴㄴㅇㅁㄹㅇㄴ',
-    description: '모임방에서 20분 동안 같이 읽기가 시작했어요!',
-    time: '2시간 전',
-    read: false,
-  },
-  {
-    category: '피드',
-    title: '내 글을 좋아합니다.',
-    description: '@user123 님이 내 글에 좋아요를 눌렀어요.',
-    time: '7시간 전',
-    read: true,
-  },
-  {
-    category: '모임',
-    title: '투표가 시작되었어요!',
-    description:
-      '투표제목을 먼저 말해줍니다 그리고 어쩌구저쩌구.ㄹㄴㄹㅇㄴㄹㅁㄴㄹㅇㄴㄹㅁㄴㄹㄴㅁㅇㄹㄴㅁㅇㄹㅁㄴㄹㄴ',
-    time: '17시간 전',
-    read: false,
-  },
-  {
-    category: '모임',
-    title: '투표가 시작되었어요!',
-    description:
-      '투표제목을 먼저 말해줍니다 그리고 어쩌구저쩌구.ㄹㄴㄹㅇㄴㄹㅁㄴㄹㅇㄴㄹㅁㄴㄹㄴㅁㅇㄹㄴㅁㅇㄹㅁㄴㄹㄴ',
-    time: '17시간 전',
-    read: false,
-  },
-  {
-    category: '모임',
-    title: '투표가 시작되었어요!',
-    description:
-      '투표제목을 먼저 말해줍니다 그리고 어쩌구저쩌구.ㄹㄴㄹㅇㄴㄹㅁㄴㄹㅇㄴㄹㅁㄴㄹㄴㅁㅇㄹㄴㅁㅇㄹㅁㄴㄹㄴ',
-    time: '17시간 전',
-    read: false,
-  },
-  {
-    category: '모임',
-    title: '투표가 시작되었어요!',
-    description:
-      '투표제목을 먼저 말해줍니다 그리고 어쩌구저쩌구.ㄹㄴㄹㅇㄴㄹㅁㄴㄹㅇㄴㄹㅁㄴㄹㄴㅁㅇㄹㄴㅁㅇㄹㅁㄴㄹㄴ',
-    time: '17시간 전',
-    read: false,
-  },
-  {
-    category: '모임',
-    title: '투표가 시작되었어요!',
-    description:
-      '투표제목을 먼저 말해줍니다 그리고 어쩌구저쩌구.ㄹㄴㄹㅇㄴㄹㅁㄴㄹㅇㄴㄹㅁㄴㄹㄴㅁㅇㄹㄴㅁㅇㄹㅁㄴㄹㄴ',
-    time: '17시간 전',
-    read: false,
-  },
-  {
-    category: '모임',
-    title: '투표가 시작되었어요!',
-    description:
-      '투표제목을 먼저 말해줍니다 그리고 어쩌구저쩌구.ㄹㄴㄹㅇㄴㄹㅁㄴㄹㅇㄴㄹㅁㄴㄹㄴㅁㅇㄹㄴㅁㅇㄹㅁㄴㄹㄴ',
-    time: '17시간 전',
-    read: false,
-  },
-  {
-    category: '모임',
-    title: '투표가 시작되었어요!',
-    description:
-      '투표제목을 먼저 말해줍니다 그리고 어쩌구저쩌구.ㄹㄴㄹㅇㄴㄹㅁㄴㄹㅇㄴㄹㅁㄴㄹㄴㅁㅇㄹㄴㅁㅇㄹㅁㄴㄹㄴ',
-    time: '17시간 전',
-    read: false,
-  },
-  {
-    category: '모임',
-    title: '투표가 시작되었어요!',
-    description:
-      '투표제목을 먼저 말해줍니다 그리고 어쩌구저쩌구.ㄹㄴㄹㅇㄴㄹㅁㄴㄹㅇㄴㄹㅁㄴㄹㄴㅁㅇㄹㄴㅁㅇㄹㅁㄴㄹㄴ',
-    time: '17시간 전',
-    read: false,
-  },
-];
 
 const Wrapper = styled.div`
   display: flex;
