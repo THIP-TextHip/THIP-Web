@@ -1,13 +1,15 @@
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import MenuButton from '@/components/Mypage/MenuButton';
+import { usePopupActions } from '@/hooks/usePopupActions';
 import alert from '../../assets/mypage/alert.svg';
 import guide from '../../assets/mypage/guide.svg';
-import logout from '../../assets/mypage/logout.svg';
 import save from '../../assets/mypage/save.svg';
 import service from '../../assets/mypage/service.svg';
-import withdraw from '../../assets/mypage/withdraw.svg';
 import ver from '../../assets/mypage/ver.svg';
+import notice from '../../assets/mypage/notice.svg';
+import terms from '../../assets/mypage/terms.svg';
+import NavBar from '@/components/common/NavBar';
 
 const mockProfile = {
   profileImgUrl: 'https://placehold.co/54x54',
@@ -18,7 +20,29 @@ const mockProfile = {
 
 const Mypage = () => {
   const { profileImgUrl, userName, userTitle, titleColor } = mockProfile;
+  const { openConfirm, closePopup } = usePopupActions();
   const onClickEdit = () => {};
+
+  const handleLogout = () => {
+    openConfirm({
+      title: '로그아웃',
+      disc: '또 THIP 해주실거죠?',
+      onConfirm: () => {
+        //실제 로그아웃 로직 구현
+        console.log('로그아웃 실행');
+        closePopup();
+        //토큰 삭제, 메인 페이지로 이동
+      },
+      onClose: () => {
+        console.log('로그아웃 취소');
+        closePopup();
+      },
+    });
+  };
+
+  const handleNotice = () => {
+    window.open('https://www.naver.com', '_blank');
+  };
 
   return (
     <Wrapper>
@@ -41,21 +65,28 @@ const Mypage = () => {
         <Section>
           <SectionTitle>내 활동</SectionTitle>
           <MenuGrid>
-            <MenuButton src={save} name="저장" />
+            <MenuButton src={save} name="저장" isButton />
           </MenuGrid>
         </Section>
         <Section>
           <SectionTitle>메뉴</SectionTitle>
           <MenuGrid>
-            <MenuButton src={alert} name="알림설정" />
-            <MenuButton src={guide} name="가이드" />
-            <MenuButton src={service} name="고객센터" />
-            <MenuButton src={withdraw} name="회원탈퇴" />
-            <MenuButton src={logout} name="로그아웃" />
-            <MenuButton src={ver} name="버젼 1.0" />
+            <MenuButton src={alert} name="알림설정" isButton />
+            <MenuButton src={service} name="고객센터" isButton />
+            <MenuButton src={notice} name="공지사항" isButton />
+            <MenuButton src={terms} name="이용약관" isButton onClick={handleNotice} />
+            <MenuButton src={guide} name="가이드" isButton />
+            <MenuButton src={ver} name="버젼 1.0" isButton={false} />
           </MenuGrid>
         </Section>
+        <BottomMenu>
+          <div className="logout" onClick={handleLogout}>
+            로그아웃
+          </div>
+          <div className="withdraw">회원탈퇴</div>
+        </BottomMenu>
       </Container>
+      <NavBar />
     </Wrapper>
   );
 };
@@ -67,7 +98,7 @@ const Wrapper = styled.div`
   align-items: center;
   min-width: 320px;
   max-width: 767px;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0 auto;
   background-color: #121212;
 `;
@@ -151,6 +182,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100vh;
   padding-top: 76px;
   gap: 40px;
 `;
@@ -174,10 +206,25 @@ const MenuGrid = styled.div`
   gap: 12px;
   padding: 0 20px;
 
-  @media (min-width: 572px) {
+  @media (min-width: 612px) {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
+`;
+
+const BottomMenu = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  margin-top: auto;
+  padding-bottom: 93px;
+
+  color: ${colors.grey[200]};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
+  line-height: 20px;
+  cursor: pointer;
 `;
 
 export default Mypage;

@@ -5,16 +5,19 @@ import rightArrow from '../../assets/common/right-Chevron.svg';
 export interface MenuButtonProps {
   src: string;
   name: string;
+  textColor?: string;
+  isButton?: boolean;
+  onClick?: () => void;
 }
 
-const MenuButton = ({ src, name }: MenuButtonProps) => {
+const MenuButton = ({ src, name, isButton, onClick }: MenuButtonProps) => {
   return (
-    <Wrapper>
+    <Wrapper onClick={onClick}>
       <div className="main">
         <img src={src} />
         <div>{name}</div>
       </div>
-      <img src={rightArrow} />
+      {isButton && <img src={rightArrow} />}
     </Wrapper>
   );
 };
@@ -30,6 +33,7 @@ const Wrapper = styled.div`
   gap: 16px;
   border-radius: 12px;
   background-color: ${colors.darkgrey.dark};
+  cursor: pointer;
 
   color: ${colors.white};
   font-size: ${typography.fontSize.base};
