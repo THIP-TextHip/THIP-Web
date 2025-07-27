@@ -173,6 +173,7 @@ const Description = styled.div`
 `;
 
 const EmptyState = styled.div`
+  margin-top: 50%;
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.semibold};
   padding: 40px;
