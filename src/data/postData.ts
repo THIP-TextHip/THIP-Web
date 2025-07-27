@@ -1,4 +1,6 @@
 import type { FeedPostProps, ReplyDataProps, PostData } from '@/types/post';
+import test from '../assets/common/test.jpg';
+import test2 from '../assets/common/test2.jpg';
 
 export const mockPosts: PostData[] = [
   {
@@ -54,7 +56,7 @@ export const mockFeedPost: FeedPostProps = {
   feedId: 1,
   initialLikeCount: 15,
   commentCount: 2,
-  showHeader: true,
+  images: [test2, 'https://placehold.co/300x300', test],
   tags: ['소설', '베스트셀러', '한강'],
 };
 

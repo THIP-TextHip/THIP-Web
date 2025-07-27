@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { colors } from '@/styles/global/global';
 
 const HeaderWrapper = styled.div`
   position: fixed;
@@ -6,10 +7,10 @@ const HeaderWrapper = styled.div`
   left: 0;
   right: 0;
   z-index: 100;
-  max-width: 767px;
+  max-width: 766px;
   margin: 0 auto;
   padding: 16px 20px;
-  background-color: var(--color-black-main);
+  background-color: ${colors.black.main};
 `;
 
 const NextButton = styled.div<{ active: boolean }>`

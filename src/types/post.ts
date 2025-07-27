@@ -24,7 +24,7 @@ export interface FeedListProps {
 }
 
 export interface FeedPostProps extends PostData {
-  showHeader: boolean;
+  showHeader?: boolean;
   isMyFeed?: boolean;
 }
 
