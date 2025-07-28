@@ -23,8 +23,9 @@ import SearchBook from './searchBook/SearchBook';
 import SearchBookGroup from './searchBook/SearchBookGroup';
 import GroupDetail from './groupDetail/GroupDetail';
 import FeedDetailPage from './feed/FeedDetailPage';
-import ScrollToTop from '@/components/common/ScrollToTop';
+import ScrollToTop from '../components/common/ScrollToTop';
 import UserSearch from './feed/UserSearch';
+import Memory from './memory/Memory';
 import Mypage from './mypage/Mypage';
 import SavePage from './mypage/SavePage';
 import AlertPage from './mypage/AlertPage';
@@ -48,6 +49,7 @@ const Router = () => {
         <Route path="group/create" element={<CreateGroup />} />
         <Route path="group/search" element={<GroupSearch />} />
         <Route path="group/detail" element={<GroupDetail />} />
+        <Route path="memory" element={<Memory />} />
         <Route path="feed" element={<Feed />} />
         <Route path="feed/search" element={<UserSearch />} />
         <Route path="feed/:feedId" element={<FeedDetailPage />} />
