@@ -6,47 +6,59 @@ import type { SubReplyDataProps } from '@/types/post';
 import like from '../../../assets/feed/like.svg';
 import activeLike from '../../../assets/feed/activeLike.svg';
 import replyIcon from '../../../assets/feed/replyIcon.svg';
+import { useReplyActions } from '@/hooks/useReplyActions';
 
 const SubReply = ({
-  profileImgUrl,
-  userName,
-  userId,
-  userTitle,
+  replyCommentUserName,
+  replyCommentUserTitle,
+  replyCommentContent,
+  replyCommentUserId,
+  replyCommentId,
+  replyCommentimgUrl,
   titleColor,
-  createdAt,
-  initialLikeCount,
-  subreplyContent,
+  postDate,
+  likeCount,
+  isLike,
 }: SubReplyDataProps) => {
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
+  const [liked, setLiked] = useState<boolean>(isLike);
+  const [currentLikeCount, setCurrentLikeCount] = useState<number>(likeCount);
+
+  const { startReply } = useReplyActions();
+
+  const handleReplyClick = () => {
+    startReply(replyCommentUserName, replyCommentId);
+  };
+
   const handleLike = () => {
-    setLiked(!liked);
-    setLikeCount(prev => (liked ? prev - 1 : prev + 1));
+    setLiked(prev => !prev);
+    setCurrentLikeCount(prev => (liked ? prev - 1 : prev + 1));
   };
 
   return (
     <Container>
       <ReplyIcon>
-        <img src={replyIcon} alt="대댓글" />
+        <img src={replyIcon} alt="대댓글 아이콘" />
       </ReplyIcon>
       <Content>
         <PostHeader
-          profileImgUrl={profileImgUrl}
-          userName={userName}
-          userTitle={userTitle}
+          profileImgUrl={replyCommentimgUrl}
+          userName={replyCommentUserName}
+          userTitle={replyCommentUserTitle}
           titleColor={titleColor}
-          createdAt={createdAt}
-          userId={userId}
+          createdAt={postDate}
+          userId={replyCommentUserId}
           type="reply"
         />
         <ReplySection>
           <div className="left">
-            <div className="reply">{subreplyContent}</div>
-            <div className="sub-reply">답글작성</div>
+            <div className="reply">{replyCommentContent}</div>
+            <div className="sub-reply" onClick={handleReplyClick}>
+              답글작성
+            </div>
           </div>
           <div className="right">
-            <img src={liked ? activeLike : like} onClick={handleLike} />
-            <div className="count">{likeCount}</div>
+            <img src={liked ? activeLike : like} onClick={handleLike} alt="좋아요" />
+            <div className="count">{currentLikeCount}</div>
           </div>
         </ReplySection>
       </Content>

@@ -24,7 +24,7 @@ export interface FeedListProps {
 }
 
 export interface FeedPostProps extends PostData {
-  showHeader: boolean;
+  showHeader?: boolean;
   isMyFeed?: boolean;
 }
 
@@ -35,28 +35,31 @@ export type PostBodyProps = Pick<
 
 // 대댓글(SubReply)
 export interface SubReplyDataProps {
+  replyCommentUserName: string;
+  replyCommentUserId: number;
+  replyCommentimgUrl: string;
+  replyCommentContent: string;
+  replyCommentUserTitle: string;
   replyCommentId: number;
-  profileImgUrl: string;
-  userName: string;
-  userId: number;
-  userTitle: string;
   titleColor: string;
-  createdAt: string;
-  subreplyContent: string;
-  initialLikeCount: number;
+  postDate: string;
+  likeCount: number;
+  isLike: boolean;
 }
 
 // 댓글(Reply)
 export interface ReplyDataProps {
   commentId: number;
-  profileImgUrl: string;
-  userName: string;
   userId: number;
+  imageUrl: string;
+  nickName: string;
   userTitle: string;
   titleColor: string;
   createdAt: string;
-  replyContent: string;
-  initialLikeCount: number;
+  postDate: string;
+  content: string;
+  likeCount: number;
+  isLike: boolean;
   replyCommentList: SubReplyDataProps[];
 }
 

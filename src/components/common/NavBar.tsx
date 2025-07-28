@@ -69,7 +69,7 @@ const items: RouteItem[] = [
   { path: '/feed', label: '피드', icon: FeedIcon, activeIcon: FeedIconActive },
   { path: '/group', label: '모임', icon: GroupIcon, activeIcon: GroupIconActive },
   { path: '/search', label: '검색', icon: SearchIcon, activeIcon: SearchIconActive },
-  { path: '/my', label: '내 정보', icon: MyIcon, activeIcon: MyIconActive },
+  { path: '/mypage', label: '내 정보', icon: MyIcon, activeIcon: MyIconActive },
 ];
 
 const NavBar = ({ src, path }: FabProps) => {

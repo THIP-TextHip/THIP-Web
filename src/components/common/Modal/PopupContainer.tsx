@@ -10,10 +10,13 @@ const PopupContainer = () => {
   const { popupType, popupProps, isOpen } = usePopupStore();
 
   useEffect(() => {
-    // 모달일 때만 스크롤 차단
-    document.body.style.overflow = popupType === 'snackbar' && isOpen ? '' : 'hidden';
+    if (isOpen && popupType !== 'snackbar') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = 'auto';
     };
   }, [isOpen, popupType]);
 

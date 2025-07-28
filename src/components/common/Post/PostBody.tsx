@@ -44,38 +44,6 @@ const PostContent = styled.div<{ hasImage: boolean }>`
   }
 `;
 
-const TagContainer = styled.div`
-  .tagList {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-    padding-bottom: 16px;
-    overflow: hidden;
-
-    .hashTag {
-      width: auto;
-      flex-shrink: 0;
-      height: 30px;
-      padding: 8px 12px;
-      justify-content: center;
-      align-items: center;
-      border-radius: 20px;
-      border: 1px solid var(--color-button-color_line-button_line_lightgrey01, #adadad);
-
-      color: var(--color-white);
-      font-size: var(--string-size-small03, 12px);
-      font-weight: var(--string-weight-regular, 400);
-      line-height: normal;
-    }
-  }
-
-  .borderBottom {
-    width: 100%;
-    height: 1px;
-    background: var(--color-view-card-background-darkgrey-2, #282828);
-  }
-`;
-
 const PostBody = ({
   bookTitle,
   isbn,
@@ -83,13 +51,11 @@ const PostBody = ({
   postContent,
   feedId,
   images = [],
-  tags = [],
 }: PostBodyProps) => {
   const navigate = useNavigate();
   const hasImage = images.length > 0;
-  const hasTag = tags.length > 0;
 
-  const handlePostContent = () => {
+  const handlePostClick = (feedId: number) => {
     // if (!isClickable) return;
     navigate(`/feed/${feedId}`);
     // API 연동시 경로 수정 필요
@@ -98,7 +64,7 @@ const PostBody = ({
   return (
     <Container>
       <BookInfoCard bookTitle={bookTitle} bookAuthor={bookAuthor} isbn={isbn} />
-      <PostContent hasImage={hasImage} onClick={handlePostContent}>
+      <PostContent hasImage={hasImage} onClick={() => handlePostClick(feedId)}>
         <div className="content">{postContent}</div>
         {hasImage && (
           <div className="imgContainer">
@@ -106,18 +72,6 @@ const PostBody = ({
               <img key={i} src={src} />
             ))}
           </div>
-        )}
-        {hasTag && (
-          <TagContainer>
-            <div className="tagList">
-              {tags?.map((tagName, t) => (
-                <div key={t} className="hashTag">
-                  {tagName}
-                </div>
-              ))}
-            </div>
-            <div className="borderBottom"></div>
-          </TagContainer>
         )}
       </PostContent>
     </Container>

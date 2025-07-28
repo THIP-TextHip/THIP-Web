@@ -3,14 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container } from './Signup.styled';
 import leftarrow from '../../assets/common/leftArrow.svg';
 import TitleHeader from '../../components/common/TitleHeader';
-
-interface Genre {
-  id: string;
-  title: string;
-  subTitle: string;
-  iconUrl: string;
-  color: string;
-}
+import type { Genre } from '@/types/genre';
 
 const SignupGenre = () => {
   const [genres, setGenres] = useState<Genre[]>([]);

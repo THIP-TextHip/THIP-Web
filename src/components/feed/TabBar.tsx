@@ -22,6 +22,7 @@ const TabButton = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
+  width: 60px;
   padding: 8px 4px;
   font-size: var(--font-size-lg);
   cursor: pointer;
