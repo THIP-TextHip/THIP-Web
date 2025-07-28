@@ -10,6 +10,7 @@ import SignupGenre from './signup/SignupGenre';
 import SignupNickname from './signup/SignupNickname';
 import SignupDone from './signup/SignupDone';
 import CreateGroup from './group/CreateGroup';
+import CreatePost from './post/CreatePost';
 import Group from './group/Group';
 import Feed from './feed/Feed';
 import GroupSearch from './groupSearch/GroupSearch';
@@ -30,6 +31,7 @@ import AlertPage from './mypage/AlertPage';
 import WithdrawPage from './mypage/WithdrawPage';
 import WithdrawDonePage from './mypage/WithdrawDonePage';
 import EditPage from './mypage/EditPage';
+import Notice from './notice/Notice';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -41,6 +43,7 @@ const Router = () => {
           <Route path="genre" element={<SignupGenre />} />
         </Route>
         <Route path="signupdone" element={<SignupDone />} />
+        <Route path="post/create" element={<CreatePost />} />
         <Route path="group" element={<Group />} />
         <Route path="group/create" element={<CreateGroup />} />
         <Route path="group/search" element={<GroupSearch />} />
@@ -61,6 +64,7 @@ const Router = () => {
         <Route path="mypage/withdraw" element={<WithdrawPage />} />
         <Route path="mypage/withdraw/done" element={<WithdrawDonePage />} />
         <Route path="mypage/edit" element={<EditPage />} />
+        <Route path="notice" element={<Notice />} />
       </>,
     ),
   );
