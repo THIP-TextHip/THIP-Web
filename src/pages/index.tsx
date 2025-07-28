@@ -25,6 +25,10 @@ import FeedDetailPage from './feed/FeedDetailPage';
 import ScrollToTop from '@/components/common/ScrollToTop';
 import UserSearch from './feed/UserSearch';
 import Mypage from './mypage/Mypage';
+import SavePage from './mypage/SavePage';
+import AlertPage from './mypage/AlertPage';
+import WithdrawPage from './mypage/WithdrawPage';
+import WithdrawDonePage from './mypage/WithdrawDonePage';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -51,6 +55,10 @@ const Router = () => {
         <Route path="follow/:type" element={<FollowerListPage />} />
         <Route path="today-words" element={<TodayWords />} />
         <Route path="mypage" element={<Mypage />} />
+        <Route path="mypage/save" element={<SavePage />} />
+        <Route path="mypage/alert" element={<AlertPage />} />
+        <Route path="mypage/withdraw" element={<WithdrawPage />} />
+        <Route path="mypage/withdraw/done" element={<WithdrawDonePage />} />
       </>,
     ),
   );

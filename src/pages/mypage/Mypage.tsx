@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { useNavigate } from 'react-router-dom';
 import { colors, typography } from '@/styles/global/global';
 import MenuButton from '@/components/Mypage/MenuButton';
 import { usePopupActions } from '@/hooks/usePopupActions';
@@ -21,6 +22,7 @@ const mockProfile = {
 const Mypage = () => {
   const { profileImgUrl, userName, userTitle, titleColor } = mockProfile;
   const { openConfirm, closePopup } = usePopupActions();
+  const navigate = useNavigate();
   const onClickEdit = () => {};
 
   const handleLogout = () => {
@@ -44,6 +46,18 @@ const Mypage = () => {
     window.open('https://www.naver.com', '_blank');
   };
 
+  const handleSave = () => {
+    navigate('/mypage/save');
+  };
+
+  const handleAlert = () => {
+    navigate('/mypage/alert');
+  };
+
+  const handleWithdraw = () => {
+    navigate('/mypage/withdraw');
+  };
+
   return (
     <Wrapper>
       <Header>마이페이지</Header>
@@ -65,13 +79,13 @@ const Mypage = () => {
         <Section>
           <SectionTitle>내 활동</SectionTitle>
           <MenuGrid>
-            <MenuButton src={save} name="저장" isButton />
+            <MenuButton src={save} name="저장" isButton onClick={handleSave} />
           </MenuGrid>
         </Section>
         <Section>
           <SectionTitle>메뉴</SectionTitle>
           <MenuGrid>
-            <MenuButton src={alert} name="알림설정" isButton />
+            <MenuButton src={alert} name="알림설정" isButton onClick={handleAlert} />
             <MenuButton src={service} name="고객센터" isButton />
             <MenuButton src={notice} name="공지사항" isButton />
             <MenuButton src={terms} name="이용약관" isButton onClick={handleNotice} />
@@ -83,7 +97,9 @@ const Mypage = () => {
           <div className="logout" onClick={handleLogout}>
             로그아웃
           </div>
-          <div className="withdraw">회원탈퇴</div>
+          <div className="withdraw" onClick={handleWithdraw}>
+            회원탈퇴
+          </div>
         </BottomMenu>
       </Container>
       <NavBar />
