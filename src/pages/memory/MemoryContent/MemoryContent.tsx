@@ -1,4 +1,5 @@
 import type { RecordType, FilterType, Record } from '../../../pages/memory/Memory';
+import type { SortType } from '../../../components/memory/SortDropdown';
 import RecordTabs from '../../../components/memory/RecordTabs';
 import RecordFilters from '../../../components/memory/RecordFilters/RecordFilters';
 import RecordInfoMessage from '../../../components/memory/RecordInfoMessage';
@@ -10,11 +11,13 @@ interface MemoryContentProps {
   activeTab: RecordType;
   activeFilter: FilterType | null;
   readingProgress: number;
+  selectedSort: SortType;
   records: Record[];
   selectedPageRange: { start: number; end: number } | null;
   hasRecords: boolean;
   onTabChange: (tab: RecordType) => void;
   onFilterChange: (filter: FilterType) => void;
+  onSortChange: (sort: SortType) => void;
   onPageRangeClear: () => void;
   onToggleRecords: () => void;
 }
@@ -23,11 +26,13 @@ const MemoryContent = ({
   activeTab,
   activeFilter,
   readingProgress,
+  selectedSort,
   records,
   selectedPageRange,
   hasRecords,
   onTabChange,
   onFilterChange,
+  onSortChange,
   onPageRangeClear,
   onToggleRecords,
 }: MemoryContentProps) => {
@@ -44,7 +49,9 @@ const MemoryContent = ({
           <RecordFilters
             activeFilter={activeFilter}
             readingProgress={readingProgress}
+            selectedSort={selectedSort}
             onFilterChange={onFilterChange}
+            onSortChange={onSortChange}
             selectedPageRange={selectedPageRange}
             onPageRangeClear={onPageRangeClear}
           />
