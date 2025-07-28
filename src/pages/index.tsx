@@ -29,6 +29,7 @@ import SavePage from './mypage/SavePage';
 import AlertPage from './mypage/AlertPage';
 import WithdrawPage from './mypage/WithdrawPage';
 import WithdrawDonePage from './mypage/WithdrawDonePage';
+import EditPage from './mypage/EditPage';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -59,6 +60,7 @@ const Router = () => {
         <Route path="mypage/alert" element={<AlertPage />} />
         <Route path="mypage/withdraw" element={<WithdrawPage />} />
         <Route path="mypage/withdraw/done" element={<WithdrawDonePage />} />
+        <Route path="mypage/edit" element={<EditPage />} />
       </>,
     ),
   );
