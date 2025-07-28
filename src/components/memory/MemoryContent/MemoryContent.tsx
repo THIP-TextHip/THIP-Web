@@ -1,9 +1,9 @@
 import type { RecordType, FilterType, Record } from '../../../pages/memory/Memory';
-import type { SortType } from '../../../components/memory/SortDropdown';
-import RecordTabs from '../../../components/memory/RecordTabs';
-import RecordFilters from '../../../components/memory/RecordFilters/RecordFilters';
-import RecordInfoMessage from '../../../components/memory/RecordInfoMessage';
-import EmptyRecord from '../../../components/memory/EmptyRecord';
+import type { SortType } from '../SortDropdown';
+import RecordTabs from '../RecordTabs';
+import RecordFilters from '../RecordFilters/RecordFilters';
+import RecordInfoMessage from '../RecordInfoMessage';
+import EmptyRecord from '../EmptyRecord';
 import RecordList from './RecordList';
 import { Content, DevButton } from './MemoryContent.styled';
 

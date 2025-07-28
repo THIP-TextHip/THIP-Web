@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { DropdownContainer, DropdownItem } from './SortDropdown.styled';
 
 export type SortType = 'latest' | 'popular' | 'comments';
@@ -9,7 +10,26 @@ interface SortDropdownProps {
 }
 
 const SortDropdown = ({ isOpen, selectedSort, onSortSelect }: SortDropdownProps) => {
-  if (!isOpen) return null;
+  const [shouldRender, setShouldRender] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      // 다음 프레임에서 애니메이션 시작
+      requestAnimationFrame(() => {
+        setIsAnimating(true);
+      });
+    } else {
+      setIsAnimating(false);
+      // 애니메이션 완료 후 DOM에서 제거
+      setTimeout(() => {
+        setShouldRender(false);
+      }, 150);
+    }
+  }, [isOpen]);
+
+  if (!shouldRender) return null;
 
   const sortOptions = [
     { value: 'latest' as SortType, label: '최신순' },
@@ -18,7 +38,7 @@ const SortDropdown = ({ isOpen, selectedSort, onSortSelect }: SortDropdownProps)
   ];
 
   return (
-    <DropdownContainer>
+    <DropdownContainer isAnimating={isAnimating}>
       {sortOptions.map(option => (
         <DropdownItem
           key={option.value}

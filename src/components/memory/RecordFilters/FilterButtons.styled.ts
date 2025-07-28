@@ -40,6 +40,7 @@ export const FilterButton = styled.button<{ active: boolean; $disabled?: boolean
 export const SortSection = styled.div`
   display: flex;
   align-items: center;
+  position: relative;
 `;
 
 export const SortButton = styled.button`
@@ -51,13 +52,11 @@ export const SortButton = styled.button`
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
 `;
 
-export const DropdownIcon = styled.div`
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid ${semanticColors.text.tertiary};
+export const DropdownIcon = styled.img<{ isOpen: boolean }>`
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+  transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
 `;

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { FilterType } from '../../../pages/memory/Memory';
+import type { SortType } from '../SortDropdown';
 import PageInputMode from './PageInputMode';
 import FilterButtons from './FilterButtons';
 import { Container } from './RecordFilters.styled';
@@ -7,7 +8,9 @@ import { Container } from './RecordFilters.styled';
 interface RecordFiltersProps {
   activeFilter: FilterType | null;
   readingProgress: number;
+  selectedSort: SortType;
   onFilterChange: (filter: FilterType) => void;
+  onSortChange: (sort: SortType) => void;
   selectedPageRange?: { start: number; end: number } | null;
   onPageRangeClear?: () => void;
 }
@@ -15,13 +18,16 @@ interface RecordFiltersProps {
 const RecordFilters = ({
   activeFilter,
   readingProgress,
+  selectedSort,
   onFilterChange,
+  onSortChange,
   selectedPageRange,
   onPageRangeClear,
 }: RecordFiltersProps) => {
   const [startPage, setStartPage] = useState('');
   const [endPage, setEndPage] = useState('');
   const [showInputMode, setShowInputMode] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handlePageFilterClick = () => {
     if (selectedPageRange) {
@@ -68,6 +74,15 @@ const RecordFilters = ({
     onFilterChange('overall');
   };
 
+  const handleSortButtonClick = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleSortSelect = (sort: SortType) => {
+    onSortChange(sort);
+    setIsDropdownOpen(false);
+  };
+
   const isValid = Boolean(startPage && endPage && parseInt(startPage) <= parseInt(endPage));
   const hasAnyInput = startPage.length > 0 || endPage.length > 0;
   const isPageInputMode = showInputMode && activeFilter === 'page' && !selectedPageRange;
@@ -89,8 +104,12 @@ const RecordFilters = ({
           activeFilter={activeFilter}
           showInputMode={showInputMode}
           readingProgress={readingProgress}
+          selectedSort={selectedSort}
+          isDropdownOpen={isDropdownOpen}
           onPageFilterClick={handlePageFilterClick}
           onOverallFilterClick={handleOverallFilterClick}
+          onSortButtonClick={handleSortButtonClick}
+          onSortSelect={handleSortSelect}
         />
       )}
     </Container>

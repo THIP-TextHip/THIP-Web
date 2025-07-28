@@ -1,5 +1,5 @@
 import type { Record } from '../../../pages/memory/Memory';
-import RecordItem from '../../../components/memory/RecordItem/RecordItem';
+import RecordItem from '../RecordItem/RecordItem';
 import { RecordListContainer } from './RecordList.styled';
 
 interface RecordListProps {

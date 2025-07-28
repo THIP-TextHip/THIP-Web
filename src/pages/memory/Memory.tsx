@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { SortType } from '../../components/memory/SortDropdown';
-import MemoryHeader from './MemoryHeader/MemoryHeader';
-import MemoryContent from './MemoryContent/MemoryContent';
-import MemoryAddButton from './MemoryAddButton/MemoryAddButton';
+import MemoryHeader from '../../components/memory/MemoryHeader/MemoryHeader';
+import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
+import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddButton';
 import Snackbar from '../../components/common/Modal/Snackbar';
 import { Container } from './Memory.styled';
 

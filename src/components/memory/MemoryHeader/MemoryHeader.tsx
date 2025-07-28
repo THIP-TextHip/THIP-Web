@@ -1,4 +1,4 @@
-import TitleHeader from '../../../components/common/TitleHeader';
+import TitleHeader from '../../common/TitleHeader';
 import leftArrow from '../../../assets/common/leftArrow.svg';
 
 interface MemoryHeaderProps {

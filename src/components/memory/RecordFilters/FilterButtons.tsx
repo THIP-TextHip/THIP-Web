@@ -1,5 +1,8 @@
 import type { FilterType } from '../../../pages/memory/Memory';
+import type { SortType } from '../SortDropdown';
 import xIcon from '../../../assets/memory/x.svg';
+import downIcon from '../../../assets/memory/down.svg';
+import SortDropdown from '../SortDropdown';
 import {
   FilterSection,
   FilterButton,
@@ -12,18 +15,39 @@ interface FilterButtonsProps {
   activeFilter: FilterType | null;
   showInputMode: boolean;
   readingProgress: number;
+  selectedSort: SortType;
+  isDropdownOpen: boolean;
   onPageFilterClick: () => void;
   onOverallFilterClick: () => void;
+  onSortButtonClick: () => void;
+  onSortSelect: (sort: SortType) => void;
 }
 
 const FilterButtons = ({
   activeFilter,
   showInputMode,
   readingProgress,
+  selectedSort,
+  isDropdownOpen,
   onPageFilterClick,
   onOverallFilterClick,
+  onSortButtonClick,
+  onSortSelect,
 }: FilterButtonsProps) => {
   const isOverallEnabled = readingProgress >= 80;
+
+  const getSortLabel = (sort: SortType) => {
+    switch (sort) {
+      case 'latest':
+        return '최신순';
+      case 'popular':
+        return '인기순';
+      case 'comments':
+        return '댓글 많은순';
+      default:
+        return '최신순';
+    }
+  };
 
   return (
     <>
@@ -42,10 +66,15 @@ const FilterButtons = ({
       </FilterSection>
 
       <SortSection>
-        <SortButton>
-          최신순
-          <DropdownIcon />
+        <SortButton onClick={onSortButtonClick}>
+          {getSortLabel(selectedSort)}
+          <DropdownIcon src={downIcon} alt="드롭다운" isOpen={isDropdownOpen} />
         </SortButton>
+        <SortDropdown
+          isOpen={isDropdownOpen}
+          selectedSort={selectedSort}
+          onSortSelect={onSortSelect}
+        />
       </SortSection>
     </>
   );
