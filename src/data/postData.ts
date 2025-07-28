@@ -37,6 +37,23 @@ export const mockPosts: PostData[] = [
     commentCount: 125,
     isPublic: false,
   },
+  {
+    profileImgUrl: 'https://placehold.co/24x24',
+    userName: 'userName',
+    userId: 177,
+    userTitle: 'userTitle',
+    titleColor: '#FF8BAC',
+    createdAt: '12시간 전',
+    bookTitle: '제목입니다제목입니다제목입니다',
+    bookAuthor: '작가입니다',
+    isbn: 111152544,
+    postContent:
+      '내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다',
+    feedId: 58,
+    initialLikeCount: 125,
+    commentCount: 125,
+    isPublic: false,
+  },
   // …다른 포스트들…
 ];
 
