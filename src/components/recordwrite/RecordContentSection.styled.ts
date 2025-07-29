@@ -4,7 +4,7 @@ import { typography, semanticColors } from '../../styles/global/global';
 export const Section = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 `;
 
 export const SectionTitle = styled.h2`
@@ -22,20 +22,40 @@ export const TextAreaBox = styled.div`
 
 export const TextArea = styled.textarea`
   width: 100%;
-  min-height: 200px;
+  min-height: 24px;
+  max-height: 200px;
   background-color: ${semanticColors.background.primary};
   color: ${semanticColors.text.secondary};
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
+  line-height: 1.5;
   resize: none;
   outline: none;
   border: none;
   padding: 0;
-  line-height: 1.5;
+  overflow-y: auto;
+  transition: height 0.1s ease;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
+  }
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${semanticColors.text.ghost};
+    border-radius: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: ${semanticColors.text.tertiary};
   }
 `;
 
