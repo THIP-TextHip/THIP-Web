@@ -19,6 +19,7 @@ interface MemoryContentProps {
   onFilterChange: (filter: FilterType) => void;
   onSortChange: (sort: SortType) => void;
   onPageRangeClear: () => void;
+  onPageRangeSet: (range: { start: number; end: number }) => void;
   onToggleRecords: () => void;
 }
 
@@ -34,6 +35,7 @@ const MemoryContent = ({
   onFilterChange,
   onSortChange,
   onPageRangeClear,
+  onPageRangeSet,
   onToggleRecords,
 }: MemoryContentProps) => {
   return (
@@ -55,6 +57,7 @@ const MemoryContent = ({
             onSortChange={onSortChange}
             selectedPageRange={selectedPageRange}
             onPageRangeClear={onPageRangeClear}
+            onPageRangeSet={onPageRangeSet}
           />
         )}
       </FixedSection>

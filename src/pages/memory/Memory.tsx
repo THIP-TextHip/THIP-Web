@@ -22,7 +22,7 @@ export interface Record {
   type: 'text' | 'poll';
   recordType?: 'page' | 'overall';
   pollOptions?: PollOption[];
-  pageRange?: string; // 페이지 범위 정보 추가
+  pageRange?: string;
 }
 
 export interface PollOption {
@@ -171,13 +171,25 @@ const Memory = () => {
 
     switch (activeFilter) {
       case 'page':
-        return sortedRecords.filter(record => record.recordType === 'page');
+        if (selectedPageRange) {
+          // 페이지 범위가 선택된 경우, 해당 범위 내의 기록만 필터링
+          return sortedRecords.filter(record => {
+            if (record.recordType === 'page' && record.pageRange) {
+              const recordPage = parseInt(record.pageRange);
+              return recordPage >= selectedPageRange.start && recordPage <= selectedPageRange.end;
+            }
+            return false;
+          });
+        } else {
+          // 페이지 범위가 선택되지 않은 경우 모든 페이지 기록 표시
+          return sortedRecords.filter(record => record.recordType === 'page');
+        }
       case 'overall':
         return sortedRecords.filter(record => record.recordType === 'overall');
       default:
         return sortedRecords;
     }
-  }, [sortedRecords, activeFilter, activeTab]);
+  }, [sortedRecords, activeFilter, activeTab, selectedPageRange]);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -214,6 +226,10 @@ const Memory = () => {
     setSelectedPageRange(null);
   };
 
+  const handlePageRangeSet = (range: { start: number; end: number }) => {
+    setSelectedPageRange(range);
+  };
+
   const handleAddRecord = () => {
     navigate('/memory/record/write');
   };
@@ -241,6 +257,7 @@ const Memory = () => {
           onFilterChange={handleFilterChange}
           onSortChange={handleSortChange}
           onPageRangeClear={handlePageRangeClear}
+          onPageRangeSet={handlePageRangeSet}
           onToggleRecords={toggleRecords}
         />
       </ScrollableContent>

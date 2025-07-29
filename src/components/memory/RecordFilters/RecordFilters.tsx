@@ -13,6 +13,7 @@ interface RecordFiltersProps {
   onSortChange: (sort: SortType) => void;
   selectedPageRange?: { start: number; end: number } | null;
   onPageRangeClear?: () => void;
+  onPageRangeSet?: (range: { start: number; end: number }) => void;
 }
 
 const RecordFilters = ({
@@ -23,6 +24,7 @@ const RecordFilters = ({
   onSortChange,
   selectedPageRange,
   onPageRangeClear,
+  onPageRangeSet,
 }: RecordFiltersProps) => {
   const [startPage, setStartPage] = useState('');
   const [endPage, setEndPage] = useState('');
@@ -64,6 +66,11 @@ const RecordFilters = ({
     const end = parseInt(endPage);
 
     if (start && end && start <= end) {
+      // 페이지 범위를 상위 컴포넌트에 전달
+      if (onPageRangeSet) {
+        onPageRangeSet({ start, end });
+      }
+
       setShowInputMode(false);
       setStartPage('');
       setEndPage('');
