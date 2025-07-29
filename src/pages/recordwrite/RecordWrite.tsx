@@ -11,10 +11,12 @@ const RecordWrite = () => {
   const navigate = useNavigate();
   const [pageRange, setPageRange] = useState('');
   const [content, setContent] = useState('');
-  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
+  const [isOverallEnabled, setIsOverallEnabled] = useState(false);
 
   // TODO: 실제로는 백엔드에서 받아온 책 정보에서 전체 페이지 수를 가져와야 함
   const totalPages = 600; // 임시 값
+  // TODO: 실제로는 백엔드에서 받아온 가장 마지막 기록 페이지를 가져와야 함
+  const lastRecordedPage = 456; // 임시 값 (기록이 없으면 0)
 
   const handleBackClick = () => {
     navigate(-1);
@@ -25,7 +27,7 @@ const RecordWrite = () => {
     console.log('기록 작성 완료');
     console.log('페이지 범위:', pageRange);
     console.log('내용:', content);
-    console.log('종명 설정:', isVoiceEnabled);
+    console.log('총평 설정:', isOverallEnabled);
 
     // TODO: API 호출하여 기록 등록
     // 완료 후 이전 페이지로 이동
@@ -50,11 +52,12 @@ const RecordWrite = () => {
           pageRange={pageRange}
           onPageRangeChange={setPageRange}
           totalPages={totalPages}
+          lastRecordedPage={lastRecordedPage}
         />
 
         <VoiceToggleSection
-          isVoiceEnabled={isVoiceEnabled}
-          onToggle={() => setIsVoiceEnabled(!isVoiceEnabled)}
+          isOverallEnabled={isOverallEnabled}
+          onToggle={() => setIsOverallEnabled(!isOverallEnabled)}
         />
 
         <RecordContentSection content={content} onContentChange={setContent} />

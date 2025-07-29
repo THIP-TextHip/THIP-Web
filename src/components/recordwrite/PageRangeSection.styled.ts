@@ -22,19 +22,23 @@ export const PageRangeContainer = styled.div`
 
 export const PageInputContainer = styled.div<{ hasError?: boolean }>`
   width: 100%;
-  height: 56px;
-  background-color: ${semanticColors.background.card};
+  height: 48px;
+  background-color: ${semanticColors.background.cardDark};
   border: ${props => (props.hasError ? '1px solid #FF9496' : 'none')};
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 18px 52px 18px 20px;
   display: flex;
   align-items: center;
   position: relative;
+`;
 
-  &:focus-within {
-    border: ${props =>
-      props.hasError ? '1px solid #FF9496' : `1px solid ${semanticColors.button.fill.primary}`};
-  }
+export const InputWrapper = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
+  font-family: ${typography.fontFamily.primary};
 `;
 
 export const PageInput = styled.input`
@@ -42,12 +46,12 @@ export const PageInput = styled.input`
   border: none;
   outline: none;
   color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize.base};
+  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
-  width: auto;
-  min-width: 20px;
-  flex-shrink: 0;
+  width: 30px;
+  padding: 0;
+  margin: 0;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
@@ -56,10 +60,11 @@ export const PageInput = styled.input`
 
 export const PageSuffix = styled.span`
   color: ${semanticColors.text.ghost};
-  font-size: ${typography.fontSize.base};
+  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
-  margin-left: 2px;
+  margin: 0;
+  padding: 0;
 `;
 
 export const CloseButton = styled.button`
@@ -75,9 +80,8 @@ export const CloseButton = styled.button`
   justify-content: center;
 
   img {
-    width: 16px;
-    height: 16px;
-    opacity: 0.6;
+    width: 24px;
+    height: 24px;
   }
 
   &:hover img {
@@ -86,8 +90,9 @@ export const CloseButton = styled.button`
 `;
 
 export const ErrorMessage = styled.div`
-  color: #ff9496;
-  font-size: ${typography.fontSize.sm};
+  color: ${semanticColors.text.warning};
+  font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.regular};
-  margin-top: 8px;
+  margin-top: -5px;
+  margin-left: 4px;
 `;

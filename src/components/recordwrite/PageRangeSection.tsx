@@ -4,20 +4,27 @@ import {
   SectionTitle,
   PageRangeContainer,
   PageInputContainer,
+  InputWrapper,
   PageInput,
   PageSuffix,
   CloseButton,
   ErrorMessage,
 } from './PageRangeSection.styled';
-import closeIcon from '../../assets/common/closeIcon.svg';
+import closeIcon from '../../assets/common/delete.svg';
 
 interface PageRangeSectionProps {
   pageRange: string;
   onPageRangeChange: (value: string) => void;
   totalPages: number;
+  lastRecordedPage?: number;
 }
 
-const PageRangeSection = ({ pageRange, onPageRangeChange, totalPages }: PageRangeSectionProps) => {
+const PageRangeSection = ({
+  pageRange,
+  onPageRangeChange,
+  totalPages,
+  lastRecordedPage = 0,
+}: PageRangeSectionProps) => {
   const [hasError, setHasError] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,13 +54,15 @@ const PageRangeSection = ({ pageRange, onPageRangeChange, totalPages }: PageRang
       <SectionTitle>기록할 페이지</SectionTitle>
       <PageRangeContainer>
         <PageInputContainer hasError={hasError}>
-          <PageInput
-            placeholder="456"
-            value={pageRange}
-            onChange={handleInputChange}
-            inputMode="numeric"
-          />
-          <PageSuffix>/{totalPages}p</PageSuffix>
+          <InputWrapper>
+            <PageInput
+              placeholder={lastRecordedPage.toString()}
+              value={pageRange}
+              onChange={handleInputChange}
+              inputMode="numeric"
+            />
+            <PageSuffix>/{totalPages}p</PageSuffix>
+          </InputWrapper>
         </PageInputContainer>
         {pageRange && (
           <CloseButton onClick={handleClear}>
