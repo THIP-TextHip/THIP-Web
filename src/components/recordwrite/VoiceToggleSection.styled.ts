@@ -12,6 +12,26 @@ export const ToggleContainer = styled.div`
   justify-content: space-between;
 `;
 
+export const LeftSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const InfoIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+
+  img {
+    width: 16px;
+    height: 16px;
+    opacity: 0.6;
+  }
+`;
+
 export const ToggleLabel = styled.span`
   color: ${semanticColors.text.primary};
   font-size: ${typography.fontSize.base};

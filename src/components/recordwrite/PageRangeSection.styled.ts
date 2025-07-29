@@ -20,26 +20,46 @@ export const PageRangeContainer = styled.div`
   align-items: center;
 `;
 
-export const PageInput = styled.input<{ hasError?: boolean }>`
+export const PageInputContainer = styled.div<{ hasError?: boolean }>`
   width: 100%;
   height: 56px;
   background-color: ${semanticColors.background.card};
   border: ${props => (props.hasError ? '1px solid #FF9496' : 'none')};
   border-radius: 16px;
   padding: 18px 52px 18px 20px;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  &:focus-within {
+    border: ${props =>
+      props.hasError ? '1px solid #FF9496' : `1px solid ${semanticColors.button.fill.primary}`};
+  }
+`;
+
+export const PageInput = styled.input`
+  background: none;
+  border: none;
+  outline: none;
   color: ${semanticColors.text.primary};
   font-size: ${typography.fontSize.base};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
-  outline: none;
+  width: auto;
+  min-width: 20px;
+  flex-shrink: 0;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
   }
+`;
 
-  &:focus {
-    border: 1px solid ${semanticColors.button.fill.primary};
-  }
+export const PageSuffix = styled.span`
+  color: ${semanticColors.text.ghost};
+  font-size: ${typography.fontSize.base};
+  font-weight: ${typography.fontWeight.regular};
+  font-family: ${typography.fontFamily.primary};
+  margin-left: 2px;
 `;
 
 export const CloseButton = styled.button`
@@ -63,4 +83,11 @@ export const CloseButton = styled.button`
   &:hover img {
     opacity: 1;
   }
+`;
+
+export const ErrorMessage = styled.div`
+  color: #ff9496;
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
+  margin-top: 8px;
 `;
