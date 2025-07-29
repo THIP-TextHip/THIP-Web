@@ -27,6 +27,7 @@ interface PageRangeSectionProps {
   lastRecordedPage?: number;
   isOverallEnabled: boolean;
   onOverallToggle: () => void;
+  readingProgress: number;
 }
 
 const PageRangeSection = ({
@@ -36,8 +37,12 @@ const PageRangeSection = ({
   lastRecordedPage = 0,
   isOverallEnabled,
   onOverallToggle,
+  readingProgress,
 }: PageRangeSectionProps) => {
   const [hasError, setHasError] = useState(false);
+
+  // 80% 이상일 때만 총평 활성화
+  const canUseOverall = readingProgress >= 80;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -59,6 +64,13 @@ const PageRangeSection = ({
   const handleClear = () => {
     onPageRangeChange('');
     setHasError(false);
+  };
+
+  const handleToggleClick = () => {
+    if (canUseOverall) {
+      onOverallToggle();
+    }
+    // 80% 미만이면 아무것도 하지 않음
   };
 
   return (
@@ -93,10 +105,14 @@ const PageRangeSection = ({
           <InfoIcon>
             <img src={infoIcon} alt="정보" />
           </InfoIcon>
-          <ToggleLabel>총평</ToggleLabel>
+          <ToggleLabel disabled={!canUseOverall}>총평</ToggleLabel>
         </LeftSection>
-        <ToggleSwitch active={isOverallEnabled} onClick={onOverallToggle}>
-          <ToggleSlider active={isOverallEnabled} />
+        <ToggleSwitch
+          active={isOverallEnabled}
+          onClick={handleToggleClick}
+          disabled={!canUseOverall}
+        >
+          <ToggleSlider active={isOverallEnabled} disabled={!canUseOverall} />
         </ToggleSwitch>
       </ToggleContainer>
     </Section>

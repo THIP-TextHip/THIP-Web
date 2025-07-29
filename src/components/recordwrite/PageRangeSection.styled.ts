@@ -131,30 +131,36 @@ export const InfoIcon = styled.div`
   }
 `;
 
-export const ToggleLabel = styled.span`
-  color: ${semanticColors.text.secondary};
+export const ToggleLabel = styled.span<{ disabled?: boolean }>`
+  color: ${props => (props.disabled ? semanticColors.text.ghost : semanticColors.text.secondary)};
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.regular};
+  opacity: ${props => (props.disabled ? 0.5 : 1)};
 `;
 
-export const ToggleSwitch = styled.div<{ active: boolean }>`
+export const ToggleSwitch = styled.div<{ active: boolean; disabled?: boolean }>`
   width: 48px;
   height: 28px;
-  background-color: ${({ active }) =>
-    active ? semanticColors.button.fill.primary : semanticColors.background.card};
+  background-color: ${({ active, disabled }) => {
+    if (disabled) return semanticColors.text.ghost;
+    return active ? semanticColors.button.fill.primary : semanticColors.background.card;
+  }};
   border-radius: 14px;
   position: relative;
-  cursor: pointer;
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
   transition: background-color 0.3s;
+  opacity: ${props => (props.disabled ? 0.5 : 1)};
 `;
 
-export const ToggleSlider = styled.div<{ active: boolean }>`
+export const ToggleSlider = styled.div<{ active: boolean; disabled?: boolean }>`
   width: 20px;
   height: 20px;
-  background-color: ${semanticColors.text.primary};
+  background-color: ${props =>
+    props.disabled ? semanticColors.text.tertiary : semanticColors.text.primary};
   border-radius: 50%;
   position: absolute;
   top: 4px;
   left: ${({ active }) => (active ? '24px' : '4px')};
   transition: left 0.3s;
+  opacity: ${props => (props.disabled ? 0.7 : 1)};
 `;

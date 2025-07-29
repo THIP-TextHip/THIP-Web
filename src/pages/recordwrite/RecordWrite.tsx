@@ -18,6 +18,8 @@ const RecordWrite = () => {
   const totalPages = 600; // 임시 값
   // TODO: 실제로는 백엔드에서 받아온 가장 마지막 기록 페이지를 가져와야 함
   const lastRecordedPage = 456; // 임시 값 (기록이 없으면 0)
+  // TODO: 실제로는 백엔드에서 받아온 읽기 진행도를 가져와야 함
+  const readingProgress = 70; // 임시 값 (80% 미만이므로 총평 비활성화)
 
   const handleBackClick = () => {
     navigate(-1);
@@ -90,6 +92,7 @@ const RecordWrite = () => {
           lastRecordedPage={lastRecordedPage}
           isOverallEnabled={isOverallEnabled}
           onOverallToggle={() => setIsOverallEnabled(!isOverallEnabled)}
+          readingProgress={readingProgress}
         />
 
         <RecordContentSection content={content} onContentChange={setContent} />
