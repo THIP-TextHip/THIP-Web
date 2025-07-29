@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import PageRangeSection from '../../components/recordwrite/PageRangeSection';
 import RecordContentSection from '../../components/recordwrite/RecordContentSection';
-import VoiceToggleSection from '../../components/recordwrite/VoiceToggleSection';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { Container } from './RecordWrite.styled';
 
@@ -25,7 +24,7 @@ const RecordWrite = () => {
   const handleCompleteClick = () => {
     // 기록 작성 완료 로직
     console.log('기록 작성 완료');
-    console.log('페이지 범위:', pageRange);
+    console.log('페이지 범위:', isOverallEnabled ? '전체범위' : pageRange);
     console.log('내용:', content);
     console.log('총평 설정:', isOverallEnabled);
 
@@ -34,8 +33,10 @@ const RecordWrite = () => {
     navigate(-1);
   };
 
-  // 페이지 범위와 내용이 모두 입력되어야 완료 버튼 활성화
-  const isFormValid = pageRange.trim() !== '' && content.trim() !== '';
+  // 총평이 켜져있으면 항상 유효, 아니면 페이지 범위와 내용이 모두 입력되어야 완료 버튼 활성화
+  const isFormValid = isOverallEnabled
+    ? content.trim() !== ''
+    : pageRange.trim() !== '' && content.trim() !== '';
 
   return (
     <>
@@ -53,11 +54,8 @@ const RecordWrite = () => {
           onPageRangeChange={setPageRange}
           totalPages={totalPages}
           lastRecordedPage={lastRecordedPage}
-        />
-
-        <VoiceToggleSection
           isOverallEnabled={isOverallEnabled}
-          onToggle={() => setIsOverallEnabled(!isOverallEnabled)}
+          onOverallToggle={() => setIsOverallEnabled(!isOverallEnabled)}
         />
 
         <RecordContentSection content={content} onContentChange={setContent} />

@@ -67,6 +67,13 @@ export const PageSuffix = styled.span`
   padding: 0;
 `;
 
+export const OverallRangeText = styled.div`
+  color: ${semanticColors.text.primary};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
+  font-family: ${typography.fontFamily.primary};
+`;
+
 export const CloseButton = styled.button`
   position: absolute;
   right: 16px;
@@ -95,4 +102,59 @@ export const ErrorMessage = styled.div`
   font-weight: ${typography.fontWeight.regular};
   margin-top: -5px;
   margin-left: 4px;
+`;
+
+export const ToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: -5px;
+  gap: 8px;
+`;
+
+export const LeftSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+export const InfoIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+export const ToggleLabel = styled.span`
+  color: ${semanticColors.text.secondary};
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.regular};
+`;
+
+export const ToggleSwitch = styled.div<{ active: boolean }>`
+  width: 48px;
+  height: 28px;
+  background-color: ${({ active }) =>
+    active ? semanticColors.button.fill.primary : semanticColors.background.card};
+  border-radius: 14px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+`;
+
+export const ToggleSlider = styled.div<{ active: boolean }>`
+  width: 20px;
+  height: 20px;
+  background-color: ${semanticColors.text.primary};
+  border-radius: 50%;
+  position: absolute;
+  top: 4px;
+  left: ${({ active }) => (active ? '24px' : '4px')};
+  transition: left 0.3s;
 `;

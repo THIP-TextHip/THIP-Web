@@ -7,16 +7,26 @@ import {
   InputWrapper,
   PageInput,
   PageSuffix,
+  OverallRangeText,
   CloseButton,
   ErrorMessage,
+  ToggleContainer,
+  LeftSection,
+  InfoIcon,
+  ToggleLabel,
+  ToggleSwitch,
+  ToggleSlider,
 } from './PageRangeSection.styled';
 import closeIcon from '../../assets/common/delete.svg';
+import infoIcon from '../../assets/common/infoIcon.svg';
 
 interface PageRangeSectionProps {
   pageRange: string;
   onPageRangeChange: (value: string) => void;
   totalPages: number;
   lastRecordedPage?: number;
+  isOverallEnabled: boolean;
+  onOverallToggle: () => void;
 }
 
 const PageRangeSection = ({
@@ -24,6 +34,8 @@ const PageRangeSection = ({
   onPageRangeChange,
   totalPages,
   lastRecordedPage = 0,
+  isOverallEnabled,
+  onOverallToggle,
 }: PageRangeSectionProps) => {
   const [hasError, setHasError] = useState(false);
 
@@ -54,23 +66,39 @@ const PageRangeSection = ({
       <SectionTitle>기록할 페이지</SectionTitle>
       <PageRangeContainer>
         <PageInputContainer hasError={hasError}>
-          <InputWrapper>
-            <PageInput
-              placeholder={lastRecordedPage.toString()}
-              value={pageRange}
-              onChange={handleInputChange}
-              inputMode="numeric"
-            />
-            <PageSuffix>/{totalPages}p</PageSuffix>
-          </InputWrapper>
+          {isOverallEnabled ? (
+            <OverallRangeText>전체범위</OverallRangeText>
+          ) : (
+            <InputWrapper>
+              <PageInput
+                placeholder={lastRecordedPage.toString()}
+                value={pageRange}
+                onChange={handleInputChange}
+                inputMode="numeric"
+              />
+              <PageSuffix>/{totalPages}p</PageSuffix>
+            </InputWrapper>
+          )}
         </PageInputContainer>
-        {pageRange && (
+        {!isOverallEnabled && pageRange && (
           <CloseButton onClick={handleClear}>
             <img src={closeIcon} alt="지우기" />
           </CloseButton>
         )}
       </PageRangeContainer>
-      {hasError && <ErrorMessage>전체페이지를 초과할 수 없어요.</ErrorMessage>}
+      {!isOverallEnabled && hasError && <ErrorMessage>전체페이지를 초과할 수 없어요.</ErrorMessage>}
+
+      <ToggleContainer>
+        <LeftSection>
+          <InfoIcon>
+            <img src={infoIcon} alt="정보" />
+          </InfoIcon>
+          <ToggleLabel>총평</ToggleLabel>
+        </LeftSection>
+        <ToggleSwitch active={isOverallEnabled} onClick={onOverallToggle}>
+          <ToggleSlider active={isOverallEnabled} />
+        </ToggleSwitch>
+      </ToggleContainer>
     </Section>
   );
 };
