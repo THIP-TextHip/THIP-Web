@@ -168,7 +168,7 @@ const Memory = () => {
   };
 
   const handleAddRecord = () => {
-    console.log('기록 작성하기');
+    navigate('/memory/record/write');
   };
 
   const toggleRecords = () => {
