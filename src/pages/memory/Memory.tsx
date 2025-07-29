@@ -5,7 +5,7 @@ import MemoryHeader from '../../components/memory/MemoryHeader/MemoryHeader';
 import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
 import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddButton';
 import Snackbar from '../../components/common/Modal/Snackbar';
-import { Container } from './Memory.styled';
+import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 
 export type RecordType = 'group' | 'my';
 export type FilterType = 'page' | 'overall';
@@ -224,32 +224,38 @@ const Memory = () => {
 
   return (
     <Container>
-      <MemoryHeader onBackClick={handleBackClick} />
+      <FixedHeader>
+        <MemoryHeader onBackClick={handleBackClick} />
+      </FixedHeader>
 
-      <MemoryContent
-        activeTab={activeTab}
-        activeFilter={activeFilter}
-        readingProgress={readingProgress}
-        selectedSort={selectedSort}
-        records={filteredRecords}
-        selectedPageRange={selectedPageRange}
-        hasRecords={activeTab === 'my' ? myRecords.length > 0 : hasRecords}
-        onTabChange={handleTabChange}
-        onFilterChange={handleFilterChange}
-        onSortChange={handleSortChange}
-        onPageRangeClear={handlePageRangeClear}
-        onToggleRecords={toggleRecords}
-      />
-
-      <MemoryAddButton onAddRecord={handleAddRecord} />
-
-      {showSnackbar && (
-        <Snackbar
-          message="독서 진행도 80% 이상부터 총평을 볼 수 있어요."
-          variant="top"
-          onClose={handleSnackbarClose}
+      <ScrollableContent>
+        <MemoryContent
+          activeTab={activeTab}
+          activeFilter={activeFilter}
+          readingProgress={readingProgress}
+          selectedSort={selectedSort}
+          records={filteredRecords}
+          selectedPageRange={selectedPageRange}
+          hasRecords={activeTab === 'my' ? myRecords.length > 0 : hasRecords}
+          onTabChange={handleTabChange}
+          onFilterChange={handleFilterChange}
+          onSortChange={handleSortChange}
+          onPageRangeClear={handlePageRangeClear}
+          onToggleRecords={toggleRecords}
         />
-      )}
+      </ScrollableContent>
+
+      <FloatingElements>
+        <MemoryAddButton onAddRecord={handleAddRecord} />
+
+        {showSnackbar && (
+          <Snackbar
+            message="독서 진행도 80% 이상부터 총평을 볼 수 있어요."
+            variant="top"
+            onClose={handleSnackbarClose}
+          />
+        )}
+      </FloatingElements>
     </Container>
   );
 };

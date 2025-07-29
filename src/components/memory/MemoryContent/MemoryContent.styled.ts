@@ -1,28 +1,44 @@
 import styled from '@emotion/styled';
-import { semanticColors, colors, typography } from '../../../styles/global/global';
+import { semanticColors, typography } from '../../../styles/global/global';
 
 export const Content = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 1;
   padding: 0 20px;
-  padding-bottom: 100px;
+`;
+
+export const FixedSection = styled.div`
+  position: sticky;
+  top: 0;
+  background-color: ${semanticColors.background.primary};
+  z-index: 5;
+  padding: 20px 0 16px 0;
+  margin: 0 -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 56px;
+`;
+
+export const ScrollableSection = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 export const DevButton = styled.button`
-  background-color: ${colors.red};
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background: ${semanticColors.button.fill.primary};
   color: ${semanticColors.text.primary};
   border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.medium};
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: ${typography.fontSize.xs};
   cursor: pointer;
-  margin: 16px 0;
-  align-self: flex-start;
-  z-index: 1000;
+  z-index: 100;
+  opacity: 0.8;
 
   &:hover {
-    opacity: 0.8;
+    opacity: 1;
   }
 `;
