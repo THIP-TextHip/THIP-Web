@@ -55,7 +55,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   // 페이지 정보 표시 함수
   const renderPageInfo = () => {
     if (recordType === 'overall') {
-      return '전체범위';
+      return '총평';
     } else if (pageRange) {
       return `${pageRange}p`;
     }
