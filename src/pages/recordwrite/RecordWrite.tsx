@@ -5,12 +5,14 @@ import PageRangeSection from '../../components/recordwrite/PageRangeSection';
 import RecordContentSection from '../../components/recordwrite/RecordContentSection';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { Container } from './RecordWrite.styled';
+import type { Record } from '../memory/Memory';
 
 const RecordWrite = () => {
   const navigate = useNavigate();
   const [pageRange, setPageRange] = useState('');
   const [content, setContent] = useState('');
   const [isOverallEnabled, setIsOverallEnabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // TODO: 실제로는 백엔드에서 받아온 책 정보에서 전체 페이지 수를 가져와야 함
   const totalPages = 600; // 임시 값
@@ -21,22 +23,54 @@ const RecordWrite = () => {
     navigate(-1);
   };
 
-  const handleCompleteClick = () => {
-    // 기록 작성 완료 로직
-    console.log('기록 작성 완료');
-    console.log('페이지 범위:', isOverallEnabled ? '전체범위' : pageRange);
-    console.log('내용:', content);
-    console.log('총평 설정:', isOverallEnabled);
+  const handleCompleteClick = async () => {
+    if (isSubmitting) return; // 중복 실행 방지
 
-    // TODO: API 호출하여 기록 등록
-    // 완료 후 이전 페이지로 이동
-    navigate(-1);
+    setIsSubmitting(true);
+
+    try {
+      // 페이지 범위 결정: 입력값이 없으면 마지막 기록 페이지 사용
+      const finalPageRange = isOverallEnabled
+        ? undefined
+        : pageRange.trim() !== ''
+          ? pageRange
+          : lastRecordedPage.toString();
+
+      // 새 기록 객체 생성
+      const newRecord: Record = {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // 고유한 ID
+        user: '내가', // TODO: 실제 사용자 이름으로 변경
+        userPoints: 0, // TODO: 실제 사용자 포인트로 변경
+        content: content,
+        likeCount: 0,
+        commentCount: 0,
+        timeAgo: '방금 전',
+        createdAt: new Date(),
+        type: 'text',
+        recordType: isOverallEnabled ? 'overall' : 'page',
+        pageRange: finalPageRange, // 최종 페이지 범위 저장
+      };
+
+      console.log('기록 작성 완료', newRecord);
+      console.log('페이지 범위:', isOverallEnabled ? '전체범위' : `${finalPageRange}p`);
+      console.log('내용:', content);
+      console.log('총평 설정:', isOverallEnabled);
+
+      // TODO: API 호출하여 서버에 기록 저장
+      // await api.createRecord(newRecord);
+
+      navigate('/memory', {
+        state: { newRecord },
+        replace: true,
+      });
+    } catch (error) {
+      console.error('기록 저장 실패:', error);
+      setIsSubmitting(false);
+    }
   };
 
-  // 총평이 켜져있으면 항상 유효, 아니면 페이지 범위와 내용이 모두 입력되어야 완료 버튼 활성화
-  const isFormValid = isOverallEnabled
-    ? content.trim() !== ''
-    : pageRange.trim() !== '' && content.trim() !== '';
+  // 총평이 켜져있으면 내용만 필요, 아니면 내용은 필수 (페이지는 기본값 사용 가능)
+  const isFormValid = content.trim() !== '';
 
   return (
     <>
@@ -46,7 +80,7 @@ const RecordWrite = () => {
         rightButton="완료"
         onLeftClick={handleBackClick}
         onRightClick={handleCompleteClick}
-        isNextActive={isFormValid}
+        isNextActive={isFormValid && !isSubmitting}
       />
       <Container>
         <PageRangeSection

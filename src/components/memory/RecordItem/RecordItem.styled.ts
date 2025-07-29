@@ -36,7 +36,7 @@ export const UserName = styled.span`
   font-weight: ${typography.fontWeight.medium};
 `;
 
-export const UserPoints = styled.span`
+export const PageInfo = styled.span`
   color: ${semanticColors.text.point.subpurple};
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.regular};

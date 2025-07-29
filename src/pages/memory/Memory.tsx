@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { SortType } from '../../components/memory/SortDropdown';
 import MemoryHeader from '../../components/memory/MemoryHeader/MemoryHeader';
 import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
@@ -22,6 +22,7 @@ export interface Record {
   type: 'text' | 'poll';
   recordType?: 'page' | 'overall';
   pollOptions?: PollOption[];
+  pageRange?: string; // 페이지 범위 정보 추가
 }
 
 export interface PollOption {
@@ -33,6 +34,7 @@ export interface PollOption {
 
 const Memory = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<RecordType>('group');
   const [activeFilter, setActiveFilter] = useState<FilterType | null>(null);
   const [selectedSort, setSelectedSort] = useState<SortType>('latest');
@@ -45,8 +47,11 @@ const Memory = () => {
   // 개발용 상태 - 기록 유무 전환
   const [hasRecords, setHasRecords] = useState(true);
 
-  // 더미 데이터 - 실제로는 API에서 가져올 데이터
-  const dummyRecords: Record[] = [
+  // 내 기록들을 별도로 관리
+  const [myRecords, setMyRecords] = useState<Record[]>([]);
+
+  // 그룹 기록들을 별도로 관리 (내가 작성한 것도 포함)
+  const [groupRecords, setGroupRecords] = useState<Record[]>([
     {
       id: '1',
       user: 'user.01',
@@ -59,6 +64,7 @@ const Memory = () => {
       createdAt: new Date('2024-01-15T12:00:00'),
       type: 'text',
       recordType: 'page',
+      pageRange: '123',
     },
     {
       id: '2',
@@ -71,6 +77,7 @@ const Memory = () => {
       createdAt: new Date('2024-01-15T16:00:00'),
       type: 'poll',
       recordType: 'page',
+      pageRange: '456',
       pollOptions: [
         {
           id: '1.',
@@ -98,13 +105,48 @@ const Memory = () => {
       type: 'text',
       recordType: 'overall',
     },
-  ];
+  ]);
+
+  // location.state에서 새로 추가된 기록 확인
+  React.useEffect(() => {
+    if (location.state?.newRecord) {
+      const newRecord = location.state.newRecord as Record;
+
+      // 중복 확인을 위한 함수
+      const addRecordIfNotExists = (prevRecords: Record[]) => {
+        const exists = prevRecords.some(record => record.id === newRecord.id);
+        if (exists) {
+          return prevRecords;
+        }
+        return [newRecord, ...prevRecords];
+      };
+
+      // 내 기록에 추가
+      setMyRecords(prev => addRecordIfNotExists(prev));
+
+      // 그룹 기록에도 추가 (내가 작성한 기록도 그룹에 표시)
+      setGroupRecords(prev => addRecordIfNotExists(prev));
+
+      // 내 기록 탭으로 이동
+      setActiveTab('my');
+
+      // state 즉시 초기화 (중복 추가 방지)
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state?.newRecord?.id, navigate, location.pathname]);
+
+  // 현재 표시할 기록들
+  const currentRecords = useMemo(() => {
+    if (activeTab === 'my') {
+      return myRecords;
+    } else {
+      return hasRecords ? groupRecords : [];
+    }
+  }, [activeTab, myRecords, hasRecords, groupRecords]);
 
   // 정렬된 기록 목록
   const sortedRecords = useMemo(() => {
-    if (!hasRecords) return [];
-
-    const recordsToSort = [...dummyRecords];
+    const recordsToSort = [...currentRecords];
 
     switch (selectedSort) {
       case 'latest':
@@ -116,10 +158,15 @@ const Memory = () => {
       default:
         return recordsToSort;
     }
-  }, [hasRecords, selectedSort, dummyRecords]);
+  }, [currentRecords, selectedSort]);
 
   // 필터링된 기록 목록
   const filteredRecords = useMemo(() => {
+    if (activeTab === 'my') {
+      // 내 기록에서는 필터링 없이 모든 기록 표시
+      return sortedRecords;
+    }
+
     if (!activeFilter) return sortedRecords;
 
     switch (activeFilter) {
@@ -130,7 +177,7 @@ const Memory = () => {
       default:
         return sortedRecords;
     }
-  }, [sortedRecords, activeFilter]);
+  }, [sortedRecords, activeFilter, activeTab]);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -186,7 +233,7 @@ const Memory = () => {
         selectedSort={selectedSort}
         records={filteredRecords}
         selectedPageRange={selectedPageRange}
-        hasRecords={hasRecords}
+        hasRecords={activeTab === 'my' ? myRecords.length > 0 : hasRecords}
         onTabChange={handleTabChange}
         onFilterChange={handleFilterChange}
         onSortChange={handleSortChange}
