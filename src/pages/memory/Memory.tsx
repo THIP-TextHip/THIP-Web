@@ -230,10 +230,6 @@ const Memory = () => {
     setSelectedPageRange(range);
   };
 
-  const handleAddRecord = () => {
-    navigate('/memory/record/write');
-  };
-
   const toggleRecords = () => {
     setHasRecords(!hasRecords);
   };
@@ -263,7 +259,7 @@ const Memory = () => {
       </ScrollableContent>
 
       <FloatingElements>
-        <MemoryAddButton onAddRecord={handleAddRecord} />
+        <MemoryAddButton />
 
         {showSnackbar && (
           <Snackbar
