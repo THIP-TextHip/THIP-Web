@@ -101,15 +101,3 @@ export const AddOptionButton = styled.button`
     color: ${semanticColors.text.primary};
   }
 `;
-
-export const StatusMessage = styled.div<{ completed: boolean }>`
-  color: ${props =>
-    props.completed ? semanticColors.text.primary : semanticColors.text.secondary};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-  text-align: center;
-  padding: 12px;
-  background-color: ${props => (props.completed ? 'transparent' : semanticColors.background.card)};
-  border-radius: 8px;
-  margin-top: 8px;
-`;

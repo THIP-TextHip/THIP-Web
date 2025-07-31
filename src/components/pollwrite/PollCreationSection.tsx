@@ -8,7 +8,6 @@ import {
   OptionInput,
   DeleteButton,
   AddOptionButton,
-  StatusMessage,
 } from './PollCreationSection.styled';
 import closeIcon from '../../assets/common/delete.svg';
 import trashIcon from '../../assets/common/trash.svg';
@@ -30,9 +29,6 @@ const PollCreationSection = ({
   const maxOptions = 5;
   const [focusStates, setFocusStates] = useState<boolean[]>(pollOptions.map(() => false));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  // 모든 옵션이 채워져 있는지 확인
-  const allOptionsCompleted = pollOptions.every(option => option.trim() !== '');
 
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -134,10 +130,6 @@ const PollCreationSection = ({
           <AddOptionButton onClick={handleAddOption}>항목 추가</AddOptionButton>
         )}
       </PollOptionsContainer>
-
-      {allOptionsCompleted && pollContent.trim() !== '' && (
-        <StatusMessage completed={true}>투표 내용을 20자 이내로 입력완료</StatusMessage>
-      )}
     </Section>
   );
 };
