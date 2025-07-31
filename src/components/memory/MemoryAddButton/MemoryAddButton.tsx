@@ -1,14 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import plusIcon from '../../../assets/memory/plus.svg';
 import penIcon from '../../../assets/memory/pen.svg';
 import voteIcon from '../../../assets/memory/vote.svg';
 import { AddButton, DropdownContainer, DropdownItem } from './MemoryAddButton.styled';
 
-interface MemoryAddButtonProps {
-  onAddRecord: () => void;
-}
-
-const MemoryAddButton = ({ onAddRecord }: MemoryAddButtonProps) => {
+const MemoryAddButton = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -35,12 +33,13 @@ const MemoryAddButton = ({ onAddRecord }: MemoryAddButtonProps) => {
 
   const handleRecordWrite = () => {
     setIsOpen(false);
-    onAddRecord();
+    navigate('/memory/record/write');
     console.log('기록 작성하기');
   };
 
   const handlePollCreate = () => {
     setIsOpen(false);
+    navigate('/memory/poll/write');
     console.log('투표 생성하기');
   };
 
