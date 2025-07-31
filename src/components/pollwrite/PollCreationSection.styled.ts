@@ -20,6 +20,7 @@ export const PollInput = styled.input`
   font-size: ${typography.fontSize.lg};
   font-weight: ${typography.fontWeight.medium};
   font-family: ${typography.fontFamily.primary};
+  line-height: 24px;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
@@ -50,13 +51,14 @@ export const OptionInput = styled.input`
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
+  line-height: 24px;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
   }
 `;
 
-export const CloseButton = styled.button`
+export const DeleteButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,8 +70,8 @@ export const CloseButton = styled.button`
   padding: 0;
 
   img {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     opacity: 0.6;
   }
 
@@ -85,7 +87,7 @@ export const AddOptionButton = styled.button`
   background-color: ${semanticColors.button.fill.white};
   border-radius: 12px;
   border: none;
-  padding: 10px;
+  padding: 12px;
   color: ${semanticColors.text.onlightPrimary};
   font-size: ${typography.fontSize.base};
   font-weight: ${typography.fontWeight.semibold};

@@ -1,3 +1,4 @@
+import { useState, useRef } from 'react';
 import {
   Section,
   PollContentContainer,
@@ -5,11 +6,12 @@ import {
   PollOptionsContainer,
   OptionInputContainer,
   OptionInput,
-  CloseButton,
+  DeleteButton,
   AddOptionButton,
   StatusMessage,
 } from './PollCreationSection.styled';
 import closeIcon from '../../assets/common/delete.svg';
+import trashIcon from '../../assets/common/trash.svg';
 
 interface PollCreationSectionProps {
   pollContent: string;
@@ -26,6 +28,8 @@ const PollCreationSection = ({
 }: PollCreationSectionProps) => {
   const maxContentLength = 20;
   const maxOptions = 5;
+  const [focusStates, setFocusStates] = useState<boolean[]>(pollOptions.map(() => false));
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // 모든 옵션이 채워져 있는지 확인
   const allOptionsCompleted = pollOptions.every(option => option.trim() !== '');
@@ -43,18 +47,48 @@ const PollCreationSection = ({
     onPollOptionsChange(newOptions);
   };
 
+  const handleOptionFocus = (index: number) => {
+    const newFocusStates = [...focusStates];
+    newFocusStates[index] = true;
+    setFocusStates(newFocusStates);
+  };
+
+  const handleOptionBlur = (index: number) => {
+    const newFocusStates = [...focusStates];
+    newFocusStates[index] = false;
+    setFocusStates(newFocusStates);
+  };
+
+  const handleClearOption = (index: number) => {
+    const newOptions = [...pollOptions];
+    newOptions[index] = '';
+    onPollOptionsChange(newOptions);
+  };
+
   const handleRemoveOption = (index: number) => {
     if (pollOptions.length > 2) {
       const newOptions = pollOptions.filter((_, i) => i !== index);
+      const newFocusStates = focusStates.filter((_, i) => i !== index);
       onPollOptionsChange(newOptions);
+      setFocusStates(newFocusStates);
+
+      // refs 배열도 업데이트
+      inputRefs.current = inputRefs.current.filter((_, i) => i !== index);
     }
   };
 
   const handleAddOption = () => {
     if (pollOptions.length < maxOptions) {
       onPollOptionsChange([...pollOptions, '']);
+      setFocusStates([...focusStates, false]);
     }
   };
+
+  // pollOptions 길이가 변경될 때 focusStates 동기화
+  if (focusStates.length !== pollOptions.length) {
+    const newFocusStates = pollOptions.map((_, index) => focusStates[index] || false);
+    setFocusStates(newFocusStates);
+  }
 
   return (
     <Section>
@@ -71,15 +105,27 @@ const PollCreationSection = ({
         {pollOptions.map((option, index) => (
           <OptionInputContainer key={index}>
             <OptionInput
+              ref={el => {
+                inputRefs.current[index] = el;
+              }}
               placeholder={`항목을 20자 이내로 입력`}
               value={option}
               onChange={e => handleOptionChange(index, e.target.value)}
+              onFocus={() => handleOptionFocus(index)}
+              onBlur={() => handleOptionBlur(index)}
               maxLength={20}
             />
-            {pollOptions.length > 2 && (
-              <CloseButton onClick={() => handleRemoveOption(index)}>
-                <img src={closeIcon} alt="삭제" />
-              </CloseButton>
+            {/* 텍스트가 있을 때는 X 아이콘으로 텍스트 삭제 */}
+            {option.trim() !== '' && (
+              <DeleteButton onClick={() => handleClearOption(index)}>
+                <img src={closeIcon} alt="텍스트 삭제" />
+              </DeleteButton>
+            )}
+            {/* 텍스트가 없고 3번째 항목(index >= 2)부터만 쓰레기통 아이콘으로 항목 삭제 */}
+            {option.trim() === '' && index >= 2 && (
+              <DeleteButton onClick={() => handleRemoveOption(index)}>
+                <img src={trashIcon} alt="항목 삭제" />
+              </DeleteButton>
             )}
           </OptionInputContainer>
         ))}
