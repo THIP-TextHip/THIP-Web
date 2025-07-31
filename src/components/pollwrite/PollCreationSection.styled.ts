@@ -1,33 +1,14 @@
 import styled from '@emotion/styled';
-import { typography, semanticColors } from '../../styles/global/global';
+import { typography, semanticColors, colors } from '../../styles/global/global';
 
 export const Section = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
-`;
-
-export const SectionTitle = styled.h2`
-  color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  margin: 0;
+  gap: 20px;
 `;
 
 export const PollContentContainer = styled.div`
-  background-color: ${semanticColors.background.card};
-  border-radius: 8px;
-  padding: 16px;
   position: relative;
-
-  .char-count {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    color: ${semanticColors.text.ghost};
-    font-size: ${typography.fontSize.xs};
-    font-weight: ${typography.fontWeight.regular};
-  }
 `;
 
 export const PollInput = styled.input`
@@ -36,10 +17,9 @@ export const PollInput = styled.input`
   border: none;
   outline: none;
   color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize.base};
-  font-weight: ${typography.fontWeight.regular};
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.medium};
   font-family: ${typography.fontFamily.primary};
-  padding-bottom: 24px;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
@@ -52,19 +32,12 @@ export const PollOptionsContainer = styled.div`
   gap: 12px;
 `;
 
-export const OptionsTitle = styled.div`
-  color: ${semanticColors.text.secondary};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-`;
-
 export const OptionInputContainer = styled.div`
   display: flex;
   align-items: center;
-  background-color: ${semanticColors.background.card};
-  border: 1px solid ${semanticColors.background.cardDark};
-  border-radius: 8px;
-  padding: 16px;
+  border: 1px solid ${colors.grey[300]};
+  border-radius: 12px;
+  padding: 12px;
   gap: 12px;
 `;
 
@@ -109,14 +82,15 @@ export const AddOptionButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${semanticColors.background.primary};
-  border: 1px solid ${semanticColors.background.cardDark};
-  border-radius: 8px;
-  padding: 16px;
-  color: ${semanticColors.text.secondary};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.medium};
+  background-color: ${semanticColors.button.fill.white};
+  border-radius: 12px;
+  border: none;
+  padding: 10px;
+  color: ${semanticColors.text.onlightPrimary};
+  font-size: ${typography.fontSize.base};
+  font-weight: ${typography.fontWeight.semibold};
   font-family: ${typography.fontFamily.primary};
+  line-height: 24px;
   cursor: pointer;
   transition: all 0.2s ease;
 

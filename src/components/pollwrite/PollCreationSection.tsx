@@ -1,10 +1,8 @@
 import {
   Section,
-  SectionTitle,
   PollContentContainer,
   PollInput,
   PollOptionsContainer,
-  OptionsTitle,
   OptionInputContainer,
   OptionInput,
   CloseButton,
@@ -60,8 +58,6 @@ const PollCreationSection = ({
 
   return (
     <Section>
-      <SectionTitle>투표 내용</SectionTitle>
-
       <PollContentContainer>
         <PollInput
           placeholder="투표 내용을 20자 이내로 입력하세요."
@@ -69,14 +65,7 @@ const PollCreationSection = ({
           onChange={handleContentChange}
           maxLength={maxContentLength}
         />
-        <span className="char-count">
-          {pollContent.length}/{maxContentLength}
-        </span>
       </PollContentContainer>
-
-      <OptionsTitle>
-        투표 항목을 20자 이내로 입력{allOptionsCompleted ? '완료' : '하세요'}.
-      </OptionsTitle>
 
       <PollOptionsContainer>
         {pollOptions.map((option, index) => (
