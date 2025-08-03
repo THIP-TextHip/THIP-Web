@@ -1,22 +1,9 @@
 import { apiClient } from '../index';
 import type { PostData } from '@/types/post';
 
-export interface MyFeedItem extends PostData {
-  feedId: number;
-  postDate: string;
-  isbn: number;
-  bookTitle: string;
-  bookAuthor: string;
-  contentBody: string;
-  contentsUrl: string[];
-  likeCount: number;
-  commentCount: number;
-  isPublic: boolean;
-}
-
 // API 응답 데이터 타입
 export interface MyFeedData {
-  feedList: MyFeedItem[];
+  feedList: PostData[];
   nextCursor: string;
   isLast: boolean;
 }
