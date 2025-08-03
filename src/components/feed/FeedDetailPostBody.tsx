@@ -72,18 +72,22 @@ const TagContainer = styled.div`
   }
 `;
 
+interface FeedDetailPostBodyProps extends PostBodyProps {
+  tags?: string[]; // API에 없지만 컴포넌트에서 사용
+}
+
 const FeedDetailPostBody = ({
   bookTitle,
   isbn,
   bookAuthor,
-  postContent,
-  images = [],
+  contentBody,
+  contentsUrl = [],
   tags = [],
-}: PostBodyProps) => {
+}: FeedDetailPostBodyProps) => {
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const hasImage = images.length > 0;
+  const hasImage = contentsUrl.length > 0;
   const hasTag = tags.length > 0;
 
   const handleImageClick = (index: number) => {
@@ -99,10 +103,10 @@ const FeedDetailPostBody = ({
     <Container>
       <BookInfoCard bookTitle={bookTitle} bookAuthor={bookAuthor} isbn={isbn} />
       <PostContent hasImage={hasImage}>
-        <div className="content">{postContent}</div>
+        <div className="content">{contentBody}</div>
         {hasImage && (
           <div className="imgContainer">
-            {images.map((src, i) => (
+            {contentsUrl.map((src: string, i: number) => (
               <img key={i} src={src} alt={`이미지 ${i + 1}`} onClick={() => handleImageClick(i)} />
             ))}
           </div>
@@ -122,7 +126,7 @@ const FeedDetailPostBody = ({
       </PostContent>
       {isImageViewerOpen && (
         <ImageViewer
-          images={images}
+          images={contentsUrl}
           initialIndex={selectedImageIndex}
           isOpen={isImageViewerOpen}
           onClose={handleCloseImageViewer}

@@ -19,7 +19,7 @@ const SavePage = () => {
 
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(tabs[0]);
-  const [savedBooks, setSavedBooks] = useState<{ [isbn: number]: boolean }>({});
+  const [savedBooks, setSavedBooks] = useState<{ [isbn: string]: boolean }>({});
 
   const handleBack = () => {
     navigate('/mypage');
@@ -29,7 +29,7 @@ const SavePage = () => {
     window.scrollTo(0, 0);
   }, [activeTab]);
 
-  const handleSaveToggle = (isbn: number) => {
+  const handleSaveToggle = (isbn: string) => {
     setSavedBooks(prev => ({
       ...prev,
       [isbn]: !prev[isbn],

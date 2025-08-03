@@ -49,7 +49,7 @@ const BookContainer = styled.div`
 interface BookInfoCardProps {
   bookTitle: string;
   bookAuthor: string;
-  isbn: number;
+  isbn: string;
 }
 
 const BookInfoCard = ({ bookTitle, bookAuthor, isbn }: BookInfoCardProps) => {
