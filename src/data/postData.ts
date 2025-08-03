@@ -10,7 +10,7 @@ export const mockPosts: PostData[] = [
     creatorProfileImageUrl: 'https://placehold.co/24x24',
     alias: 'userTitle',
     postDate: '12시간 전',
-    isbn: 111155544,
+    isbn: '1111555441234',
     bookTitle: '제목입니다',
     bookAuthor: '작가입니다',
     contentBody: '내용입니다…',
@@ -28,7 +28,7 @@ export const mockPosts: PostData[] = [
     creatorProfileImageUrl: 'https://placehold.co/24x24',
     alias: 'userTitle',
     postDate: '12시간 전',
-    isbn: 111152544,
+    isbn: '1111525445613',
     bookTitle: '제목입니다제목입니다제목입니다',
     bookAuthor: '작가입니다',
     contentBody:
@@ -47,7 +47,7 @@ export const mockPosts: PostData[] = [
     creatorProfileImageUrl: 'https://placehold.co/24x24',
     alias: 'userTitle',
     postDate: '12시간 전',
-    isbn: 111152544,
+    isbn: '111152544099',
     bookTitle: '제목입니다제목입니다제목입니다',
     bookAuthor: '작가입니다',
     contentBody:
@@ -69,7 +69,7 @@ export const mockFeedPost: FeedPostProps = {
   creatorProfileImageUrl: 'https://placehold.co/54x54',
   alias: '문학가',
   postDate: '2025.01.12',
-  isbn: 111155546,
+  isbn: '111155541766',
   bookTitle: '채식주의자',
   bookAuthor: '한강',
   contentBody:

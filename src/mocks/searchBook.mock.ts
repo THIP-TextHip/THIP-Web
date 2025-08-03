@@ -42,7 +42,7 @@ export const mockSearchBook = {
       creatorProfileImageUrl: 'https://placehold.co/24x24',
       alias: 'userTitle',
       postDate: '12시간 전',
-      isbn: 3,
+      isbn: '3',
       bookTitle: '제목입니다',
       bookAuthor: '작가입니다',
       contentBody: '내용입니다…',
@@ -60,7 +60,7 @@ export const mockSearchBook = {
       creatorProfileImageUrl: 'https://placehold.co/24x24',
       alias: 'userTitle',
       postDate: '12시간 전',
-      isbn: 3,
+      isbn: '3',
       bookTitle: '제목입니다제목입니다제목입니다',
       bookAuthor: '작가입니다',
       contentBody:

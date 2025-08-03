@@ -1,5 +1,5 @@
 export interface Book {
-  isbn: number;
+  isbn: string;
   title: string;
   author: string;
   coverUrl: string;
