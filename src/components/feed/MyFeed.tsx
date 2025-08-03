@@ -6,6 +6,7 @@ import { colors, typography } from '@/styles/global/global';
 import TotalBar from './TotalBar';
 
 const Container = styled.div`
+  height: 100vh;
   padding-top: 136px;
   padding-bottom: 155px;
   background-color: var(--color-black-main);

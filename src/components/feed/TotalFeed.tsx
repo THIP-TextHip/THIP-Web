@@ -5,6 +5,7 @@ import type { FeedListProps } from '../../types/post';
 import { colors, typography } from '@/styles/global/global';
 
 const Container = styled.div`
+  height: 100vh;
   padding-top: 136px;
   padding-bottom: 155px;
   background-color: var(--color-black-main);
