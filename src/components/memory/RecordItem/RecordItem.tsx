@@ -11,7 +11,7 @@ import {
   UserAvatar,
   UserInfo,
   UserName,
-  UserPoints,
+  PageInfo,
   TimeStamp,
   ContentSection,
   ActionSection,
@@ -24,7 +24,17 @@ interface RecordItemProps {
 }
 
 const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
-  const { user, userPoints, content, likeCount, commentCount, timeAgo, type, pollOptions } = record;
+  const {
+    user,
+    content,
+    likeCount,
+    commentCount,
+    timeAgo,
+    type,
+    pollOptions,
+    pageRange,
+    recordType,
+  } = record;
 
   // 좋아요 상태 관리
   const [isLiked, setIsLiked] = useState(false);
@@ -42,13 +52,23 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     }
   };
 
+  // 페이지 정보 표시 함수
+  const renderPageInfo = () => {
+    if (recordType === 'overall') {
+      return '총평';
+    } else if (pageRange) {
+      return `${pageRange}p`;
+    }
+    return '0p'; // 기본값
+  };
+
   return (
     <Container shouldBlur={shouldBlur}>
       <UserSection>
         <UserAvatar />
         <UserInfo>
           <UserName>{user}</UserName>
-          <UserPoints>{userPoints}p</UserPoints>
+          <PageInfo>{renderPageInfo()}</PageInfo>
         </UserInfo>
         <TimeStamp>{timeAgo}</TimeStamp>
       </UserSection>
