@@ -13,34 +13,34 @@ import closeIcon from '../../assets/common/delete.svg';
 import trashIcon from '../../assets/common/trash.svg';
 
 interface PollCreationSectionProps {
-  pollContent: string;
-  onPollContentChange: (value: string) => void;
-  pollOptions: string[];
-  onPollOptionsChange: (options: string[]) => void;
+  content: string;
+  onContentChange: (value: string) => void;
+  options: string[];
+  onOptionsChange: (options: string[]) => void;
 }
 
 const PollCreationSection = ({
-  pollContent,
-  onPollContentChange,
-  pollOptions,
-  onPollOptionsChange,
+  content,
+  onContentChange,
+  options,
+  onOptionsChange,
 }: PollCreationSectionProps) => {
   const maxContentLength = 20;
   const maxOptions = 5;
-  const [focusStates, setFocusStates] = useState<boolean[]>(pollOptions.map(() => false));
+  const [focusStates, setFocusStates] = useState<boolean[]>(options.map(() => false));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value.length <= maxContentLength) {
-      onPollContentChange(value);
+      onContentChange(value);
     }
   };
 
   const handleOptionChange = (index: number, value: string) => {
-    const newOptions = [...pollOptions];
+    const newOptions = [...options];
     newOptions[index] = value;
-    onPollOptionsChange(newOptions);
+    onOptionsChange(newOptions);
   };
 
   const handleOptionFocus = (index: number) => {
@@ -56,16 +56,16 @@ const PollCreationSection = ({
   };
 
   const handleClearOption = (index: number) => {
-    const newOptions = [...pollOptions];
+    const newOptions = [...options];
     newOptions[index] = '';
-    onPollOptionsChange(newOptions);
+    onOptionsChange(newOptions);
   };
 
   const handleRemoveOption = (index: number) => {
-    if (pollOptions.length > 2) {
-      const newOptions = pollOptions.filter((_, i) => i !== index);
+    if (options.length > 2) {
+      const newOptions = options.filter((_, i) => i !== index);
       const newFocusStates = focusStates.filter((_, i) => i !== index);
-      onPollOptionsChange(newOptions);
+      onOptionsChange(newOptions);
       setFocusStates(newFocusStates);
 
       // refs 배열도 업데이트
@@ -74,15 +74,15 @@ const PollCreationSection = ({
   };
 
   const handleAddOption = () => {
-    if (pollOptions.length < maxOptions) {
-      onPollOptionsChange([...pollOptions, '']);
+    if (options.length < maxOptions) {
+      onOptionsChange([...options, '']);
       setFocusStates([...focusStates, false]);
     }
   };
 
-  // pollOptions 길이가 변경될 때 focusStates 동기화
-  if (focusStates.length !== pollOptions.length) {
-    const newFocusStates = pollOptions.map((_, index) => focusStates[index] || false);
+  // options 길이가 변경될 때 focusStates 동기화
+  if (focusStates.length !== options.length) {
+    const newFocusStates = options.map((_, index) => focusStates[index] || false);
     setFocusStates(newFocusStates);
   }
 
@@ -91,14 +91,14 @@ const PollCreationSection = ({
       <PollContentContainer>
         <PollInput
           placeholder="투표 내용을 20자 이내로 입력하세요."
-          value={pollContent}
+          value={content}
           onChange={handleContentChange}
           maxLength={maxContentLength}
         />
       </PollContentContainer>
 
       <PollOptionsContainer>
-        {pollOptions.map((option, index) => (
+        {options.map((option, index) => (
           <OptionInputContainer key={index}>
             <OptionInput
               ref={el => {
@@ -126,7 +126,7 @@ const PollCreationSection = ({
           </OptionInputContainer>
         ))}
 
-        {pollOptions.length < maxOptions && (
+        {options.length < maxOptions && (
           <AddOptionButton onClick={handleAddOption}>항목 추가</AddOptionButton>
         )}
       </PollOptionsContainer>
