@@ -8,11 +8,11 @@ const ACCESS_TOKEN =
 export const TokenManager = {
   setAccessToken: (token: string) => localStorage.setItem('accessToken', token),
   getAccessToken: (): string | null => localStorage.getItem('accessToken'),
-  setRefreshToken: (token: string) => localStorage.setItem('refreshToken', token),
-  getRefreshToken: (): string | null => localStorage.getItem('refreshToken'),
+  // setRefreshToken: (token: string) => localStorage.setItem('refreshToken', token),
+  // getRefreshToken: (): string | null => localStorage.getItem('refreshToken'),
   clearTokens: () => {
     localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    // localStorage.removeItem('refreshToken');
   },
   hasValidToken: (): boolean => !!localStorage.getItem('accessToken'),
 };
