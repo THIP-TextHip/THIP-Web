@@ -6,7 +6,7 @@ import { colors, typography } from '@/styles/global/global';
 import TotalBar from './TotalBar';
 
 const Container = styled.div`
-  height: 100%;
+  height: 100vh;
   padding-top: 136px;
   padding-bottom: 155px;
   background-color: var(--color-black-main);
@@ -15,7 +15,6 @@ const Container = styled.div`
 const EmptyState = styled.div`
   display: flex;
   height: 100%;
-  padding: 32px 0 20px 0;
   justify-content: center;
   align-items: center;
 
