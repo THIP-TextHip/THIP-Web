@@ -41,12 +41,12 @@ const SubReply = ({
       </ReplyIcon>
       <Content>
         <PostHeader
-          profileImgUrl={replyCommentimgUrl}
-          userName={replyCommentUserName}
-          userTitle={replyCommentUserTitle}
+          creatorProfileImageUrl={replyCommentimgUrl}
+          creatorNickname={replyCommentUserName}
+          alias={replyCommentUserTitle}
           titleColor={titleColor}
-          createdAt={postDate}
-          userId={replyCommentUserId}
+          postDate={postDate}
+          creatorId={replyCommentUserId}
           type="reply"
         />
         <ReplySection>

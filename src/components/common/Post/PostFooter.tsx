@@ -43,27 +43,31 @@ const Container = styled.div<{ isDetail: boolean }>`
 `;
 
 interface PostFooterProps {
-  initialLikeCount: number;
+  likeCount: number;
   commentCount: number;
   feedId: number;
   isMyFeed: boolean;
+  isSaved?: boolean;
+  isLiked?: boolean;
   isPublic?: boolean;
   isDetail?: boolean;
 }
 
 const PostFooter = ({
-  initialLikeCount,
+  likeCount: initialLikeCount,
   commentCount,
   feedId,
   isMyFeed,
-  isPublic,
+  isSaved = false,
+  isLiked = false,
+  isPublic = true,
   isDetail = false,
 }: PostFooterProps) => {
   const navigate = useNavigate();
 
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(isLiked);
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(isSaved);
 
   const handleLike = () => {
     setLiked(!liked);

@@ -1,19 +1,19 @@
 export interface PostData {
-  profileImgUrl: string;
-  userName: string;
-  userId: number;
-  userTitle: string;
-  titleColor: string;
-  createdAt: string;
-  bookTitle: string;
-  isbn: number;
-  bookAuthor: string;
-  postContent: string;
   feedId: number;
-  initialLikeCount: number;
+  creatorId?: number;
+  creatorNickname?: string;
+  creatorProfileImageUrl?: string;
+  alias?: string;
+  postDate: string;
+  isbn: number;
+  bookTitle: string;
+  bookAuthor: string;
+  contentBody: string;
+  contentsUrl: string[];
+  likeCount: number;
   commentCount: number;
-  images?: string[];
-  tags?: string[];
+  isSaved?: boolean;
+  isLiked?: boolean;
   isPublic?: boolean;
 }
 
@@ -30,7 +30,7 @@ export interface FeedPostProps extends PostData {
 
 export type PostBodyProps = Pick<
   PostData,
-  'bookTitle' | 'bookAuthor' | 'postContent' | 'feedId' | 'images' | 'tags' | 'isbn'
+  'bookTitle' | 'bookAuthor' | 'contentBody' | 'feedId' | 'contentsUrl' | 'isbn'
 >;
 
 // 대댓글(SubReply)

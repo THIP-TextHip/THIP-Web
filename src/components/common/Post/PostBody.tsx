@@ -48,12 +48,12 @@ const PostBody = ({
   bookTitle,
   isbn,
   bookAuthor,
-  postContent,
+  contentBody,
   feedId,
-  images = [],
+  contentsUrl = [],
 }: PostBodyProps) => {
   const navigate = useNavigate();
-  const hasImage = images.length > 0;
+  const hasImage = contentsUrl.length > 0;
 
   const handlePostClick = (feedId: number) => {
     // if (!isClickable) return;
@@ -65,10 +65,10 @@ const PostBody = ({
     <Container>
       <BookInfoCard bookTitle={bookTitle} bookAuthor={bookAuthor} isbn={isbn} />
       <PostContent hasImage={hasImage} onClick={() => handlePostClick(feedId)}>
-        <div className="content">{postContent}</div>
+        <div className="content">{contentBody}</div>
         {hasImage && (
           <div className="imgContainer">
-            {images.map((src, i) => (
+            {contentsUrl.map((src: string, i: number) => (
               <img key={i} src={src} />
             ))}
           </div>

@@ -36,12 +36,12 @@ const Reply = ({
   return (
     <Container>
       <PostHeader
-        profileImgUrl={imageUrl}
-        userName={nickName}
-        userTitle={userTitle}
+        creatorProfileImageUrl={imageUrl}
+        creatorNickname={nickName}
+        alias={userTitle}
         titleColor={titleColor}
-        createdAt={postDate}
-        userId={userId}
+        postDate={postDate}
+        creatorId={userId}
         type="reply"
       />
       <ReplySection>

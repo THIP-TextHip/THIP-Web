@@ -1,41 +1,44 @@
 import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 interface PostHeaderProps {
-  profileImgUrl: string;
-  userName: string;
-  userTitle: string;
-  titleColor: string;
-  createdAt: string;
-  userId: number;
+  creatorProfileImageUrl?: string;
+  creatorNickname?: string;
+  alias?: string;
+  titleColor?: string;
+  postDate: string;
+  creatorId?: number;
   type?: 'post' | 'reply';
 }
 
 const PostHeader = ({
-  profileImgUrl,
-  userName,
-  userTitle,
-  titleColor,
-  createdAt,
-  userId,
+  creatorProfileImageUrl,
+  creatorNickname,
+  alias,
+  titleColor = '#FFFFFF', // 기본값 설정
+  postDate,
+  creatorId,
   type = 'post',
 }: PostHeaderProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/otherfeed/${userId}`);
+    if (creatorId) {
+      navigate(`/otherfeed/${creatorId}`);
+    }
   };
+
   return (
     <Container type={type} onClick={handleClick}>
       <div className="headerInfo">
-        <img src={profileImgUrl} alt="칭호 이미지" />
+        <img src={creatorProfileImageUrl} alt="칭호 이미지" />
         <div className="infoBox">
-          <div className="username">{userName}</div>
+          <div className="username">{creatorNickname}</div>
           <div className="usertitle" style={{ color: titleColor }}>
-            {userTitle}
+            {alias}
           </div>
         </div>
       </div>
-      <div className="timestamp">{createdAt}</div>
+      <div className="timestamp">{postDate}</div>
     </Container>
   );
 };
