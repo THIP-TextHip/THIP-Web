@@ -1,0 +1,37 @@
+[
+  {
+    "id": "literature",
+    "title": "문학",
+    "subTitle": "문학가",
+    "iconUrl": "/assets/genre/literature.svg",
+    "color": "#A0F8E8"
+  },
+  {
+    "id": "science",
+    "title": "과학",
+    "subTitle": "과학자",
+    "iconUrl": "/assets/genre/science.svg",
+    "color": "#C8A5FF"
+  },
+  {
+    "id": "socialScience",
+    "title": "사회과학",
+    "subTitle": "사회학자",
+    "iconUrl": "/assets/genre/socialScience.svg",
+    "color": "#FDB770"
+  },
+  {
+    "id": "art",
+    "title": "예술",
+    "subTitle": "예술가",
+    "iconUrl": "/assets/genre/art.svg",
+    "color": "#FF8BAC"
+  },
+  {
+    "id": "humanity",
+    "title": "인문학",
+    "subTitle": "철학자",
+    "iconUrl": "/assets/genre/humanity.svg",
+    "color": "#A1D5FF"
+  }
+]
