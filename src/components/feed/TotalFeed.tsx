@@ -13,7 +13,7 @@ const Container = styled.div`
 
 const EmptyState = styled.div`
   display: flex;
-  height: 473px;
+  height: 100%;
   padding: 32px 0 20px 0;
   justify-content: center;
   align-items: center;
