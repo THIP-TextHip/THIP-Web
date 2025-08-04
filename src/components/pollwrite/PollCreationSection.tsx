@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Section,
   PollContentContainer,
@@ -80,11 +80,12 @@ const PollCreationSection = ({
     }
   };
 
-  // options 길이가 변경될 때 focusStates 동기화
-  if (focusStates.length !== options.length) {
-    const newFocusStates = options.map((_, index) => focusStates[index] || false);
-    setFocusStates(newFocusStates);
-  }
+  useEffect(() => {
+    if (focusStates.length !== options.length) {
+      const newFocusStates = options.map((_, index) => focusStates[index] || false);
+      setFocusStates(newFocusStates);
+    }
+  }, [options.length, focusStates.length]);
 
   return (
     <Section>
