@@ -54,20 +54,20 @@ const UploadProgressBar = ({ isVisible, onComplete }: UploadProgressBarProps) =>
 };
 
 const Container = styled.div`
-  padding: 16px 20px;
+  padding: 16px 0px;
   background-color: ${semanticColors.background.primary};
 `;
 
 const ProgressText = styled.div`
   color: ${semanticColors.text.point.green};
-  font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.regular};
-  margin-bottom: 8px;
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.medium};
+  margin-bottom: 12px;
 `;
 
 const ProgressBarContainer = styled.div`
   width: 100%;
-  height: 6px;
+  height: 7px;
   background-color: ${colors.grey[300]};
   border-radius: 3px;
   overflow: hidden;
