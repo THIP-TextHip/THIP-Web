@@ -1,18 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { colors, typography, semanticColors } from '../../../styles/global/global';
 
-interface UploadProgressModalProps {
+interface UploadProgressBarProps {
   isVisible: boolean;
   onComplete: () => void;
 }
 
-const UploadProgressModal = ({ isVisible, onComplete }: UploadProgressModalProps) => {
+const UploadProgressBar = ({ isVisible, onComplete }: UploadProgressBarProps) => {
   const [progress, setProgress] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   useEffect(() => {
     if (!isVisible) {
       setProgress(0);
+      setIsCompleted(false);
       return;
     }
 
@@ -25,9 +27,10 @@ const UploadProgressModal = ({ isVisible, onComplete }: UploadProgressModalProps
         const newProgress = Math.min(prev + increment, 100);
         if (newProgress >= 100) {
           clearInterval(timer);
+          setIsCompleted(true);
           setTimeout(() => {
             onComplete();
-          }, 500); // 0.5초 후 완료
+          }, 1000); // 1초 후 완료 (완료 메시지를 보여주기 위해)
         }
         return newProgress;
       });
@@ -39,54 +42,34 @@ const UploadProgressModal = ({ isVisible, onComplete }: UploadProgressModalProps
   if (!isVisible) return null;
 
   return (
-    <Overlay>
-      <Container>
-        <ProgressText>기록을 게시 중입니다...</ProgressText>
-        <ProgressBarContainer>
-          <ProgressBarFill progress={progress} />
-        </ProgressBarContainer>
-      </Container>
-    </Overlay>
+    <Container>
+      <ProgressText>
+        {isCompleted ? '기록이 게시되었습니다!' : '기록을 게시 중입니다...'}
+      </ProgressText>
+      <ProgressBarContainer>
+        <ProgressBarFill progress={progress} />
+      </ProgressBarContainer>
+    </Container>
   );
 };
 
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: ${colors.black[50]};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-`;
-
 const Container = styled.div`
+  padding: 16px 20px;
   background-color: ${semanticColors.background.primary};
-  padding: 32px 24px;
-  border-radius: 16px;
-  min-width: 280px;
-  max-width: 320px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
 `;
 
 const ProgressText = styled.div`
   color: ${semanticColors.text.point.green};
-  font-size: ${typography.fontSize.sm};
+  font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.regular};
-  text-align: center;
+  margin-bottom: 8px;
 `;
 
 const ProgressBarContainer = styled.div`
   width: 100%;
-  height: 8px;
+  height: 6px;
   background-color: ${colors.grey[300]};
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
 `;
 
@@ -94,8 +77,8 @@ const ProgressBarFill = styled.div<{ progress: number }>`
   width: ${({ progress }) => progress}%;
   height: 100%;
   background-color: ${semanticColors.text.point.green};
-  border-radius: 4px;
+  border-radius: 3px;
   transition: width 0.1s ease-out;
 `;
 
-export default UploadProgressModal;
+export default UploadProgressBar;

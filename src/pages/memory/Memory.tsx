@@ -4,7 +4,6 @@ import type { SortType } from '../../components/memory/SortDropdown';
 import MemoryHeader from '../../components/memory/MemoryHeader/MemoryHeader';
 import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
 import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddButton';
-import RecordItemWithProgress from '../../components/memory/RecordItemWithProgress/RecordItemWithProgress';
 import Snackbar from '../../components/common/Modal/Snackbar';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 
@@ -33,10 +32,6 @@ export interface PollOption {
   isHighest?: boolean;
 }
 
-interface UploadingRecord extends Record {
-  isUploading: boolean;
-}
-
 const Memory = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,8 +44,8 @@ const Memory = () => {
     null,
   );
 
-  // 업로드 중인 기록들
-  const [uploadingRecords, setUploadingRecords] = useState<UploadingRecord[]>([]);
+  // 업로드 프로그레스 상태
+  const [showUploadProgress, setShowUploadProgress] = useState(false);
 
   // 개발용 상태 - 기록 유무 전환
   const [hasRecords, setHasRecords] = useState(true);
@@ -109,24 +104,37 @@ const Memory = () => {
       const newRecord = location.state.newRecord as Record & { isUploading?: boolean };
 
       if (newRecord.isUploading) {
-        // 업로드 중인 기록으로 추가
-        const uploadingRecord: UploadingRecord = {
-          ...newRecord,
-          isUploading: true,
+        // 업로드 프로그레스 시작
+        setShowUploadProgress(true);
+
+        // 미리 기록을 추가해둠 (프로그레스 완료 후 표시됨)
+        const finalRecord: Record = {
+          id: newRecord.id,
+          user: newRecord.user,
+          userPoints: newRecord.userPoints,
+          content: newRecord.content,
+          likeCount: newRecord.likeCount,
+          commentCount: newRecord.commentCount,
+          timeAgo: newRecord.timeAgo,
+          createdAt: newRecord.createdAt,
+          type: newRecord.type,
+          recordType: newRecord.recordType,
+          pageRange: newRecord.pageRange,
+          pollOptions: newRecord.pollOptions,
         };
 
-        setUploadingRecords(prev => [uploadingRecord, ...prev]);
-      } else {
-        // 이미 완료된 기록으로 추가
+        // 중복 확인을 위한 함수
         const addRecordIfNotExists = (prevRecords: Record[]) => {
-          const exists = prevRecords.some(record => record.id === newRecord.id);
+          const exists = prevRecords.some(record => record.id === finalRecord.id);
           if (exists) {
             return prevRecords;
           }
-          return [newRecord, ...prevRecords];
+          return [finalRecord, ...prevRecords];
         };
 
+        // 내 기록에 추가
         setMyRecords(prev => addRecordIfNotExists(prev));
+        // 그룹 기록에도 추가
         setGroupRecords(prev => addRecordIfNotExists(prev));
       }
 
@@ -139,43 +147,8 @@ const Memory = () => {
   }, [location.state?.newRecord?.id, navigate, location.pathname]);
 
   // 업로드 완료 처리
-  const handleUploadComplete = (recordId: string) => {
-    const completedRecord = uploadingRecords.find(record => record.id === recordId);
-    if (completedRecord) {
-      // 업로드 중인 기록에서 제거
-      setUploadingRecords(prev => prev.filter(record => record.id !== recordId));
-
-      // 완료된 기록을 실제 기록 목록에 추가
-      const finalRecord: Record = {
-        id: completedRecord.id,
-        user: completedRecord.user,
-        userPoints: completedRecord.userPoints,
-        content: completedRecord.content,
-        likeCount: completedRecord.likeCount,
-        commentCount: completedRecord.commentCount,
-        timeAgo: completedRecord.timeAgo,
-        createdAt: completedRecord.createdAt,
-        type: completedRecord.type,
-        recordType: completedRecord.recordType,
-        pageRange: completedRecord.pageRange,
-        pollOptions: completedRecord.pollOptions,
-      };
-
-      // 중복 확인을 위한 함수
-      const addRecordIfNotExists = (prevRecords: Record[]) => {
-        const exists = prevRecords.some(record => record.id === finalRecord.id);
-        if (exists) {
-          return prevRecords;
-        }
-        return [finalRecord, ...prevRecords];
-      };
-
-      // 내 기록에 추가
-      setMyRecords(prev => addRecordIfNotExists(prev));
-
-      // 그룹 기록에도 추가 (내가 작성한 기록도 그룹에 표시)
-      setGroupRecords(prev => addRecordIfNotExists(prev));
-    }
+  const handleUploadComplete = () => {
+    setShowUploadProgress(false);
   };
 
   // 현재 표시할 기록들
@@ -279,15 +252,6 @@ const Memory = () => {
       </FixedHeader>
 
       <ScrollableContent>
-        {/* 업로드 중인 기록들을 개별적으로 표시 */}
-        {uploadingRecords.map(uploadingRecord => (
-          <RecordItemWithProgress
-            key={uploadingRecord.id}
-            record={uploadingRecord}
-            onUploadComplete={handleUploadComplete}
-          />
-        ))}
-
         <MemoryContent
           activeTab={activeTab}
           activeFilter={activeFilter}
@@ -296,12 +260,14 @@ const Memory = () => {
           records={filteredRecords}
           selectedPageRange={selectedPageRange}
           hasRecords={hasRecords}
+          showUploadProgress={showUploadProgress}
           onTabChange={handleTabChange}
           onFilterChange={handleFilterChange}
           onSortChange={handleSortChange}
           onPageRangeClear={handlePageRangeClear}
           onPageRangeSet={handlePageRangeSet}
           onToggleRecords={handleToggleRecords}
+          onUploadComplete={handleUploadComplete}
         />
       </ScrollableContent>
 
