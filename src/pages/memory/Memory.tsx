@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { SortType } from '../../components/memory/SortDropdown';
 import MemoryHeader from '../../components/memory/MemoryHeader/MemoryHeader';
@@ -31,6 +31,14 @@ export interface PollOption {
   percentage: number;
   isHighest?: boolean;
 }
+
+const addRecordIfNotExists = (prevRecords: Record[], newRecord: Record) => {
+  const exists = prevRecords.some(record => record.id === newRecord.id);
+  if (exists) {
+    return prevRecords;
+  }
+  return [newRecord, ...prevRecords];
+};
 
 const Memory = () => {
   const navigate = useNavigate();
@@ -101,41 +109,20 @@ const Memory = () => {
   // location.state에서 새로 추가된 기록 확인
   React.useEffect(() => {
     if (location.state?.newRecord) {
-      const newRecord = location.state.newRecord as Record & { isUploading?: boolean };
+      const { isUploading, ...recordData } = location.state.newRecord as Record & {
+        isUploading?: boolean;
+      };
 
-      if (newRecord.isUploading) {
+      if (isUploading) {
         // 업로드 프로그레스 시작
         setShowUploadProgress(true);
 
-        // 미리 기록을 추가해둠 (프로그레스 완료 후 표시됨)
-        const finalRecord: Record = {
-          id: newRecord.id,
-          user: newRecord.user,
-          userPoints: newRecord.userPoints,
-          content: newRecord.content,
-          likeCount: newRecord.likeCount,
-          commentCount: newRecord.commentCount,
-          timeAgo: newRecord.timeAgo,
-          createdAt: newRecord.createdAt,
-          type: newRecord.type,
-          recordType: newRecord.recordType,
-          pageRange: newRecord.pageRange,
-          pollOptions: newRecord.pollOptions,
-        };
-
-        // 중복 확인을 위한 함수
-        const addRecordIfNotExists = (prevRecords: Record[]) => {
-          const exists = prevRecords.some(record => record.id === finalRecord.id);
-          if (exists) {
-            return prevRecords;
-          }
-          return [finalRecord, ...prevRecords];
-        };
+        const finalRecord: Record = recordData;
 
         // 내 기록에 추가
-        setMyRecords(prev => addRecordIfNotExists(prev));
+        setMyRecords(prev => addRecordIfNotExists(prev, finalRecord));
         // 그룹 기록에도 추가
-        setGroupRecords(prev => addRecordIfNotExists(prev));
+        setGroupRecords(prev => addRecordIfNotExists(prev, finalRecord));
       }
 
       // 내 기록 탭으로 이동
@@ -144,12 +131,12 @@ const Memory = () => {
       // state 즉시 초기화 (중복 추가 방지)
       navigate(location.pathname, { replace: true, state: null });
     }
-  }, [location.state?.newRecord, navigate, location.pathname]);
+  }, [location.pathname]);
 
   // 업로드 완료 처리
-  const handleUploadComplete = () => {
+  const handleUploadComplete = useCallback(() => {
     setShowUploadProgress(false);
-  };
+  }, []);
 
   // 현재 표시할 기록들
   const currentRecords = useMemo(() => {
@@ -206,44 +193,47 @@ const Memory = () => {
     }
   }, [activeTab, activeFilter, selectedPageRange, sortedRecords]);
 
-  const handleBackClick = () => {
+  const handleBackClick = useCallback(() => {
     navigate('/group');
-  };
+  }, [navigate]);
 
-  const handleTabChange = (tab: RecordType) => {
+  const handleTabChange = useCallback((tab: RecordType) => {
     setActiveTab(tab);
     // 탭 변경 시 필터 초기화
     setActiveFilter(null);
     setSelectedPageRange(null);
-  };
+  }, []);
 
-  const handleFilterChange = (filter: FilterType) => {
-    if (activeFilter === filter) {
-      // 같은 필터를 다시 클릭하면 해제
-      setActiveFilter(null);
-      setSelectedPageRange(null);
-    } else {
-      setActiveFilter(filter);
-      setSelectedPageRange(null);
-    }
-  };
+  const handleFilterChange = useCallback(
+    (filter: FilterType) => {
+      if (activeFilter === filter) {
+        // 같은 필터를 다시 클릭하면 해제
+        setActiveFilter(null);
+        setSelectedPageRange(null);
+      } else {
+        setActiveFilter(filter);
+        setSelectedPageRange(null);
+      }
+    },
+    [activeFilter],
+  );
 
-  const handleSortChange = (sort: SortType) => {
+  const handleSortChange = useCallback((sort: SortType) => {
     setSelectedSort(sort);
-  };
+  }, []);
 
-  const handlePageRangeClear = () => {
+  const handlePageRangeClear = useCallback(() => {
     setSelectedPageRange(null);
-  };
+  }, []);
 
-  const handlePageRangeSet = (range: { start: number; end: number }) => {
+  const handlePageRangeSet = useCallback((range: { start: number; end: number }) => {
     setSelectedPageRange(range);
     setActiveFilter('page'); // 페이지 범위 설정 시 페이지별 보기로 자동 변경
-  };
+  }, []);
 
-  const handleToggleRecords = () => {
+  const handleToggleRecords = useCallback(() => {
     setHasRecords(!hasRecords);
-  };
+  }, [hasRecords]);
 
   return (
     <Container>
