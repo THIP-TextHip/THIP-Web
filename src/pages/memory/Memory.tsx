@@ -144,7 +144,7 @@ const Memory = () => {
       // state 즉시 초기화 (중복 추가 방지)
       navigate(location.pathname, { replace: true, state: null });
     }
-  }, [location.state?.newRecord?.id, navigate, location.pathname]);
+  }, [location.state?.newRecord, navigate, location.pathname]);
 
   // 업로드 완료 처리
   const handleUploadComplete = () => {
@@ -278,7 +278,7 @@ const Memory = () => {
       {showSnackbar && (
         <Snackbar
           message="기록이 성공적으로 저장되었습니다!"
-          isVisible={showSnackbar}
+          variant="bottom"
           onClose={() => setShowSnackbar(false)}
         />
       )}
