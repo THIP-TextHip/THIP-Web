@@ -45,24 +45,25 @@ const PollWrite = () => {
         .map((option, index) => ({
           id: `${index + 1}.`,
           text: option.trim(),
-          percentage: 0,
-          isHighest: false,
+          percentage: index === 0 ? 90 : 10, // 첫 번째 옵션을 90%로 설정 (데모용)
+          isHighest: index === 0, // 첫 번째 옵션이 최고값
         }));
 
-      // 새 투표 기록 객체 생성
-      const newPollRecord: Record = {
+      // 새 투표 기록 객체 생성 (업로드 중 상태로)
+      const newPollRecord: Record & { isUploading?: boolean } = {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // 고유한 ID
-        user: '내가', // TODO: 실제 사용자 이름으로 변경
-        userPoints: 0, // TODO: 실제 사용자 포인트로 변경
+        user: 'user.01', // TODO: 실제 사용자 이름으로 변경
+        userPoints: 132, // TODO: 실제 사용자 포인트로 변경
         content: pollContent,
         likeCount: 0,
         commentCount: 0,
-        timeAgo: '방금 전',
+        timeAgo: '12시간 전',
         createdAt: new Date(),
         type: 'poll',
         recordType: isOverallEnabled ? 'overall' : 'page',
         pageRange: finalPageRange, // 최종 페이지 범위 저장
         pollOptions: pollOptionsData,
+        isUploading: true, // 업로드 중 표시
       };
 
       console.log('투표 생성 완료', newPollRecord);
@@ -74,6 +75,7 @@ const PollWrite = () => {
       // TODO: API 호출하여 서버에 투표 저장
       // await api.createPoll(newPollRecord);
 
+      // 바로 기록장으로 이동 (업로드 중인 투표와 함께)
       navigate('/memory', {
         state: { newRecord: newPollRecord },
         replace: true,
@@ -84,7 +86,7 @@ const PollWrite = () => {
     }
   };
 
-  // 모든 투표 옵션이 채워져야 하고, 투표 내용도 필요
+  // 투표 내용과 최소 2개의 옵션이 필요
   const isFormValid =
     pollContent.trim() !== '' && pollOptions.filter(option => option.trim() !== '').length >= 2;
 
@@ -110,10 +112,10 @@ const PollWrite = () => {
         />
 
         <PollCreationSection
-          pollContent={pollContent}
-          onPollContentChange={setPollContent}
-          pollOptions={pollOptions}
-          onPollOptionsChange={setPollOptions}
+          content={pollContent}
+          onContentChange={setPollContent}
+          options={pollOptions}
+          onOptionsChange={setPollOptions}
         />
       </Container>
     </>

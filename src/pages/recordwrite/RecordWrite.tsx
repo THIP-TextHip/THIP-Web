@@ -38,19 +38,20 @@ const RecordWrite = () => {
           ? pageRange
           : lastRecordedPage.toString();
 
-      // 새 기록 객체 생성
-      const newRecord: Record = {
+      // 새 기록 객체 생성 (업로드 중 상태로)
+      const newRecord: Record & { isUploading?: boolean } = {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // 고유한 ID
-        user: '내가', // TODO: 실제 사용자 이름으로 변경
-        userPoints: 0, // TODO: 실제 사용자 포인트로 변경
+        user: 'user.01', // TODO: 실제 사용자 이름으로 변경
+        userPoints: 132, // TODO: 실제 사용자 포인트로 변경
         content: content,
         likeCount: 0,
         commentCount: 0,
-        timeAgo: '방금 전',
+        timeAgo: '12시간 전',
         createdAt: new Date(),
         type: 'text',
         recordType: isOverallEnabled ? 'overall' : 'page',
         pageRange: finalPageRange, // 최종 페이지 범위 저장
+        isUploading: true, // 업로드 중 표시
       };
 
       console.log('기록 작성 완료', newRecord);
@@ -61,6 +62,7 @@ const RecordWrite = () => {
       // TODO: API 호출하여 서버에 기록 저장
       // await api.createRecord(newRecord);
 
+      // 바로 기록장으로 이동 (업로드 중인 기록과 함께)
       navigate('/memory', {
         state: { newRecord },
         replace: true,
