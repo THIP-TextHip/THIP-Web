@@ -21,7 +21,6 @@ const FollowerListPage = () => {
   const [retryCount, setRetryCount] = useState(0);
   const [nextCursor, setNextCursor] = useState<string>('');
   const [isLast, setIsLast] = useState(false);
-  // const [totalCount, setTotalCount] = useState(0);
 
   const handleBackClick = () => {
     navigate(-1);

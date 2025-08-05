@@ -23,6 +23,7 @@ const OtherFeedPage = () => {
   const [profileData, setProfileData] = useState<OtherProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const handleBackClick = () => {
     navigate(-1);
   };
