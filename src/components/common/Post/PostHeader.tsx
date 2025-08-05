@@ -4,7 +4,7 @@ interface PostHeaderProps {
   creatorProfileImageUrl?: string;
   creatorNickname?: string;
   alias?: string;
-  titleColor?: string;
+  aliasColor?: string;
   postDate: string;
   creatorId?: number;
   type?: 'post' | 'reply';
@@ -14,7 +14,7 @@ const PostHeader = ({
   creatorProfileImageUrl,
   creatorNickname,
   alias,
-  titleColor = '#FFFFFF', // 기본값 설정
+  aliasColor = '#FFFFFF', // 기본값 설정
   postDate,
   creatorId,
   type = 'post',
@@ -33,7 +33,7 @@ const PostHeader = ({
         <img src={creatorProfileImageUrl} alt="칭호 이미지" />
         <div className="infoBox">
           <div className="username">{creatorNickname}</div>
-          <div className="usertitle" style={{ color: titleColor }}>
+          <div className="usertitle" style={{ color: aliasColor }}>
             {alias}
           </div>
         </div>
