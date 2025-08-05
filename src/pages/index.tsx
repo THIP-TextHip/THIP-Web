@@ -35,6 +35,7 @@ import WithdrawPage from './mypage/WithdrawPage';
 import WithdrawDonePage from './mypage/WithdrawDonePage';
 import EditPage from './mypage/EditPage';
 import Notice from './notice/Notice';
+import ParticipatedGroupDetail from './groupDetail/ParticipatedGroupDetail';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -51,6 +52,7 @@ const Router = () => {
         <Route path="group/create" element={<CreateGroup />} />
         <Route path="group/search" element={<GroupSearch />} />
         <Route path="group/detail" element={<GroupDetail />} />
+        <Route path="group/detail/joined" element={<ParticipatedGroupDetail />} />
         <Route path="memory" element={<Memory />} />
         <Route path="memory/record/write" element={<RecordWrite />} />
         <Route path="memory/poll/write" element={<PollWrite />} />
