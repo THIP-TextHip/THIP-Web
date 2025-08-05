@@ -28,7 +28,6 @@ const Profile = ({
 }: ProfileProps) => {
   const [followed, setFollowed] = useState(isFollowing);
 
-  // isFollowing prop이 변경될 때 내부 상태 업데이트
   useEffect(() => {
     setFollowed(isFollowing);
   }, [isFollowing]);
@@ -49,8 +48,8 @@ const Profile = ({
       console.log('API 응답:', response);
 
       // API 응답으로 팔로우 상태 업데이트
-      setFollowed(response.isFollowing);
-      console.log(`${nickname} - ${response.isFollowing ? '띱 완료' : '띱 취소'}`);
+      setFollowed(response.data.isFollowing);
+      console.log(`${nickname} - ${response.data.isFollowing ? '띱 완료' : '띱 취소'}`);
     } catch (error) {
       console.error('팔로우/언팔로우 실패:', error);
       // 에러 발생 시 상태 변경하지 않음

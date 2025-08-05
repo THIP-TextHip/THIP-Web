@@ -5,7 +5,12 @@ export interface FollowRequest {
 }
 
 export interface FollowResponse {
-  isFollowing: boolean; // 바뀐 팔로우 상태
+  isSuccess: boolean;
+  code: number;
+  message: string;
+  data: {
+    isFollowing: boolean; // 바뀐 팔로우 상태
+  };
 }
 
 export interface FollowErrorResponse {

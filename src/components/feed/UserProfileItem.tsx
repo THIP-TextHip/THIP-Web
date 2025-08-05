@@ -30,8 +30,8 @@ const UserProfileItem = ({
     try {
       const response = await postFollow(userId, !followed);
       // API 응답으로 팔로우 상태 업데이트
-      setFollowed(response.isFollowing);
-      console.log(`${nickName} - ${response.isFollowing ? '띱 완료' : '띱 취소 완료'}`);
+      setFollowed(response.data.isFollowing);
+      console.log(`${nickName} - ${response.data.isFollowing ? '띱 완료' : '띱 취소'}`);
     } catch (error) {
       console.error('팔로우/언팔로우 실패:', error);
     }

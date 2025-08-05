@@ -3,6 +3,7 @@ export interface FollowData {
   nickname: string;
   profileImageUrl: string;
   aliasName: string;
-  aliasColor: string;
-  followerCount: number;
+  aliasColor?: string;
+  followerCount?: number;
+  isFollowing?: boolean;
 }

@@ -2,9 +2,14 @@ import { apiClient } from '../index';
 import type { FollowData } from '@/types/follow';
 
 export interface FollowingListResponse {
-  followings: FollowData[];
-  nextCursor: string;
-  isLast: boolean;
+  isSuccess: boolean;
+  code: number;
+  message: string;
+  data: {
+    followings: FollowData[];
+    nextCursor: string;
+    isLast: boolean;
+  };
 }
 
 export interface GetFollowingListParams {

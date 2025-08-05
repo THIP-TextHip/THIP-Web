@@ -4,7 +4,7 @@ export interface UserProfileItemProps {
   profileImgUrl: string;
   nickName: string;
   aliasName: string;
-  aliasColor: string;
+  aliasColor?: string;
   followerCount?: number;
   isFollowing?: boolean;
   userId: number;

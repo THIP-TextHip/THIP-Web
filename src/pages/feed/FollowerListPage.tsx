@@ -21,7 +21,7 @@ const FollowerListPage = () => {
   const [retryCount, setRetryCount] = useState(0);
   const [nextCursor, setNextCursor] = useState<string>('');
   const [isLast, setIsLast] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
+  // const [totalCount, setTotalCount] = useState(0);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -51,13 +51,18 @@ const FollowerListPage = () => {
         }
 
         // type에 따라 적절한 데이터 추출
-        const userData =
-          type === 'followerlist'
-            ? (response as { followers: FollowData[] }).followers || []
-            : (response as { followings: FollowData[] }).followings || [];
+        let userData: FollowData[] = [];
+        if (type === 'followerlist') {
+          userData = (response.data as { followers: FollowData[] })?.followers || [];
+        } else {
+          userData = (response.data as { followings: FollowData[] })?.followings || [];
+        }
+
+        console.log('API 응답:', response);
+        console.log('추출된 사용자 데이터:', userData);
 
         // API 응답이 유효한지 확인
-        if (!response) {
+        if (!response || !response.data) {
           console.error('API 응답이 없습니다.');
           setError('API 응답이 없습니다.');
           return;
@@ -71,9 +76,9 @@ const FollowerListPage = () => {
           setUserList(userData);
         }
 
-        setNextCursor(response.nextCursor);
-        setIsLast(response.isLast);
-        setTotalCount(prev => prev + userData.length);
+        setNextCursor(response.data.nextCursor);
+        setIsLast(response.data.isLast);
+        // setTotalCount(prev => prev + userData.length);
         setRetryCount(0);
       } catch (error) {
         console.error('사용자 목록 로드 실패:', error);
@@ -107,7 +112,7 @@ const FollowerListPage = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [loading, isLast, error, retryCount, nextCursor, loadUserList]);
+  }, [isLast, error, retryCount, nextCursor, loadUserList]);
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -117,7 +122,7 @@ const FollowerListPage = () => {
   return (
     <Wrapper>
       <TitleHeader leftIcon={<img src={leftArrow} />} onLeftClick={handleBackClick} title={title} />
-      <TotalBar>전체 {totalCount}</TotalBar>
+      <TotalBar>전체 {userList.length}</TotalBar>
       <UserProfileList>
         {userList.map((user, index) => (
           <UserProfileItem
@@ -129,6 +134,7 @@ const FollowerListPage = () => {
             followerCount={user.followerCount}
             userId={user.userId}
             type={type as UserProfileType}
+            isFollowing={user.isFollowing}
             isLast={index === userList.length - 1}
           />
         ))}
@@ -143,6 +149,7 @@ const Wrapper = styled.div`
   align-items: center;
   min-width: 320px;
   max-width: 767px;
+  padding: 0 20px;
   margin: 0 auto;
   background-color: var(--color-black-main);
 `;
