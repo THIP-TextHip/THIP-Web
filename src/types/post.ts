@@ -21,11 +21,15 @@ export interface FeedListProps {
   showHeader: boolean;
   posts: PostData[];
   isMyFeed?: boolean;
+  isTotalFeed?: boolean;
+  isLast?: boolean;
 }
 
 export interface FeedPostProps extends PostData {
   showHeader?: boolean;
   isMyFeed?: boolean;
+  isTotalFeed?: boolean;
+  isLast?: boolean;
 }
 
 export type PostBodyProps = Pick<
@@ -41,7 +45,7 @@ export interface SubReplyDataProps {
   replyCommentContent: string;
   replyCommentUserTitle: string;
   replyCommentId: number;
-  titleColor: string;
+  aliasColor: string;
   postDate: string;
   likeCount: number;
   isLike: boolean;
@@ -54,7 +58,7 @@ export interface ReplyDataProps {
   imageUrl: string;
   nickName: string;
   userTitle: string;
-  titleColor: string;
+  aliasColor: string;
   createdAt: string;
   postDate: string;
   content: string;

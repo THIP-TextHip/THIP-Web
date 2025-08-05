@@ -22,7 +22,7 @@ export interface GetMyFeedParams {
 }
 
 // 내 피드 조회 API 함수
-export const getMyFeeds = async (params?: GetMyFeedParams): Promise<MyFeedResponse> => {
+export const getMyFeeds = async (params?: GetMyFeedParams) => {
   const queryParams = new URLSearchParams();
 
   // cursor가 있을 때만 쿼리 파라미터에 추가

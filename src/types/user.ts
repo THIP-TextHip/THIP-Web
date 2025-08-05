@@ -6,7 +6,7 @@ export interface UserProfileItemProps {
   userTitle: string;
   titleColor: string;
   followerCount?: number;
-  isFollowed?: boolean;
+  isFollowing?: boolean;
   userId: number;
   isLast?: boolean;
   type?: UserProfileType;

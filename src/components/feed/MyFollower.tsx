@@ -53,24 +53,23 @@ const Container = styled.div`
   }
 `;
 
-interface Follower {
-  id: string;
-  profileImageUrl: string;
+interface MyFollowerProps {
+  userId?: string;
+  followerCount: number;
+  latestFollowerProfileImageUrls?: string[];
 }
 
-const MyFollower = () => {
+const MyFollower = ({
+  userId,
+  followerCount = 0,
+  latestFollowerProfileImageUrls = [],
+}: MyFollowerProps) => {
   const navigate = useNavigate();
-  const followers: Follower[] = [
-    { id: '1', profileImageUrl: 'https://placehold.co/24x24' },
-    { id: '2', profileImageUrl: 'https://placehold.co/24x24' },
-    { id: '3', profileImageUrl: 'https://placehold.co/24x24' },
-    { id: '4', profileImageUrl: 'https://placehold.co/24x24' },
-    { id: '5', profileImageUrl: 'https://placehold.co/24x24' },
-    { id: '6', profileImageUrl: 'https://placehold.co/24x24' },
-  ];
 
   const handleMoreClick = () => {
-    navigate('/follow/followerlist');
+    if (userId) {
+      navigate(`/follow/followerlist/${userId}`);
+    }
   };
 
   return (
@@ -78,14 +77,14 @@ const MyFollower = () => {
       <div className="left">
         <img src={people} />
         <div className="textContainer">
-          <div className="followerNum">{followers.length}명</div>
+          <div className="followerNum">{followerCount}명</div>
           <div className="disc">이 구독중</div>
         </div>
       </div>
-      {followers.length > 0 && (
+      {followerCount > 0 && (
         <div className="right" onClick={handleMoreClick}>
-          {followers.slice(0, 5).map(f => (
-            <img className="profileImg" key={f.id} src={f.profileImageUrl} alt="구독자" />
+          {latestFollowerProfileImageUrls.slice(0, 5).map((imageUrl, index) => (
+            <img className="profileImg" key={index} src={imageUrl} alt="나를 띱한 유저들" />
           ))}
           <img src={rightArrow} />
         </div>

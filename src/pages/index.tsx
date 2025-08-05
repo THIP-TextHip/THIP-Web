@@ -62,7 +62,7 @@ const Router = () => {
         <Route path="search/book" element={<SearchBook />} />
         <Route path="search/book/group" element={<SearchBookGroup />} />
         <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
-        <Route path="follow/:type" element={<FollowerListPage />} />
+        <Route path="follow/:type/:userId" element={<FollowerListPage />} />
         <Route path="today-words" element={<TodayWords />} />
         <Route path="mypage" element={<Mypage />} />
         <Route path="mypage/save" element={<SavePage />} />

@@ -7,6 +7,7 @@ import comment from '../../../assets/feed/comment.svg';
 import save from '../../../assets/feed/save.svg';
 import activeSave from '../../../assets/feed/activeSave.svg';
 import lockIcon from '../../../assets/feed/lockIcon.svg';
+import { postSaveFeed } from '@/api/feeds/postSave';
 
 const Container = styled.div<{ isDetail: boolean }>`
   width: 100%;
@@ -74,8 +75,20 @@ const PostFooter = ({
     setLikeCount(prev => (liked ? prev - 1 : prev + 1));
   };
 
-  const handleSave = () => {
-    setSaved(!saved);
+  const handleSave = async () => {
+    try {
+      const response = await postSaveFeed(feedId, !saved);
+
+      if (response.isSuccess) {
+        // 성공 시 상태 업데이트
+        setSaved(response.data?.isSaved ?? !saved);
+        console.log('저장 상태 변경 성공:', response.data?.isSaved);
+      } else {
+        console.error('저장 상태 변경 실패:', response.message);
+      }
+    } catch (error) {
+      console.error('저장 API 호출 실패:', error);
+    }
   };
 
   const handleComment = () => {

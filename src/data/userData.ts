@@ -8,6 +8,7 @@ export const mockUserList: UserProfileItemProps[] = [
     titleColor: '#FF8BAC',
     followerCount: 15,
     userId: 9,
+    isFollowing: false,
   },
   {
     profileImgUrl: 'https://placehold.co/36x36',
@@ -16,7 +17,7 @@ export const mockUserList: UserProfileItemProps[] = [
     titleColor: '#FF8BAC',
     followerCount: 15,
     userId: 1,
-    isFollowed: true,
+    isFollowing: true,
   },
   {
     profileImgUrl: 'https://placehold.co/36x36',
@@ -25,7 +26,7 @@ export const mockUserList: UserProfileItemProps[] = [
     titleColor: '#A0F8E8',
     followerCount: 15,
     userId: 2,
-    isFollowed: false,
+    isFollowing: false,
   },
   {
     profileImgUrl: 'https://placehold.co/36x36',
@@ -34,5 +35,6 @@ export const mockUserList: UserProfileItemProps[] = [
     titleColor: '#A0F8E8',
     followerCount: 7,
     userId: 3,
+    isFollowing: false,
   },
 ];
