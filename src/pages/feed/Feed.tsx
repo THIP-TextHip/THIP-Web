@@ -6,17 +6,11 @@ import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
 import writefab from '../../assets/common/writefab.svg';
-import { mockPosts } from '@/data/postData';
+// import { mockPosts } from '@/data/postData';
 import { useNavigate } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
 import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import type { PostData } from '@/types/post';
-
-const Container = styled.div`
-  min-width: 320px;
-  max-width: 767px;
-  margin: 0 auto;
-`;
 
 const tabs = ['피드', '내 피드'];
 
@@ -41,14 +35,20 @@ const Feed = () => {
   };
 
   // 전체 피드 로드 함수
-  const loadTotalFeeds = async (cursor?: string) => {
+  const loadTotalFeeds = async (_cursor?: string) => {
     try {
       setTotalLoading(true);
-      const response = await getTotalFeeds(cursor ? { cursor } : undefined);
 
-      if (cursor) {
-        // 다음 페이지 데이터 추가
-        setTotalFeedPosts(prev => [...prev, ...response.data.feedList]);
+      // cursor가 있으면 다음 페이지, 없으면 첫 페이지
+      const response = await getTotalFeeds(_cursor ? { cursor: _cursor } : undefined);
+
+      if (_cursor) {
+        // 다음 페이지 데이터 추가 (무한 스크롤) - 중복 제거
+        setTotalFeedPosts(prev => {
+          const existingIds = new Set(prev.map(post => post.feedId));
+          const newPosts = response.data.feedList.filter(post => !existingIds.has(post.feedId));
+          return [...prev, ...newPosts];
+        });
       } else {
         // 첫 페이지 데이터 설정
         setTotalFeedPosts(response.data.feedList);
@@ -58,20 +58,18 @@ const Feed = () => {
       setTotalIsLast(response.data.isLast);
     } catch (error) {
       console.error('전체 피드 로드 실패:', error);
-      // 에러 시 mockPosts 사용 (fallback)
-      setTotalFeedPosts(mockPosts);
     } finally {
       setTotalLoading(false);
     }
   };
 
   // 내 피드 로드 함수
-  const loadMyFeeds = async (cursor?: string) => {
+  const loadMyFeeds = async (_cursor?: string) => {
     try {
       setMyLoading(true);
-      const response = await getMyFeeds(cursor ? { cursor } : undefined);
+      const response = await getMyFeeds(_cursor ? { cursor: _cursor } : undefined);
 
-      if (cursor) {
+      if (_cursor) {
         // 다음 페이지 데이터 추가
         setMyFeedPosts(prev => [...prev, ...response.data.feedList]);
       } else {
@@ -83,8 +81,6 @@ const Feed = () => {
       setMyIsLast(response.data.isLast);
     } catch (error) {
       console.error('내 피드 로드 실패:', error);
-      // 에러 시 mockPosts 사용 (fallback)
-      setMyFeedPosts(mockPosts);
     } finally {
       setMyLoading(false);
     }
@@ -135,8 +131,8 @@ const Feed = () => {
     window.scrollTo(0, 0);
   }, [activeTab]);
 
+  // 탭별로 API 호출
   useEffect(() => {
-    // 탭별로 API 호출
     if (activeTab === '피드') {
       loadTotalFeeds();
     } else if (activeTab === '내 피드') {
@@ -150,16 +146,27 @@ const Feed = () => {
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {activeTab === '피드' ? (
         <>
-          <TotalFeed showHeader={true} posts={totalFeedPosts} isMyFeed={false} />
+          <TotalFeed
+            showHeader={true}
+            posts={totalFeedPosts}
+            isMyFeed={false}
+            isLast={totalIsLast}
+          />
         </>
       ) : (
         <>
-          <MyFeed showHeader={false} posts={myFeedPosts} isMyFeed={true} />
+          <MyFeed showHeader={false} posts={myFeedPosts} isMyFeed={true} isLast={myIsLast} />
         </>
       )}
       <NavBar src={writefab} path="/" />
     </Container>
   );
 };
+
+const Container = styled.div`
+  min-width: 320px;
+  max-width: 767px;
+  margin: 0 auto;
+`;
 
 export default Feed;
