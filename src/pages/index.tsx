@@ -63,10 +63,7 @@ const Router = () => {
         <Route path="search/book/group" element={<SearchBookGroup />} />
         <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
         <Route path="follow/:type/:userId" element={<FollowerListPage />} />
-<<<<<<< HEAD
         <Route path="follow/:type" element={<FollowerListPage />} />
-=======
->>>>>>> 6a2adf7ddfde45db71e7551654c2c9857e703a4f
         <Route path="today-words" element={<TodayWords />} />
         <Route path="mypage" element={<Mypage />} />
         <Route path="mypage/save" element={<SavePage />} />
