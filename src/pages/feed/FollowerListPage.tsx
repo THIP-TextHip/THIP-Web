@@ -1,31 +1,135 @@
 import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import UserProfileItem from '@/components/feed/UserProfileItem';
-import { mockUserList } from '@/data/userData';
 import type { UserProfileType } from '@/types/user';
+import { getFollowerList } from '@/api/users/getFollowerList';
+import { getFollowingList } from '@/api/users/getFollowingList';
+import type { FollowData } from '@/types/follow';
 
 const FollowerListPage = () => {
   const navigate = useNavigate();
-  const { type } = useParams<{ type: UserProfileType }>();
+  const { type, userId } = useParams<{ type: UserProfileType; userId?: string }>();
   const title = type === 'followerlist' ? '띱 목록' : '내 띱 목록';
+
+  // 상태 관리
+  const [userList, setUserList] = useState<FollowData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [nextCursor, setNextCursor] = useState<string>('');
+  const [isLast, setIsLast] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+
   const handleBackClick = () => {
     navigate(-1);
   };
-  const totalCount = mockUserList.length;
+
+  // API 호출 함수
+  const loadUserList = useCallback(
+    async (cursor?: string) => {
+      if (loading) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+        let response;
+
+        if (type === 'followerlist') {
+          // 띱 목록 API 호출
+          if (!userId) {
+            console.error('userId가 없습니다.');
+            setError('사용자 ID가 없습니다.');
+            return;
+          }
+          response = await getFollowerList(userId, { size: 10, cursor: cursor || null });
+        } else {
+          // 내 띱 목록 API 호출
+          response = await getFollowingList({ size: 10, cursor: cursor || null });
+        }
+
+        // type에 따라 적절한 데이터 추출
+        const userData =
+          type === 'followerlist'
+            ? (response as { followers: FollowData[] }).followers || []
+            : (response as { followings: FollowData[] }).followings || [];
+
+        // API 응답이 유효한지 확인
+        if (!response) {
+          console.error('API 응답이 없습니다.');
+          setError('API 응답이 없습니다.');
+          return;
+        }
+
+        if (cursor) {
+          // 다음 페이지 데이터 추가 (무한 스크롤)
+          setUserList(prev => [...prev, ...userData]);
+        } else {
+          // 첫 페이지 데이터 설정
+          setUserList(userData);
+        }
+
+        setNextCursor(response.nextCursor);
+        setIsLast(response.isLast);
+        setTotalCount(prev => prev + userData.length);
+        setRetryCount(0);
+      } catch (error) {
+        console.error('사용자 목록 로드 실패:', error);
+        setError('사용자 목록을 불러오는데 실패했습니다.');
+        setRetryCount(prev => prev + 1);
+        // 에러 발생 시 로딩 상태를 false로 설정하여 무한 요청 방지
+      } finally {
+        setLoading(false);
+      }
+    },
+    [type, userId],
+  );
+
+  // 무한 스크롤 구현
+  useEffect(() => {
+    const handleScroll = () => {
+      // 로딩 중이거나 마지막 페이지이거나 에러가 있거나 재시도 횟수 초과시 요청하지 않음
+      if (loading || isLast || error || retryCount >= 3 || !nextCursor) {
+        console.log('스크롤 요청 차단:', { loading, isLast, error, retryCount, nextCursor });
+        return;
+      }
+
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      if (scrollTop + windowHeight >= documentHeight - 200) {
+        loadUserList(nextCursor);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loading, isLast, error, retryCount, nextCursor, loadUserList]);
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    loadUserList();
+  }, [loadUserList]);
 
   return (
     <Wrapper>
       <TitleHeader leftIcon={<img src={leftArrow} />} onLeftClick={handleBackClick} title={title} />
       <TotalBar>전체 {totalCount}</TotalBar>
       <UserProfileList>
-        {mockUserList.map((user, index) => (
+        {userList.map((user, index) => (
           <UserProfileItem
-            key={index}
-            {...user}
+            key={user.userId}
+            profileImgUrl={user.profileImageUrl}
+            nickName={user.nickname}
+            aliasName={user.aliasName}
+            aliasColor={user.aliasColor}
+            followerCount={user.followerCount}
+            userId={user.userId}
             type={type as UserProfileType}
-            isLast={index === mockUserList.length - 1}
+            isLast={index === userList.length - 1}
           />
         ))}
       </UserProfileList>
