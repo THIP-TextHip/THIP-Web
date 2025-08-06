@@ -156,11 +156,10 @@ const Wrapper = styled.div`
 const TotalBar = styled.div`
   position: fixed;
   top: 0;
-  width: 100%;
+  width: calc(100% - 40px);
   min-width: 320px;
   max-width: 540px;
-  padding-top: 76px;
-  padding-bottom: 4px;
+  padding: 76px 0 4px 0;
   border-bottom: 1px solid var(--color-darkgrey-dark);
   background-color: var(--color-black-main);
 
