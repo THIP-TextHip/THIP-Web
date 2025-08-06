@@ -15,33 +15,10 @@ import {
   Tag,
   TagGenre,
 } from './GroupDetail.styled';
-import {
-  RecordSection,
-  RecordSectionHeader,
-  RecordSectionTitle,
-  RecordSectionChevron,
-  RecordSectionContent,
-  BookTitle,
-  CurrentPage,
-  ProgressSection,
-  ProgressBar,
-  ProgressBarFill,
-  ProgressText,
-  CommentSection,
-  CommentSectionHeader,
-  CommentContent,
-  CommentText,
-  HotTopicSection,
-  HotTopicSectionHeader,
-  HotTopicContent,
-  HotTopicText,
-  VoteOptionsList,
-  VoteOption,
-  VoteOptionNumber,
-  VoteOptionText,
-  Pagination,
-  PaginationDot,
-} from './ParticipatedGroupDetail.styled';
+import RecordSection from '../../components/group/RecordSection';
+import CommentSection from '../../components/group/CommentSection';
+import HotTopicSection from '../../components/group/HotTopicSection';
+import type { VoteOption } from '../../components/group/HotTopicSection';
 
 import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
@@ -51,7 +28,6 @@ import { mockGroupDetail } from '../../mocks/groupDetail.mock';
 import lockIcon from '../../assets/group/lock.svg';
 import calendarIcon from '../../assets/group/calendar.svg';
 import peopleIcon from '../../assets/common/darkPeople.svg';
-import rightChevron from '../../assets/common/right-Chevron.svg';
 
 const ParticipatedGroupDetail = () => {
   const { title, isPrivate, introduction, activityPeriod, members, ddayText, genre } =
@@ -75,6 +51,28 @@ const ParticipatedGroupDetail = () => {
 
   const handleHotTopicSectionClick = () => {
     // 뜨거운 감자 페이지로 이동
+  };
+
+  // 모킹 데이터
+  const recordData = {
+    bookAuthor: '최정화 저',
+    currentPage: 1,
+    progress: 30,
+  };
+
+  const commentData = {
+    message: '모임방 멤버들과 간단한 인사를 나눠보세요!',
+  };
+
+  const hotTopicData = {
+    topicText: '투표 1개 내용입니다...',
+    voteOptions: [
+      { id: '1', text: '김땡땡' },
+      { id: '2', text: '김땡땡' },
+      { id: '3', text: '김땡땡' },
+    ] as VoteOption[],
+    currentPage: 0,
+    totalPages: 3,
   };
 
   return (
@@ -120,61 +118,22 @@ const ParticipatedGroupDetail = () => {
         </BannerSection>
       </TopBackground>
 
-      <RecordSection>
-        <RecordSectionHeader onClick={handleRecordSectionClick}>
-          <RecordSectionTitle>기록장</RecordSectionTitle>
-          <RecordSectionChevron src={rightChevron} alt="기록장 이동 버튼" />
-        </RecordSectionHeader>
-        <RecordSectionContent>
-          <BookTitle>최정화 저</BookTitle>
-          <CurrentPage>현재 페이지 1</CurrentPage>
-          <ProgressSection>
-            <ProgressBar>
-              <ProgressBarFill progress={30} />
-            </ProgressBar>
-            <ProgressText>30%</ProgressText>
-          </ProgressSection>
-        </RecordSectionContent>
-      </RecordSection>
+      <RecordSection
+        bookAuthor={recordData.bookAuthor}
+        currentPage={recordData.currentPage}
+        progress={recordData.progress}
+        onClick={handleRecordSectionClick}
+      />
 
-      <CommentSection>
-        <CommentSectionHeader onClick={handleCommentSectionClick}>
-          <RecordSectionTitle>오늘의 한마디</RecordSectionTitle>
-          <RecordSectionChevron src={rightChevron} alt="한마디 이동 버튼" />
-        </CommentSectionHeader>
-        <CommentContent>
-          <CommentText>모임방 멤버들과 간단한 인사를 나눠보세요!</CommentText>
-        </CommentContent>
-      </CommentSection>
+      <CommentSection message={commentData.message} onClick={handleCommentSectionClick} />
 
-      <HotTopicSection>
-        <HotTopicSectionHeader onClick={handleHotTopicSectionClick}>
-          <RecordSectionTitle>모임방의 뜨거운 감자</RecordSectionTitle>
-          <RecordSectionChevron src={rightChevron} alt="뜨거운 감자 이동 버튼" />
-        </HotTopicSectionHeader>
-        <HotTopicContent>
-          <HotTopicText>투표 1개 내용입니다...</HotTopicText>
-          <VoteOptionsList>
-            <VoteOption>
-              <VoteOptionNumber>1.</VoteOptionNumber>
-              <VoteOptionText>김땡땡</VoteOptionText>
-            </VoteOption>
-            <VoteOption>
-              <VoteOptionNumber>1.</VoteOptionNumber>
-              <VoteOptionText>김땡땡</VoteOptionText>
-            </VoteOption>
-            <VoteOption>
-              <VoteOptionNumber>1.</VoteOptionNumber>
-              <VoteOptionText>김땡땡</VoteOptionText>
-            </VoteOption>
-          </VoteOptionsList>
-          <Pagination>
-            <PaginationDot active />
-            <PaginationDot />
-            <PaginationDot />
-          </Pagination>
-        </HotTopicContent>
-      </HotTopicSection>
+      <HotTopicSection
+        topicText={hotTopicData.topicText}
+        voteOptions={hotTopicData.voteOptions}
+        currentPage={hotTopicData.currentPage}
+        totalPages={hotTopicData.totalPages}
+        onClick={handleHotTopicSectionClick}
+      />
     </Wrapper>
   );
 };
