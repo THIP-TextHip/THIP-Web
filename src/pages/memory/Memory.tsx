@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { SortType } from '../../components/memory/SortDropdown';
 import MemoryHeader from '../../components/memory/MemoryHeader/MemoryHeader';
@@ -32,6 +32,14 @@ export interface PollOption {
   isHighest?: boolean;
 }
 
+const addRecordIfNotExists = (prevRecords: Record[], newRecord: Record) => {
+  const exists = prevRecords.some(record => record.id === newRecord.id);
+  if (exists) {
+    return prevRecords;
+  }
+  return [newRecord, ...prevRecords];
+};
+
 const Memory = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,6 +51,9 @@ const Memory = () => {
   const [selectedPageRange, setSelectedPageRange] = useState<{ start: number; end: number } | null>(
     null,
   );
+
+  // 업로드 프로그레스 상태
+  const [showUploadProgress, setShowUploadProgress] = useState(false);
 
   // 개발용 상태 - 기록 유무 전환
   const [hasRecords, setHasRecords] = useState(true);
@@ -57,27 +68,27 @@ const Memory = () => {
       user: 'user.01',
       userPoints: 132,
       content:
-        '내 생각에 이 부분이 가장 어려운 것 같다. 비유도 난해하고 잘 이해가 가지 않는데 다른 메이트들은 어떻게 읽었나요?',
-      likeCount: 50,
-      commentCount: 25,
+        '공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다. 공백 포함 글자 입력입니다.',
+      likeCount: 123,
+      commentCount: 123,
       timeAgo: '12시간 전',
       createdAt: new Date('2024-01-15T12:00:00'),
       type: 'text',
       recordType: 'page',
-      pageRange: '123',
+      pageRange: '132',
     },
     {
       id: '2',
       user: 'user.01',
-      userPoints: 12,
-      content: '3연에 나오는 심장은 무엇을 의미하는 걸까요?',
+      userPoints: 132,
+      content: '공백 포함 글자 입력입니다.',
       likeCount: 123,
-      commentCount: 45,
-      timeAgo: '8시간 전',
+      commentCount: 123,
+      timeAgo: '12시간 전',
       createdAt: new Date('2024-01-15T16:00:00'),
       type: 'poll',
       recordType: 'page',
-      pageRange: '456',
+      pageRange: '132',
       pollOptions: [
         {
           id: '1.',
@@ -93,39 +104,26 @@ const Memory = () => {
         },
       ],
     },
-    {
-      id: '3',
-      user: 'user.02',
-      userPoints: 89,
-      content: '공백 포함 글자 입력입니다.',
-      likeCount: 75,
-      commentCount: 15,
-      timeAgo: '4시간 전',
-      createdAt: new Date('2024-01-15T20:00:00'),
-      type: 'text',
-      recordType: 'overall',
-    },
   ]);
 
   // location.state에서 새로 추가된 기록 확인
   React.useEffect(() => {
     if (location.state?.newRecord) {
-      const newRecord = location.state.newRecord as Record;
-
-      // 중복 확인을 위한 함수
-      const addRecordIfNotExists = (prevRecords: Record[]) => {
-        const exists = prevRecords.some(record => record.id === newRecord.id);
-        if (exists) {
-          return prevRecords;
-        }
-        return [newRecord, ...prevRecords];
+      const { isUploading, ...recordData } = location.state.newRecord as Record & {
+        isUploading?: boolean;
       };
 
-      // 내 기록에 추가
-      setMyRecords(prev => addRecordIfNotExists(prev));
+      if (isUploading) {
+        // 업로드 프로그레스 시작
+        setShowUploadProgress(true);
 
-      // 그룹 기록에도 추가 (내가 작성한 기록도 그룹에 표시)
-      setGroupRecords(prev => addRecordIfNotExists(prev));
+        const finalRecord: Record = recordData;
+
+        // 내 기록에 추가
+        setMyRecords(prev => addRecordIfNotExists(prev, finalRecord));
+        // 그룹 기록에도 추가
+        setGroupRecords(prev => addRecordIfNotExists(prev, finalRecord));
+      }
 
       // 내 기록 탭으로 이동
       setActiveTab('my');
@@ -133,7 +131,12 @@ const Memory = () => {
       // state 즉시 초기화 (중복 추가 방지)
       navigate(location.pathname, { replace: true, state: null });
     }
-  }, [location.state?.newRecord?.id, navigate, location.pathname]);
+  }, [location.pathname]);
+
+  // 업로드 완료 처리
+  const handleUploadComplete = useCallback(() => {
+    setShowUploadProgress(false);
+  }, []);
 
   // 현재 표시할 기록들
   const currentRecords = useMemo(() => {
@@ -174,65 +177,63 @@ const Memory = () => {
         if (selectedPageRange) {
           // 페이지 범위가 선택된 경우, 해당 범위 내의 기록만 필터링
           return sortedRecords.filter(record => {
-            if (record.recordType === 'page' && record.pageRange) {
-              const recordPage = parseInt(record.pageRange);
-              return recordPage >= selectedPageRange.start && recordPage <= selectedPageRange.end;
-            }
-            return false;
+            if (record.recordType !== 'page' || !record.pageRange) return false;
+            const recordPage = parseInt(record.pageRange);
+            return recordPage >= selectedPageRange.start && recordPage <= selectedPageRange.end;
           });
         } else {
-          // 페이지 범위가 선택되지 않은 경우 모든 페이지 기록 표시
+          // 페이지별 보기: 총평이 아닌 기록만 표시
           return sortedRecords.filter(record => record.recordType === 'page');
         }
       case 'overall':
+        // 총평 보기: 총평 기록만 표시
         return sortedRecords.filter(record => record.recordType === 'overall');
       default:
         return sortedRecords;
     }
-  }, [sortedRecords, activeFilter, activeTab, selectedPageRange]);
+  }, [activeTab, activeFilter, selectedPageRange, sortedRecords]);
 
-  const handleBackClick = () => {
-    navigate(-1);
-  };
+  const handleBackClick = useCallback(() => {
+    navigate('/group');
+  }, [navigate]);
 
-  const handleTabChange = (tab: RecordType) => {
+  const handleTabChange = useCallback((tab: RecordType) => {
     setActiveTab(tab);
-  };
-
-  const handleFilterChange = (filter: FilterType) => {
-    if (filter === 'page') {
-      setActiveFilter(filter);
-    } else if (filter === 'overall') {
-      if (readingProgress < 80) {
-        setShowSnackbar(true);
-        return;
-      }
-      setActiveFilter(filter);
-      setSelectedPageRange(null);
-    }
-  };
-
-  const handleSortChange = (sort: SortType) => {
-    setSelectedSort(sort);
-    console.log('정렬 변경:', sort);
-  };
-
-  const handleSnackbarClose = () => {
-    setShowSnackbar(false);
-  };
-
-  const handlePageRangeClear = () => {
+    // 탭 변경 시 필터 초기화
     setActiveFilter(null);
     setSelectedPageRange(null);
-  };
+  }, []);
 
-  const handlePageRangeSet = (range: { start: number; end: number }) => {
+  const handleFilterChange = useCallback(
+    (filter: FilterType) => {
+      if (activeFilter === filter) {
+        // 같은 필터를 다시 클릭하면 해제
+        setActiveFilter(null);
+        setSelectedPageRange(null);
+      } else {
+        setActiveFilter(filter);
+        setSelectedPageRange(null);
+      }
+    },
+    [activeFilter],
+  );
+
+  const handleSortChange = useCallback((sort: SortType) => {
+    setSelectedSort(sort);
+  }, []);
+
+  const handlePageRangeClear = useCallback(() => {
+    setSelectedPageRange(null);
+  }, []);
+
+  const handlePageRangeSet = useCallback((range: { start: number; end: number }) => {
     setSelectedPageRange(range);
-  };
+    setActiveFilter('page'); // 페이지 범위 설정 시 페이지별 보기로 자동 변경
+  }, []);
 
-  const toggleRecords = () => {
+  const handleToggleRecords = useCallback(() => {
     setHasRecords(!hasRecords);
-  };
+  }, [hasRecords]);
 
   return (
     <Container>
@@ -248,27 +249,29 @@ const Memory = () => {
           selectedSort={selectedSort}
           records={filteredRecords}
           selectedPageRange={selectedPageRange}
-          hasRecords={activeTab === 'my' ? myRecords.length > 0 : hasRecords}
+          hasRecords={hasRecords}
+          showUploadProgress={showUploadProgress}
           onTabChange={handleTabChange}
           onFilterChange={handleFilterChange}
           onSortChange={handleSortChange}
           onPageRangeClear={handlePageRangeClear}
           onPageRangeSet={handlePageRangeSet}
-          onToggleRecords={toggleRecords}
+          onToggleRecords={handleToggleRecords}
+          onUploadComplete={handleUploadComplete}
         />
       </ScrollableContent>
 
       <FloatingElements>
         <MemoryAddButton />
-
-        {showSnackbar && (
-          <Snackbar
-            message="독서 진행도 80% 이상부터 총평을 볼 수 있어요."
-            variant="top"
-            onClose={handleSnackbarClose}
-          />
-        )}
       </FloatingElements>
+
+      {showSnackbar && (
+        <Snackbar
+          message="기록이 성공적으로 저장되었습니다!"
+          variant="bottom"
+          onClose={() => setShowSnackbar(false)}
+        />
+      )}
     </Container>
   );
 };

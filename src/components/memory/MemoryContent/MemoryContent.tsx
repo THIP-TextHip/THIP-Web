@@ -5,6 +5,7 @@ import RecordFilters from '../RecordFilters/RecordFilters';
 import RecordInfoMessage from '../RecordInfoMessage';
 import EmptyRecord from '../EmptyRecord';
 import RecordList from './RecordList';
+import UploadProgressBar from '../UploadProgressBar/UploadProgressBar';
 import { Content, FixedSection, ScrollableSection, DevButton } from './MemoryContent.styled';
 
 interface MemoryContentProps {
@@ -15,12 +16,14 @@ interface MemoryContentProps {
   records: Record[];
   selectedPageRange: { start: number; end: number } | null;
   hasRecords: boolean;
+  showUploadProgress: boolean;
   onTabChange: (tab: RecordType) => void;
   onFilterChange: (filter: FilterType) => void;
   onSortChange: (sort: SortType) => void;
   onPageRangeClear: () => void;
   onPageRangeSet: (range: { start: number; end: number }) => void;
   onToggleRecords: () => void;
+  onUploadComplete: () => void;
 }
 
 const MemoryContent = ({
@@ -31,12 +34,14 @@ const MemoryContent = ({
   records,
   selectedPageRange,
   hasRecords,
+  showUploadProgress,
   onTabChange,
   onFilterChange,
   onSortChange,
   onPageRangeClear,
   onPageRangeSet,
   onToggleRecords,
+  onUploadComplete,
 }: MemoryContentProps) => {
   return (
     <Content>
@@ -46,6 +51,9 @@ const MemoryContent = ({
       {/* 고정 영역: 탭과 필터만 */}
       <FixedSection>
         <RecordTabs activeTab={activeTab} onTabChange={onTabChange} />
+
+        {/* 업로드 프로그레스 바 - 탭 바로 아래에 위치 */}
+        <UploadProgressBar isVisible={showUploadProgress} onComplete={onUploadComplete} />
 
         {/* 그룹 기록일 때만 필터 표시 */}
         {activeTab === 'group' && (
