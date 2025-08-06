@@ -46,7 +46,7 @@ const ParticipatedGroupDetail = () => {
   };
 
   const handleCommentSectionClick = () => {
-    // 한마디 작성 페이지로 이동
+    navigate('/today-words');
   };
 
   const handleHotTopicSectionClick = () => {

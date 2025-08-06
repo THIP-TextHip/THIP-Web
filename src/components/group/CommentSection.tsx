@@ -6,7 +6,7 @@ import {
   CommentContent,
   CommentText,
 } from './CommentSection.styled';
-import rightChevron from '../../assets/common/right-Chevron.svg';
+import rightChevron from '../../assets/group/right-chevron.svg';
 
 interface CommentSectionProps {
   message: string;
