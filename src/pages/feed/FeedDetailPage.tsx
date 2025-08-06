@@ -115,7 +115,7 @@ const FeedDetailPage = () => {
         value={replyContent}
         onChange={setReplyContent}
         onSend={() => {
-          submitComment({ postId: Number(feedId), postType: 'feed' });
+          submitComment({ postId: Number(feedId), postType: 'FEED' });
         }}
         placeholder="댓글을 입력하세요"
         isReplying={isReplying}
