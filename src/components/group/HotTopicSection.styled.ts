@@ -35,8 +35,17 @@ export const HotTopicContent = styled.div`
 
 export const SlideContainer = styled.div`
   display: flex;
-  transition: transform 0.3s ease-in-out;
   touch-action: pan-x;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+`;
+
+export const SlideItem = styled.div`
+  width: 100%;
+  flex-shrink: 0;
+  padding-right: 0;
 `;
 
 export const HotTopicText = styled.p`

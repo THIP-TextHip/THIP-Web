@@ -13,8 +13,9 @@ import {
   EmptyVoteContainer,
   EmptyVoteTitle,
   SlideContainer,
+  SlideItem,
 } from './HotTopicSection.styled';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 export interface VoteOption {
   id: string;
@@ -25,54 +26,140 @@ export interface Poll {
   id: string;
   question: string;
   options: VoteOption[];
-  pageNumber: number; // 해당 투표가 위치한 페이지
+  pageNumber: number;
 }
 
 interface HotTopicSectionProps {
   polls: Poll[];
   hasPolls: boolean;
   onClick: () => void;
-  onPollClick: (pageNumber: number) => void; // 투표 클릭 시 해당 페이지로 이동
+  onPollClick: (pageNumber: number) => void;
 }
 
 const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSectionProps) => {
   const [currentPollIndex, setCurrentPollIndex] = useState(0);
   const slideRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [translateX, setTranslateX] = useState(0);
+  const [startTranslateX, setStartTranslateX] = useState(0);
+
+  const containerWidth = 100; // 각 슬라이드의 width %
 
   // 투표 옵션 클릭 시 해당 페이지로 이동
   const handleVoteClick = (poll: Poll) => {
-    onPollClick(poll.pageNumber);
+    if (!isDragging) {
+      onPollClick(poll.pageNumber);
+    }
   };
 
-  // 슬라이드 터치/드래그 처리
+  // 슬라이드 위치 계산
+  const getTargetTranslateX = (index: number) => {
+    return -index * containerWidth;
+  };
+
+  // 가장 가까운 슬라이드로 스냅
+  const snapToClosest = useCallback(() => {
+    const currentTranslate = translateX;
+    let closestIndex = Math.round(Math.abs(currentTranslate) / containerWidth);
+
+    // 범위 제한
+    closestIndex = Math.max(0, Math.min(closestIndex, polls.length - 1));
+
+    const targetTranslate = getTargetTranslateX(closestIndex);
+    setTranslateX(targetTranslate);
+    setCurrentPollIndex(closestIndex);
+  }, [translateX, polls.length]);
+
+  // 드래그 시작 (마우스/터치 공통)
+  const handleDragStart = (clientX: number) => {
+    setIsDragging(true);
+    setStartX(clientX);
+    setStartTranslateX(translateX);
+  };
+
+  // 드래그 중 (마우스/터치 공통)
+  const handleDragMove = useCallback(
+    (clientX: number) => {
+      if (!isDragging) return;
+
+      const deltaX = clientX - startX;
+      const newTranslateX = startTranslateX + (deltaX / window.innerWidth) * 100;
+
+      // 드래그 범위 제한 (약간의 오버스크롤 허용)
+      const minTranslate = getTargetTranslateX(polls.length - 1) - 20;
+      const maxTranslate = getTargetTranslateX(0) + 20;
+
+      const limitedTranslateX = Math.max(minTranslate, Math.min(maxTranslate, newTranslateX));
+      setTranslateX(limitedTranslateX);
+    },
+    [isDragging, startX, startTranslateX, polls.length],
+  );
+
+  // 드래그 끝 (마우스/터치 공통)
+  const handleDragEnd = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      snapToClosest();
+    }
+  };
+
+  // 터치 이벤트
   const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    slideRef.current?.setAttribute('data-start-x', touch.clientX.toString());
+    e.preventDefault();
+    handleDragStart(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault();
+    handleDragMove(e.touches[0].clientX);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    const touch = e.changedTouches[0];
-    const startX = parseFloat(slideRef.current?.getAttribute('data-start-x') || '0');
-    const diffX = startX - touch.clientX;
-
-    if (Math.abs(diffX) > 50) {
-      // 최소 50px 이상 드래그해야 슬라이드
-      if (diffX > 0 && currentPollIndex < polls.length - 1) {
-        // 오른쪽으로 슬라이드 (다음 투표)
-        setCurrentPollIndex(currentPollIndex + 1);
-      } else if (diffX < 0 && currentPollIndex > 0) {
-        // 왼쪽으로 슬라이드 (이전 투표)
-        setCurrentPollIndex(currentPollIndex - 1);
-      }
-    }
+    e.preventDefault();
+    handleDragEnd();
   };
+
+  // 마우스 이벤트
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleDragStart(e.clientX);
+  };
+
+  // 전역 마우스 이벤트 리스너
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      handleDragMove(e.clientX);
+    };
+
+    const handleMouseUp = () => {
+      handleDragEnd();
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, handleDragMove]);
+
+  // 인덱스 변경 시 translateX 업데이트
+  useEffect(() => {
+    if (!isDragging) {
+      setTranslateX(getTargetTranslateX(currentPollIndex));
+    }
+  }, [currentPollIndex, isDragging]);
 
   const renderVoteOptions = (poll: Poll) => {
     return poll.options.map((option, index) => (
       <VoteOption
         key={option.id}
         onClick={() => handleVoteClick(poll)}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: isDragging ? 'grabbing' : 'pointer' }}
       >
         <VoteOptionNumber>{index + 1}.</VoteOptionNumber>
         <VoteOptionText>{option.text}</VoteOptionText>
@@ -98,24 +185,20 @@ const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSect
         <SlideContainer
           ref={slideRef}
           onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
           style={{
-            transform: `translateX(-${currentPollIndex * 100}%)`,
-            width: `${polls.length * 100}%`,
+            transform: `translateX(${translateX}%)`,
+            transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            cursor: isDragging ? 'grabbing' : 'grab',
           }}
         >
           {polls.map(poll => (
-            <div
-              key={poll.id}
-              style={{
-                width: `${100 / polls.length}%`,
-                display: 'inline-block',
-                verticalAlign: 'top',
-              }}
-            >
+            <SlideItem key={poll.id}>
               <HotTopicText>{poll.question}</HotTopicText>
               <VoteOptionsList>{renderVoteOptions(poll)}</VoteOptionsList>
-            </div>
+            </SlideItem>
           ))}
         </SlideContainer>
 
