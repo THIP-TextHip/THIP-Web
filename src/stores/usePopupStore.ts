@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 // Popup 타입 정의
-export type PopupType = 'confirm-modal' | 'moremenu' | 'snackbar' | null;
+export type PopupType = 'confirm-modal' | 'moremenu' | 'snackbar' | 'reply-modal' | null;
 
 // 모달 & 스낵바 Props 타입
 export interface ConfirmModalProps {
@@ -25,12 +25,26 @@ export interface SnackbarProps {
   onClose: () => void;
 }
 
+export interface ReplyModalProps {
+  isOpen: boolean;
+  userId: number;
+  replyId: number;
+  position?: {
+    x: number;
+    y: number;
+  };
+  onClose: () => void;
+}
+
 // 통합 상태 타입
 interface PopupState {
   popupType: PopupType;
-  popupProps?: ConfirmModalProps | MoreMenuProps | SnackbarProps;
+  popupProps?: ConfirmModalProps | MoreMenuProps | SnackbarProps | ReplyModalProps;
   isOpen: boolean;
-  openPopup: (type: PopupType, props?: ConfirmModalProps | MoreMenuProps | SnackbarProps) => void;
+  openPopup: (
+    type: PopupType,
+    props?: ConfirmModalProps | MoreMenuProps | SnackbarProps | ReplyModalProps,
+  ) => void;
   closePopup: () => void;
 }
 

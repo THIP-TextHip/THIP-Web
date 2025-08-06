@@ -1,4 +1,9 @@
-import type { ConfirmModalProps, MoreMenuProps, SnackbarProps } from '@/stores/usePopupStore';
+import type {
+  ConfirmModalProps,
+  MoreMenuProps,
+  SnackbarProps,
+  ReplyModalProps,
+} from '@/stores/usePopupStore';
 import { usePopupStore } from '@/stores/usePopupStore';
 
 export const usePopupActions = () => {
@@ -15,11 +20,16 @@ export const usePopupActions = () => {
   const openSnackbar = (props: SnackbarProps) => {
     openPopup('snackbar', props);
   };
+  // 댓글 더보기 모달
+  const openReplyModal = (props: ReplyModalProps) => {
+    openPopup('reply-modal', props);
+  };
 
   return {
     openConfirm,
     openMoreMenu,
     openSnackbar,
+    openReplyModal,
     closePopup,
   };
 };
