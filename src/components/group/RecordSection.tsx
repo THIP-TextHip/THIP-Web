@@ -4,14 +4,13 @@ import {
   RecordSectionTitle,
   RecordSectionChevron,
   RecordSectionContent,
-  BookTitle,
   CurrentPage,
-  ProgressSection,
   ProgressBar,
+  PercentText,
   ProgressBarFill,
   ProgressText,
 } from './RecordSection.styled';
-import rightChevron from '../../assets/common/right-Chevron.svg';
+import rightChevron from '../../assets/group/right-chevron.svg';
 
 interface RecordSectionProps {
   bookAuthor: string;
@@ -20,7 +19,7 @@ interface RecordSectionProps {
   onClick: () => void;
 }
 
-const RecordSection = ({ bookAuthor, currentPage, progress, onClick }: RecordSectionProps) => {
+const RecordSection = ({ currentPage, progress, onClick }: RecordSectionProps) => {
   return (
     <StyledRecordSection>
       <RecordSectionHeader onClick={onClick}>
@@ -28,14 +27,14 @@ const RecordSection = ({ bookAuthor, currentPage, progress, onClick }: RecordSec
         <RecordSectionChevron src={rightChevron} alt="기록장 이동 버튼" />
       </RecordSectionHeader>
       <RecordSectionContent>
-        <BookTitle>{bookAuthor}</BookTitle>
         <CurrentPage>현재 페이지 {currentPage}</CurrentPage>
-        <ProgressSection>
-          <ProgressBar>
-            <ProgressBarFill progress={progress} />
-          </ProgressBar>
-          <ProgressText>{progress}%</ProgressText>
-        </ProgressSection>
+        <div style={{ display: 'flex', alignItems: 'baseline' }}>
+          <ProgressText>{progress}</ProgressText>
+          <PercentText>%</PercentText>
+        </div>
+        <ProgressBar>
+          <ProgressBarFill progress={progress} />
+        </ProgressBar>
       </RecordSectionContent>
     </StyledRecordSection>
   );

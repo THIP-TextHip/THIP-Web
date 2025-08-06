@@ -1,15 +1,15 @@
 import styled from '@emotion/styled';
-import { colors, typography } from '@/styles/global/global';
+import { colors, semanticColors, typography } from '@/styles/global/global';
 
 export const RecordSection = styled.section`
   display: flex;
   flex-direction: column;
-  width: 94%;
-  gap: 24px;
+  width: 90%;
+  gap: 12px;
   background: ${colors.darkgrey.dark};
-  margin: 10px 20px 0 20px;
-  padding: 20px;
-  border-radius: 16px;
+  margin: 20px 20px 0 20px;
+  padding: 16px 12px;
+  border-radius: 12px;
 `;
 
 export const RecordSectionHeader = styled.div`
@@ -22,13 +22,14 @@ export const RecordSectionHeader = styled.div`
 export const RecordSectionTitle = styled.h3`
   color: ${colors.white};
   font-size: ${typography.fontSize.base};
-  font-weight: ${typography.fontWeight.medium};
+  font-weight: ${typography.fontWeight.semibold};
   margin: 0;
 `;
 
 export const RecordSectionChevron = styled.img`
   width: 24px;
   height: 24px;
+  margin-right: -8px;
 `;
 
 export const RecordSectionContent = styled.div`
@@ -37,30 +38,20 @@ export const RecordSectionContent = styled.div`
   gap: 16px;
 `;
 
-export const BookTitle = styled.div`
-  color: ${colors.white};
-  font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.medium};
-`;
-
 export const CurrentPage = styled.div`
-  color: ${colors.white};
+  color: ${semanticColors.text.secondary};
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.medium};
-`;
-
-export const ProgressSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
 `;
 
 export const ProgressBar = styled.div`
-  flex: 1;
-  height: 8px;
-  background-color: ${colors.grey[400]};
+  width: 100%;
+  height: 7px;
+  background-color: ${colors.grey[300]};
   border-radius: 4px;
   overflow: hidden;
+  margin-top: -4px;
+  margin-bottom: 20px;
 `;
 
 export const ProgressBarFill = styled.div<{ progress: number }>`
@@ -71,9 +62,14 @@ export const ProgressBarFill = styled.div<{ progress: number }>`
   transition: width 0.3s ease;
 `;
 
-export const ProgressText = styled.span`
+export const PercentText = styled.span`
   color: ${colors.purple.main};
   font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.medium};
-  min-width: 32px;
+  font-weight: ${typography.fontWeight.semibold};
+`;
+
+export const ProgressText = styled.span`
+  color: ${colors.purple.main};
+  font-size: ${typography.fontSize.base};
+  font-weight: ${typography.fontWeight.semibold};
 `;
