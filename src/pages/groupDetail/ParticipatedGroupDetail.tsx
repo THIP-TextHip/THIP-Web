@@ -1,5 +1,4 @@
 import {
-  Wrapper,
   TopBackground,
   Header,
   BannerSection,
@@ -15,9 +14,11 @@ import {
   Tag,
   TagGenre,
 } from './GroupDetail.styled';
+import { ParticipatedWrapper } from './ParticipatedGroupDetail.styled';
 import RecordSection from '../../components/group/RecordSection';
 import CommentSection from '../../components/group/CommentSection';
 import HotTopicSection from '../../components/group/HotTopicSection';
+import GroupBookSection from '../../components/group/GroupBookSection';
 import type { VoteOption } from '../../components/group/HotTopicSection';
 
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -30,8 +31,7 @@ import calendarIcon from '../../assets/group/calendar.svg';
 import peopleIcon from '../../assets/common/darkPeople.svg';
 
 const ParticipatedGroupDetail = () => {
-  const { title, isPrivate, introduction, activityPeriod, members, ddayText, genre } =
-    mockGroupDetail;
+  const { title, isPrivate, introduction, activityPeriod, members, genre, book } = mockGroupDetail;
 
   const navigate = useNavigate();
 
@@ -51,6 +51,11 @@ const ParticipatedGroupDetail = () => {
 
   const handleHotTopicSectionClick = () => {
     // 뜨거운 감자 페이지로 이동
+  };
+
+  const handleBookSectionClick = () => {
+    // 책 상세정보 페이지로 이동 (예: /book/:isbn)
+    navigate(`/book/${book.isbn || '123'}`);
   };
 
   // 모킹 데이터
@@ -76,7 +81,7 @@ const ParticipatedGroupDetail = () => {
   };
 
   return (
-    <Wrapper>
+    <ParticipatedWrapper>
       <TopBackground genre={genre}>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
@@ -118,6 +123,14 @@ const ParticipatedGroupDetail = () => {
         </BannerSection>
       </TopBackground>
 
+      <GroupBookSection
+        title={book.title}
+        author={book.author}
+        coverUrl={book.coverUrl}
+        description={book.description}
+        onClick={handleBookSectionClick}
+      />
+
       <RecordSection
         bookAuthor={recordData.bookAuthor}
         currentPage={recordData.currentPage}
@@ -134,7 +147,7 @@ const ParticipatedGroupDetail = () => {
         totalPages={hotTopicData.totalPages}
         onClick={handleHotTopicSectionClick}
       />
-    </Wrapper>
+    </ParticipatedWrapper>
   );
 };
 
