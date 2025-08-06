@@ -4,34 +4,37 @@ import styled from '@emotion/styled';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import type { UserProfileItemProps } from '@/types/user';
 import { colors, typography } from '@/styles/global/global';
+import { postFollow } from '@/api/users/postFollow';
 
 const UserProfileItem = ({
   profileImgUrl,
-  userName,
-  userTitle,
-  titleColor,
+  nickName,
+  aliasName,
+  aliasColor,
   followerCount,
-  isFollowed = false,
+  isFollowing,
   userId,
   isLast,
-  type = 'followlist',
+  type,
 }: UserProfileItemProps) => {
   const navigate = useNavigate();
-  const [followed, setFollowed] = useState(isFollowed);
+  const [followed, setFollowed] = useState(isFollowing);
 
   const handleProfileClick = () => {
     navigate(`/otherfeed/${userId}`);
   };
 
-  const toggleFollow = (e: React.MouseEvent) => {
+  const toggleFollow = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (followed) {
-      // await axios.delete(`/api/unfollow/${userName}`);
-    } else {
-      // await axios.post(`/api/follow/${userName}`);
+
+    try {
+      const response = await postFollow(userId, !followed);
+      // API 응답으로 팔로우 상태 업데이트
+      setFollowed(response.data.isFollowing);
+      console.log(`${nickName} - ${response.data.isFollowing ? '띱 완료' : '띱 취소'}`);
+    } catch (error) {
+      console.error('팔로우/언팔로우 실패:', error);
     }
-    setFollowed(prev => !prev);
-    console.log(`${userName} - ${followed ? '팔로우 취소' : '팔로우 요청'}`);
   };
 
   return (
@@ -40,9 +43,9 @@ const UserProfileItem = ({
         <div className="userInfo">
           <img src={profileImgUrl} />
           <div className="user">
-            <div className="username">{userName}</div>
-            <div className="usertitle" style={{ color: titleColor }}>
-              {userTitle}
+            <div className="username">{nickName}</div>
+            <div className="usertitle" style={{ color: aliasColor }}>
+              {aliasName}
             </div>
           </div>
         </div>

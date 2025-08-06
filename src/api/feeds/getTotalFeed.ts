@@ -21,7 +21,7 @@ export interface GetTotalFeedParams {
   cursor?: string; // 첫 페이지는 null 또는 없음, 다음 페이지부터는 nextCursor 값 사용
 }
 
-export const getTotalFeeds = async (params?: GetTotalFeedParams): Promise<TotalFeedResponse> => {
+export const getTotalFeeds = async (params?: GetTotalFeedParams) => {
   const queryParams = new URLSearchParams();
 
   // cursor가 있을 때만 쿼리 파라미터에 추가

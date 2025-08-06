@@ -15,7 +15,7 @@ const SubReply = ({
   replyCommentUserId,
   replyCommentId,
   replyCommentimgUrl,
-  titleColor,
+  aliasColor,
   postDate,
   likeCount,
   isLike,
@@ -44,7 +44,7 @@ const SubReply = ({
           creatorProfileImageUrl={replyCommentimgUrl}
           creatorNickname={replyCommentUserName}
           alias={replyCommentUserTitle}
-          titleColor={titleColor}
+          aliasColor={aliasColor}
           postDate={postDate}
           creatorId={replyCommentUserId}
           type="reply"

@@ -1,11 +1,12 @@
 import { useReplyStore } from '@/stores/useReplyStore';
-import axios from 'axios';
+import { postReply } from '@/api/comments/postReply';
 
 interface SubmitCommentProps {
   postId: number;
-  postType: 'feed' | 'record' | 'vote';
+  postType: 'FEED' | 'RECORD' | 'VOTE';
   onSuccess?: () => void;
 }
+
 export const useReplyActions = () => {
   const {
     isReplying,
@@ -26,12 +27,13 @@ export const useReplyActions = () => {
       content,
       isReplyRequest: isReplying, // 답글 여부
       parentId: isReplying ? parentId : null, // 답글이라면 부모 댓글 ID 포함
-      postType,
+      postType: postType.toUpperCase() as 'FEED' | 'RECORD' | 'VOTE',
     };
 
     try {
       console.log('댓글or답글 작성 API 요청');
-      await axios.post(`/comments/${postId}`, requestBody);
+      const response = await postReply(postId, requestBody);
+      console.log('댓글 작성 성공:', response);
       if (onSuccess) onSuccess();
       clearReplyContent();
       cancelReply();
