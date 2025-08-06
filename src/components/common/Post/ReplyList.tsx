@@ -13,8 +13,8 @@ const ReplyList = ({ commentList }: ReplyListProps) => {
         commentList.map(comment => (
           <div className="comment-group" key={comment.commentId}>
             <Reply {...comment} />
-            {comment.replyCommentList.map(sub => (
-              <SubReply key={sub.replyCommentId} {...sub} />
+            {comment.replyList.map(sub => (
+              <SubReply key={sub.replyId} {...sub} />
             ))}
           </div>
         ))
