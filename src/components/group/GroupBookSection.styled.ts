@@ -1,83 +1,40 @@
 import styled from '@emotion/styled';
-import { colors, typography } from '@/styles/global/global';
+import { colors, semanticColors, typography } from '@/styles/global/global';
 
 export const GroupBookSection = styled.section`
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   width: 94%;
-  gap: 24px;
   background: ${colors.darkgrey.dark};
   margin: 10px 20px 0 20px;
-  padding: 20px;
-  border-radius: 16px;
-`;
-
-export const GroupBookSectionHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
   cursor: pointer;
 `;
 
-export const GroupBookSectionTitle = styled.h3`
+export const BookTitle = styled.h3`
   color: ${colors.white};
   font-size: ${typography.fontSize.base};
-  font-weight: ${typography.fontWeight.medium};
+  font-weight: ${typography.fontWeight.semibold};
   margin: 0;
+  margin-right: 12px;
 `;
 
-export const GroupBookSectionChevron = styled.img`
+export const BookAuthor = styled.span`
+  color: ${semanticColors.text.secondary};
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.regular};
+`;
+
+export const ChevronIcon = styled.img`
   width: 24px;
   height: 24px;
+  flex-shrink: 0;
 `;
 
-export const GroupBookSectionContent = styled.div`
+export const RightSection = styled.div`
   display: flex;
-  flex-direction: column;
-`;
-
-export const BookInfo = styled.div`
-  display: flex;
-  gap: 16px;
-`;
-
-export const BookCover = styled.img`
-  width: 80px;
-  height: 107px;
-  object-fit: cover;
-`;
-
-export const BookDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.medium};
-  gap: 20px;
-  color: ${colors.white};
-  margin: auto 0;
-`;
-
-export const BookTitle = styled.h4`
-  color: ${colors.white};
-  font-size: ${typography.fontSize.base};
-  font-weight: ${typography.fontWeight.medium};
-  margin: 0;
-`;
-
-export const BookAuthor = styled.div`
-  color: ${colors.white};
-  font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.medium};
-`;
-
-export const BookDescription = styled.div`
-  font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.medium};
-  color: ${colors.white};
-
-  > p {
-    margin-top: 4px;
-    color: ${colors.grey[200]};
-    font-weight: ${typography.fontWeight.regular};
-  }
+  align-items: center;
+  margin-right: -8px;
 `;

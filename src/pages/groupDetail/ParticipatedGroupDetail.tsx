@@ -123,13 +123,7 @@ const ParticipatedGroupDetail = () => {
         </BannerSection>
       </TopBackground>
 
-      <GroupBookSection
-        title={book.title}
-        author={book.author}
-        coverUrl={book.coverUrl}
-        description={book.description}
-        onClick={handleBookSectionClick}
-      />
+      <GroupBookSection title={book.title} author={book.author} onClick={handleBookSectionClick} />
 
       <RecordSection
         bookAuthor={recordData.bookAuthor}
