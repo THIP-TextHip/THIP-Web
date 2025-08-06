@@ -30,13 +30,20 @@ export const HotTopicContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  overflow: hidden;
+`;
+
+export const SlideContainer = styled.div`
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  touch-action: pan-x;
 `;
 
 export const HotTopicText = styled.p`
   color: ${colors.grey[100]};
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.medium};
-  margin: 0;
+  margin: 0 0 10px 0;
 `;
 
 export const VoteOptionsList = styled.div`
@@ -52,6 +59,12 @@ export const VoteOption = styled.div`
   padding: 12px;
   background: ${colors.darkgrey.main};
   border-radius: 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: ${colors.grey[400]};
+  }
 `;
 
 export const VoteOptionNumber = styled.span`
@@ -70,7 +83,7 @@ export const Pagination = styled.div`
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 2px;
+  margin-top: 10px;
 `;
 
 export const PaginationDot = styled.div<{ active?: boolean }>`
@@ -78,4 +91,26 @@ export const PaginationDot = styled.div<{ active?: boolean }>`
   height: 4px;
   border-radius: 50%;
   background-color: ${({ active }) => (active ? colors.white : colors.grey[300])};
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: ${colors.grey[100]};
+  }
+`;
+
+export const EmptyVoteContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+`;
+
+export const EmptyVoteTitle = styled.h4`
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.medium};
+  margin: 0;
 `;

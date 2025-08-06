@@ -19,7 +19,7 @@ import RecordSection from '../../components/group/RecordSection';
 import CommentSection from '../../components/group/CommentSection';
 import HotTopicSection from '../../components/group/HotTopicSection';
 import GroupBookSection from '../../components/group/GroupBookSection';
-import type { VoteOption } from '../../components/group/HotTopicSection';
+import type { Poll } from '../../components/group/HotTopicSection';
 
 import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
@@ -50,12 +50,18 @@ const ParticipatedGroupDetail = () => {
   };
 
   const handleHotTopicSectionClick = () => {
-    // 뜨거운 감자 페이지로 이동
+    // 뜨거운 감자 전체 페이지로 이동
+    navigate('/memory'); // 또는 투표 전체 리스트 페이지
   };
 
   const handleBookSectionClick = () => {
-    // 책 상세정보 페이지로 이동 (예: /book/:isbn)
-    navigate(`/book/${book.isbn || '123'}`);
+    navigate(`/book/123`);
+  };
+
+  // 투표 클릭 시 해당 페이지의 기록장으로 이동
+  const handlePollClick = (pageNumber: number) => {
+    // 해당 투표가 위치한 페이지 번호로 필터를 씌운 기록장 화면으로 이동
+    navigate(`/memory?page=${pageNumber}&filter=poll`);
   };
 
   // 모킹 데이터
@@ -69,16 +75,42 @@ const ParticipatedGroupDetail = () => {
     message: '모임방 멤버들과 간단한 인사를 나눠보세요!',
   };
 
-  const hotTopicData = {
-    topicText: '투표 1번 내용입니다...',
-    voteOptions: [
-      { id: '1', text: '김땡땡' },
-      { id: '2', text: '김땡땡' },
-      { id: '3', text: '김땡땡' },
-    ] as VoteOption[],
-    currentPage: 0,
-    totalPages: 3,
-  };
+  // 투표 데이터 (투표 결과 없이 질문과 선택지만)
+  const mockPolls: Poll[] = [
+    {
+      id: '1',
+      question: '3연에 나오는 심장은 무엇을 의미하는 걸까요?',
+      options: [
+        { id: '1', text: '김땡땡' },
+        { id: '2', text: '김땡땡' },
+      ],
+      pageNumber: 456, // 해당 투표가 위치한 페이지
+    },
+    {
+      id: '2',
+      question: '또 다른 투표 질문입니다',
+      options: [
+        { id: '1', text: '선택지 1' },
+        { id: '2', text: '선택지 2' },
+        { id: '3', text: '선택지 3' },
+      ],
+      pageNumber: 123,
+    },
+    {
+      id: '3',
+      question: '세 번째 투표입니다',
+      options: [
+        { id: '1', text: 'A 답변' },
+        { id: '2', text: 'B 답변' },
+      ],
+      pageNumber: 789,
+    },
+  ];
+
+  // 투표가 없을 때 테스트하려면 이걸 사용
+  // const mockPolls: Poll[] = [];
+
+  const hasPolls = mockPolls.length > 0;
 
   return (
     <ParticipatedWrapper>
@@ -135,11 +167,10 @@ const ParticipatedGroupDetail = () => {
       <CommentSection message={commentData.message} onClick={handleCommentSectionClick} />
 
       <HotTopicSection
-        topicText={hotTopicData.topicText}
-        voteOptions={hotTopicData.voteOptions}
-        currentPage={hotTopicData.currentPage}
-        totalPages={hotTopicData.totalPages}
+        polls={mockPolls}
+        hasPolls={hasPolls}
         onClick={handleHotTopicSectionClick}
+        onPollClick={handlePollClick}
       />
     </ParticipatedWrapper>
   );
