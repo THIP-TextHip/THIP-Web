@@ -70,7 +70,7 @@ const ParticipatedGroupDetail = () => {
   };
 
   const hotTopicData = {
-    topicText: '투표 1개 내용입니다...',
+    topicText: '투표 1번 내용입니다...',
     voteOptions: [
       { id: '1', text: '김땡땡' },
       { id: '2', text: '김땡땡' },

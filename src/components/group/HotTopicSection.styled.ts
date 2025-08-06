@@ -4,12 +4,12 @@ import { colors, typography } from '@/styles/global/global';
 export const HotTopicSection = styled.section`
   display: flex;
   flex-direction: column;
-  width: 94%;
-  gap: 24px;
+  width: 90%;
+  gap: 12px;
   background: ${colors.darkgrey.dark};
   margin: 20px 20px 80px 20px;
-  padding: 20px;
-  border-radius: 16px;
+  padding: 16px 12px;
+  border-radius: 12px;
 `;
 
 export const HotTopicSectionHeader = styled.div`
@@ -22,60 +22,55 @@ export const HotTopicSectionHeader = styled.div`
 export const HotTopicSectionTitle = styled.h3`
   color: ${colors.white};
   font-size: ${typography.fontSize.base};
-  font-weight: ${typography.fontWeight.medium};
+  font-weight: ${typography.fontWeight.semibold};
   margin: 0;
-`;
-
-export const HotTopicSectionChevron = styled.img`
-  width: 24px;
-  height: 24px;
 `;
 
 export const HotTopicContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 `;
 
 export const HotTopicText = styled.p`
-  color: ${colors.grey[200]};
+  color: ${colors.grey[100]};
   font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.regular};
+  font-weight: ${typography.fontWeight.medium};
   margin: 0;
 `;
 
 export const VoteOptionsList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 `;
 
 export const VoteOption = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: ${colors.grey[400]};
-  border-radius: 40px;
+  gap: 2px;
+  padding: 12px;
+  background: ${colors.darkgrey.main};
+  border-radius: 12px;
 `;
 
 export const VoteOptionNumber = styled.span`
   color: ${colors.white};
-  font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.medium};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
 `;
 
 export const VoteOptionText = styled.span`
   color: ${colors.white};
-  font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.medium};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
 `;
 
 export const Pagination = styled.div`
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 12px;
+  margin-top: 2px;
 `;
 
 export const PaginationDot = styled.div<{ active?: boolean }>`

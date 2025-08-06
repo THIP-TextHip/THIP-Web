@@ -2,7 +2,6 @@ import {
   HotTopicSection as StyledHotTopicSection,
   HotTopicSectionHeader,
   HotTopicSectionTitle,
-  HotTopicSectionChevron,
   HotTopicContent,
   HotTopicText,
   VoteOptionsList,
@@ -12,7 +11,6 @@ import {
   Pagination,
   PaginationDot,
 } from './HotTopicSection.styled';
-import rightChevron from '../../assets/common/right-Chevron.svg';
 
 export interface VoteOption {
   id: string;
@@ -38,7 +36,6 @@ const HotTopicSection = ({
     <StyledHotTopicSection>
       <HotTopicSectionHeader onClick={onClick}>
         <HotTopicSectionTitle>모임방의 뜨거운 감자</HotTopicSectionTitle>
-        <HotTopicSectionChevron src={rightChevron} alt="뜨거운 감자 이동 버튼" />
       </HotTopicSectionHeader>
       <HotTopicContent>
         <HotTopicText>{topicText}</HotTopicText>
