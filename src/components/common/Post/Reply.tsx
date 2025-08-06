@@ -13,7 +13,7 @@ const Reply = ({
   imageUrl,
   nickName,
   userTitle,
-  titleColor,
+  aliasColor,
   postDate,
   content,
   isLike,
@@ -39,7 +39,7 @@ const Reply = ({
         creatorProfileImageUrl={imageUrl}
         creatorNickname={nickName}
         alias={userTitle}
-        titleColor={titleColor}
+        aliasColor={aliasColor}
         postDate={postDate}
         creatorId={userId}
         type="reply"

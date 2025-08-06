@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import PostHeader from '@/components/common/Post/PostHeader';
 import FeedDetailPostBody from './FeedDetailPostBody';
 import PostFooter from '@/components/common/Post/PostFooter';
-import type { FeedPostProps } from '../../types/post';
+import type { FeedDetailData } from '@/api/feeds/getFeedDetail';
 
 const Container = styled.div`
   display: flex;
@@ -22,12 +22,16 @@ const BorderBottom = styled.div`
   background-color: var(--color-darkgrey-dark);
 `;
 
-const FeedDetailPost = ({ isMyFeed, ...postData }: FeedPostProps) => {
+interface FeedDetailPostProps extends FeedDetailData {
+  isMyFeed?: boolean;
+}
+
+const FeedDetailPost = ({ isMyFeed, tagList, aliasColor, ...postData }: FeedDetailPostProps) => {
   return (
     <>
       <Container>
-        <PostHeader {...postData} />
-        <FeedDetailPostBody {...postData} />
+        <PostHeader {...postData} aliasColor={aliasColor} />
+        <FeedDetailPostBody {...postData} tags={tagList} />
         <PostFooter isDetail={true} isMyFeed={!!isMyFeed} {...postData} />
       </Container>
       <BorderBottom />

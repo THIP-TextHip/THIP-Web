@@ -1,11 +1,55 @@
 import styled from '@emotion/styled';
 import Profile from './Profile';
 import FeedPost from './FeedPost';
-import type { FeedListProps } from '../../types/post';
-import { colors, typography } from '../../styles/global/global';
 import TotalBar from './TotalBar';
+import { colors, typography } from '../../styles/global/global';
+import type { OtherFeedItem } from '@/api/feeds/getOtherFeed';
+import type { OtherProfileData } from '@/types/profile';
+
+interface OtherFeedProps {
+  showHeader?: boolean;
+  posts?: OtherFeedItem[];
+  isMyFeed?: boolean;
+  profileData?: OtherProfileData | null;
+  userId?: number;
+}
+
+const OtherFeed = ({ posts = [], profileData, userId }: OtherFeedProps) => {
+  const hasPosts = posts.length > 0;
+
+  if (!profileData) {
+    return <></>;
+  }
+
+  return (
+    <Container>
+      <Profile
+        userId={userId}
+        showFollowButton={true}
+        isFollowing={profileData.isFollowing}
+        profileImageUrl={profileData.profileImageUrl}
+        nickname={profileData.nickname}
+        aliasName={profileData.aliasName}
+        aliasColor={profileData.aliasColor}
+        followerCount={profileData.followerCount}
+        latestFollowerProfileImageUrls={profileData?.latestFollowerProfileImageUrls || []}
+      />
+      <TotalBar count={profileData.totalFeedCount} />
+      {hasPosts ? (
+        posts.map(post => (
+          <FeedPost key={post.feedId} showHeader={false} isMyFeed={false} {...post} />
+        ))
+      ) : (
+        <EmptyState>
+          <div>피드에 작성된 글이 없어요</div>
+        </EmptyState>
+      )}
+    </Container>
+  );
+};
 
 const Container = styled.div`
+  min-height: 100vh;
   padding-top: 56px;
   padding-bottom: 155px;
   background-color: var(--color-black-main);
@@ -24,26 +68,5 @@ const EmptyState = styled.div`
   line-height: 24px;
   letter-spacing: 0.018px;
 `;
-
-const OtherFeed = ({ showHeader, posts = [], isMyFeed }: FeedListProps) => {
-  const hasPosts = posts.length > 0;
-  const postCount = posts.length;
-
-  return (
-    <Container>
-      <Profile showFollowButton={true} isFollowed={false} />
-      <TotalBar count={postCount} />
-      {hasPosts ? (
-        posts.map(post => (
-          <FeedPost key={post.feedId} showHeader={showHeader} isMyFeed={isMyFeed} {...post} />
-        ))
-      ) : (
-        <EmptyState>
-          <div>피드에 작성된 글이 없어요</div>
-        </EmptyState>
-      )}
-    </Container>
-  );
-};
 
 export default OtherFeed;
