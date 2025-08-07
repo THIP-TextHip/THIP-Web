@@ -21,6 +21,7 @@ import HotTopicSection from '../../components/group/HotTopicSection';
 import GroupBookSection from '../../components/group/GroupBookSection';
 import GroupActionBottomSheet from '../../components/group/GroupActionBottomSheet';
 import type { Poll } from '../../components/group/HotTopicSection';
+import { usePopupActions } from '@/hooks/usePopupActions';
 
 import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
@@ -34,6 +35,7 @@ import { useState } from 'react';
 
 const ParticipatedGroupDetail = () => {
   const { title, isPrivate, introduction, activityPeriod, members, genre, book } = mockGroupDetail;
+  const { openConfirm } = usePopupActions();
 
   const navigate = useNavigate();
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
@@ -54,17 +56,27 @@ const ParticipatedGroupDetail = () => {
   };
 
   const handleDeleteGroup = () => {
-    // 방 삭제하기 로직
-    console.log('방 삭제하기');
-    // 실제로는 API 호출 후 성공하면 홈으로 이동
-    navigate('/group');
+    openConfirm({
+      title: '모임방을 삭제하시겠어요?',
+      disc: '방을 삭제하게 되면\n독서메이트들과의 추억이 사라집니다.',
+      onConfirm: () => {
+        console.log('방 삭제 확정');
+        // 실제 삭제 API 호출 후 홈으로 이동
+        navigate('/group');
+      },
+    });
   };
 
   const handleLeaveGroup = () => {
-    // 방 나가기 로직
-    console.log('방 나가기');
-    // 실제로는 API 호출 후 성공하면 홈으로 이동
-    navigate('/group');
+    openConfirm({
+      title: '모임방을 나가시겠어요?',
+      disc: '방을 나가시게 되면\n독서메이트들과의 추억이 사라집니다.',
+      onConfirm: () => {
+        console.log('방 나가기 확정');
+        // 실제 나가기 API 호출 후 홈으로 이동
+        navigate('/group');
+      },
+    });
   };
 
   const handleReportGroup = () => {
