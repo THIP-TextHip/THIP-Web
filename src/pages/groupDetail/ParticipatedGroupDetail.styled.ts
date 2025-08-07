@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { colors } from '@/styles/global/global';
+import { colors, typography } from '@/styles/global/global';
 
 export const ParticipatedWrapper = styled.div`
   display: flex;
@@ -36,4 +36,26 @@ export const MetaTopRow = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+`;
+
+export const MetaInfo = styled.div`
+  display: flex;
+  margin-top: 16px;
+  gap: 20px;
+  width: 100%;
+`;
+
+export const Meta = styled.div`
+  display: flex;
+  flex-direction: column;
+  font-size: ${typography.fontSize['xs']};
+  font-weight: ${typography.fontWeight.medium};
+  color: ${colors.white};
+  gap: 12px;
+  flex: 1;
+  span {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
 `;

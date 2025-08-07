@@ -5,8 +5,6 @@ import {
   GroupTitle,
   SubTitle,
   Intro,
-  MetaInfo,
-  Meta,
   MetaDate,
   MetaMember,
   MetaTotalMember,
@@ -19,6 +17,8 @@ import {
   ClickableMeta,
   MetaChevron,
   MetaTopRow,
+  MetaInfo,
+  Meta,
 } from './ParticipatedGroupDetail.styled';
 import RecordSection from '../../components/group/RecordSection';
 import CommentSection from '../../components/group/CommentSection';
