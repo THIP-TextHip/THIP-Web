@@ -5,7 +5,7 @@ import {
   HotTopicContent,
   HotTopicText,
   VoteOptionsList,
-  VoteOption,
+  VoteOption as StyledVoteOption,
   VoteOptionNumber,
   VoteOptionText,
   Pagination,
@@ -156,14 +156,14 @@ const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSect
 
   const renderVoteOptions = (poll: Poll) => {
     return poll.options.map((option, index) => (
-      <VoteOption
+      <StyledVoteOption
         key={option.id}
         onClick={() => handleVoteClick(poll)}
         style={{ cursor: isDragging ? 'grabbing' : 'pointer' }}
       >
         <VoteOptionNumber>{index + 1}.</VoteOptionNumber>
         <VoteOptionText>{option.text}</VoteOptionText>
-      </VoteOption>
+      </StyledVoteOption>
     ));
   };
 
