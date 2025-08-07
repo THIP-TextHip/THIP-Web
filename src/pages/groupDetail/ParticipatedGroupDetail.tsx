@@ -66,7 +66,6 @@ const ParticipatedGroupDetail = () => {
 
   // 모킹 데이터
   const recordData = {
-    bookAuthor: '최정화 저',
     currentPage: 1,
     progress: 30,
   };
@@ -158,7 +157,6 @@ const ParticipatedGroupDetail = () => {
       <GroupBookSection title={book.title} author={book.author} onClick={handleBookSectionClick} />
 
       <RecordSection
-        bookAuthor={recordData.bookAuthor}
         currentPage={recordData.currentPage}
         progress={recordData.progress}
         onClick={handleRecordSectionClick}

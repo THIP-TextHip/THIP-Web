@@ -13,7 +13,6 @@ import {
 import rightChevron from '../../assets/group/right-chevron.svg';
 
 interface RecordSectionProps {
-  bookAuthor: string;
   currentPage: number;
   progress: number;
   onClick: () => void;
