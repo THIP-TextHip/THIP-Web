@@ -8,7 +8,7 @@ import { postFollow } from '@/api/users/postFollow';
 
 const UserProfileItem = ({
   profileImgUrl,
-  nickName,
+  nickname,
   aliasName,
   aliasColor,
   followerCount,
@@ -31,7 +31,7 @@ const UserProfileItem = ({
       const response = await postFollow(userId, !followed);
       // API 응답으로 팔로우 상태 업데이트
       setFollowed(response.data.isFollowing);
-      console.log(`${nickName} - ${response.data.isFollowing ? '띱 완료' : '띱 취소'}`);
+      console.log(`${nickname} - ${response.data.isFollowing ? '띱 완료' : '띱 취소'}`);
     } catch (error) {
       console.error('팔로우/언팔로우 실패:', error);
     }
@@ -43,7 +43,7 @@ const UserProfileItem = ({
         <div className="userInfo">
           <img src={profileImgUrl} />
           <div className="user">
-            <div className="username">{nickName}</div>
+            <div className="username">{nickname}</div>
             <div className="usertitle" style={{ color: aliasColor }}>
               {aliasName}
             </div>
@@ -108,7 +108,6 @@ const UserProfile = styled.div`
       .usertitle {
         font-size: ${typography.fontSize.xs};
         font-weight: ${typography.fontWeight.regular};
-        line-height: 20px;
       }
     }
   }
