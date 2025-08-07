@@ -14,7 +14,12 @@ import {
   Tag,
   TagGenre,
 } from './GroupDetail.styled';
-import { ParticipatedWrapper } from './ParticipatedGroupDetail.styled';
+import {
+  ParticipatedWrapper,
+  ClickableMeta,
+  MetaChevron,
+  MetaTopRow,
+} from './ParticipatedGroupDetail.styled';
 import RecordSection from '../../components/group/RecordSection';
 import CommentSection from '../../components/group/CommentSection';
 import HotTopicSection from '../../components/group/HotTopicSection';
@@ -22,6 +27,7 @@ import GroupBookSection from '../../components/group/GroupBookSection';
 import GroupActionBottomSheet from '../../components/group/GroupActionBottomSheet';
 import type { Poll } from '../../components/group/HotTopicSection';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import rightChevron from '../../assets/group/right-chevron.svg';
 
 import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
@@ -108,6 +114,10 @@ const ParticipatedGroupDetail = () => {
     navigate(`/memory?page=${pageNumber}&filter=poll`);
   };
 
+  const handleMembersClick = () => {
+    navigate('/group/members'); // 또는 실제 독서메이트 페이지 경로
+  };
+
   // 모킹 데이터
   const recordData = {
     currentPage: 1,
@@ -181,13 +191,21 @@ const ParticipatedGroupDetail = () => {
               </MetaDate>
             </Meta>
             <Meta>
-              <span>
-                <IconButton src={peopleIcon} alt="사람 아이콘" /> 독서메이트
-              </span>
-              <span>
-                <MetaMember>{members.current}</MetaMember>
-                <MetaTotalMember>명 참여 중</MetaTotalMember>
-              </span>
+              <ClickableMeta onClick={handleMembersClick}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <MetaTopRow>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                      <IconButton src={peopleIcon} alt="사람 아이콘" />
+                      <span>독서메이트</span>
+                    </div>
+                    <MetaChevron src={rightChevron} alt="독서메이트 목록 보기" />
+                  </MetaTopRow>
+                  <span>
+                    <MetaMember>{members.current}</MetaMember>
+                    <MetaTotalMember>명 참여 중</MetaTotalMember>
+                  </span>
+                </div>
+              </ClickableMeta>
             </Meta>
           </MetaInfo>
           <TagRow>

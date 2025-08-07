@@ -14,3 +14,26 @@ export const ParticipatedWrapper = styled.div`
   background-color: ${colors.black.main};
   overflow: hidden;
 `;
+
+export const ClickableMeta = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+export const MetaChevron = styled.img`
+  width: 24px;
+  height: 24px;
+`;
+
+export const MetaTopRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
