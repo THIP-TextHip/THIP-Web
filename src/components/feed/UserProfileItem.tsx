@@ -67,6 +67,9 @@ const UserProfileItem = ({
 
 const Wrapper = styled.div<{ isLast?: boolean }>`
   width: 100%;
+  max-width: 500px;
+  min-width: 320px;
+  margin: 0 auto;
   height: 78px;
   padding: 20px 0;
   border-bottom: ${({ isLast }) => (isLast ? 'none' : '1px solid var(--color-darkgrey-dark)')};
