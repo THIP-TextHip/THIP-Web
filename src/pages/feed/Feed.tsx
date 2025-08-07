@@ -158,7 +158,7 @@ const Feed = () => {
           <MyFeed showHeader={false} posts={myFeedPosts} isMyFeed={true} isLast={myIsLast} />
         </>
       )}
-      <NavBar src={writefab} path="/" />
+      <NavBar src={writefab} path="/post/create" />
     </Container>
   );
 };
