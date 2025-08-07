@@ -40,9 +40,13 @@ const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSect
   const [currentPollIndex, setCurrentPollIndex] = useState(0);
   const slideRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
   const [translateX, setTranslateX] = useState(0);
-  const [startTranslateX, setStartTranslateX] = useState(0);
+
+  // useRef로 드래그 상태 관리
+  const dragStateRef = useRef({
+    startX: 0,
+    startTranslateX: 0,
+  });
 
   const containerWidth = 100; // 각 슬라이드의 width %
 
@@ -72,37 +76,41 @@ const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSect
   }, [translateX, polls.length]);
 
   // 드래그 시작 (마우스/터치 공통)
-  const handleDragStart = (clientX: number) => {
-    setIsDragging(true);
-    setStartX(clientX);
-    setStartTranslateX(translateX);
-  };
+  const handleDragStart = useCallback(
+    (clientX: number) => {
+      setIsDragging(true);
+      dragStateRef.current.startX = clientX;
+      dragStateRef.current.startTranslateX = translateX;
+    },
+    [translateX],
+  );
 
   // 드래그 중 (마우스/터치 공통)
   const handleDragMove = useCallback(
     (clientX: number) => {
       if (!isDragging) return;
 
-      const deltaX = clientX - startX;
-      const newTranslateX = startTranslateX + (deltaX / window.innerWidth) * 100;
+      const deltaX = clientX - dragStateRef.current.startX;
+      const newTranslateX =
+        dragStateRef.current.startTranslateX + (deltaX / window.innerWidth) * 100;
 
-      // 드래그 범위 제한 (약간의 오버스크롤 허용)
+      // 드래그 범위 제한
       const minTranslate = getTargetTranslateX(polls.length - 1) - 20;
       const maxTranslate = getTargetTranslateX(0) + 20;
 
       const limitedTranslateX = Math.max(minTranslate, Math.min(maxTranslate, newTranslateX));
       setTranslateX(limitedTranslateX);
     },
-    [isDragging, startX, startTranslateX, polls.length],
+    [isDragging, polls.length],
   );
 
   // 드래그 끝 (마우스/터치 공통)
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     if (isDragging) {
       setIsDragging(false);
       snapToClosest();
     }
-  };
+  }, [isDragging, snapToClosest]);
 
   // 터치 이벤트
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -145,7 +153,7 @@ const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSect
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, handleDragMove]);
+  }, [isDragging, handleDragMove, handleDragEnd]);
 
   // 인덱스 변경 시 translateX 업데이트
   useEffect(() => {
