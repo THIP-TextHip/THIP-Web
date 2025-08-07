@@ -6,16 +6,17 @@ import FeedDetailPost from '@/components/feed/FeedDetailPost';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
 import ReplyList from '@/components/common/Post/ReplyList';
-import { mockCommentList } from '@/data/postData';
 import MessageInput from '@/components/today-words/MessageInput';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { getFeedDetail, type FeedDetailData } from '@/api/feeds/getFeedDetail';
+import { getComments, type CommentData } from '@/api/comments/getComments';
 
 const FeedDetailPage = () => {
   const navigate = useNavigate();
   const { feedId } = useParams<{ feedId: string }>();
   const [feedData, setFeedData] = useState<FeedDetailData | null>(null);
+  const [commentList, setCommentList] = useState<CommentData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,9 +24,16 @@ const FeedDetailPage = () => {
   const { isReplying, targetUserName, replyContent, setReplyContent, submitComment, cancelReply } =
     useReplyActions();
 
-  // 피드 상세 정보 로드
+  // 페이지를 떠날 때 답글 상태 초기화
   useEffect(() => {
-    const loadFeedDetail = async () => {
+    return () => {
+      cancelReply();
+    };
+  }, [cancelReply]);
+
+  // 피드 상세 정보와 댓글 목록 로드
+  useEffect(() => {
+    const loadFeedDetailAndComments = async () => {
       if (!feedId) {
         setError('피드 ID가 없습니다.');
         setLoading(false);
@@ -34,18 +42,25 @@ const FeedDetailPage = () => {
 
       try {
         setLoading(true);
-        const response = await getFeedDetail(Number(feedId));
-        setFeedData(response.data);
+
+        // 피드 상세 정보와 댓글 목록을 병렬로 로드
+        const [feedResponse, commentsResponse] = await Promise.all([
+          getFeedDetail(Number(feedId)),
+          getComments(Number(feedId)),
+        ]);
+
+        setFeedData(feedResponse.data);
+        setCommentList(commentsResponse.data.commentList);
         setError(null);
       } catch (err) {
-        console.error('피드 상세 정보 로드 실패:', err);
+        console.error('피드 상세 정보 또는 댓글 로드 실패:', err);
         setError('피드 정보를 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
       }
     };
 
-    loadFeedDetail();
+    loadFeedDetailAndComments();
   }, [feedId]);
 
   const handleMoreClick = () => {
@@ -110,7 +125,7 @@ const FeedDetailPage = () => {
         onRightClick={handleMoreClick}
       />
       <FeedDetailPost {...feedData} />
-      <ReplyList commentList={mockCommentList} />
+      <ReplyList commentList={commentList} />
       <MessageInput
         value={replyContent}
         onChange={setReplyContent}
