@@ -61,6 +61,7 @@ export function UserSearchResult({
                 isLast={index === searchedUserList.length - 1}
               />
             ))}
+            {hasMore && <ObserverDiv ref={observerRef}></ObserverDiv>}
           </>
         )}
       </List>
@@ -106,4 +107,8 @@ const EmptyWrapper = styled.div`
   font-size: var(--string-size-large01, 18px);
   font-weight: var(--string-weight-semibold, 600);
   line-height: var(--string-lineheight-height24, 24px); /* 133.333% */
+`;
+
+const ObserverDiv = styled.div`
+  height: 100px;
 `;
