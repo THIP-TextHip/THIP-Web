@@ -19,6 +19,7 @@ import RecordSection from '../../components/group/RecordSection';
 import CommentSection from '../../components/group/CommentSection';
 import HotTopicSection from '../../components/group/HotTopicSection';
 import GroupBookSection from '../../components/group/GroupBookSection';
+import GroupActionBottomSheet from '../../components/group/GroupActionBottomSheet';
 import type { Poll } from '../../components/group/HotTopicSection';
 
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -29,17 +30,48 @@ import { mockGroupDetail } from '../../mocks/groupDetail.mock';
 import lockIcon from '../../assets/group/lock.svg';
 import calendarIcon from '../../assets/group/calendar.svg';
 import peopleIcon from '../../assets/common/darkPeople.svg';
+import { useState } from 'react';
 
 const ParticipatedGroupDetail = () => {
   const { title, isPrivate, introduction, activityPeriod, members, genre, book } = mockGroupDetail;
 
   const navigate = useNavigate();
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
+  // 모임방 생성자 여부 (실제로는 API에서 받아와야 함)
+  const [isGroupOwner] = useState(false); // true면 생성자, false면 참여자
 
   const handleBackButton = () => {
     navigate(-1);
   };
 
-  const handleMoreButton = () => {};
+  const handleMoreButton = () => {
+    setIsBottomSheetOpen(true);
+  };
+
+  const handleCloseBottomSheet = () => {
+    setIsBottomSheetOpen(false);
+  };
+
+  const handleDeleteGroup = () => {
+    // 방 삭제하기 로직
+    console.log('방 삭제하기');
+    // 실제로는 API 호출 후 성공하면 홈으로 이동
+    navigate('/group');
+  };
+
+  const handleLeaveGroup = () => {
+    // 방 나가기 로직
+    console.log('방 나가기');
+    // 실제로는 API 호출 후 성공하면 홈으로 이동
+    navigate('/group');
+  };
+
+  const handleReportGroup = () => {
+    // 방 신고하기 로직
+    console.log('방 신고하기');
+    // 실제로는 신고 모달이나 페이지로 이동
+  };
 
   const handleRecordSectionClick = () => {
     navigate('/memory');
@@ -169,6 +201,15 @@ const ParticipatedGroupDetail = () => {
         hasPolls={hasPolls}
         onClick={handleHotTopicSectionClick}
         onPollClick={handlePollClick}
+      />
+
+      <GroupActionBottomSheet
+        isOpen={isBottomSheetOpen}
+        isGroupOwner={isGroupOwner}
+        onClose={handleCloseBottomSheet}
+        onDeleteGroup={handleDeleteGroup}
+        onLeaveGroup={handleLeaveGroup}
+        onReportGroup={handleReportGroup}
       />
     </ParticipatedWrapper>
   );
