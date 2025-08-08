@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { typography, colors } from '@/styles/global/global';
 import PostHeader from './PostHeader';
-import type { SubReplyDataProps } from '@/types/post';
+import type { ReplyData } from '@/api/comments/getComments';
 import like from '../../../assets/feed/like.svg';
 import activeLike from '../../../assets/feed/activeLike.svg';
 import replyIcon from '../../../assets/feed/replyIcon.svg';
@@ -11,8 +11,8 @@ import { usePopupActions } from '@/hooks/usePopupActions';
 import { postLike } from '@/api/comments/postLike';
 
 const SubReply = ({
+  commentId,
   parentCommentCreatorNickname,
-  replyId,
   creatorId,
   creatorProfileImageUrl,
   creatorNickname,
@@ -22,7 +22,8 @@ const SubReply = ({
   content,
   likeCount,
   isLike,
-}: SubReplyDataProps) => {
+  isDeleted,
+}: ReplyData) => {
   const [liked, setLiked] = useState<boolean>(isLike);
   const [currentLikeCount, setCurrentLikeCount] = useState<number>(likeCount);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,12 +32,12 @@ const SubReply = ({
   const { openReplyModal, closePopup } = usePopupActions();
 
   const handleReplyClick = () => {
-    startReply(creatorNickname, replyId);
+    startReply(creatorNickname, commentId);
   };
 
   const handleLike = async () => {
     try {
-      const response = await postLike(replyId, !liked);
+      const response = await postLike(commentId, !liked);
       console.log('좋아요 상태 변경 성공:', response);
 
       // 서버 응답으로 상태 업데이트
@@ -53,7 +54,7 @@ const SubReply = ({
       openReplyModal({
         isOpen: true,
         userId: creatorId,
-        replyId: replyId,
+        commentId: commentId,
         position: {
           x: rect.right,
           y: rect.bottom,
@@ -62,6 +63,15 @@ const SubReply = ({
       });
     }
   };
+
+  // 삭제된 댓글인 경우 처리
+  if (isDeleted) {
+    return (
+      <DeletedContainer>
+        <div className="deleted-text">삭제된 댓글이에요.</div>
+      </DeletedContainer>
+    );
+  }
 
   return (
     <Container ref={containerRef}>
@@ -84,7 +94,13 @@ const SubReply = ({
               <div className="reply-nickname">@{parentCommentCreatorNickname} </div>
               {content}
             </div>
-            <div className="sub-reply" onClick={handleReplyClick}>
+            <div
+              className="sub-reply"
+              onClick={e => {
+                e.stopPropagation();
+                handleReplyClick();
+              }}
+            >
               답글작성
             </div>
           </div>
@@ -104,6 +120,18 @@ const SubReply = ({
     </Container>
   );
 };
+
+const DeletedContainer = styled.div`
+  display: flex;
+  width: 100%;
+
+  .deleted-text {
+    color: ${colors.grey[300]};
+    font-size: ${typography.fontSize.sm};
+    font-weight: ${typography.fontWeight.regular};
+    line-height: 20px;
+  }
+`;
 
 const Container = styled.div`
   display: flex;

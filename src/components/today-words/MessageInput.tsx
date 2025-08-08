@@ -17,8 +17,8 @@ interface MessageInputProps {
   onChange: (value: string) => void;
   onSend: () => void;
   isReplying?: boolean;
-  targetUserName?: string;
   onCancelReply?: () => void;
+  nickname?: string;
 }
 
 const MessageInput = ({
@@ -27,8 +27,8 @@ const MessageInput = ({
   onChange,
   onSend,
   isReplying = false,
-  targetUserName,
   onCancelReply,
+  nickname,
 }: MessageInputProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState(false);
@@ -61,12 +61,12 @@ const MessageInput = ({
   return (
     <Wrapper>
       {/* 답글 작성 중일 때만 표시 */}
-      {isReplying && targetUserName && (
+      {isReplying && nickname && (
         <ReplyContainer>
           <div className="left">
             <img src={replyIcon} alt="답글 아이콘" />
             <div className="notice">
-              <div className="userName">@{targetUserName}</div>
+              <div className="userName">@{nickname}</div>
               <div className="disc">님에게 답글작성</div>
             </div>
           </div>

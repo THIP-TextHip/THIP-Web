@@ -28,7 +28,7 @@ export interface SnackbarProps {
 export interface ReplyModalProps {
   isOpen: boolean;
   userId: number;
-  replyId: number;
+  commentId: number;
   position?: {
     x: number;
     y: number;

@@ -39,7 +39,8 @@ export type PostBodyProps = Pick<
 
 // 대댓글(SubReply)
 export interface SubReplyDataProps {
-  replyId: number;
+  commentId: number;
+  parentCommentCreatorNickname: string;
   creatorId: number;
   creatorProfileImageUrl: string | null;
   creatorNickname: string;
@@ -49,7 +50,7 @@ export interface SubReplyDataProps {
   content: string;
   likeCount: number;
   isLike: boolean;
-  parentCommentCreatorNickname?: string;
+  isDeleted: boolean;
 }
 
 // 댓글(Reply)
@@ -64,6 +65,7 @@ export interface ReplyDataProps {
   content: string;
   likeCount: number;
   isLike: boolean;
+  isDeleted: boolean;
   replyList: SubReplyDataProps[];
 }
 

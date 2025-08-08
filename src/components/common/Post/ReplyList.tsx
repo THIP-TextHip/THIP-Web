@@ -2,7 +2,11 @@ import styled from '@emotion/styled';
 import { typography, colors } from '@/styles/global/global';
 import Reply from './Reply';
 import SubReply from './SubReply';
-import type { ReplyListProps } from '@/types/post';
+import type { CommentData } from '@/api/comments/getComments';
+
+interface ReplyListProps {
+  commentList: CommentData[];
+}
 
 const ReplyList = ({ commentList }: ReplyListProps) => {
   const hasComments = commentList.length > 0;
@@ -10,11 +14,14 @@ const ReplyList = ({ commentList }: ReplyListProps) => {
   return (
     <Container>
       {hasComments ? (
-        commentList.map(comment => (
-          <div className="comment-group" key={comment.commentId}>
+        commentList.map((comment, commentIndex) => (
+          <div className="comment-group" key={comment.commentId || `comment-${commentIndex}`}>
             <Reply {...comment} />
-            {comment.replyList.map(sub => (
-              <SubReply key={sub.replyId} {...sub} />
+            {comment.replyList.map((sub, replyIndex) => (
+              <SubReply
+                key={sub.commentId || `reply-${comment.commentId || commentIndex}-${replyIndex}`}
+                {...sub}
+              />
             ))}
           </div>
         ))

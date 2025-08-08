@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
 import FeedDetailPost from '@/components/feed/FeedDetailPost';
@@ -12,6 +12,7 @@ import { useReplyActions } from '@/hooks/useReplyActions';
 import { getFeedDetail, type FeedDetailData } from '@/api/feeds/getFeedDetail';
 import { getComments, type CommentData } from '@/api/comments/getComments';
 import { deleteFeedPost } from '@/api/feeds/deleteFeedPost';
+import { useReplyStore } from '@/stores/useReplyStore';
 
 const FeedDetailPage = () => {
   const navigate = useNavigate();
@@ -22,8 +23,20 @@ const FeedDetailPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   const { openMoreMenu, openConfirm, openSnackbar, closePopup } = usePopupActions();
-  const { isReplying, targetUserName, replyContent, setReplyContent, submitComment, cancelReply } =
+  const { isReplying, replyContent, setReplyContent, submitComment, cancelReply } =
     useReplyActions();
+  const { nickname } = useReplyStore();
+  // 댓글 목록을 다시 로드하는 함수
+  const reloadComments = useCallback(async () => {
+    if (!feedId) return;
+
+    try {
+      const commentsResponse = await getComments(Number(feedId), { postType: 'FEED' });
+      setCommentList(commentsResponse.data.commentList);
+    } catch (err) {
+      console.error('댓글 목록 다시 로드 실패:', err);
+    }
+  }, [feedId]);
 
   // 페이지를 떠날 때 답글 상태 초기화
   useEffect(() => {
@@ -47,7 +60,7 @@ const FeedDetailPage = () => {
         // 피드 상세 정보와 댓글 목록을 병렬로 로드
         const [feedResponse, commentsResponse] = await Promise.all([
           getFeedDetail(Number(feedId)),
-          getComments(Number(feedId)),
+          getComments(Number(feedId), { postType: 'FEED' }),
         ]);
 
         setFeedData(feedResponse.data);
@@ -63,6 +76,14 @@ const FeedDetailPage = () => {
 
     loadFeedDetailAndComments();
   }, [feedId]);
+
+  const handleCommentSubmit = async () => {
+    await submitComment({
+      postId: Number(feedId),
+      postType: 'FEED',
+      onSuccess: reloadComments,
+    });
+  };
 
   const handleMoreClick = () => {
     openMoreMenu({
@@ -101,10 +122,8 @@ const FeedDetailPage = () => {
               });
             }
           },
-          onClose: closePopup,
         });
       },
-      onClose: closePopup,
     });
   };
 
@@ -138,10 +157,10 @@ const FeedDetailPage = () => {
         placeholder="여러분의 생각을 남겨주세요."
         value={replyContent}
         onChange={setReplyContent}
-        onSend={() => submitComment({ postId: Number(feedId), postType: 'FEED' })}
+        onSend={handleCommentSubmit}
         isReplying={isReplying}
-        targetUserName={targetUserName}
         onCancelReply={cancelReply}
+        nickname={nickname}
       />
     </Wrapper>
   );
