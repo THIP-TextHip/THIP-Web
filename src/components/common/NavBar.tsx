@@ -1,7 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
 import Fab from './Fab';
-import type { FabProps } from '../../types/fab';
 import FeedIcon from '../../assets/navbar/feed.svg';
 import GroupIcon from '../../assets/navbar/group.svg';
 import SearchIcon from '../../assets/navbar/search.svg';
@@ -72,7 +71,12 @@ const items: RouteItem[] = [
   { path: '/mypage', label: '내 정보', icon: MyIcon, activeIcon: MyIconActive },
 ];
 
-const NavBar = ({ src, path }: FabProps) => {
+interface NavBarProps {
+  src?: string;
+  path?: string;
+}
+
+const NavBar = ({ src, path }: NavBarProps) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 

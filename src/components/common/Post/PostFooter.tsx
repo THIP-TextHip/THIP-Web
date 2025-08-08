@@ -8,6 +8,7 @@ import save from '../../../assets/feed/save.svg';
 import activeSave from '../../../assets/feed/activeSave.svg';
 import lockIcon from '../../../assets/feed/lockIcon.svg';
 import { postSaveFeed } from '@/api/feeds/postSave';
+import { postFeedLike } from '@/api/feeds/postFeedLike';
 
 const Container = styled.div<{ isDetail: boolean }>`
   width: 100%;
@@ -70,9 +71,21 @@ const PostFooter = ({
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
   const [saved, setSaved] = useState(isSaved);
 
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikeCount(prev => (liked ? prev - 1 : prev + 1));
+  const handleLike = async () => {
+    try {
+      const response = await postFeedLike(feedId, !liked);
+
+      if (response.isSuccess) {
+        // 성공 시 상태 업데이트
+        setLiked(response.data.isLiked);
+        setLikeCount(prev => (response.data.isLiked ? prev + 1 : prev - 1));
+        console.log('좋아요 상태 변경 성공:', response.data.isLiked);
+      } else {
+        console.error('좋아요 상태 변경 실패:', response.message);
+      }
+    } catch (error) {
+      console.error('좋아요 API 호출 실패:', error);
+    }
   };
 
   const handleSave = async () => {
