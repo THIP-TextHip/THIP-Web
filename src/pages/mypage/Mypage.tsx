@@ -11,19 +11,22 @@ import ver from '../../assets/mypage/ver.svg';
 import notice from '../../assets/mypage/notice.svg';
 import terms from '../../assets/mypage/terms.svg';
 import NavBar from '@/components/common/NavBar';
-
-const mockProfile = {
-  profileImgUrl: 'https://placehold.co/54x54',
-  userName: '문학하는 고래',
-  userTitle: '문학가',
-  titleColor: '#a1d5ff',
-};
+import { getMyProfile, type GetMyProfileResponse } from '@/api/users/getMyProfile';
+import { useEffect, useState } from 'react';
 
 const Mypage = () => {
-  const { profileImgUrl, userName, userTitle, titleColor } = mockProfile;
+  const [profile, setProfile] = useState<GetMyProfileResponse['data'] | undefined>(undefined);
   const { openConfirm, closePopup } = usePopupActions();
   const navigate = useNavigate();
   const onClickEdit = () => {};
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const profile = await getMyProfile();
+      setProfile(profile);
+    };
+    fetchProfile();
+  }, []);
 
   const handleLogout = () => {
     openConfirm({
@@ -64,11 +67,11 @@ const Mypage = () => {
       <Container>
         <UserProfile>
           <div className="userInfo">
-            <img src={profileImgUrl} />
+            <img src={profile?.profileImageUrl} />
             <div className="user">
-              <div className="username">{userName}</div>
-              <div className="usertitle" style={{ color: titleColor }}>
-                {userTitle}
+              <div className="username">{profile?.nickname}</div>
+              <div className="usertitle" style={{ color: profile?.aliasName }}>
+                {profile?.aliasName}
               </div>
             </div>
           </div>

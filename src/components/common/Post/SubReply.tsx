@@ -125,7 +125,7 @@ const SubReply = ({
   if (isDeleted) {
     return (
       <DeletedContainer>
-        <div className="deleted-text">삭제된 댓글이에요.</div>
+        <div className="deleted-text">삭제된 댓글이에요</div>
       </DeletedContainer>
     );
   }
