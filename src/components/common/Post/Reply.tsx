@@ -54,29 +54,39 @@ const Reply = ({
   const handleDelete = async () => {
     try {
       const response = await deleteComment(commentId);
+      closePopup();
+
       if (response.isSuccess) {
-        openSnackbar({
-          message: '댓글이 삭제되었습니다.',
-          variant: 'top',
-          onClose: closePopup,
-        });
+        // 약간의 지연 후 스낵바 오픈 → 진입 애니메이션이 확실히 보이도록
+        setTimeout(() => {
+          openSnackbar({
+            message: '댓글이 삭제되었습니다.',
+            variant: 'top',
+            onClose: closePopup,
+          });
+        }, 100);
         if (onDelete) {
           onDelete();
         }
       } else {
+        setTimeout(() => {
+          openSnackbar({
+            message: '댓글 삭제에 실패했습니다.',
+            variant: 'top',
+            onClose: closePopup,
+          });
+        }, 100);
+      }
+    } catch (error) {
+      console.error('댓글 삭제 실패:', error);
+      closePopup();
+      setTimeout(() => {
         openSnackbar({
           message: '댓글 삭제에 실패했습니다.',
           variant: 'top',
           onClose: closePopup,
         });
-      }
-    } catch (error) {
-      console.error('댓글 삭제 실패:', error);
-      openSnackbar({
-        message: '댓글 삭제에 실패했습니다.',
-        variant: 'top',
-        onClose: closePopup,
-      });
+      }, 100);
     }
   };
 

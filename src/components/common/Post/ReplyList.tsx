@@ -6,9 +6,10 @@ import type { CommentData } from '@/api/comments/getComments';
 
 interface ReplyListProps {
   commentList: CommentData[];
+  onReload: () => void;
 }
 
-const ReplyList = ({ commentList }: ReplyListProps) => {
+const ReplyList = ({ commentList, onReload }: ReplyListProps) => {
   const hasComments = commentList.length > 0;
 
   return (
@@ -16,11 +17,12 @@ const ReplyList = ({ commentList }: ReplyListProps) => {
       {hasComments ? (
         commentList.map((comment, commentIndex) => (
           <div className="comment-group" key={comment.commentId || `comment-${commentIndex}`}>
-            <Reply {...comment} />
+            <Reply {...comment} onDelete={onReload} />
             {comment.replyList.map((sub, replyIndex) => (
               <SubReply
                 key={sub.commentId || `reply-${comment.commentId || commentIndex}-${replyIndex}`}
                 {...sub}
+                onDelete={onReload}
               />
             ))}
           </div>

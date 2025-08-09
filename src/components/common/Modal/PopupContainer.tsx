@@ -38,11 +38,7 @@ const PopupContainer = () => {
         );
       }
       case 'moremenu': {
-        return (
-          <Wrapper>
-            <MoreMenu {...(popupProps as MoreMenuProps)} />
-          </Wrapper>
-        );
+        return <MoreMenu {...(popupProps as MoreMenuProps)} />;
       }
       case 'reply-modal': {
         return <ReplyModal {...(popupProps as ReplyModalProps)} />;

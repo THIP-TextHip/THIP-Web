@@ -88,10 +88,14 @@ const FeedDetailPage = () => {
   const handleMoreClick = () => {
     openMoreMenu({
       onEdit: () => console.log('수정하기 클릭'),
+      onClose: () => {
+        closePopup();
+      },
       onDelete: () => {
         openConfirm({
           title: '이 피드를 삭제하시겠어요?',
           disc: '삭제 후에는 되돌릴 수 없어요',
+          onClose: closePopup,
           onConfirm: async () => {
             try {
               if (!feedId) return;
@@ -152,7 +156,7 @@ const FeedDetailPage = () => {
         onRightClick={handleMoreClick}
       />
       <FeedDetailPost {...feedData} />
-      <ReplyList commentList={commentList} />
+      <ReplyList commentList={commentList} onReload={reloadComments} />
       <MessageInput
         placeholder="여러분의 생각을 남겨주세요."
         value={replyContent}
