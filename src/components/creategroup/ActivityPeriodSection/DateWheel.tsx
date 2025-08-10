@@ -91,12 +91,12 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault();
+    // passive 이벤트에서는 preventDefault를 제거
     handleInteractionStart(e.touches[0].clientY);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
+    // passive 이벤트에서는 preventDefault를 제거
     if (e.touches.length > 0) {
       handleInteractionMove(e.touches[0].clientY);
     }
@@ -121,7 +121,7 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
   };
 
   const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
+    // passive 이벤트에서는 preventDefault를 제거
     const delta = e.deltaY > 0 ? 1 : -1;
     moveToIndex(delta);
   };
@@ -141,6 +141,46 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
       setSliderState(newState);
     }
   };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleTouchStartNonPassive = (e: TouchEvent) => {
+      e.preventDefault();
+      handleInteractionStart(e.touches[0].clientY);
+    };
+
+    const handleTouchMoveNonPassive = (e: TouchEvent) => {
+      e.preventDefault();
+      if (e.touches.length > 0) {
+        handleInteractionMove(e.touches[0].clientY);
+      }
+    };
+
+    const handleTouchEndNonPassive = () => {
+      handleInteractionEnd();
+    };
+
+    const handleWheelNonPassive = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 1 : -1;
+      moveToIndex(delta);
+    };
+
+    // non-passive 옵션으로 이벤트 리스너 등록
+    container.addEventListener('touchstart', handleTouchStartNonPassive, { passive: false });
+    container.addEventListener('touchmove', handleTouchMoveNonPassive, { passive: false });
+    container.addEventListener('touchend', handleTouchEndNonPassive, { passive: false });
+    container.addEventListener('wheel', handleWheelNonPassive, { passive: false });
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStartNonPassive);
+      container.removeEventListener('touchmove', handleTouchMoveNonPassive);
+      container.removeEventListener('touchend', handleTouchEndNonPassive);
+      container.removeEventListener('wheel', handleWheelNonPassive);
+    };
+  }, [currentIndex, values]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const slideValues = () => {
     if (!sliderState || !sliderState.slides) return [];
@@ -173,11 +213,7 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
     <WheelContainer
       ref={containerRef}
       className="wheel keen-slider wheel--perspective-center"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleInteractionEnd}
       onMouseDown={handleMouseDown}
-      onWheel={handleWheel}
       style={{ height: '150px' }}
     >
       <WheelShadowTop radius={radius} onClick={() => moveToIndex(-1)} />
