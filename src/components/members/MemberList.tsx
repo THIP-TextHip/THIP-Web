@@ -53,7 +53,9 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
               <MemberRole>{member.role}</MemberRole>
             </MemberInfo>
           </ProfileSection>
-          <MemberStatus>{member.followers}</MemberStatus>
+          <MemberStatus>
+            {`${(member.followersCount ?? 0).toLocaleString()}명이 띱 하는 중`}
+          </MemberStatus>
           <ChevronIcon src={rightChevron} alt="이동" />
         </MemberItem>
       ))}
