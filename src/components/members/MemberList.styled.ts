@@ -20,6 +20,11 @@ export const MemberItem = styled.div`
     background-color: ${colors.darkgrey['50']};
   }
 
+  &:focus-visible {
+    outline: 2px solid ${semanticColors.text.point.green};
+    outline-offset: -2px;
+  }
+
   &::after {
     content: '';
     position: absolute;

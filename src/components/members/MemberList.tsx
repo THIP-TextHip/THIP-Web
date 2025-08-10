@@ -30,10 +30,23 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, memberId: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleMemberClick(memberId);
+    }
+  };
+
   return (
     <Container>
       {members.map(member => (
-        <MemberItem key={member.id} onClick={() => handleMemberClick(member.id)}>
+        <MemberItem
+          key={member.id}
+          role="button"
+          tabIndex={0}
+          onClick={() => handleMemberClick(member.id)}
+          onKeyDown={e => handleKeyDown(e, member.id)}
+        >
           <ProfileSection>
             <ProfileImage />
             <MemberInfo>
