@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import type { KeyboardEvent } from 'react';
 import rightChevron from '../../assets/member/right-chevron.svg';
 import type { Member } from '../../mocks/members.mock';
 import {
@@ -26,14 +27,7 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
       onMemberClick(memberId);
     } else {
       // 기본 동작: 개별 유저 페이지로 이동
-      navigate(`/user/${memberId}`);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent, memberId: string) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleMemberClick(memberId);
+      navigate(`/otherfeed/${memberId}`);
     }
   };
 
@@ -45,7 +39,12 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
           role="button"
           tabIndex={0}
           onClick={() => handleMemberClick(member.id)}
-          onKeyDown={e => handleKeyDown(e, member.id)}
+          onKeyDown={(e: KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleMemberClick(member.id);
+            }
+          }}
         >
           <ProfileSection>
             <ProfileImage />
