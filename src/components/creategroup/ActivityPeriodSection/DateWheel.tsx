@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   WheelContainer,
   WheelInner,
@@ -56,51 +56,64 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
     }
   }, [currentIndex, values]);
 
-  const handleInteractionStart = (clientY: number) => {
-    isDragging.current = true;
-    startY.current = clientY;
-    startIndex.current = currentIndex;
-  };
+  const handleInteractionStart = useCallback(
+    (clientY: number) => {
+      isDragging.current = true;
+      startY.current = clientY;
+      startIndex.current = currentIndex;
+    },
+    [currentIndex],
+  );
 
-  const handleInteractionMove = (clientY: number) => {
-    if (!isDragging.current) return;
+  const handleInteractionMove = useCallback(
+    (clientY: number) => {
+      if (!isDragging.current) return;
 
-    const deltaY = clientY - startY.current;
-    const sensitivity = 30;
-    const deltaIndex = Math.round(-deltaY / sensitivity);
-    const newIndex = Math.max(0, Math.min(values.length - 1, startIndex.current + deltaIndex));
+      const deltaY = clientY - startY.current;
+      const sensitivity = 30;
+      const deltaIndex = Math.round(-deltaY / sensitivity);
+      const newIndex = Math.max(0, Math.min(values.length - 1, startIndex.current + deltaIndex));
 
-    if (newIndex !== currentIndex) {
-      setCurrentIndex(newIndex);
+      if (newIndex !== currentIndex) {
+        setCurrentIndex(newIndex);
 
-      const newState: SliderState = {
-        abs: newIndex,
-        slides: values.map((_, i) => ({
-          distance: i - newIndex,
-        })),
-      };
-      setSliderState(newState);
-    }
-  };
+        const newState: SliderState = {
+          abs: newIndex,
+          slides: values.map((_, i) => ({
+            distance: i - newIndex,
+          })),
+        };
+        setSliderState(newState);
+      }
+    },
+    [currentIndex, values],
+  );
 
-  const handleInteractionEnd = () => {
+  const handleInteractionEnd = useCallback(() => {
     if (!isDragging.current) return;
 
     isDragging.current = false;
     onChange(values[currentIndex]);
-  };
+  }, [currentIndex, values, onChange]);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    // passive 이벤트에서는 preventDefault를 제거
-    handleInteractionStart(e.touches[0].clientY);
-  };
+  const moveToIndex = useCallback(
+    (direction: number) => {
+      const newIndex = Math.max(0, Math.min(values.length - 1, currentIndex + direction));
+      if (newIndex !== currentIndex) {
+        setCurrentIndex(newIndex);
+        onChange(values[newIndex]);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    // passive 이벤트에서는 preventDefault를 제거
-    if (e.touches.length > 0) {
-      handleInteractionMove(e.touches[0].clientY);
-    }
-  };
+        const newState: SliderState = {
+          abs: newIndex,
+          slides: values.map((_, i) => ({
+            distance: i - newIndex,
+          })),
+        };
+        setSliderState(newState);
+      }
+    },
+    [currentIndex, values, onChange],
+  );
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -120,28 +133,7 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const handleWheel = (e: React.WheelEvent) => {
-    // passive 이벤트에서는 preventDefault를 제거
-    const delta = e.deltaY > 0 ? 1 : -1;
-    moveToIndex(delta);
-  };
-
-  const moveToIndex = (direction: number) => {
-    const newIndex = Math.max(0, Math.min(values.length - 1, currentIndex + direction));
-    if (newIndex !== currentIndex) {
-      setCurrentIndex(newIndex);
-      onChange(values[newIndex]);
-
-      const newState: SliderState = {
-        abs: newIndex,
-        slides: values.map((_, i) => ({
-          distance: i - newIndex,
-        })),
-      };
-      setSliderState(newState);
-    }
-  };
-
+  // 터치 및 휠 이벤트를 non-passive로 등록하기 위한 useEffect
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -180,7 +172,7 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
       container.removeEventListener('touchend', handleTouchEndNonPassive);
       container.removeEventListener('wheel', handleWheelNonPassive);
     };
-  }, [currentIndex, values]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [handleInteractionStart, handleInteractionMove, handleInteractionEnd, moveToIndex]);
 
   const slideValues = () => {
     if (!sliderState || !sliderState.slides) return [];
