@@ -13,10 +13,18 @@ import { Container } from './CreateGroup.styled';
 import { createRoom } from '../../api/rooms/createRoom';
 import type { CreateRoomRequest } from '@/types/room';
 
+// Book 타입 정의
+interface Book {
+  id?: number;
+  title: string;
+  author: string;
+  cover: string;
+  isbn?: string;
+}
+
 const CreateGroup = () => {
   const navigate = useNavigate();
-  const [bookTitle, setBookTitle] = useState('');
-  const [selectedBook, setSelectedBook] = useState<any>(null);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [selectedGenre, setSelectedGenre] = useState('');
   const [roomTitle, setRoomTitle] = useState('');
   const [roomDescription, setRoomDescription] = useState('');
@@ -92,9 +100,8 @@ const CreateGroup = () => {
     setIsBookSearchOpen(false);
   };
 
-  const handleBookSelect = (book: any) => {
+  const handleBookSelect = (book: Book) => {
     setSelectedBook(book);
-    setBookTitle(book.title);
   };
 
   const handleGenreSelect = (genre: string) => {
@@ -117,9 +124,8 @@ const CreateGroup = () => {
     setPassword('');
   };
 
-  // 폼 유효성 검사 - 필수 필드들이 모두 채워져 있는지 확인
   const isFormValid =
-    (selectedBook || bookTitle.trim() !== '') &&
+    selectedBook !== null &&
     selectedGenre !== '' &&
     roomTitle.trim() !== '' &&
     roomDescription.trim() !== '' &&
@@ -138,10 +144,9 @@ const CreateGroup = () => {
       />
       <Container>
         <BookSelectionSection
-          bookTitle={bookTitle}
           selectedBook={selectedBook}
-          onBookSearchClick={handleBookSearchOpen}
-          onChangeBookClick={handleChangeBook}
+          onSearchClick={handleBookSearchOpen}
+          onChangeClick={handleChangeBook}
         />
 
         <GenreSelectionSection selectedGenre={selectedGenre} onGenreSelect={handleGenreSelect} />
@@ -165,7 +170,7 @@ const CreateGroup = () => {
         <PrivacySettingSection
           isPrivate={isPrivate}
           password={password}
-          onPrivacyToggle={handlePrivacyToggle}
+          onToggle={handlePrivacyToggle}
           onPasswordChange={handlePasswordChange}
           onPasswordClose={handlePasswordClose}
         />
@@ -173,7 +178,7 @@ const CreateGroup = () => {
         <BookSearchBottomSheet
           isOpen={isBookSearchOpen}
           onClose={handleBookSearchClose}
-          onBookSelect={handleBookSelect}
+          onSelectBook={handleBookSelect}
         />
       </Container>
     </>
