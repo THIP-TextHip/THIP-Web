@@ -74,11 +74,11 @@ const Mypage = () => {
       <Container>
         <UserProfile>
           <div className="userInfo">
-            <img src={profile?.profileImageUrl} />
+            <img src={profile.profileImageUrl} />
             <div className="user">
-              <div className="username">{profile?.nickname}</div>
-              <div className="usertitle" style={{ color: profile?.aliasColor }}>
-                {profile?.aliasName}
+              <div className="username">{profile.nickname}</div>
+              <div className="usertitle" style={{ color: profile.aliasColor }}>
+                {profile.aliasName}
               </div>
             </div>
           </div>
