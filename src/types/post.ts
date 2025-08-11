@@ -39,32 +39,33 @@ export type PostBodyProps = Pick<
 
 // 대댓글(SubReply)
 export interface SubReplyDataProps {
-  replyCommentUserName: string;
-  replyCommentUserId: number;
-  replyCommentimgUrl: string;
-  replyCommentContent: string;
-  replyCommentUserTitle: string;
-  replyCommentId: number;
+  parentCommentCreatorNickname: string;
+  creatorId: number;
+  creatorProfileImageUrl: string | null;
+  creatorNickname: string;
+  alias: string;
   aliasColor: string;
   postDate: string;
+  content: string;
   likeCount: number;
+  replyId: number;
   isLike: boolean;
 }
 
 // 댓글(Reply)
 export interface ReplyDataProps {
   commentId: number;
-  userId: number;
-  imageUrl: string;
-  nickName: string;
-  userTitle: string;
+  creatorId: number;
+  creatorProfileImageUrl: string | null;
+  creatorNickname: string;
+  alias: string;
   aliasColor: string;
-  createdAt: string;
   postDate: string;
   content: string;
   likeCount: number;
   isLike: boolean;
-  replyCommentList: SubReplyDataProps[];
+  isDeleted: boolean;
+  replyList: SubReplyDataProps[];
 }
 
 // ReplyList Props

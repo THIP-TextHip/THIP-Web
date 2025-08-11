@@ -2,11 +2,11 @@ import { create } from 'zustand';
 
 interface ReplyState {
   isReplying: boolean;
-  targetUserName: string;
+  nickname: string;
   parentId: number | null;
   replyContent: string;
 
-  startReply: (userName: string, parentId: number) => void;
+  startReply: (parentCommentCreatorNickname: string, parentId: number) => void;
   cancelReply: () => void;
   setReplyContent: (content: string) => void;
   clearReplyContent: () => void;
@@ -14,14 +14,13 @@ interface ReplyState {
 
 export const useReplyStore = create<ReplyState>(set => ({
   isReplying: false,
-  targetUserName: '',
+  nickname: '',
   parentId: null,
   replyContent: '',
 
-  startReply: (userName, parentId) => set({ isReplying: true, targetUserName: userName, parentId }),
+  startReply: (nickname, parentId) => set({ isReplying: true, nickname, parentId }),
 
-  cancelReply: () =>
-    set({ isReplying: false, targetUserName: '', parentId: null, replyContent: '' }),
+  cancelReply: () => set({ isReplying: false, nickname: '', parentId: null, replyContent: '' }),
 
   setReplyContent: (content: string) => set({ replyContent: content }),
 

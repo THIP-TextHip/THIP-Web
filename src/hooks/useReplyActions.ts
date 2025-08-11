@@ -10,7 +10,7 @@ interface SubmitCommentProps {
 export const useReplyActions = () => {
   const {
     isReplying,
-    targetUserName,
+    nickname,
     parentId,
     replyContent,
     startReply,
@@ -44,7 +44,7 @@ export const useReplyActions = () => {
 
   return {
     isReplying,
-    targetUserName,
+    nickname,
     replyContent,
     startReply,
     cancelReply,

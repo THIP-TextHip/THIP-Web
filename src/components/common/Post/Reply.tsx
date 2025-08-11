@@ -1,64 +1,168 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { typography, colors } from '@/styles/global/global';
 import PostHeader from './PostHeader';
-import type { ReplyDataProps } from '@/types/post';
+import type { CommentData } from '@/api/comments/getComments';
 import like from '../../../assets/feed/like.svg';
 import activeLike from '../../../assets/feed/activeLike.svg';
 import { useReplyActions } from '@/hooks/useReplyActions';
+import { usePopupActions } from '@/hooks/usePopupActions';
+import { postLike } from '@/api/comments/postLike';
+import { deleteComment } from '@/api/comments/deleteComment';
+
+interface ReplyProps extends CommentData {
+  onDelete?: () => void;
+}
 
 const Reply = ({
   commentId,
-  userId,
-  imageUrl,
-  nickName,
-  userTitle,
+  creatorId,
+  creatorProfileImageUrl,
+  creatorNickname,
+  alias,
   aliasColor,
   postDate,
   content,
   isLike,
   likeCount: initialLikeCount,
-}: ReplyDataProps) => {
+  isDeleted,
+  onDelete,
+}: ReplyProps) => {
   const [liked, setLiked] = useState(isLike);
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const { startReply } = useReplyActions();
+  const { openMoreMenu, closePopup, openConfirm, openSnackbar } = usePopupActions();
 
-  const handleLike = () => {
-    setLiked(prev => !prev);
-    setLikeCount(prev => (liked ? prev - 1 : prev + 1));
+  const handleLike = async () => {
+    try {
+      const response = await postLike(commentId, !liked);
+      console.log('좋아요 상태 변경 성공:', response);
+      setLiked(response.data.isLiked);
+      setLikeCount(prev => (response.data.isLiked ? prev + 1 : prev - 1));
+    } catch (error) {
+      console.error('좋아요 상태 변경 실패:', error);
+    }
   };
 
   const handleReplyClick = () => {
-    startReply(nickName, commentId);
+    // 답글 작성 시에는 현재 댓글 작성자의 이름을 사용
+    startReply(creatorNickname, commentId);
   };
 
+  const handleDelete = async () => {
+    try {
+      const response = await deleteComment(commentId);
+      closePopup();
+
+      if (response.isSuccess) {
+        // 약간의 지연 후 스낵바 오픈 → 진입 애니메이션이 확실히 보이도록
+        setTimeout(() => {
+          openSnackbar({
+            message: '댓글이 삭제되었습니다.',
+            variant: 'top',
+            onClose: closePopup,
+          });
+        }, 100);
+        if (onDelete) {
+          onDelete();
+        }
+      } else {
+        setTimeout(() => {
+          openSnackbar({
+            message: '댓글 삭제에 실패했습니다.',
+            variant: 'top',
+            onClose: closePopup,
+          });
+        }, 100);
+      }
+    } catch (error) {
+      console.error('댓글 삭제 실패:', error);
+      closePopup();
+      setTimeout(() => {
+        openSnackbar({
+          message: '댓글 삭제에 실패했습니다.',
+          variant: 'top',
+          onClose: closePopup,
+        });
+      }, 100);
+    }
+  };
+
+  const handleMoreClick = () => {
+    openMoreMenu({
+      onDelete: () => {
+        openConfirm({
+          title: '이 댓글을 삭제하시겠어요?',
+          disc: '삭제 후에는 되돌릴 수 없어요',
+          onConfirm: handleDelete,
+        });
+      },
+      onClose: closePopup,
+    });
+  };
+
+  // 삭제된 댓글인 경우 처리
+  if (isDeleted) {
+    return (
+      <DeletedContainer>
+        <div className="deleted-text">삭제된 댓글이에요</div>
+      </DeletedContainer>
+    );
+  }
+
   return (
-    <Container>
+    <Container ref={containerRef}>
       <PostHeader
-        creatorProfileImageUrl={imageUrl}
-        creatorNickname={nickName}
-        alias={userTitle}
+        creatorProfileImageUrl={creatorProfileImageUrl || undefined}
+        creatorNickname={creatorNickname}
+        alias={alias}
         aliasColor={aliasColor}
         postDate={postDate}
-        creatorId={userId}
+        creatorId={creatorId}
         type="reply"
       />
-      <ReplySection>
+      <ReplySection onClick={handleMoreClick}>
         <div className="left">
           <div className="reply">{content}</div>
-          <div className="sub-reply" onClick={handleReplyClick}>
+          <div
+            className="sub-reply"
+            onClick={e => {
+              e.stopPropagation();
+              handleReplyClick();
+            }}
+          >
             답글작성
           </div>
         </div>
         <div className="right">
-          <img src={liked ? activeLike : like} onClick={handleLike} alt="좋아요" />
+          <img
+            src={liked ? activeLike : like}
+            onClick={e => {
+              e.stopPropagation();
+              handleLike();
+            }}
+            alt="좋아요"
+          />
           <div className="count">{likeCount}</div>
         </div>
       </ReplySection>
     </Container>
   );
 };
+const DeletedContainer = styled.div`
+  display: flex;
+  width: 100%;
+
+  .deleted-text {
+    color: ${colors.grey[300]};
+    font-size: ${typography.fontSize.sm};
+    font-weight: ${typography.fontWeight.regular};
+    line-height: 20px;
+  }
+`;
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
