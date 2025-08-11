@@ -77,7 +77,7 @@ const Mypage = () => {
             <img src={profile?.profileImageUrl} />
             <div className="user">
               <div className="username">{profile?.nickname}</div>
-              <div className="usertitle" style={{ color: profile?.aliasName }}>
+              <div className="usertitle" style={{ color: profile?.aliasColor }}>
                 {profile?.aliasName}
               </div>
             </div>

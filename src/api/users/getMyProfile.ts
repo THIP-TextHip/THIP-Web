@@ -8,6 +8,7 @@ export interface GetMyProfileResponse {
     profileImageUrl: string;
     nickname: string;
     aliasName: string;
+    aliasColor: string;
   };
 }
 
