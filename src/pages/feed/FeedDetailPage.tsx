@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
 import FeedDetailPost from '@/components/feed/FeedDetailPost';
@@ -11,6 +11,8 @@ import { usePopupActions } from '@/hooks/usePopupActions';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { getFeedDetail, type FeedDetailData } from '@/api/feeds/getFeedDetail';
 import { getComments, type CommentData } from '@/api/comments/getComments';
+import { deleteFeedPost } from '@/api/feeds/deleteFeedPost';
+import { useReplyStore } from '@/stores/useReplyStore';
 
 const FeedDetailPage = () => {
   const navigate = useNavigate();
@@ -21,8 +23,20 @@ const FeedDetailPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   const { openMoreMenu, openConfirm, openSnackbar, closePopup } = usePopupActions();
-  const { isReplying, targetUserName, replyContent, setReplyContent, submitComment, cancelReply } =
+  const { isReplying, replyContent, setReplyContent, submitComment, cancelReply } =
     useReplyActions();
+  const { nickname } = useReplyStore();
+  // 댓글 목록을 다시 로드하는 함수
+  const reloadComments = useCallback(async () => {
+    if (!feedId) return;
+
+    try {
+      const commentsResponse = await getComments(Number(feedId), { postType: 'FEED' });
+      setCommentList(commentsResponse.data.commentList);
+    } catch (err) {
+      console.error('댓글 목록 다시 로드 실패:', err);
+    }
+  }, [feedId]);
 
   // 페이지를 떠날 때 답글 상태 초기화
   useEffect(() => {
@@ -46,7 +60,7 @@ const FeedDetailPage = () => {
         // 피드 상세 정보와 댓글 목록을 병렬로 로드
         const [feedResponse, commentsResponse] = await Promise.all([
           getFeedDetail(Number(feedId)),
-          getComments(Number(feedId)),
+          getComments(Number(feedId), { postType: 'FEED' }),
         ]);
 
         setFeedData(feedResponse.data);
@@ -63,26 +77,56 @@ const FeedDetailPage = () => {
     loadFeedDetailAndComments();
   }, [feedId]);
 
+  const handleCommentSubmit = async () => {
+    await submitComment({
+      postId: Number(feedId),
+      postType: 'FEED',
+      onSuccess: reloadComments,
+    });
+  };
+
   const handleMoreClick = () => {
     openMoreMenu({
       onEdit: () => console.log('수정하기 클릭'),
+      onClose: () => {
+        closePopup();
+      },
       onDelete: () => {
         openConfirm({
           title: '이 피드를 삭제하시겠어요?',
           disc: '삭제 후에는 되돌릴 수 없어요',
-          onConfirm: async () => {
-            console.log('API 호출: 피드 삭제');
-            closePopup();
-            openSnackbar({
-              message: '피드가 삭제되었습니다.',
-              variant: 'top',
-              onClose: closePopup,
-            });
-          },
           onClose: closePopup,
+          onConfirm: async () => {
+            try {
+              if (!feedId) return;
+              const resp = await deleteFeedPost(Number(feedId));
+              if (resp.isSuccess) {
+                closePopup();
+                openSnackbar({
+                  message: '피드 삭제를 완료했어요.',
+                  variant: 'top',
+                  onClose: closePopup,
+                });
+                // 즉시 /feed로 리다이렉트
+                navigate('/feed', { state: { initialTab: '내 피드' } });
+              } else {
+                openSnackbar({
+                  message: '피드 삭제를 실패했어요.',
+                  variant: 'top',
+                  onClose: closePopup,
+                });
+              }
+            } catch (e) {
+              console.error('피드 삭제 실패:', e);
+              openSnackbar({
+                message: '피드 삭제 중 오류가 발생했어요.',
+                variant: 'top',
+                onClose: closePopup,
+              });
+            }
+          },
         });
       },
-      onClose: closePopup,
     });
   };
 
@@ -90,30 +134,16 @@ const FeedDetailPage = () => {
     navigate(-1);
   };
 
-  // 로딩 중일 때
   if (loading) {
-    return (
-      <Wrapper>
-        <TitleHeader
-          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
-          onLeftClick={handleBackClick}
-        />
-        <LoadingMessage>피드 글 로딩 중...</LoadingMessage>
-      </Wrapper>
-    );
+    return <></>;
   }
 
-  // 에러가 있을 때
-  if (error || !feedData) {
-    return (
-      <Wrapper>
-        <TitleHeader
-          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
-          onLeftClick={handleBackClick}
-        />
-        <ErrorMessage>{error || '피드 글을 찾을 수 없어요.'}</ErrorMessage>
-      </Wrapper>
-    );
+  if (error) {
+    return <></>;
+  }
+
+  if (!feedData) {
+    return <></>;
   }
 
   return (
@@ -125,17 +155,15 @@ const FeedDetailPage = () => {
         onRightClick={handleMoreClick}
       />
       <FeedDetailPost {...feedData} />
-      <ReplyList commentList={commentList} />
+      <ReplyList commentList={commentList} onReload={reloadComments} />
       <MessageInput
+        placeholder="여러분의 생각을 남겨주세요."
         value={replyContent}
         onChange={setReplyContent}
-        onSend={() => {
-          submitComment({ postId: Number(feedId), postType: 'FEED' });
-        }}
-        placeholder="댓글을 입력하세요"
+        onSend={handleCommentSubmit}
         isReplying={isReplying}
-        targetUserName={targetUserName}
         onCancelReply={cancelReply}
+        nickname={nickname}
       />
     </Wrapper>
   );
@@ -152,25 +180,6 @@ const Wrapper = styled.div`
   padding-top: 56px;
   margin: 0 auto;
   background-color: #121212;
-`;
-
-const LoadingMessage = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  color: var(--color-white);
-  font-size: var(--font-size-base);
-`;
-
-const ErrorMessage = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  color: var(--color-red);
-  font-size: var(--font-size-base);
-  text-align: center;
 `;
 
 export default FeedDetailPage;

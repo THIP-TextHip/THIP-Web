@@ -5,7 +5,7 @@ import { deleteComment } from '@/api/comments/deleteComment';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import type { ReplyModalProps } from '@/stores/usePopupStore';
 
-const ReplyModal = ({ isOpen, userId, replyId, position, onClose }: ReplyModalProps) => {
+const ReplyModal = ({ isOpen, userId, commentId, position, onClose }: ReplyModalProps) => {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const { openConfirm, openSnackbar, closePopup } = usePopupActions();
 
@@ -33,8 +33,8 @@ const ReplyModal = ({ isOpen, userId, replyId, position, onClose }: ReplyModalPr
       disc: '삭제 후에는 되돌릴 수 없어요.',
       onConfirm: async () => {
         try {
-          await deleteComment(replyId);
-          console.log('댓글 삭제 성공:', replyId);
+          await deleteComment(commentId);
+          console.log('댓글 삭제 성공:', commentId);
 
           openSnackbar({
             message: '댓글 삭제를 완료했어요.',

@@ -96,8 +96,10 @@ export const mockCommentList: ReplyDataProps[] = [
       '이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!이 책 정말 좋죠!',
     likeCount: 1,
     isLike: false,
+    isDeleted: false,
     replyList: [
       {
+        parentCommentCreatorNickname: 'User31',
         replyId: 1,
         creatorId: 1234,
         creatorProfileImageUrl: 'https://placehold.co/36x36',
@@ -110,6 +112,7 @@ export const mockCommentList: ReplyDataProps[] = [
         isLike: false,
       },
       {
+        parentCommentCreatorNickname: 'User35',
         replyId: 2,
         creatorId: 222,
         creatorProfileImageUrl: 'https://placehold.co/36x36',
@@ -135,5 +138,6 @@ export const mockCommentList: ReplyDataProps[] = [
     likeCount: 3,
     isLike: true,
     replyList: [],
+    isDeleted: false,
   },
 ];

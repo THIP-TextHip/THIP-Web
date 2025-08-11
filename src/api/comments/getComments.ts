@@ -11,11 +11,13 @@ export interface CommentData {
   content: string;
   likeCount: number;
   isLike: boolean;
+  isDeleted: boolean;
   replyList: ReplyData[];
 }
 
 export interface ReplyData {
-  replyId: number;
+  parentCommentCreatorNickname: string;
+  commentId: number;
   creatorId: number;
   creatorProfileImageUrl: string | null;
   creatorNickname: string;
@@ -25,6 +27,7 @@ export interface ReplyData {
   content: string;
   likeCount: number;
   isLike: boolean;
+  isDeleted: boolean;
 }
 
 export interface GetCommentsResponse {
@@ -41,9 +44,10 @@ export interface GetCommentsResponse {
 export interface GetCommentsParams {
   size?: number;
   cursor?: string | null;
+  postType: 'FEED' | 'RECORD' | 'VOTE';
 }
 
-export const getComments = async (postId: number, params?: GetCommentsParams) => {
+export const getComments = async (postId: number, params: GetCommentsParams) => {
   const searchParams = new URLSearchParams();
 
   if (params?.size) {
@@ -54,8 +58,10 @@ export const getComments = async (postId: number, params?: GetCommentsParams) =>
     searchParams.append('cursor', params.cursor);
   }
 
+  searchParams.append('postType', params.postType);
+
   const queryString = searchParams.toString();
-  const url = queryString ? `/comments/${postId}?${queryString}` : `/comments/${postId}`;
+  const url = `/comments/${postId}?${queryString}`;
 
   const response = await apiClient.get<GetCommentsResponse>(url);
   return response.data;
