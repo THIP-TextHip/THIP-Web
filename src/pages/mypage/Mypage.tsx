@@ -15,10 +15,9 @@ import { getMyProfile, type GetMyProfileResponse } from '@/api/users/getMyProfil
 import { useEffect, useState } from 'react';
 
 const Mypage = () => {
-  const [profile, setProfile] = useState<GetMyProfileResponse['data'] | undefined>(undefined);
+  const [profile, setProfile] = useState<GetMyProfileResponse['data'] | null>(null);
   const { openConfirm, closePopup } = usePopupActions();
   const navigate = useNavigate();
-  const onClickEdit = () => {};
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -27,6 +26,14 @@ const Mypage = () => {
     };
     fetchProfile();
   }, []);
+
+  const handleEditClick = () => {
+    navigate('/mypage/edit', { state: { profile } });
+  };
+
+  if (!profile) {
+    return <div>로딩 중...</div>;
+  }
 
   const handleLogout = () => {
     openConfirm({
@@ -75,7 +82,7 @@ const Mypage = () => {
               </div>
             </div>
           </div>
-          <div className="edit" onClick={onClickEdit}>
+          <div className="edit" onClick={handleEditClick}>
             편집
           </div>
         </UserProfile>
