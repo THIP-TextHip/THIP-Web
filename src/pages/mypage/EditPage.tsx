@@ -88,7 +88,7 @@ const EditPage = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    const filteredValue = inputValue.replace(/[^ㄱ-ㅎ가-힣a-zA-Z0-9]/g, '');
+    const filteredValue = inputValue.replace(/[^ㄱ-ㅎ가-힣a-z0-9]/g, '');
     setNickname(filteredValue);
 
     // 입력이 변경되면 에러 상태 초기화
