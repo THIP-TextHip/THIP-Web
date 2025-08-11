@@ -28,8 +28,34 @@ const CreateGroup = () => {
   const [selectedGenre, setSelectedGenre] = useState('');
   const [roomTitle, setRoomTitle] = useState('');
   const [roomDescription, setRoomDescription] = useState('');
-  const [startDate, setStartDate] = useState({ year: 2025, month: 1, day: 1 });
-  const [endDate, setEndDate] = useState({ year: 2025, month: 1, day: 1 });
+
+  // 시작 날짜: 오늘 + 1일, 종료 날짜: 오늘 + 30일로 기본 설정
+  const getDefaultDates = () => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const oneMonthLater = new Date(today);
+    oneMonthLater.setDate(today.getDate() + 30);
+
+    return {
+      start: {
+        year: tomorrow.getFullYear(),
+        month: tomorrow.getMonth() + 1,
+        day: tomorrow.getDate(),
+      },
+      end: {
+        year: oneMonthLater.getFullYear(),
+        month: oneMonthLater.getMonth() + 1,
+        day: oneMonthLater.getDate(),
+      },
+    };
+  };
+
+  const defaultDates = getDefaultDates();
+  const [startDate, setStartDate] = useState(defaultDates.start);
+  const [endDate, setEndDate] = useState(defaultDates.end);
+
   const [memberLimit, setMemberLimit] = useState(1);
   const [isPrivate, setIsPrivate] = useState(false);
   const [password, setPassword] = useState('');
@@ -57,32 +83,95 @@ const CreateGroup = () => {
       const roomData: CreateRoomRequest = {
         isbn: selectedBook?.isbn || '9788936434632', // 선택된 책의 ISBN 또는 기본값
         category: selectedGenre,
-        roomName: roomTitle,
-        description: roomDescription,
+        roomName: roomTitle.trim(), // 공백 제거
+        description: roomDescription.trim(), // 공백 제거
         progressStartDate: formatDate(startDate),
         progressEndDate: formatDate(endDate),
         recruitCount: memberLimit,
-        password: isPrivate ? password : '', // 공개방이면 빈 문자열
+        // 비밀번호 처리: 비공개방이면 4자리 숫자, 공개방이면 null
+        password: isPrivate ? password.trim() : null,
         isPublic: !isPrivate, // isPrivate의 반대값
       };
 
-      console.log('방 생성 요청 데이터:', roomData);
+      // 날짜 검증 추가
+      const today = new Date();
+      const startDateObj = new Date(startDate.year, startDate.month - 1, startDate.day);
+      const endDateObj = new Date(endDate.year, endDate.month - 1, endDate.day);
+
+      // 시작 날짜가 오늘 이후인지 확인
+      if (startDateObj <= today) {
+        alert('시작 날짜는 오늘 날짜 이후여야 합니다.');
+        return;
+      }
+
+      // 종료 날짜가 시작 날짜 이후인지 확인
+      if (endDateObj <= startDateObj) {
+        alert('종료 날짜는 시작 날짜 이후여야 합니다.');
+        return;
+      }
+
+      // 요청 데이터 검증
+      const validation = {
+        isbn: roomData.isbn.length > 0,
+        category: roomData.category.length > 0,
+        roomName: roomData.roomName.length > 0,
+        description: roomData.description.length > 0,
+        startDate: roomData.progressStartDate.length >= 8, // 날짜 형식
+        endDate: roomData.progressEndDate.length >= 8,
+        recruitCount: roomData.recruitCount >= 1 && roomData.recruitCount <= 30,
+        // 비밀번호 검증: 비공개방이면 4자리 숫자, 공개방이면 null 허용
+        password: !isPrivate || (roomData.password !== null && /^\d{4}$/.test(roomData.password)),
+      };
+
+      const invalidFields = Object.entries(validation)
+        .filter(([_, isValid]) => !isValid)
+        .map(([field, _]) => field);
+
+      if (invalidFields.length > 0) {
+        console.error('❌ 유효하지 않은 필드들:', invalidFields);
+        alert(`다음 필드들을 확인해주세요: ${invalidFields.join(', ')}`);
+        return;
+      }
+
+      console.log('🚀 방 생성 요청 데이터:', roomData);
+      console.log('📍 API URL:', `${import.meta.env.VITE_API_BASE_URL}/rooms`);
 
       // 방 생성 API 호출
       const response = await createRoom(roomData);
 
-      if (response.isSuccess) {
-        console.log('방 생성 성공:', response.data.roomId);
+      console.log('✅ API 응답:', response);
+
+      // 두 가지 응답 형식 모두 확인
+      const isSuccessful = response.isSuccess || response.success;
+
+      if (isSuccessful) {
+        console.log('🎉 방 생성 성공! Room ID:', response.data.roomId);
 
         // 성공 시 생성된 방 상세 페이지로 이동
         navigate(`/group/${response.data.roomId}`, { replace: true });
       } else {
-        console.error('방 생성 실패:', response.message);
-        alert(`방 생성에 실패했습니다: ${response.message}`);
+        console.error('❌ 방 생성 실패:', response.message, 'Code:', response.code);
+        alert(`방 생성에 실패했습니다: ${response.message} (코드: ${response.code})`);
       }
-    } catch (error) {
-      console.error('방 생성 중 오류 발생:', error);
-      alert('방 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } catch (error: any) {
+      console.error('💥 방 생성 중 오류 발생:', error);
+
+      // 자세한 오류 정보 로깅
+      if (error.response) {
+        console.error('📡 응답 상태:', error.response.status);
+        console.error('📡 응답 데이터:', error.response.data);
+        console.error('📡 응답 헤더:', error.response.headers);
+
+        // 서버 오류 메시지가 있으면 표시
+        const errorMessage = error.response.data?.message || error.message;
+        alert(`방 생성 실패: ${errorMessage} (상태: ${error.response.status})`);
+      } else if (error.request) {
+        console.error('📡 요청 정보:', error.request);
+        alert('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
+      } else {
+        console.error('❗ 오류 메시지:', error.message);
+        alert(`오류가 발생했습니다: ${error.message}`);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -124,12 +213,13 @@ const CreateGroup = () => {
     setPassword('');
   };
 
+  // 폼 유효성 검사 - 4자리 숫자 비밀번호 검증 포함
   const isFormValid =
     selectedBook !== null &&
     selectedGenre !== '' &&
     roomTitle.trim() !== '' &&
     roomDescription.trim() !== '' &&
-    (!isPrivate || password.trim() !== '') && // 비공개방인 경우 비밀번호 필수
+    (!isPrivate || (password.trim() !== '' && /^\d{4}$/.test(password.trim()))) && // 비공개방인 경우 4자리 숫자 필수
     !isSubmitting;
 
   return (

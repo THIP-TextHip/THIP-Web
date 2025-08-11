@@ -27,7 +27,7 @@ export interface CreateRoomRequest {
   progressStartDate: string; // YYYY.MM.DD 형식
   progressEndDate: string; // YYYY.MM.DD 형식
   recruitCount: number;
-  password: string;
+  password: string | null; // 비공개방: 4자리 숫자, 공개방: null
   isPublic: boolean;
 }
 

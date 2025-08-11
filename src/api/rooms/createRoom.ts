@@ -6,7 +6,7 @@ export type CreateRoomResponse = ApiResponse<CreateRoomData>;
 
 // 방 생성 API 함수
 export const createRoom = async (roomData: CreateRoomRequest) => {
-  const response = await apiClient.post<CreateRoomResponse>('/rooms', roomData);
+  const response = await apiClient.post<CreateRoomResponse>('rooms', roomData);
   return response.data;
 };
 
