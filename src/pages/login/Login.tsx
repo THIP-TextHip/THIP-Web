@@ -4,6 +4,32 @@ import KaKao from '../../assets/login/kakao.svg';
 import Google from '../../assets/login/google.svg';
 import { Wrapper } from '@/components/common/Wrapper';
 
+const Login = () => {
+  const handleKakaoLogin = () => {
+    // 직접 카카오 로그인 URL로 리다이렉션
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/kakao`;
+  };
+
+  const handleGoogleLogin = () => {
+    // 직접 구글 로그인 URL로 리다이렉션
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/google`;
+  };
+
+  return (
+    <Wrapper>
+      <img src={logo} />
+      <ButtonBox>
+        <SocialButton onClick={handleKakaoLogin} bg="#fee500">
+          <img src={KaKao} /> 카카오계정 로그인
+        </SocialButton>
+        <SocialButton onClick={handleGoogleLogin} bg="#fefefe">
+          <img src={Google} /> 구글계정 로그인
+        </SocialButton>
+      </ButtonBox>
+    </Wrapper>
+  );
+};
+
 const ButtonBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -34,29 +60,5 @@ const SocialButton = styled.div<{ bg: string }>`
   line-height: 24px;
   cursor: pointer;
 `;
-
-const Login = () => {
-  const handleKakaoLogin = () => {
-    return;
-  };
-
-  const handleGoogleLogin = () => {
-    return;
-  };
-
-  return (
-    <Wrapper>
-      <img src={logo} />
-      <ButtonBox>
-        <SocialButton onClick={handleKakaoLogin} bg="#fee500">
-          <img src={KaKao} /> 카카오계정 로그인
-        </SocialButton>
-        <SocialButton onClick={handleGoogleLogin} bg="#fefefe">
-          <img src={Google} /> 구글계정 로그인
-        </SocialButton>
-      </ButtonBox>
-    </Wrapper>
-  );
-};
 
 export default Login;
