@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 
 export const Container = styled.div`
   display: flex;
+  position: relative;
   flex-direction: column;
   background-color: var(--color-black-main);
   min-width: 360px;
@@ -10,6 +11,17 @@ export const Container = styled.div`
   margin: 0 auto;
   padding: 96px 20px 0 20px;
   gap: 12px;
+
+  .errorMessage {
+    position: absolute;
+    top: 220px;
+    left: 24px;
+
+    color: var(--color-text-warning_red, #ff9496);
+    font-size: var(--string-size-small03, 12px);
+    font-weight: var(--string-weight-regular, 400);
+    line-height: normal;
+  }
 
   .title {
     margin-top: 40px;
@@ -164,7 +176,7 @@ export const Container = styled.div`
   }
 `;
 
-export const InputBox = styled.div`
+export const InputBox = styled.div<{ hasError?: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -175,9 +187,11 @@ export const InputBox = styled.div`
   border-radius: 12px;
   padding: 12px;
   background-color: var(--color-darkgrey-dark);
+  border: 1px solid ${props => (props.hasError ? '#FF9496' : 'none')};
+  transition: border-color 0.2s ease;
 `;
 
-export const StyledInput = styled.input`
+export const StyledInput = styled.input<{ hasError?: boolean }>`
   flex: 1;
   background: none;
   border: none;
