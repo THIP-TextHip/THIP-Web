@@ -105,11 +105,10 @@ const FeedDetailPage = () => {
                 openSnackbar({
                   message: '피드 삭제를 완료했어요.',
                   variant: 'top',
-                  onClose: () => {
-                    closePopup();
-                    navigate('/feed', { state: { initialTab: '내 피드' } });
-                  },
+                  onClose: closePopup,
                 });
+                // 즉시 /feed로 리다이렉트
+                navigate('/feed', { state: { initialTab: '내 피드' } });
               } else {
                 openSnackbar({
                   message: '피드 삭제를 실패했어요.',
