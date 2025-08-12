@@ -21,7 +21,7 @@ const SubReply = ({
   creatorId,
   creatorProfileImageUrl,
   creatorNickname,
-  alias,
+  aliasName,
   aliasColor,
   postDate,
   content,
@@ -139,7 +139,7 @@ const SubReply = ({
         <PostHeader
           creatorProfileImageUrl={creatorProfileImageUrl || ''}
           creatorNickname={creatorNickname}
-          aliasName={alias}
+          aliasName={aliasName || ''}
           aliasColor={aliasColor}
           postDate={postDate}
           creatorId={creatorId}
