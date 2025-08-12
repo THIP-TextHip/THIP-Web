@@ -43,7 +43,7 @@ const mockSavedBooks: Book[] = [
     title: '토마토 컵라면',
     author: '작가명',
     cover: '/src/assets/books/tomato.svg',
-    isbn: '9781234567890',
+    isbn: '9780374500016',
   },
   {
     id: 2,

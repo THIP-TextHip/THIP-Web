@@ -1,59 +1,55 @@
 import { apiClient } from '../index';
 
-// 피드 작성 요청 바디 타입
-export interface CreateFeedRequest {
-  request: {
-    isbn: string;
-    contentBody: string;
-    isPublic: boolean;
-    tagList: string[];
-  };
-  images: string[]; // 이미지 URL들의 배열 (별도로 업로드된 이미지 URL들)
+/** 서버에 보낼 request JSON 페이로드 */
+export interface CreateFeedBody {
+  isbn: string;
+  contentBody: string;
+  isPublic: boolean;
+  tagList?: string[];
 }
 
-// 피드 작성 응답 데이터 타입
-export interface CreateFeedData {
-  feedId: number;
-}
-
-// API 응답 타입
-export interface CreateFeedResponse {
-  isSuccess: boolean;
+/** 성공 응답 */
+export interface CreateFeedSuccess {
+  isSuccess: true;
   code: number;
   message: string;
-  data?: CreateFeedData; // 성공 시에만 존재
+  data: {
+    feedId: number;
+  };
 }
 
-// 피드 작성 API 함수
-export const createFeed = async (feedData: CreateFeedRequest) => {
-  const response = await apiClient.post<CreateFeedResponse>('/feeds', feedData);
-  return response.data;
-};
+/** 실패 응답 */
+export interface CreateFeedFail {
+  isSuccess: false;
+  code: number;
+  message: string;
+}
 
-/*
-사용 방법:
+export type CreateFeedResponse = CreateFeedSuccess | CreateFeedFail;
 
-const feedData: CreateFeedRequest = {
-  request: {
-    isbn: "9780306406157",
-    contentBody: "이 책은 정말 좋습니다!",
-    isPublic: true,
-    tagList: ["한국소설", "외국소설", "AI"]
-  },
-  images: ["string"] // 업로드된 이미지 URL들
-};
+/**
+ * 피드 작성 API
+ * - multipart/form-data
+ *   - request: application/json (Blob로 감싸 전송)
+ *   - images: File[] (선택값, 없으면 미첨부)
+ */
+export const createFeed = async (
+  body: CreateFeedBody,
+  images?: File[],
+): Promise<CreateFeedResponse> => {
+  const form = new FormData();
 
-try {
-  const result = await createFeed(feedData);
-  if (result.isSuccess) {
-    console.log('피드 작성 성공:', result.data?.feedId);
-    // 성공 처리 로직
-  } else {
-    console.log('피드 작성 실패:', result.message);
-    // 실패 처리 로직
+  // request 파트(JSON) - 필수
+  form.append('request', new Blob([JSON.stringify(body)], { type: 'application/json' }));
+
+  // images 파트들 - 선택
+  if (images && images.length > 0) {
+    images.forEach(file => form.append('images', file));
   }
-} catch (error) {
-  console.error('API 호출 오류:', error);
-  // 에러 처리 로직
-}
-*/
+
+  const { data } = await apiClient.post<CreateFeedResponse>('/feeds', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+  return data;
+};
