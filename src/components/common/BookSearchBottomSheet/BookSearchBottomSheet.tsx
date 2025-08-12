@@ -26,6 +26,7 @@ interface Book {
   title: string;
   author: string;
   cover: string;
+  isbn: string;
 }
 
 interface BookSearchBottomSheetProps {
@@ -36,25 +37,27 @@ interface BookSearchBottomSheetProps {
 
 type TabType = 'saved' | 'group';
 
-// Mock Data
 const mockSavedBooks: Book[] = [
   {
     id: 1,
     title: '토마토 컵라면',
     author: '작가명',
     cover: '/src/assets/books/tomato.svg',
+    isbn: '9781234567890',
   },
   {
     id: 2,
     title: '사슴',
     author: '작가명',
     cover: '/src/assets/books/deer.svg',
+    isbn: '9781234567891',
   },
   {
     id: 3,
     title: '호르몬 체인지',
     author: '작가명',
     cover: '/src/assets/books/hormone.svg',
+    isbn: '9781234567892',
   },
 ];
 
@@ -64,18 +67,21 @@ const mockGroupBooks: Book[] = [
     title: '단 한번의 삶',
     author: '작가명',
     cover: '/src/assets/books/life.svg',
+    isbn: '9781234567893',
   },
   {
     id: 5,
     title: '호르몬 체인지',
     author: '작가명',
     cover: '/src/assets/books/hormone.svg',
+    isbn: '9781234567892',
   },
   {
     id: 6,
     title: '토마토 컵라면',
     author: '작가명',
     cover: '/src/assets/books/tomato.svg',
+    isbn: '9781234567890',
   },
 ];
 

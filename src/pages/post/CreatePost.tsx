@@ -18,7 +18,7 @@ interface Book {
   title: string;
   author: string;
   cover: string;
-  isbn?: string;
+  isbn: string;
 }
 
 const CreatePost = () => {
@@ -72,15 +72,6 @@ const CreatePost = () => {
     if (!isFormValid) {
       openSnackbar({
         message: '책 선택과 글 내용을 입력해주세요.',
-        variant: 'top',
-        onClose: closePopup,
-      });
-      return;
-    }
-
-    if (!selectedBook?.isbn) {
-      openSnackbar({
-        message: 'ISBN 정보가 없는 책입니다. 다른 책을 선택해주세요.',
         variant: 'top',
         onClose: closePopup,
       });
