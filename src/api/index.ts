@@ -2,7 +2,7 @@ import axios, { type AxiosResponse, type AxiosError } from 'axios';
 
 // 하드코딩된 액세스 토큰
 const ACCESS_TOKEN =
-  'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDIwMTY4OCwiZXhwIjoxNzU2NzkzNjg4fQ.oOyJ7JI_t2-Xq1-gfAv4ZaYNrbyplvqdxhCk76-Txe4';
+  'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjgsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.giRdeg9HWsdhLxg9JZhE0LaMg0hv7ReP0UBMsEUsNxs';
 
 // 토큰 관리 유틸리티
 export const TokenManager = {
