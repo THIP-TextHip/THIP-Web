@@ -125,34 +125,26 @@ const CreateGroup = () => {
         .map(([field]) => field);
 
       if (invalidFields.length > 0) {
-        console.error('❌ 유효하지 않은 필드들:', invalidFields);
         alert(`다음 필드들을 확인해주세요: ${invalidFields.join(', ')}`);
         return;
       }
 
-      console.log('🚀 방 생성 요청 데이터:', roomData);
-      console.log('📍 API URL:', `${import.meta.env.VITE_API_BASE_URL}/rooms`);
-
       // 방 생성 API 호출
       const response = await createRoom(roomData);
-
-      console.log('✅ API 응답:', response);
 
       // 두 가지 응답 형식 모두 확인
       const isSuccessful = response.isSuccess || response.isSuccess;
 
       if (isSuccessful) {
-        console.log('🎉 방 생성 성공! Room ID:', response.data.roomId);
-
-        // 성공 시 생성된 방 상세 페이지로 이동
-        navigate(`/group/${response.data.roomId}`, { replace: true });
+        // 성공 시 모집 중인 방 상세 페이지로 이동
+        navigate('/group/detail', {
+          replace: true,
+          state: { roomId: response.data.roomId },
+        });
       } else {
-        console.error('❌ 방 생성 실패:', response.message, 'Code:', response.code);
         alert(`방 생성에 실패했습니다: ${response.message} (코드: ${response.code})`);
       }
     } catch (error) {
-      console.error('💥 방 생성 중 오류 발생:', error);
-
       // 자세한 오류 정보 로깅
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as {
@@ -166,24 +158,16 @@ const CreateGroup = () => {
         };
 
         if (axiosError.response) {
-          console.error('📡 응답 상태:', axiosError.response.status);
-          console.error('📡 응답 데이터:', axiosError.response.data);
-          console.error('📡 응답 헤더:', axiosError.response.headers);
-
-          // 서버 오류 메시지가 있으면 표시
           const errorMessage = axiosError.response.data?.message || axiosError.message;
           alert(`방 생성 실패: ${errorMessage} (상태: ${axiosError.response.status})`);
         } else if (axiosError.request) {
-          console.error('📡 요청 정보:', axiosError.request);
           alert('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
         } else {
-          console.error('❗ 오류 메시지:', axiosError.message);
           alert(`오류가 발생했습니다: ${axiosError.message}`);
         }
       } else {
         const errorMessage =
           error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
-        console.error('❗ 오류 메시지:', errorMessage);
         alert(`오류가 발생했습니다: ${errorMessage}`);
       }
     } finally {
