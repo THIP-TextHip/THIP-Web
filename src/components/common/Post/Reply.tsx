@@ -19,7 +19,7 @@ const Reply = ({
   creatorId,
   creatorProfileImageUrl,
   creatorNickname,
-  alias,
+  aliasName,
   aliasColor,
   postDate,
   content,
@@ -117,7 +117,7 @@ const Reply = ({
       <PostHeader
         creatorProfileImageUrl={creatorProfileImageUrl || undefined}
         creatorNickname={creatorNickname}
-        alias={alias}
+        aliasName={aliasName}
         aliasColor={aliasColor}
         postDate={postDate}
         creatorId={creatorId}

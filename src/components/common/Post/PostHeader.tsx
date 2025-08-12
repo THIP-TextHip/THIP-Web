@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 interface PostHeaderProps {
   creatorProfileImageUrl?: string;
   creatorNickname?: string;
-  alias?: string;
+  aliasName?: string;
   aliasColor?: string;
   postDate: string;
   creatorId?: number;
@@ -13,8 +13,8 @@ interface PostHeaderProps {
 const PostHeader = ({
   creatorProfileImageUrl,
   creatorNickname,
-  alias,
-  aliasColor = '#FFFFFF', // 기본값 설정
+  aliasName,
+  aliasColor,
   postDate,
   creatorId,
   type = 'post',
@@ -34,7 +34,7 @@ const PostHeader = ({
         <div className="infoBox">
           <div className="username">{creatorNickname}</div>
           <div className="usertitle" style={{ color: aliasColor }}>
-            {alias}
+            {aliasName}
           </div>
         </div>
       </div>

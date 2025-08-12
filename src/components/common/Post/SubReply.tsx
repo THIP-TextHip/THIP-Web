@@ -21,7 +21,7 @@ const SubReply = ({
   creatorId,
   creatorProfileImageUrl,
   creatorNickname,
-  alias,
+  aliasName,
   aliasColor,
   postDate,
   content,
@@ -139,7 +139,7 @@ const SubReply = ({
         <PostHeader
           creatorProfileImageUrl={creatorProfileImageUrl || ''}
           creatorNickname={creatorNickname}
-          alias={alias}
+          aliasName={aliasName || ''}
           aliasColor={aliasColor}
           postDate={postDate}
           creatorId={creatorId}
@@ -148,8 +148,7 @@ const SubReply = ({
         <ReplySection onClick={handleMoreClick}>
           <div className="left">
             <div className="reply">
-              <div className="reply-nickname">@{parentCommentCreatorNickname} </div>
-              {content}
+              <span className="reply-nickname">@{parentCommentCreatorNickname}</span> {content}
             </div>
             <div
               className="sub-reply"
@@ -229,7 +228,7 @@ const ReplySection = styled.div`
       line-height: 20px;
 
       .reply-nickname {
-        color: ${colors.grey[100]};
+        color: ${colors.white};
         font-size: ${typography.fontSize.sm};
         font-weight: ${typography.fontWeight.regular};
         line-height: 20px;
