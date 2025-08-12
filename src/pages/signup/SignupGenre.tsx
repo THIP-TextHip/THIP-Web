@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 import { Container } from './Signup.styled';
 import leftarrow from '../../assets/common/leftArrow.svg';
 import TitleHeader from '../../components/common/TitleHeader';
@@ -22,30 +23,21 @@ const SignupGenre = () => {
   } | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [cookies] = useCookies(['Authorization']);
 
   // SignupNickname에서 넘어온 nickname 받기
   const nickname = location.state?.nickname;
 
-  // 쿠키에서 Authorization 토큰 추출
-  const getAuthTokenFromCookie = async () => {
-    console.log('=== 쿠키 디버깅 ===');
+  // react-cookie를 사용하여 Authorization 토큰 추출
+  const getAuthTokenFromCookie = () => {
+    console.log('=== react-cookie 디버깅 ===');
     console.log('현재 페이지 URL:', window.location.href);
     console.log('현재 도메인:', window.location.hostname);
-    console.log('전체 쿠키:', document.cookie);
+    console.log('react-cookie로 읽은 Authorization:', cookies.Authorization);
 
-    // 방법 1: document.cookie 사용
-    if (document.cookie) {
-      const cookies = document.cookie.split(';');
-      console.log('분리된 쿠키들:', cookies);
-
-      for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-        console.log('쿠키 이름:', name, '값:', value);
-        if (name === 'Authorization') {
-          console.log('Authorization 토큰 발견:', value);
-          return value;
-        }
-      }
+    if (cookies.Authorization) {
+      console.log('react-cookie로 Authorization 토큰 발견:', cookies.Authorization);
+      return cookies.Authorization;
     }
 
     // 방법 2: 직접 쿠키 이름으로 검색
@@ -86,32 +78,7 @@ const SignupGenre = () => {
     console.log('쿠키 총 길이:', document.cookie.length);
     console.log('쿠키 원본 문자열:', JSON.stringify(document.cookie));
 
-    // 방법 7: 서버에서 쿠키 정보 가져오기 (HttpOnly 쿠키일 경우)
-    try {
-      console.log('서버에서 쿠키 정보를 가져오는 중...');
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/me`, {
-        method: 'GET',
-        credentials: 'include', // 쿠키 포함
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('서버 응답:', data);
-        // 서버에서 토큰을 헤더로 보내주거나, 사용자 정보를 통해 인증 상태 확인
-        if (data.data && data.data.userId) {
-          console.log('서버에서 사용자 정보 확인됨, 인증 상태 유효');
-          return 'VALID_AUTH'; // 특별한 값으로 인증 상태 표시
-        }
-      }
-    } catch (error) {
-      console.log('서버 쿠키 확인 실패:', error);
-    }
-
-    console.log('Authorization 토큰을 찾을 수 없습니다.');
-    console.log('가능한 원인: 도메인 불일치, 경로 불일치, 쿠키 만료, HttpOnly 설정');
+    console.log('react-cookie로 Authorization 토큰을 찾을 수 없습니다.');
     return null;
   };
 
@@ -139,7 +106,7 @@ const SignupGenre = () => {
     if (!selectedAlias || !nickname) return;
 
     // 쿠키에서 토큰 추출
-    const authToken = await getAuthTokenFromCookie();
+    const authToken = getAuthTokenFromCookie();
     if (!authToken) {
       console.log('쿠키에서 Authorization 토큰을 찾을 수 없습니다.');
       console.log('토큰이 없어 회원가입을 진행할 수 없습니다.');
