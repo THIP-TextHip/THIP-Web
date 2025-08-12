@@ -6,8 +6,10 @@ import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import SearchBar from '@/components/search/SearchBar';
 import { colors, typography } from '@/styles/global/global';
 import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
+import { searchBooks, convertToSearchedBooks } from '@/api/books/searchBooks';
 
 export interface SearchedBook {
   id: number;
@@ -17,57 +19,107 @@ export interface SearchedBook {
   coverUrl: string;
 }
 
-const dummySearchedBook: SearchedBook[] = [
-  {
-    id: 1,
-    title: '채식주의자',
-    author: '한강',
-    publisher: '창비',
-    coverUrl: 'https://image.yes24.com/goods/17122707/XL',
-  },
-  {
-    id: 2,
-    title: '채소 마스터 클래스',
-    author: '백지혜',
-    publisher: '세미콜론',
-    coverUrl: 'https://image.yes24.com/goods/109378551/XL',
-  },
-  {
-    id: 3,
-    title: '채소 식탁',
-    author: '김경민',
-    publisher: '래디시',
-    coverUrl: 'https://image.yes24.com/goods/117194041/XL',
-  },
-];
 const Search = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [isSearched, setIsSearched] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchedBook[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  const [recentSearches, setRecentSearches] = useState<string[]>([
-    '딸기12',
-    '당근',
-    '수박245',
-    '참',
-    '메론1',
-  ]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const handleChange = (value: string) => {
     setSearchTerm(value);
     setIsSearched(false);
     setIsSearching(value.trim() !== '');
+
+    if (value.trim()) {
+      setSearchParams({ q: value.trim() }, { replace: true });
+
+      if (searchTimeoutId) {
+        clearTimeout(searchTimeoutId);
+      }
+
+      const timeoutId = setTimeout(() => {
+        handleSearch(value.trim(), false);
+      }, 300);
+
+      setSearchTimeoutId(timeoutId);
+    } else {
+      setSearchParams({}, { replace: true });
+
+      setSearchResults([]);
+      setIsSearched(false);
+
+      if (searchTimeoutId) {
+        clearTimeout(searchTimeoutId);
+        setSearchTimeoutId(null);
+      }
+    }
   };
 
-  const handleSearch = (term: string) => {
+  const handleSearch = useCallback(async (term: string, isManualSearch: boolean = false) => {
     if (!term.trim()) return;
+
     setIsSearching(true);
-    setIsSearched(true);
+
+    if (isManualSearch) {
+      setIsSearched(false);
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await searchBooks(term, 1);
+      console.log('API 응답:', response);
+
+      if (response.isSuccess) {
+        const convertedResults = convertToSearchedBooks(response.data.searchResult);
+        console.log('변환된 결과:', convertedResults);
+        setSearchResults(convertedResults);
+      } else {
+        console.log('검색 실패:', response.message);
+        setSearchResults([]);
+      }
+
+      if (isManualSearch) {
+        setIsSearched(true);
+      }
+    } catch (error) {
+      console.error('검색 중 오류 발생:', error);
+      setSearchResults([]);
+      if (isManualSearch) {
+        setIsSearched(true);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+
     setRecentSearches(prev => {
       const filtered = prev.filter(t => t !== term);
       return [term, ...filtered].slice(0, 5);
     });
-  };
+  }, []);
+
+  useEffect(() => {
+    const query = searchParams.get('q') || '';
+    if (query && !isInitialized) {
+      setSearchTerm(query);
+      setIsSearching(true);
+      handleSearch(query, true);
+      setIsInitialized(true);
+    }
+  }, [searchParams, handleSearch, isInitialized]);
+
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setIsSearching(false);
+      setIsSearched(false);
+    }
+  }, [searchTerm]);
 
   const handleDelete = (recentSearch: string) => {
     setRecentSearches(prev => prev.filter(t => t !== recentSearch));
@@ -75,13 +127,30 @@ const Search = () => {
 
   const handleRecentSearchClick = (recentSearch: string) => {
     setSearchTerm(recentSearch);
-    setIsSearched(true);
-    setIsSearching(true);
+    handleSearch(recentSearch, true);
   };
 
   const handleBackButton = () => {
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+      setSearchTimeoutId(null);
+    }
+
     setSearchTerm('');
+    setSearchResults([]);
+    setIsSearching(false);
+    setIsSearched(false);
+    setIsInitialized(false);
+    setSearchParams({}, { replace: true });
   };
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutId) {
+        clearTimeout(searchTimeoutId);
+      }
+    };
+  }, [searchTimeoutId]);
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
@@ -106,26 +175,21 @@ const Search = () => {
           placeholder="책 제목, 작가명을 검색해보세요."
           value={searchTerm}
           onChange={handleChange}
-          onSearch={() => handleSearch(searchTerm.trim())}
+          onSearch={() => handleSearch(searchTerm.trim(), true)}
           isSearched={isSearched}
         />
       </SearchBarContainer>
       <Content>
         {isSearching ? (
           <>
-            (
-            {isSearched ? (
-              <BookSearchResult
-                type={'searched'}
-                searchedBookList={dummySearchedBook}
-              ></BookSearchResult>
+            {isLoading ? (
+              <LoadingMessage>검색 중...</LoadingMessage>
             ) : (
               <BookSearchResult
-                type={'searching'}
-                searchedBookList={dummySearchedBook}
-              ></BookSearchResult>
+                type={isSearched ? 'searched' : 'searching'}
+                searchedBookList={searchResults}
+              />
             )}
-            )
           </>
         ) : (
           <>
@@ -185,4 +249,13 @@ const SearchBarContainer = styled.div`
 
 const Content = styled.div`
   margin-top: 132px;
+`;
+
+const LoadingMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  color: ${colors.white};
+  font-size: ${typography.fontSize.base};
 `;
