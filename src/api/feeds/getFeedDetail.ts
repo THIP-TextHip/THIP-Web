@@ -6,7 +6,7 @@ export interface FeedDetailData {
   creatorId: number;
   creatorNickname: string;
   creatorProfileImageUrl: string;
-  alias: string;
+  aliasName: string;
   aliasColor: string;
   postDate: string;
   isbn: string;

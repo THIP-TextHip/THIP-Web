@@ -5,7 +5,7 @@ export interface CommentData {
   creatorId: number;
   creatorProfileImageUrl: string | null;
   creatorNickname: string;
-  alias: string;
+  aliasName: string;
   aliasColor: string;
   postDate: string;
   content: string;
@@ -21,7 +21,7 @@ export interface ReplyData {
   creatorId: number;
   creatorProfileImageUrl: string | null;
   creatorNickname: string;
-  alias: string;
+  aliasName: string;
   aliasColor: string;
   postDate: string;
   content: string;
