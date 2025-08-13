@@ -17,6 +17,7 @@ export interface SearchedBook {
   author: string;
   publisher: string;
   coverUrl: string;
+  isbn: string;
 }
 
 const Search = () => {

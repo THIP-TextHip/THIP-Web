@@ -31,7 +31,7 @@ export function BookSearchResult({ type, searchedBookList }: BookSearchResultPro
           </EmptyWrapper>
         ) : (
           searchedBookList.map(book => (
-            <BookItem key={book.id}>
+            <BookItem key={book.id} onClick={() => navigate(`/search/book/${book.isbn}`)}>
               <Cover src={book.coverUrl} alt={`${book.title} 커버`} />
               <BookInfo>
                 <Title>{book.title}</Title>
@@ -63,6 +63,7 @@ const BookItem = styled.div`
   display: flex;
   border-bottom: 1px solid ${colors.darkgrey.dark};
   padding: 12px 0;
+  cursor: pointer;
 `;
 
 const ResultHeader = styled.div`
