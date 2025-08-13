@@ -1,64 +1,71 @@
 import { colors, typography } from '@/styles/global/global';
 import styled from '@emotion/styled';
-
-interface Book {
-  id: number;
-  title: string;
-  coverUrl: string;
-}
-
-const dummyBooks: Book[] = [
-  {
-    id: 1,
-    title: '토마토 컵라면',
-    coverUrl: 'https://cdn.imweb.me/upload/S20230204e049098f5e744/e6fd3d849546d.jpg',
-  },
-  {
-    id: 2,
-    title: '사슴',
-    coverUrl: 'https://cdn.imweb.me/upload/S20230204e049098f5e744/e6fd3d849546d.jpg',
-  },
-  {
-    id: 3,
-    title: '호르몬 체인지지',
-    coverUrl: 'https://cdn.imweb.me/upload/S20230204e049098f5e744/e6fd3d849546d.jpg',
-  },
-  {
-    id: 4,
-    title: '호르몬 체인지지',
-    coverUrl: 'https://cdn.imweb.me/upload/S20230204e049098f5e744/e6fd3d849546d.jpg',
-  },
-  {
-    id: 5,
-    title: '호르몬 체인지지',
-    coverUrl: 'https://cdn.imweb.me/upload/S20230204e049098f5e744/e6fd3d849546d.jpg',
-  },
-  {
-    id: 6,
-    title: '호르몬 체인지지',
-    coverUrl: 'https://cdn.imweb.me/upload/S20230204e049098f5e744/e6fd3d849546d.jpg',
-  },
-];
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getMostSearchedBooks, type MostSearchedBook } from '@/api/books/getMostSearchedBooks';
 
 export default function MostSearchedBooks() {
+  const [books, setBooks] = useState<MostSearchedBook[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchMostSearchedBooks = async () => {
+      try {
+        setIsLoading(true);
+        const response = await getMostSearchedBooks();
+
+        if (response.isSuccess) {
+          setBooks(response.data.bookList);
+        } else {
+          setError(response.message);
+        }
+      } catch (error) {
+        console.error('인기 검색 도서 조회 오류:', error);
+        setError('인기 검색 도서를 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMostSearchedBooks();
+  }, []);
+
+  const handleBookClick = (isbn: string) => {
+    navigate(`/search/book/${isbn}`);
+  };
+
+  const getCurrentDate = () => {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${month}.${day}. 기준`;
+  };
   return (
     <Container>
       <Header>
         <Title>가장 많이 검색된 책</Title>
-        {/* 서버 응답 포맷을 모르기에 우선 하드 코딩 */}
-        <DateText>01.12. 기준</DateText>
+        <DateText>{getCurrentDate()}</DateText>
       </Header>
-      {dummyBooks.length === 0 ? (
+      {isLoading ? (
+        <LoadingMessage>로딩 중...</LoadingMessage>
+      ) : error ? (
+        <EmptyMessage>
+          <MainText>데이터를 불러올 수 없어요.</MainText>
+          <SubText>{error}</SubText>
+        </EmptyMessage>
+      ) : books.length === 0 ? (
         <EmptyMessage>
           <MainText>아직 순위가 집계되지 않았어요.</MainText>
           <SubText>조금만 기다려주세요!</SubText>
         </EmptyMessage>
       ) : (
         <BookList>
-          {dummyBooks.map((book, index) => (
-            <BookItem key={book.id}>
-              <Rank>{index + 1}.</Rank>
-              <Cover src={book.coverUrl} alt={`${book.title} 커버`} />
+          {books.map(book => (
+            <BookItem key={book.isbn} onClick={() => handleBookClick(book.isbn)}>
+              <Rank>{book.rank}.</Rank>
+              <Cover src={book.imageUrl} alt={`${book.title} 커버`} />
               <BookTitle>{book.title}</BookTitle>
             </BookItem>
           ))}
@@ -106,6 +113,12 @@ const BookItem = styled.li`
   align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid ${colors.darkgrey.dark};
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: ${colors.darkgrey.main};
+  }
 `;
 
 const Rank = styled.span`
@@ -149,5 +162,15 @@ const MainText = styled.div`
 const SubText = styled.div`
   font-size: ${typography.fontSize.sm};
   color: ${colors.grey[100]};
+  font-weight: ${typography.fontWeight.regular};
+`;
+
+const LoadingMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: ${typography.fontSize.base};
+  color: ${colors.grey[200]};
   font-weight: ${typography.fontWeight.regular};
 `;
