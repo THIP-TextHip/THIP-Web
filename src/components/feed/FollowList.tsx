@@ -1,35 +1,47 @@
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import people from '../../assets/feed/people.svg';
 import character from '../../assets/feed/character.svg';
 import { typography } from '@/styles/global/global';
-
-const followerData = {
-  followers: [
-    { userId: 1, src: 'https://placehold.co/36x36', username: 'user1' },
-    { userId: 2, src: 'https://placehold.co/36x36', username: 'user2' },
-    { userId: 3, src: 'https://placehold.co/36x36', username: 'user3' },
-    { userId: 4, src: 'https://placehold.co/36x36', username: 'user4' },
-    { userId: 5, src: 'https://placehold.co/36x36', username: 'user5' },
-    { userId: 6, src: 'https://placehold.co/36x36', username: 'user6' },
-    { userId: 7, src: 'https://placehold.co/36x36', username: 'user7' },
-    { userId: 8, src: 'https://placehold.co/36x36', username: 'user8' },
-    { userId: 9, src: 'https://placehold.co/36x36', username: 'user9' },
-    { userId: 10, src: 'https://placehold.co/36x36', username: 'user10' },
-    { userId: 11, src: 'https://placehold.co/36x36', username: 'user11' },
-    { userId: 12, src: 'https://placehold.co/36x36', username: 'user12' },
-  ],
-};
+import { getRecentFollowing, type RecentWriterData } from '@/api/users/getRecentFollowing';
 
 const FollowList = () => {
   const navigate = useNavigate();
-  const { followers } = followerData;
-  const hasFollowers = followers.length > 0;
-  const visible = hasFollowers ? followers.slice(0, 10) : [];
+  const [recentWriters, setRecentWriters] = useState<RecentWriterData[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // API에서 최근 글 작성한 팔로우 리스트 조회
+  const fetchRecentFollowing = async () => {
+    try {
+      setLoading(true);
+      const response = await getRecentFollowing();
+
+      if (response.isSuccess) {
+        setRecentWriters(response.data.recentWriters);
+      } else {
+        console.error('최근 팔로우 작성자 조회 실패:', response.message);
+        setRecentWriters([]);
+      }
+    } catch (error) {
+      console.error('최근 팔로우 작성자 조회 중 오류:', error);
+      setRecentWriters([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 데이터 조회
+  useEffect(() => {
+    fetchRecentFollowing();
+  }, []);
+
+  const hasFollowers = recentWriters.length > 0;
+  const visible = hasFollowers ? recentWriters.slice(0, 10) : [];
 
   const handleFindClick = () => {
-    navigate('/feed/usersearch');
+    navigate('/feed/search');
   };
 
   const handleMoreClick = () => {
@@ -46,13 +58,15 @@ const FollowList = () => {
         <img src={people} />
         <div>내 띱</div>
       </div>
-      {hasFollowers ? (
+      {loading ? (
+        <></>
+      ) : hasFollowers ? (
         <FollowContainer>
           <div className="followerList">
-            {visible.map(({ userId, src, username }) => (
-              <div className="followers" key={username} onClick={() => handleProfileClick(userId)}>
-                <img src={src} />
-                <div className="username">{username}</div>
+            {visible.map(({ userId, profileImageUrl, nickname }) => (
+              <div className="followers" key={userId} onClick={() => handleProfileClick(userId)}>
+                <img src={profileImageUrl} alt={nickname} />
+                <div className="username">{nickname}</div>
               </div>
             ))}
           </div>
