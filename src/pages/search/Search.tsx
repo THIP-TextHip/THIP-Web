@@ -208,6 +208,7 @@ const Wrapper = styled.div`
   min-width: 320px;
   max-width: 767px;
   height: 100%;
+  min-height: 100vh;
   margin: 0 auto;
   background: ${colors.black.main};
 `;
