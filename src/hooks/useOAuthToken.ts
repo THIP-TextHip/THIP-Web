@@ -28,8 +28,15 @@ export const useOAuthToken = () => {
         .catch(error => {
           console.error('❌ 토큰 발급 실패:', error);
           // 에러 발생 시 로그인 페이지로 이동
-          navigate('/');
+          // navigate('/');
+          console.log('💡 임시 토큰을 사용하여 계속 진행합니다.');
+          // 에러 발생 시에도 임시 토큰으로 계속 진행
+          // URL에서 code 파라미터 제거
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, newUrl);
         });
+    } else if (!loginTokenKey) {
+      console.log('🔑 loginTokenKey가 없습니다. 임시 토큰을 사용합니다.');
     }
   }, [isTokenRequested, navigate]);
 
