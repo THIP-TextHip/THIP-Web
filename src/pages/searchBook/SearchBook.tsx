@@ -26,12 +26,14 @@ import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
 import { IconButton } from '@/components/common/IconButton';
 import saveIcon from '../../assets/common/SaveIcon.svg';
+import filledSaveIcon from '../../assets/common/filledSaveIcon.svg';
 import rightChevron from '../../assets/common/right-Chevron.svg';
 import plusIcon from '../../assets/common/plus.svg';
 import { useState, useEffect } from 'react';
 import { IntroModal } from '@/components/search/IntroModal';
 import { getBookDetail, type BookDetail } from '@/api/books/getBookDetail';
 import { getRecruitingRooms, type RecruitingRoomsData } from '@/api/books/getRecruitingRooms';
+import { postSaveBook } from '@/api/books/postSaveBook';
 import { Filter } from '@/components/common/Filter';
 import FeedPost from '@/components/feed/FeedPost';
 import { mockSearchBook } from '@/mocks/searchBook.mock';
@@ -44,6 +46,8 @@ const SearchBook = () => {
   const [showIntroModal, setShowIntroModal] = useState(false);
   const [bookDetail, setBookDetail] = useState<BookDetail | null>(null);
   const [recruitingRoomsData, setRecruitingRoomsData] = useState<RecruitingRoomsData | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,6 +71,7 @@ const SearchBook = () => {
 
         if (bookResponse.isSuccess) {
           setBookDetail(bookResponse.data);
+          setIsSaved(bookResponse.data.isSaved);
         } else {
           setError(bookResponse.message);
         }
@@ -120,7 +125,24 @@ const SearchBook = () => {
 
   const handleWritePostButton = () => {};
 
-  const handleSaveButton = () => {};
+  const handleSaveButton = async () => {
+    if (!isbn || isSaving) return;
+
+    try {
+      setIsSaving(true);
+      const response = await postSaveBook(isbn, !isSaved);
+
+      if (response.isSuccess) {
+        setIsSaved(response.data.isSaved);
+      } else {
+        console.error('북마크 실패:', response.message);
+      }
+    } catch (error) {
+      console.error('북마크 중 오류 발생:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading || error || !bookDetail) {
     return (
@@ -162,8 +184,8 @@ const SearchBook = () => {
             <WritePostButton onClick={handleWritePostButton}>
               피드에 글쓰기 <img src={plusIcon} alt="더하기 아이콘" />
             </WritePostButton>
-            <SaveButton onClick={handleSaveButton}>
-              <img src={saveIcon} alt="저장 버튼"></img>
+            <SaveButton onClick={handleSaveButton} disabled={isSaving}>
+              <img src={isSaved ? filledSaveIcon : saveIcon} alt="저장 버튼" />
             </SaveButton>
           </RightArea>
         </ButtonSection>
