@@ -87,7 +87,10 @@ const FeedDetailPage = () => {
 
   const handleMoreClick = () => {
     openMoreMenu({
-      onEdit: () => console.log('수정하기 클릭'),
+      onEdit: () => {
+        closePopup();
+        navigate(`/post/update/${feedId}`);
+      },
       onClose: () => {
         closePopup();
       },

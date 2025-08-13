@@ -11,6 +11,7 @@ import SignupNickname from './signup/SignupNickname';
 import SignupDone from './signup/SignupDone';
 import CreateGroup from './group/CreateGroup';
 import CreatePost from './post/CreatePost';
+import UpdatePost from './post/UpdatePost';
 import Group from './group/Group';
 import Feed from './feed/Feed';
 import GroupSearch from './groupSearch/GroupSearch';
@@ -51,6 +52,7 @@ const Router = () => {
         <Route path="post/create" element={<CreatePost />} />
         <Route path="group" element={<Group />} />
         <Route path="group/create" element={<CreateGroup />} />
+        <Route path="post/update/:feedId" element={<UpdatePost />} />
         <Route path="group/search" element={<GroupSearch />} />
         <Route path="group/detail" element={<GroupDetail />} />
         <Route path="group/detail/joined" element={<ParticipatedGroupDetail />} />
