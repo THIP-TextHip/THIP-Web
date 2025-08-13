@@ -66,7 +66,7 @@ const SignupGenre = () => {
       // ✅ 쿠키는 브라우저가 자동으로 전송
       const result = await postSignup({
         aliasName: selectedAlias.subTitle,
-        nickName: nickname,
+        nickname: nickname,
       });
 
       if (result.success) {
@@ -74,7 +74,7 @@ const SignupGenre = () => {
         navigate('/signupdone', {
           state: {
             aliasName: selectedAlias.subTitle,
-            nickName: nickname,
+            nickname: nickname,
           },
         });
       } else {
