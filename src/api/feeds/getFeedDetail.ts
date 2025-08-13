@@ -6,7 +6,7 @@ export interface FeedDetailData {
   creatorId: number;
   creatorNickname: string;
   creatorProfileImageUrl: string;
-  aliasName: string;
+  alias: string;
   aliasColor: string;
   postDate: string;
   isbn: string;
@@ -18,6 +18,7 @@ export interface FeedDetailData {
   commentCount: number;
   isSaved: boolean;
   isLiked: boolean;
+  isPublic: boolean;
   tagList: string[];
 }
 
@@ -40,4 +41,5 @@ export const getFeedDetail = async (feedId: number) => {
 const feedDetail = await getFeedDetail(123);
 console.log(feedDetail.data.feedId); // 123
 console.log(feedDetail.data.tagList); // ["태그1", "태그2"]
+console.log(feedDetail.data.isPublic); // true or false
 */
