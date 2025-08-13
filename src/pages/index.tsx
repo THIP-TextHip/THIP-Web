@@ -5,7 +5,7 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import Login from './login/Login';
-import Signup from './signup/Signup';
+// import Signup from './signup/Signup';
 import SignupGenre from './signup/SignupGenre';
 import SignupNickname from './signup/SignupNickname';
 import SignupDone from './signup/SignupDone';
@@ -44,10 +44,8 @@ const Router = () => {
     createRoutesFromElements(
       <>
         <Route path="/" element={<Login />} />
-        <Route path="signup" element={<Signup />}>
-          <Route index element={<SignupNickname />} />
-          <Route path="genre" element={<SignupGenre />} />
-        </Route>
+        <Route path="signup" element={<SignupNickname />} />
+        <Route path="signup/genre" element={<SignupGenre />} />
         <Route path="signupdone" element={<SignupDone />} />
         <Route path="post/create" element={<CreatePost />} />
         <Route path="group" element={<Group />} />

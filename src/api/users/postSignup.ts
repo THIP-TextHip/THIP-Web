@@ -2,7 +2,7 @@ import { apiClient } from '../index';
 
 export interface PostSignupRequest {
   aliasName: string;
-  nickName: string;
+  nickname: string;
 }
 
 export interface PostSignupResponse {
