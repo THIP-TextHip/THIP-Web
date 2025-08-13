@@ -36,7 +36,25 @@ const BookSelectionSection = ({
           <>
             <SelectedBookContainer>
               <SelectedBookCover>
-                <img src={selectedBook.cover} alt={selectedBook.title} />
+                {selectedBook.cover && selectedBook.cover.trim() !== '' ? (
+                  <img src={selectedBook.cover} alt={selectedBook.title} />
+                ) : (
+                  <div
+                    style={{
+                      width: '60px',
+                      height: '80px',
+                      backgroundColor: '#333',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      color: '#999',
+                      borderRadius: '4px',
+                    }}
+                  >
+                    책표지
+                  </div>
+                )}
               </SelectedBookCover>
               <SelectedBookInfo>
                 <SelectedBookTitle>{selectedBook.title}</SelectedBookTitle>
