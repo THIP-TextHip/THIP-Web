@@ -6,9 +6,15 @@ interface UseUserSearchProps {
   keyword: string;
   size?: number;
   delay?: number;
+  isFinalized?: boolean;
 }
 
-export const useUserSearch = ({ keyword, size = 10, delay = 300 }: UseUserSearchProps) => {
+export const useUserSearch = ({
+  keyword,
+  size = 10,
+  delay = 300,
+  isFinalized = false,
+}: UseUserSearchProps) => {
   const [userList, setUserList] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +37,7 @@ export const useUserSearch = ({ keyword, size = 10, delay = 300 }: UseUserSearch
         const response = await getUsers({
           keyword: searchKeyword,
           size,
+          isFinalized,
         });
 
         const newUserList = response.data.userList;
@@ -49,7 +56,7 @@ export const useUserSearch = ({ keyword, size = 10, delay = 300 }: UseUserSearch
         setLoading(false);
       }
     },
-    [size],
+    [size, isFinalized],
   );
 
   // 디바운스된 키워드가 변경될 때 검색 실행

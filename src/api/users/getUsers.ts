@@ -21,6 +21,7 @@ export interface GetUsersResponse {
 export interface GetUsersParams {
   keyword?: string;
   size?: number;
+  isFinalized?: boolean;
 }
 
 export const getUsers = async (params?: GetUsersParams) => {
@@ -32,6 +33,10 @@ export const getUsers = async (params?: GetUsersParams) => {
 
   if (params?.size) {
     searchParams.append('size', params.size.toString());
+  }
+
+  if (params?.isFinalized !== undefined) {
+    searchParams.append('isFinalized', params.isFinalized.toString());
   }
 
   const queryString = searchParams.toString();
