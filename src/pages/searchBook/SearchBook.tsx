@@ -31,6 +31,7 @@ import plusIcon from '../../assets/common/plus.svg';
 import { useState, useEffect } from 'react';
 import { IntroModal } from '@/components/search/IntroModal';
 import { getBookDetail, type BookDetail } from '@/api/books/getBookDetail';
+import { getRecruitingRooms, type RecruitingRoomsData } from '@/api/books/getRecruitingRooms';
 import { Filter } from '@/components/common/Filter';
 import FeedPost from '@/components/feed/FeedPost';
 import { mockSearchBook } from '@/mocks/searchBook.mock';
@@ -42,6 +43,7 @@ const SearchBook = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>('인기순');
   const [showIntroModal, setShowIntroModal] = useState(false);
   const [bookDetail, setBookDetail] = useState<BookDetail | null>(null);
+  const [recruitingRoomsData, setRecruitingRoomsData] = useState<RecruitingRoomsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,16 +59,26 @@ const SearchBook = () => {
 
       try {
         setIsLoading(true);
-        const response = await getBookDetail(isbn);
 
-        if (response.isSuccess) {
-          setBookDetail(response.data);
+        const [bookResponse, recruitingResponse] = await Promise.all([
+          getBookDetail(isbn),
+          getRecruitingRooms(isbn),
+        ]);
+
+        if (bookResponse.isSuccess) {
+          setBookDetail(bookResponse.data);
         } else {
-          setError(response.message);
+          setError(bookResponse.message);
+        }
+
+        if (recruitingResponse.isSuccess) {
+          setRecruitingRoomsData(recruitingResponse.data);
+        } else {
+          console.error('모집중인 모임방 조회 실패:', recruitingResponse.message);
         }
       } catch (error) {
-        console.error('책 상세 정보 조회 오류:', error);
-        setError('책 정보를 불러오는데 실패했습니다.');
+        console.error('데이터 조회 오류:', error);
+        setError('정보를 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
       }
@@ -86,7 +98,24 @@ const SearchBook = () => {
   const handleMoreButton = () => {};
 
   const handleRecruitingGroupButton = () => {
-    navigate('./group');
+    if (bookDetail) {
+      navigate('/search/book/group', {
+        state: {
+          recruitingRooms: recruitingRoomsData || {
+            recruitingRoomList: [],
+            totalRoomCount: 0,
+            nextCursor: '',
+            isLast: true,
+          },
+          bookInfo: {
+            isbn: bookDetail.isbn,
+            title: bookDetail.title,
+            author: bookDetail.authorName,
+            imageUrl: bookDetail.imageUrl,
+          },
+        },
+      });
+    }
   };
 
   const handleWritePostButton = () => {};
@@ -126,7 +155,7 @@ const SearchBook = () => {
 
         <ButtonSection>
           <RecruitingGroupButton onClick={handleRecruitingGroupButton}>
-            모집중인 모임방 {bookDetail.recruitingRoomCount}개{' '}
+            모집중인 모임방 {recruitingRoomsData?.totalRoomCount || 0}개{' '}
             <img src={rightChevron} alt="오른쪽 화살표 아이콘" />
           </RecruitingGroupButton>
           <RightArea>
