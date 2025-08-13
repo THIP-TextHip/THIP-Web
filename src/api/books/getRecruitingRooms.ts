@@ -31,7 +31,7 @@ export const getRecruitingRooms = async (isbn: string): Promise<RecruitingRoomsR
     const response = await apiClient.get<RecruitingRoomsResponse>(
       `/books/${isbn}/recruiting-rooms`,
     );
-    console.log(response.data);
+
     return response.data;
   } catch (error) {
     console.error('모집중인 모임방 조회 API 오류:', error);

@@ -75,11 +75,9 @@ const Search = () => {
 
     try {
       const response = await getSearchBooks(term, 1, isManualSearch);
-      console.log('API 응답:', response);
 
       if (response.isSuccess) {
         const convertedResults = convertToSearchedBooks(response.data.searchResult);
-        console.log('변환된 결과:', convertedResults);
         setSearchResults(convertedResults);
       } else {
         console.log('검색 실패:', response.message);
@@ -209,7 +207,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   min-width: 320px;
   max-width: 767px;
-  height: 100vh;
+  height: 100%;
   margin: 0 auto;
   background: ${colors.black.main};
 `;
