@@ -73,7 +73,6 @@ const CreatePost = () => {
     }
 
     const candidates = makeIsbnCandidates(selectedBook!.isbn);
-    console.log('[CreatePost] ISBN candidates:', candidates);
 
     // images: 선택값 (없으면 undefined 전달 → FormData에 미첨부)
     const filesOrUndefined = selectedPhotos.length ? selectedPhotos : undefined;
@@ -87,8 +86,6 @@ const CreatePost = () => {
         isPublic: !isPrivate,
         ...(selectedTags.length ? { tagList: selectedTags } : {}),
       };
-
-      console.log(`[CreatePost] Try #${i + 1} with ISBN:`, isbnToSend);
 
       try {
         const result = await createNewFeed(body, filesOrUndefined);
