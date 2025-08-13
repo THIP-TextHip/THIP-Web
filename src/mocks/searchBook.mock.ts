@@ -46,7 +46,7 @@ export const mockSearchBook = {
       bookTitle: '제목입니다',
       bookAuthor: '작가입니다',
       contentBody: '내용입니다…',
-      contentUrl: ['https://placehold.co/100x100', 'https://placehold.co/100x100'],
+      contentUrls: ['https://placehold.co/100x100', 'https://placehold.co/100x100'],
       likeCount: 125,
       commentCount: 125,
       isSaved: false,
@@ -65,7 +65,7 @@ export const mockSearchBook = {
       bookAuthor: '작가입니다',
       contentBody:
         '내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다',
-      contentUrl: [],
+      contentUrls: [],
       likeCount: 125,
       commentCount: 125,
       isSaved: true,
