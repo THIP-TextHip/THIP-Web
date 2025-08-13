@@ -127,7 +127,7 @@ const FollowerListPage = () => {
           <UserProfileItem
             key={user.userId}
             profileImgUrl={user.profileImageUrl}
-            nickName={user.nickname}
+            nickname={user.nickname}
             aliasName={user.aliasName}
             aliasColor={user.aliasColor}
             followerCount={user.followerCount}

@@ -76,6 +76,7 @@ export const Intro = styled.p`
   font-size: ${typography.fontSize['xs']};
   font-weight: ${typography.fontWeight.regular};
   color: ${colors.grey[100]};
+  line-height: 20px;
 `;
 
 export const MetaInfo = styled.div`

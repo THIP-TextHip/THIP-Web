@@ -6,8 +6,7 @@ import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
 import writefab from '../../assets/common/writefab.svg';
-// import { mockPosts } from '@/data/postData';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
 import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import type { PostData } from '@/types/post';
@@ -16,7 +15,17 @@ const tabs = ['피드', '내 피드'];
 
 const Feed = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState(tabs[0]);
+  const location = useLocation();
+  const initialTabFromState = (location.state as { initialTab?: string } | null)?.initialTab;
+  const [activeTab, setActiveTab] = useState<string>(initialTabFromState ?? tabs[0]);
+
+  // 최초 마운트 시에만 history state 제거하여 이후 재방문 시 영향 없도록 처리
+  useEffect(() => {
+    if (initialTabFromState) {
+      navigate('.', { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 전체 피드 상태
   const [totalFeedPosts, setTotalFeedPosts] = useState<PostData[]>([]);
@@ -158,7 +167,7 @@ const Feed = () => {
           <MyFeed showHeader={false} posts={myFeedPosts} isMyFeed={true} isLast={myIsLast} />
         </>
       )}
-      <NavBar src={writefab} path="/" />
+      <NavBar src={writefab} path="/post/create" />
     </Container>
   );
 };

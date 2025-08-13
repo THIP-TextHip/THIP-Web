@@ -3,8 +3,14 @@ import { usePopupStore } from '@/stores/usePopupStore';
 import ConfirmModal from './ConfirmModal';
 import MoreMenu from './MoreMenu';
 import Snackbar from './Snackbar';
+import ReplyModal from './ReplyModal';
 import styled from '@emotion/styled';
-import type { ConfirmModalProps, MoreMenuProps, SnackbarProps } from '@/stores/usePopupStore';
+import type {
+  ConfirmModalProps,
+  MoreMenuProps,
+  SnackbarProps,
+  ReplyModalProps,
+} from '@/stores/usePopupStore';
 
 const PopupContainer = () => {
   const { popupType, popupProps, isOpen } = usePopupStore();
@@ -32,11 +38,10 @@ const PopupContainer = () => {
         );
       }
       case 'moremenu': {
-        return (
-          <Wrapper>
-            <MoreMenu {...(popupProps as MoreMenuProps)} />
-          </Wrapper>
-        );
+        return <MoreMenu {...(popupProps as MoreMenuProps)} />;
+      }
+      case 'reply-modal': {
+        return <ReplyModal {...(popupProps as ReplyModalProps)} />;
       }
       case 'snackbar':
         return (

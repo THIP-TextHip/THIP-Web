@@ -19,13 +19,19 @@ const MoreMenu = ({ onEdit, onDelete, onClose }: MoreMenuProps) => {
 
 const Overlay = styled.div`
   position: fixed;
-  top: 0;
   left: 0;
   right: 0;
+  top: 0;
   bottom: 0;
-  width: 100%;
-  height: 100vh;
-  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 320px;
+  max-width: 767px;
+  margin: 0 auto;
+  background-color: rgba(18, 18, 18, 0.1);
+  backdrop-filter: blur(2.5px);
+  z-index: 1200;
 `;
 
 const Container = styled.div`
@@ -43,7 +49,7 @@ const Container = styled.div`
   padding: 20px;
   border-radius: 12px 12px 0px 0px;
   background-color: ${colors.darkgrey.main};
-  z-index: 1001;
+  z-index: 1201;
 `;
 
 const Button = styled.div<{ variant: 'edit' | 'delete' }>`

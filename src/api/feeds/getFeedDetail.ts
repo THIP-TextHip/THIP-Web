@@ -6,14 +6,14 @@ export interface FeedDetailData {
   creatorId: number;
   creatorNickname: string;
   creatorProfileImageUrl: string;
-  alias: string;
+  aliasName: string;
   aliasColor: string;
   postDate: string;
   isbn: string;
   bookTitle: string;
   bookAuthor: string;
   contentBody: string;
-  contentsUrl: string[];
+  contentUrls: string[];
   likeCount: number;
   commentCount: number;
   isSaved: boolean;
@@ -23,7 +23,7 @@ export interface FeedDetailData {
 
 // API 응답 타입
 export interface FeedDetailResponse {
-  success: boolean;
+  isSuccess: boolean;
   code: number;
   message: string;
   data: FeedDetailData;

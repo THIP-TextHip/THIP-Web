@@ -6,15 +6,21 @@ import { colors } from '@/styles/global/global';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import { mockUserList } from '@/data/userData';
 import { UserSearchResult } from './UserSearchResult';
 import { useNavigate } from 'react-router-dom';
+import { useUserSearch } from '@/hooks/useUserSearch';
 
 const UserSearch = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [isSearched, setIsSearched] = useState(false);
+
+  const { userList, loading, hasMore, loadMore } = useUserSearch({
+    keyword: searchTerm,
+    size: 20,
+    delay: 300,
+  });
 
   const [recentSearches, setRecentSearches] = useState<string[]>([
     '닉네임',
@@ -80,19 +86,23 @@ const UserSearch = () => {
       <Content>
         {isSearching ? (
           <>
-            (
             {isSearched ? (
               <UserSearchResult
                 type={'searched'}
-                searchedUserList={mockUserList}
-              ></UserSearchResult>
+                searchedUserList={userList}
+                loading={loading}
+                hasMore={hasMore}
+                onLoadMore={loadMore}
+              />
             ) : (
               <UserSearchResult
                 type={'searching'}
-                searchedUserList={mockUserList}
-              ></UserSearchResult>
+                searchedUserList={userList}
+                loading={loading}
+                hasMore={hasMore}
+                onLoadMore={loadMore}
+              />
             )}
-            )
           </>
         ) : (
           <>

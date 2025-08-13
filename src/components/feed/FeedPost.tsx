@@ -18,8 +18,12 @@ const Container = styled.div`
 
 const BorderBottom = styled.div`
   width: 100%;
-  height: 10px;
-  background-color: var(--color-darkgrey-dark);
+  min-width: 280px;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 6px;
+  background: #1c1c1c;
 `;
 
 const FeedPost = ({ showHeader, isLast, isMyFeed, ...postData }: FeedPostProps) => {

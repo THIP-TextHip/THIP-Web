@@ -81,7 +81,7 @@ const OtherFeedPage = () => {
         isMyFeed={false}
         profileData={profileData}
       />
-      <NavBar src={writefab} path="/" />
+      <NavBar src={writefab} path="/post/create" />
     </Container>
   );
 };
