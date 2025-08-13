@@ -61,17 +61,17 @@ const UpdatePost = () => {
 
         // 기존 데이터로 폼 초기화
         setSelectedBook({
-          id: 0, // API에서 bookId가 없다면 임시값
+          id: 0,
           title: data.bookTitle,
           author: data.bookAuthor,
-          cover: '', // API에서 bookCover가 없다면 빈 문자열
+          cover: '',
           isbn: data.isbn,
         });
 
         setPostContent(data.contentBody);
-        setIsPrivate(!data.isPublic); // isPublic 필드 사용
+        setIsPrivate(!data.isPublic);
         setSelectedTags(data.tagList || []);
-        setRemainImageUrls(data.contentUrls || []); // 처음에는 모든 기존 이미지 유지
+        setRemainImageUrls(data.contentUrls || []);
       } catch (error) {
         console.error('피드 상세 정보 로드 실패:', error);
         openSnackbar({
@@ -86,7 +86,7 @@ const UpdatePost = () => {
     };
 
     loadFeedDetail();
-  }, [feedId, navigate, openSnackbar, closePopup]);
+  }, [feedId]); // 의존성 배열에서 함수들 제거
 
   const handleBackClick = () => {
     navigate(-1);
