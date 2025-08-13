@@ -38,15 +38,17 @@ export interface SearchBooksResponse {
   data: SearchBooksData;
 }
 
-export const searchBooks = async (
+export const getSearchBooks = async (
   query: string,
   page: number = 1,
+  isFinalized: boolean = false,
 ): Promise<SearchBooksResponse> => {
   try {
     const response = await apiClient.get<SearchBooksResponse>('/books', {
       params: {
         keyword: query.trim(),
         page: page,
+        isFinalized: isFinalized,
       },
     });
     return response.data;

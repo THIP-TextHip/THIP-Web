@@ -15,6 +15,11 @@ import {
   WritePostButton,
   SaveButton,
   FeedSection,
+  FeedTitle,
+  FilterContainer,
+  EmptyState,
+  EmptyTitle,
+  EmptySubText,
 } from './SearchBook.styled';
 import { useNavigate, useParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -26,9 +31,15 @@ import plusIcon from '../../assets/common/plus.svg';
 import { useState, useEffect } from 'react';
 import { IntroModal } from '@/components/search/IntroModal';
 import { getBookDetail, type BookDetail } from '@/api/books/getBookDetail';
+import { Filter } from '@/components/common/Filter';
+import FeedPost from '@/components/feed/FeedPost';
+import { mockSearchBook } from '@/mocks/searchBook.mock';
+
+const FILTER = ['최신순', '인기순'];
 
 const SearchBook = () => {
   const { isbn } = useParams<{ isbn: string }>();
+  const [selectedFilter, setSelectedFilter] = useState<string>('인기순');
   const [showIntroModal, setShowIntroModal] = useState(false);
   const [bookDetail, setBookDetail] = useState<BookDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -129,10 +140,27 @@ const SearchBook = () => {
         </ButtonSection>
       </BannerSection>
       <FeedSection>
-        <SubTitle>이 책과 관련된 피드</SubTitle>
-        <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
-          관련 피드가 없습니다.
-        </div>
+        <FeedTitle>피드 글 둘러보기</FeedTitle>
+        <FilterContainer>
+          <Filter
+            filters={FILTER}
+            selectedFilter={selectedFilter}
+            setSelectedFilter={setSelectedFilter}
+          />
+        </FilterContainer>
+
+        {mockSearchBook.posts.length > 0 ? (
+          <>
+            {mockSearchBook.posts.map((post, index) => (
+              <FeedPost key={index} showHeader={true} isMyFeed={false} {...post} />
+            ))}
+          </>
+        ) : (
+          <EmptyState>
+            <EmptyTitle>이 책으로 작성된 피드가 없어요.</EmptyTitle>
+            <EmptySubText>첫 번째 피드를 작성해보세요!</EmptySubText>
+          </EmptyState>
+        )}
       </FeedSection>{' '}
       {showIntroModal && (
         <IntroModal title="소개" content={bookDetail.description} onClose={handleCloseIntroModal} />

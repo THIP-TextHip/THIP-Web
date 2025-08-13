@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import { searchBooks, convertToSearchedBooks } from '@/api/books/searchBooks';
+import { getSearchBooks, convertToSearchedBooks } from '@/api/books/getSearchBooks';
 
 export interface SearchedBook {
   id: number;
@@ -24,7 +24,7 @@ const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
-  const [isSearched, setIsSearched] = useState(false);
+  const [isFinalized, setIsFinalized] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchedBook[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -34,7 +34,7 @@ const Search = () => {
 
   const handleChange = (value: string) => {
     setSearchTerm(value);
-    setIsSearched(false);
+    setIsFinalized(false);
     setIsSearching(value.trim() !== '');
 
     if (value.trim()) {
@@ -53,7 +53,7 @@ const Search = () => {
       setSearchParams({}, { replace: true });
 
       setSearchResults([]);
-      setIsSearched(false);
+      setIsFinalized(false);
 
       if (searchTimeoutId) {
         clearTimeout(searchTimeoutId);
@@ -68,13 +68,13 @@ const Search = () => {
     setIsSearching(true);
 
     if (isManualSearch) {
-      setIsSearched(false);
+      setIsFinalized(false);
     }
 
     setIsLoading(true);
 
     try {
-      const response = await searchBooks(term, 1);
+      const response = await getSearchBooks(term, 1, isManualSearch);
       console.log('API 응답:', response);
 
       if (response.isSuccess) {
@@ -87,13 +87,13 @@ const Search = () => {
       }
 
       if (isManualSearch) {
-        setIsSearched(true);
+        setIsFinalized(true);
       }
     } catch (error) {
       console.error('검색 중 오류 발생:', error);
       setSearchResults([]);
       if (isManualSearch) {
-        setIsSearched(true);
+        setIsFinalized(true);
       }
     } finally {
       setIsLoading(false);
@@ -118,7 +118,7 @@ const Search = () => {
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setIsSearching(false);
-      setIsSearched(false);
+      setIsFinalized(false);
     }
   }, [searchTerm]);
 
@@ -140,7 +140,7 @@ const Search = () => {
     setSearchTerm('');
     setSearchResults([]);
     setIsSearching(false);
-    setIsSearched(false);
+    setIsFinalized(false);
     setIsInitialized(false);
     setSearchParams({}, { replace: true });
   };
@@ -152,13 +152,6 @@ const Search = () => {
       }
     };
   }, [searchTimeoutId]);
-
-  useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setIsSearching(false);
-      setIsSearched(false);
-    }
-  }, [searchTerm]);
 
   return (
     <Wrapper>
@@ -177,7 +170,7 @@ const Search = () => {
           value={searchTerm}
           onChange={handleChange}
           onSearch={() => handleSearch(searchTerm.trim(), true)}
-          isSearched={isSearched}
+          isSearched={isFinalized}
         />
       </SearchBarContainer>
       <Content>
@@ -187,7 +180,7 @@ const Search = () => {
               <LoadingMessage>검색 중...</LoadingMessage>
             ) : (
               <BookSearchResult
-                type={isSearched ? 'searched' : 'searching'}
+                type={isFinalized ? 'searched' : 'searching'}
                 searchedBookList={searchResults}
               />
             )}
