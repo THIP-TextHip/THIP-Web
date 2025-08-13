@@ -14,7 +14,7 @@ export const mockPosts: PostData[] = [
     bookTitle: '제목입니다',
     bookAuthor: '작가입니다',
     contentBody: '내용입니다…',
-    contentsUrl: ['https://placehold.co/100x100', 'https://placehold.co/100x100'],
+    contentUrls: ['https://placehold.co/100x100', 'https://placehold.co/100x100'],
     likeCount: 125,
     commentCount: 125,
     isSaved: false,
@@ -33,7 +33,7 @@ export const mockPosts: PostData[] = [
     bookAuthor: '작가입니다',
     contentBody:
       '내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다',
-    contentsUrl: [],
+    contentUrls: [],
     likeCount: 125,
     commentCount: 125,
     isSaved: true,
@@ -52,7 +52,7 @@ export const mockPosts: PostData[] = [
     bookAuthor: '작가입니다',
     contentBody:
       '내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다내용입니다',
-    contentsUrl: [],
+    contentUrls: [],
     likeCount: 125,
     commentCount: 125,
     isSaved: false,
@@ -74,7 +74,7 @@ export const mockFeedPost: FeedPostProps = {
   bookAuthor: '한강',
   contentBody:
     '정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.정말 인상 깊게 읽은 책이에요.',
-  contentsUrl: [test2, 'https://placehold.co/300x300', test],
+  contentUrls: [test2, 'https://placehold.co/300x300', test],
   likeCount: 15,
   commentCount: 2,
   isSaved: true,

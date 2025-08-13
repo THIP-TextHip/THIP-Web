@@ -8,7 +8,7 @@ export interface OtherFeedItem {
   bookTitle: string;
   bookAuthor: string;
   contentBody: string;
-  contentsUrl: string[];
+  contentUrls: string[];
   likeCount: number;
   commentCount: number;
   isSaved: boolean;
@@ -21,7 +21,7 @@ export interface OtherFeedData {
 
 // API 응답 타입
 export interface OtherFeedResponse {
-  success: boolean;
+  isSuccess: boolean;
   code: number;
   message: string;
   data: OtherFeedData;

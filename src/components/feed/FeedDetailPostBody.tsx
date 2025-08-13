@@ -81,13 +81,13 @@ const FeedDetailPostBody = ({
   isbn,
   bookAuthor,
   contentBody,
-  contentsUrl = [],
+  contentUrls = [],
   tags = [],
 }: FeedDetailPostBodyProps) => {
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const hasImage = contentsUrl.length > 0;
+  const hasImage = contentUrls.length > 0;
   const hasTag = tags.length > 0;
 
   const handleImageClick = (index: number) => {
@@ -106,7 +106,7 @@ const FeedDetailPostBody = ({
         <div className="content">{contentBody}</div>
         {hasImage && (
           <div className="imgContainer">
-            {contentsUrl.map((src: string, i: number) => (
+            {contentUrls.map((src: string, i: number) => (
               <img key={i} src={src} alt={`이미지 ${i + 1}`} onClick={() => handleImageClick(i)} />
             ))}
           </div>
@@ -126,7 +126,7 @@ const FeedDetailPostBody = ({
       </PostContent>
       {isImageViewerOpen && (
         <ImageViewer
-          images={contentsUrl}
+          images={contentUrls}
           initialIndex={selectedImageIndex}
           isOpen={isImageViewerOpen}
           onClose={handleCloseImageViewer}

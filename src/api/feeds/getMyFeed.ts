@@ -10,7 +10,7 @@ export interface MyFeedData {
 
 // API 응답 타입
 export interface MyFeedResponse {
-  success: boolean;
+  isSuccess: boolean;
   code: number;
   message: string;
   data: MyFeedData;

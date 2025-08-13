@@ -10,7 +10,7 @@ export interface TotalFeedData {
 
 // API 응답 타입
 export interface TotalFeedResponse {
-  success: boolean;
+  isSuccess: boolean;
   code: number;
   message: string;
   data: TotalFeedData;
