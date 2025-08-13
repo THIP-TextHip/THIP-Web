@@ -34,18 +34,33 @@ export const updateFeed = async (
   feedId: number,
   body: UpdateFeedBody,
 ): Promise<UpdateFeedResponse> => {
-  const form = new FormData();
-
-  // request 파트(JSON) - 필수
-  form.append('request', new Blob([JSON.stringify(body)], { type: 'application/json' }));
-
-  // 수정 모드에서는 새 이미지 추가 불가
-
-  const { data } = await apiClient.patch<UpdateFeedResponse>(`/feeds/${feedId}`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+  // FormData 대신 JSON으로 시도
+  console.log('수정 API 요청 (JSON):', {
+    url: `/feeds/${feedId}`,
+    body: body,
   });
 
-  return data;
+  try {
+    const { data } = await apiClient.patch<UpdateFeedResponse>(`/feeds/${feedId}`, body, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    console.log('수정 API 응답:', data);
+    return data;
+  } catch (error) {
+    console.error('수정 API 에러:', error);
+
+    // FormData로 재시도
+    console.log('FormData로 재시도...');
+    const form = new FormData();
+    form.append('request', new Blob([JSON.stringify(body)], { type: 'application/json' }));
+
+    const { data } = await apiClient.patch<UpdateFeedResponse>(`/feeds/${feedId}`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    return data;
+  }
 };
 
 /*

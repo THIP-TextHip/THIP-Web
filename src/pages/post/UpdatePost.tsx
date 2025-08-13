@@ -111,11 +111,15 @@ const UpdatePost = () => {
       ...(remainImageUrls.length ? { remainImageUrls } : {}),
     };
 
-    // 수정 모드에서는 새 이미지 추가 불가
+    // API 요청 전 데이터 확인
+    console.log('수정 요청 데이터:', {
+      feedId: Number(feedId),
+      body: body,
+    });
+
     const result = await updateExistingFeed(Number(feedId), body);
 
     if (!result?.success) {
-      // 에러는 useUpdateFeed에서 이미 처리됨
       return;
     }
   };
