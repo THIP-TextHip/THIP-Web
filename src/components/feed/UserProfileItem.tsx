@@ -56,7 +56,7 @@ const UserProfileItem = ({
         )}
         {type === 'followerlist' && (
           <div className="followlistbutton">
-            <div>{followerCount}명이 띱하는 중</div>
+            <div>{followerCount ?? 0}명이 띱하는 중</div>
             <img src={rightArrow} />
           </div>
         )}

@@ -20,6 +20,7 @@ const UserSearch = () => {
     keyword: searchTerm,
     size: 20,
     delay: 300,
+    isFinalized: isSearched,
   });
 
   const [recentSearches, setRecentSearches] = useState<string[]>([
