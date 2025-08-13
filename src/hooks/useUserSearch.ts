@@ -33,7 +33,6 @@ export const useUserSearch = ({
       try {
         setLoading(true);
         setError(null);
-
         const response = await getUsers({
           keyword: searchKeyword,
           size,
