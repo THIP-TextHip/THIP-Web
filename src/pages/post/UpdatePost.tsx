@@ -27,8 +27,8 @@ const UpdatePost = () => {
   const { feedId } = useParams<{ feedId: string }>();
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [postContent, setPostContent] = useState('');
-  const [selectedPhotos] = useState<File[]>([]); // 수정 모드에서는 사용하지 않음
-  const [remainImageUrls, setRemainImageUrls] = useState<string[]>([]); // 유지할 기존 이미지들
+  const [selectedPhotos] = useState<File[]>([]);
+  const [remainImageUrls, setRemainImageUrls] = useState<string[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,7 +86,7 @@ const UpdatePost = () => {
     };
 
     loadFeedDetail();
-  }, [feedId]); // 의존성 배열에서 함수들 제거
+  }, [feedId]);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -111,12 +111,6 @@ const UpdatePost = () => {
       ...(remainImageUrls.length ? { remainImageUrls } : {}),
     };
 
-    // API 요청 전 데이터 확인
-    console.log('수정 요청 데이터:', {
-      feedId: Number(feedId),
-      body: body,
-    });
-
     const result = await updateExistingFeed(Number(feedId), body);
 
     if (!result?.success) {
@@ -124,19 +118,14 @@ const UpdatePost = () => {
     }
   };
 
-  // 새로 추가할 이미지 핸들러 (수정 모드에서는 사용하지 않음)
   const handlePhotoAdd = () => {
-    // 수정 모드에서는 새 이미지 추가 불가
     return;
   };
 
-  // 새로 추가한 이미지 제거 (수정 모드에서는 사용하지 않음)
   const handlePhotoRemove = () => {
-    // 수정 모드에서는 새 이미지 추가 불가
     return;
   };
 
-  // 기존 이미지 제거 (remainImageUrls에서 제외)
   const handleExistingImageRemove = (imageUrl: string) => {
     setRemainImageUrls(prev => prev.filter(url => url !== imageUrl));
   };
@@ -169,12 +158,11 @@ const UpdatePost = () => {
         isNextActive={isFormValid && !updateLoading}
       />
       <Container>
-        {/* 책 정보는 수정할 수 없음 (읽기 전용으로 표시) */}
         <BookSelectionSection
           selectedBook={selectedBook}
-          onSearchClick={() => {}} // 비활성화
-          onChangeClick={() => {}} // 비활성화
-          readOnly={true} // 읽기 전용 모드
+          onSearchClick={() => {}}
+          onChangeClick={() => {}}
+          readOnly={true}
         />
 
         <Section showDivider />
@@ -183,14 +171,13 @@ const UpdatePost = () => {
 
         <Section showDivider />
 
-        {/* 기존 이미지 삭제만 가능, 추가는 불가 */}
         <PhotoSection
           photos={selectedPhotos}
           onPhotoAdd={handlePhotoAdd}
           onPhotoRemove={handlePhotoRemove}
           existingImageUrls={remainImageUrls}
           onExistingImageRemove={handleExistingImageRemove}
-          isEditMode={true} // 수정 모드로 설정하여 추가 버튼 숨김
+          isEditMode={true}
         />
 
         <Section showDivider />

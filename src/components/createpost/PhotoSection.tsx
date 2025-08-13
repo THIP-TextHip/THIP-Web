@@ -13,13 +13,13 @@ import plusDisabledIcon from '../../assets/post/plus-disabled.svg';
 import closeIcon from '../../assets/post/close.svg';
 
 interface PhotoSectionProps {
-  photos: File[]; // 새로 추가할 이미지들
+  photos: File[];
   onPhotoAdd: (files: File[]) => void;
   onPhotoRemove: (index: number) => void;
-  existingImageUrls?: string[]; // 기존 이미지 URL들 (수정 시에만 사용)
-  onExistingImageRemove?: (imageUrl: string) => void; // 기존 이미지 제거 함수 (수정 시에만 사용)
-  readOnly?: boolean; // 읽기 전용 모드
-  isEditMode?: boolean; // 수정 모드 (사진 추가 버튼 숨김)
+  existingImageUrls?: string[];
+  onExistingImageRemove?: (imageUrl: string) => void;
+  readOnly?: boolean;
+  isEditMode?: boolean;
 }
 
 const PhotoSection = ({
@@ -61,14 +61,12 @@ const PhotoSection = ({
       <SectionTitle>사진 추가</SectionTitle>
       <PhotoContainer>
         <PhotoGrid>
-          {/* 새 이미지 추가 버튼 - 수정 모드에서는 숨김 */}
           {!readOnly && !isEditMode && (
             <AddPhotoButton onClick={handleFileInputClick} disabled={isDisabled}>
               <img src={isDisabled ? plusDisabledIcon : plusIcon} alt="사진 추가" />
             </AddPhotoButton>
           )}
 
-          {/* 기존 이미지들 (수정 모드에서만 표시) */}
           {existingImageUrls.map((imageUrl, index) => (
             <div
               key={`existing-${index}`}
@@ -83,7 +81,6 @@ const PhotoSection = ({
             </div>
           ))}
 
-          {/* 새로 추가된 이미지들 */}
           {photos.map((photo, index) => (
             <div
               key={`new-${index}`}

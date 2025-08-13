@@ -4,8 +4,8 @@ import { apiClient } from '../index';
 export interface UpdateFeedBody {
   contentBody: string;
   isPublic: boolean;
-  tagList?: string[]; // 선택 필드
-  remainImageUrls?: string[]; // 기존 이미지 중 유지할 URL들
+  tagList?: string[];
+  remainImageUrls?: string[];
 }
 
 /** 성공 응답 */
@@ -34,24 +34,15 @@ export const updateFeed = async (
   feedId: number,
   body: UpdateFeedBody,
 ): Promise<UpdateFeedResponse> => {
-  // FormData 대신 JSON으로 시도
-  console.log('수정 API 요청 (JSON):', {
-    url: `/feeds/${feedId}`,
-    body: body,
-  });
-
   try {
     const { data } = await apiClient.patch<UpdateFeedResponse>(`/feeds/${feedId}`, body, {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    console.log('수정 API 응답:', data);
     return data;
   } catch (error) {
     console.error('수정 API 에러:', error);
 
-    // FormData로 재시도
-    console.log('FormData로 재시도...');
     const form = new FormData();
     form.append('request', new Blob([JSON.stringify(body)], { type: 'application/json' }));
 
