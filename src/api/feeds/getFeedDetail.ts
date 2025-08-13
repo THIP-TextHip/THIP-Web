@@ -6,24 +6,25 @@ export interface FeedDetailData {
   creatorId: number;
   creatorNickname: string;
   creatorProfileImageUrl: string;
-  aliasName: string;
+  alias: string;
   aliasColor: string;
   postDate: string;
   isbn: string;
   bookTitle: string;
   bookAuthor: string;
   contentBody: string;
-  contentsUrl: string[];
+  contentUrls: string[];
   likeCount: number;
   commentCount: number;
   isSaved: boolean;
   isLiked: boolean;
+  isPublic: boolean;
   tagList: string[];
 }
 
 // API 응답 타입
 export interface FeedDetailResponse {
-  success: boolean;
+  isSuccess: boolean;
   code: number;
   message: string;
   data: FeedDetailData;
@@ -40,4 +41,5 @@ export const getFeedDetail = async (feedId: number) => {
 const feedDetail = await getFeedDetail(123);
 console.log(feedDetail.data.feedId); // 123
 console.log(feedDetail.data.tagList); // ["태그1", "태그2"]
+console.log(feedDetail.data.isPublic); // true or false
 */

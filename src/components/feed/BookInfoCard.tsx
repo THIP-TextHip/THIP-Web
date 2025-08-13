@@ -6,6 +6,8 @@ const BookContainer = styled.div`
   display: flex;
   height: 44px;
   padding: 8px 4px 8px 12px;
+  min-width: 280px;
+  max-width: 500px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -15,7 +17,7 @@ const BookContainer = styled.div`
 
   .left {
     overflow: hidden;
-    max-width: 340px;
+    width: 220px;
     white-space: nowrap;
     color: var(--color-white);
     text-overflow: ellipsis;
@@ -38,7 +40,7 @@ const BookContainer = styled.div`
     line-height: 24px;
 
     .name {
-      max-width: 100px;
+      width: 100px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
