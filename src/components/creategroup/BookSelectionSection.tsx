@@ -16,19 +16,21 @@ interface BookSelectionSectionProps {
   selectedBook: { cover: string; title: string; author: string } | null;
   onSearchClick: () => void;
   onChangeClick: () => void;
+  readOnly?: boolean;
 }
 
 const BookSelectionSection = ({
   selectedBook,
   onSearchClick,
   onChangeClick,
+  readOnly = false,
 }: BookSelectionSectionProps) => {
   return (
     <Section>
       <SectionTitle>책 선택</SectionTitle>
       <SearchBox
         hasSelectedBook={!!selectedBook}
-        onClick={selectedBook ? undefined : onSearchClick}
+        onClick={selectedBook || readOnly ? undefined : onSearchClick}
       >
         {selectedBook ? (
           <>
@@ -41,14 +43,16 @@ const BookSelectionSection = ({
                 <SelectedBookAuthor>{selectedBook.author} 저</SelectedBookAuthor>
               </SelectedBookInfo>
             </SelectedBookContainer>
-            <ChangeButton onClick={onChangeClick}>변경</ChangeButton>
+            {!readOnly && <ChangeButton onClick={onChangeClick}>변경</ChangeButton>}
           </>
         ) : (
           <>
             <SearchIcon>
               <img src={searchIcon} alt="검색" />
             </SearchIcon>
-            <span style={{ color: semanticColors.text.secondary }}>검색해서 찾기</span>
+            <span style={{ color: semanticColors.text.secondary }}>
+              {readOnly ? '책 정보' : '검색해서 찾기'}
+            </span>
           </>
         )}
       </SearchBox>
