@@ -50,10 +50,10 @@ const PostBody = ({
   bookAuthor,
   contentBody,
   feedId,
-  contentsUrl = [],
+  contentUrls = [],
 }: PostBodyProps) => {
   const navigate = useNavigate();
-  const hasImage = contentsUrl.length > 0;
+  const hasImage = contentUrls.length > 0;
 
   const handlePostClick = (feedId: number) => {
     // if (!isClickable) return;
@@ -68,7 +68,7 @@ const PostBody = ({
         <div className="content">{contentBody}</div>
         {hasImage && (
           <div className="imgContainer">
-            {contentsUrl.map((src: string, i: number) => (
+            {contentUrls.map((src: string, i: number) => (
               <img key={i} src={src} />
             ))}
           </div>
