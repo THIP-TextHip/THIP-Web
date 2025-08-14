@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import type { Group } from './MyGroupBox';
 import { GroupCard } from './GroupCard';
+import { colors, typography } from '@/styles/global/global';
 
 interface Props {
   groups: Group[];
@@ -26,9 +27,14 @@ export function RecruitingGroupBox({ groups, title }: Props) {
         ))}
       </TabContainer>
       <Grid>
-        {filtered.map(group => (
-          <GroupCard key={group.id} group={group} type={'main'} />
-        ))}
+        {filtered.length > 0 ? (
+          filtered.map(group => <GroupCard key={group.id} group={group} type={'main'} />)
+        ) : (
+          <EmptyContent>
+            <EmptyMainText>모임방이 아직 없어요.</EmptyMainText>
+            <EmptySubText>해당 장르의 모임방이 생기면 보여줄게요!</EmptySubText>
+          </EmptyContent>
+        )}
       </Grid>
     </Container>
   );
@@ -94,4 +100,30 @@ const Grid = styled.div`
   @media (min-width: 584px) {
     grid-template-columns: 1fr 1fr;
   }
+`;
+
+const EmptyContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 60px 20px;
+  grid-column: 1 / -1;
+`;
+
+const EmptyMainText = styled.p`
+  color: ${colors.white};
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
+  text-align: center;
+  margin: 0;
+`;
+
+const EmptySubText = styled.p`
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
+  text-align: center;
+  margin: 0;
 `;
