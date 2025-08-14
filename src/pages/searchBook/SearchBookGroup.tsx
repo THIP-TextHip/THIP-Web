@@ -2,19 +2,33 @@ import TitleHeader from '@/components/common/TitleHeader';
 import { colors, typography } from '@/styles/global/global';
 import styled from '@emotion/styled';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { GroupCard } from '@/components/group/GroupCard';
-import { mockSearchBookGroup } from '@/mocks/searchBook.mock';
+import { type RecruitingRoomsData } from '@/api/books/getRecruitingRooms';
+
+interface LocationState {
+  recruitingRooms: RecruitingRoomsData;
+  bookInfo: {
+    isbn: string;
+    title: string;
+    author: string;
+    imageUrl: string;
+  };
+}
 
 const SearchBookGroup = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { recruitingRooms, bookInfo } = (location.state as LocationState) || {};
 
   const handleBackButton = () => {
     navigate(-1);
   };
   const handleMakeGroup = () => {};
 
-  const hasGroups = mockSearchBookGroup.length > 0;
+  const groupList = recruitingRooms?.recruitingRoomList || [];
+  const totalCount = recruitingRooms?.totalRoomCount || 0;
+  const hasGroups = groupList.length > 0;
 
   return (
     <Wrapper>
@@ -23,11 +37,23 @@ const SearchBookGroup = () => {
         leftIcon={<img src={leftArrow} alt="뒤로 가기" />}
         onLeftClick={handleBackButton}
       />
-      <ContentHeader>전체 {mockSearchBookGroup.length}</ContentHeader>
+      <ContentHeader>전체 {totalCount}</ContentHeader>
       {hasGroups ? (
         <Content>
-          {mockSearchBookGroup.map(group => (
-            <GroupCard group={group} isOngoing={true} type={'modal'} />
+          {groupList.map((room, index) => (
+            <GroupCard
+              key={room.roomId || index}
+              group={{
+                id: room.roomId,
+                title: room.roomName,
+                participants: room.memberCount,
+                maximumParticipants: room.recruitCount,
+                deadLine: 0,
+                coverUrl: room.bookImageUrl || bookInfo?.imageUrl,
+              }}
+              isOngoing={true}
+              type={'modal'}
+            />
           ))}
         </Content>
       ) : (
