@@ -46,7 +46,6 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
               : 'playingAndRecruiting';
 
         const response = await getMyRooms(roomType, null);
-        console.log(response);
 
         if (response.isSuccess) {
           setRooms(response.data.roomList);
