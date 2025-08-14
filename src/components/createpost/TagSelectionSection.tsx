@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Section, SectionTitle } from '../../pages/group/CommonSection.styled';
 import {
   TagContainer,
@@ -13,28 +13,42 @@ import {
   TagCount,
 } from './TagSelectionSection.styled';
 import closeIcon from '../../assets/post/close.svg';
+import { getWriteInfo, type CategoryData } from '@/api/feeds/getWriteInfo';
 
 interface TagSelectionSectionProps {
   selectedTags: string[];
   onTagToggle: (tag: string) => void;
 }
 
-// 상위 장르와 하위 태그 매핑
-const genreTagsMap: Record<string, string[]> = {
-  문학: ['소설', '시', '에세이', '인문학', '철학'],
-  '과학·IT': ['기술', '과학', 'AI', '데이터'],
-  사회과학: ['정치', '경제', '사회학', '심리학', '역사'],
-  인문학: ['철학', '역사', '문화', '언어학', '종교'],
-  예술: ['미술', '음악', '영화', '디자인', '사진'],
-};
-
-const availableGenres = Object.keys(genreTagsMap);
-
 const TagSelectionSection = ({ selectedTags, onTagToggle }: TagSelectionSectionProps) => {
-  const [selectedGenre, setSelectedGenre] = useState<string>('문학');
+  const [categories, setCategories] = useState<CategoryData[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
-  const handleGenreSelect = (genre: string) => {
-    setSelectedGenre(genre);
+  // API에서 카테고리 및 태그 데이터 로드
+  useEffect(() => {
+    const loadWriteInfo = async () => {
+      try {
+        setLoading(true);
+        const response = await getWriteInfo();
+
+        if (response.isSuccess && response.data.categoryList.length > 0) {
+          setCategories(response.data.categoryList);
+          // 첫 번째 카테고리를 기본 선택
+          setSelectedCategory(response.data.categoryList[0].category);
+        }
+      } catch (error) {
+        console.error('카테고리 정보 로드 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadWriteInfo();
+  }, []);
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
   };
 
   const handleTagToggle = (tag: string) => {
@@ -54,28 +68,38 @@ const TagSelectionSection = ({ selectedTags, onTagToggle }: TagSelectionSectionP
     onTagToggle(tag);
   };
 
-  const currentSubTags = genreTagsMap[selectedGenre] || [];
+  // 현재 선택된 카테고리의 태그 목록
+  const currentTags = categories.find(cat => cat.category === selectedCategory)?.tagList || [];
+
+  if (loading) {
+    return (
+      <Section>
+        <SectionTitle>태그</SectionTitle>
+        <TagContainer>
+          <div>로딩 중...</div>
+        </TagContainer>
+      </Section>
+    );
+  }
 
   return (
     <Section>
       <SectionTitle>태그</SectionTitle>
       <TagContainer>
-        {/* 상위 장르 선택 */}
         <GenreButtonGroup>
-          {availableGenres.map(genre => (
+          {categories.map(categoryData => (
             <GenreButton
-              key={genre}
-              active={selectedGenre === genre}
-              onClick={() => handleGenreSelect(genre)}
+              key={categoryData.category}
+              active={selectedCategory === categoryData.category}
+              onClick={() => handleCategorySelect(categoryData.category)}
             >
-              {genre}
+              {categoryData.category}
             </GenreButton>
           ))}
         </GenreButtonGroup>
 
-        {/* 하위 태그 그리드 */}
         <SubTagGrid>
-          {currentSubTags.map(tag => (
+          {currentTags.map(tag => (
             <SubTagButton
               key={tag}
               active={selectedTags.includes(tag)}
