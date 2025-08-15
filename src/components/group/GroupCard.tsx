@@ -9,12 +9,13 @@ interface Props {
   isOngoing?: boolean;
   type?: 'main' | 'search' | 'modal';
   isRecommend?: boolean;
+  onClick?: () => void;
 }
 
 export const GroupCard = forwardRef<HTMLDivElement, Props>(
-  ({ group, isOngoing, type = 'main', isRecommend = false }, ref) => {
+  ({ group, isOngoing, type = 'main', isRecommend = false, onClick }, ref) => {
     return (
-      <Card ref={ref} cardType={type}>
+      <Card ref={ref} cardType={type} onClick={onClick}>
         <Cover src={group.coverUrl} alt="cover" cardType={type} isRecommend={isRecommend} />
         <Info>
           <Title isRecommend={isRecommend}>{group.title}</Title>

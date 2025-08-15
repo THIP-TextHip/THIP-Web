@@ -137,9 +137,8 @@ const CreateGroup = () => {
 
       if (isSuccessful) {
         // 성공 시 모집 중인 방 상세 페이지로 이동
-        navigate('/group/detail', {
+        navigate(`/group/detail/${response.data.roomId}`, {
           replace: true,
-          state: { roomId: response.data.roomId },
         });
       } else {
         alert(`방 생성에 실패했습니다: ${response.message} (코드: ${response.code})`);
