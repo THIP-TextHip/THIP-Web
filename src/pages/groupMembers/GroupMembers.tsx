@@ -1,12 +1,57 @@
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import MemberList from '../../components/members/MemberList';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import { mockMembers } from '../../mocks/members.mock';
-import { Wrapper } from './GroupMembers.styled';
+import { Wrapper, LoadingContainer, ErrorContainer, EmptyContainer } from './GroupMembers.styled';
+import {
+  getRoomMembers,
+  convertRoomMembersToMembers,
+  type Member,
+  type RoomMembersResponse,
+} from '@/api/rooms/getRoomMembers';
 
 const GroupMembers = () => {
   const navigate = useNavigate();
+  const { roomId } = useParams<{ roomId: string }>();
+
+  // API 상태 관리
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // API 호출
+  useEffect(() => {
+    const fetchMembers = async () => {
+      // roomId 우선 순위: URL 파라미터 > localStorage > 기본값 1
+      const currentRoomId = roomId || localStorage.getItem('currentRoomId') || '1';
+
+      if (!currentRoomId) {
+        setError('방 ID를 찾을 수 없습니다.');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response: RoomMembersResponse = await getRoomMembers(parseInt(currentRoomId));
+
+        if (response.isSuccess) {
+          const convertedMembers = convertRoomMembersToMembers(response.data.userList);
+          setMembers(convertedMembers);
+        } else {
+          setError(response.message);
+        }
+      } catch (err) {
+        setError('독서메이트 목록을 불러오는 중 오류가 발생했습니다.');
+        console.error('독서메이트 조회 오류:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMembers();
+  }, [roomId]);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -14,8 +59,40 @@ const GroupMembers = () => {
 
   const handleMemberClick = (memberId: string) => {
     // 특정 사용자 페이지로 이동
-    navigate(`/user/${memberId}`);
+    navigate(`/otherfeed/${memberId}`);
   };
+
+  // 로딩 상태
+  if (loading) {
+    return (
+      <>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          title="독서메이트"
+          onLeftClick={handleBackClick}
+        />
+        <Wrapper>
+          <LoadingContainer>로딩 중...</LoadingContainer>
+        </Wrapper>
+      </>
+    );
+  }
+
+  // 에러 상태
+  if (error) {
+    return (
+      <>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          title="독서메이트"
+          onLeftClick={handleBackClick}
+        />
+        <Wrapper>
+          <ErrorContainer>{error}</ErrorContainer>
+        </Wrapper>
+      </>
+    );
+  }
 
   return (
     <>
@@ -25,7 +102,11 @@ const GroupMembers = () => {
         onLeftClick={handleBackClick}
       />
       <Wrapper>
-        <MemberList members={mockMembers} onMemberClick={handleMemberClick} />
+        {members.length > 0 ? (
+          <MemberList members={members} onMemberClick={handleMemberClick} />
+        ) : (
+          <EmptyContainer>독서메이트가 없습니다.</EmptyContainer>
+        )}
       </Wrapper>
     </>
   );
