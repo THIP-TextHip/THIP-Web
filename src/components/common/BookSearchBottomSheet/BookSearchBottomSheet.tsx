@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import closeIcon from '../../../assets/group/close.svg';
 import whitesearchIcon from '../../../assets/group/search_white.svg';
+import { getSavedBooks, type SavedBook } from '@/api/books/getSavedBooks';
 import {
   Overlay,
   BottomSheetContainer,
@@ -18,6 +19,12 @@ import {
   BookCover,
   BookInfo,
   BookTitle,
+  LoadingContainer,
+  LoadingText,
+  ErrorContainer,
+  ErrorText,
+  EmptyContainer,
+  EmptyText,
 } from './BookSearchBottomSheet.styled.ts';
 
 // Types
@@ -37,78 +44,94 @@ interface BookSearchBottomSheetProps {
 
 type TabType = 'saved' | 'group';
 
-const mockSavedBooks: Book[] = [
-  {
-    id: 1,
-    title: '토마토 컵라면',
-    author: '작가명',
-    cover: '/src/assets/books/tomato.svg',
-    isbn: '9780374500016',
-  },
-  {
-    id: 2,
-    title: '사슴',
-    author: '작가명',
-    cover: '/src/assets/books/deer.svg',
-    isbn: '9781234567891',
-  },
-  {
-    id: 3,
-    title: '호르몬 체인지',
-    author: '작가명',
-    cover: '/src/assets/books/hormone.svg',
-    isbn: '9781234567892',
-  },
-];
-
-const mockGroupBooks: Book[] = [
-  {
-    id: 4,
-    title: '단 한번의 삶',
-    author: '작가명',
-    cover: '/src/assets/books/life.svg',
-    isbn: '9781234567893',
-  },
-  {
-    id: 5,
-    title: '호르몬 체인지',
-    author: '작가명',
-    cover: '/src/assets/books/hormone.svg',
-    isbn: '9781234567892',
-  },
-  {
-    id: 6,
-    title: '토마토 컵라면',
-    author: '작가명',
-    cover: '/src/assets/books/tomato.svg',
-    isbn: '9781234567890',
-  },
-];
-
 const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBottomSheetProps) => {
   // State
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredBooks, setFilteredBooks] = useState<Book[]>(mockSavedBooks);
+  const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>('saved');
+  const [savedBooks, setSavedBooks] = useState<SavedBook[]>([]);
+  const [groupBooks, setGroupBooks] = useState<SavedBook[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Effects
+  // API에서 받은 데이터를 Book 타입으로 변환하는 함수
+  const convertSavedBookToBook = (savedBook: SavedBook): Book => ({
+    id: savedBook.bookId,
+    title: savedBook.bookTitle,
+    author: savedBook.authorName,
+    cover: savedBook.bookImageUrl,
+    isbn: savedBook.isbn,
+  });
+
+  // 저장한 책 데이터 가져오기
+  const fetchSavedBooks = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await getSavedBooks('saved');
+
+      if (response.isSuccess && response.data) {
+        setSavedBooks(response.data.bookList);
+      } else {
+        setError(response.message || '저장한 책을 불러오는데 실패했습니다.');
+      }
+    } catch (err) {
+      console.error('저장한 책 조회 오류:', err);
+      setError('저장한 책을 불러오는데 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 모임 책 데이터 가져오기
+  const fetchGroupBooks = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await getSavedBooks('joining');
+
+      if (response.isSuccess && response.data) {
+        setGroupBooks(response.data.bookList);
+      } else {
+        setError(response.message || '모임 책을 불러오는데 실패했습니다.');
+      }
+    } catch (err) {
+      console.error('모임 책 조회 오류:', err);
+      setError('모임 책을 불러오는데 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 컴포넌트가 열릴 때 초기 데이터 로드
   useEffect(() => {
-    // 현재 활성화된 탭의 책 목록 가져오기
-    const currentTabBooks = activeTab === 'saved' ? mockSavedBooks : mockGroupBooks;
+    if (isOpen) {
+      if (activeTab === 'saved' && savedBooks.length === 0) {
+        fetchSavedBooks();
+      } else if (activeTab === 'group' && groupBooks.length === 0) {
+        fetchGroupBooks();
+      }
+    }
+  }, [isOpen, activeTab, savedBooks.length, groupBooks.length]);
+
+  // 필터링 로직
+  useEffect(() => {
+    const currentTabBooks = activeTab === 'saved' ? savedBooks : groupBooks;
+    const convertedBooks = currentTabBooks.map(convertSavedBookToBook);
 
     if (searchQuery.trim() === '') {
-      // 검색어가 없을 때는 선택된 탭의 전체 목록 표시
-      setFilteredBooks(currentTabBooks);
+      setFilteredBooks(convertedBooks);
     } else {
-      // 검색어가 있을 때는 선택된 탭 내에서만 검색
-      const filtered = currentTabBooks.filter(
+      const filtered = convertedBooks.filter(
         book =>
           book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           book.author.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredBooks(filtered);
     }
-  }, [searchQuery, activeTab]);
+  }, [searchQuery, activeTab, savedBooks, groupBooks]);
 
   useEffect(() => {
     if (isOpen) {
@@ -153,25 +176,24 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     setSearchQuery('');
   };
 
-  const handleTabChange = (tab: TabType) => {
+  const handleTabChange = async (tab: TabType) => {
     setActiveTab(tab);
-    // 탭 변경 시 현재 검색어로 새로운 탭에서 다시 검색
-    const newTabBooks = tab === 'saved' ? mockSavedBooks : mockGroupBooks;
+    setError(null);
 
-    if (searchQuery.trim() === '') {
-      setFilteredBooks(newTabBooks);
-    } else {
-      const filtered = newTabBooks.filter(
-        book =>
-          book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          book.author.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
-      setFilteredBooks(filtered);
+    // 탭 변경 시 해당 탭의 데이터가 없으면 API 호출
+    if (tab === 'saved' && savedBooks.length === 0) {
+      await fetchSavedBooks();
+    } else if (tab === 'group' && groupBooks.length === 0) {
+      await fetchGroupBooks();
     }
   };
 
   // 검색어가 없을 때만 탭 표시
   const showTabs = searchQuery.trim() === '';
+
+  // 현재 탭의 책 개수 확인
+  const currentTabBooks = activeTab === 'saved' ? savedBooks : groupBooks;
+  const hasBooks = currentTabBooks.length > 0;
 
   return (
     <Overlay isVisible={isOpen} onClick={handleOverlayClick}>
@@ -211,18 +233,36 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
 
           {/* 책 목록 영역 */}
           <BookListContainer>
-            <BookList>
-              {filteredBooks.map(book => (
-                <BookItem key={book.id} onClick={() => handleBookSelect(book)}>
-                  <BookCover>
-                    <img src={book.cover} alt={book.title} onError={handleImageError} />
-                  </BookCover>
-                  <BookInfo>
-                    <BookTitle>{book.title}</BookTitle>
-                  </BookInfo>
-                </BookItem>
-              ))}
-            </BookList>
+            {isLoading ? (
+              <LoadingContainer>
+                <LoadingText>책 목록을 불러오는 중...</LoadingText>
+              </LoadingContainer>
+            ) : error ? (
+              <ErrorContainer>
+                <ErrorText>{error}</ErrorText>
+              </ErrorContainer>
+            ) : !hasBooks ? (
+              <EmptyContainer>
+                <EmptyText>
+                  {activeTab === 'saved'
+                    ? '저장한 책이 없습니다.'
+                    : '참여 중인 모임의 책이 없습니다.'}
+                </EmptyText>
+              </EmptyContainer>
+            ) : (
+              <BookList>
+                {filteredBooks.map(book => (
+                  <BookItem key={book.id} onClick={() => handleBookSelect(book)}>
+                    <BookCover>
+                      <img src={book.cover} alt={book.title} onError={handleImageError} />
+                    </BookCover>
+                    <BookInfo>
+                      <BookTitle>{book.title}</BookTitle>
+                    </BookInfo>
+                  </BookItem>
+                ))}
+              </BookList>
+            )}
           </BookListContainer>
         </Content>
       </BottomSheetContainer>

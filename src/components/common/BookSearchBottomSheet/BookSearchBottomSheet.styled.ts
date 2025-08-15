@@ -111,71 +111,65 @@ export const TabContainer = styled.div`
 export const Tab = styled.button<{ active: boolean }>`
   background: none;
   border: none;
-  color: ${({ active }) => (active ? semanticColors.text.primary : semanticColors.text.ghost)};
+  color: ${({ active }) => (active ? colors.white : colors.grey[300])};
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.semibold};
-  padding: 8px 0 8px 0;
   cursor: pointer;
   position: relative;
 
-  ${({ active }) =>
-    active &&
-    `
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background-color: ${semanticColors.text.primary};
-    }
-  `}
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 5px;
+    right: 5px;
+    height: 2px;
+    background-color: ${({ active }) => (active ? colors.white : 'transparent')};
+    transition: background-color 0.2s ease;
+  }
+
+  &:hover {
+    color: ${colors.white};
+  }
 `;
 
 export const BookListContainer = styled.div`
   flex: 1;
   overflow-y: auto;
-  margin-right: -16px;
-  padding-right: 16px;
+  min-height: 0;
 
   &::-webkit-scrollbar {
-    width: 4px;
+    width: 3px;
   }
 
   &::-webkit-scrollbar-track {
-    background: ${colors.grey[400]};
-    border-radius: 2px;
-    margin-right: 14px;
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: ${colors.white};
-    border-radius: 2px;
+    background: ${colors.white};
+    border-radius: 3px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background-color: ${colors.grey[200]};
+    background: ${colors.grey[100]};
   }
-
-  /* Firefox 스크롤바 */
-  scrollbar-width: thin;
-  scrollbar-color: ${colors.white} ${colors.grey[400]};
 `;
 
 export const BookList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 12px;
 `;
 
 export const BookItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 0;
-  border-bottom: 1px solid ${colors.grey[400]};
+  padding: 12px 2px;
+  background-color: none;
+  border-radius: 12px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 `;
 
 export const BookCover = styled.div`
@@ -183,7 +177,8 @@ export const BookCover = styled.div`
   height: 60px;
   overflow: hidden;
   flex-shrink: 0;
-  background-color: ${semanticColors.background.card};
+  margin-right: 8px;
+  border: 1px solid ${colors.grey[300]};
 
   img {
     width: 100%;
@@ -194,14 +189,62 @@ export const BookCover = styled.div`
 
 export const BookInfo = styled.div`
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  min-width: 0;
 `;
 
-export const BookTitle = styled.div`
-  color: ${semanticColors.text.primary};
+export const BookTitle = styled.h3`
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
+  color: ${colors.white};
+  margin: 0;
   line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+`;
+
+// 로딩 상태 스타일
+export const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
+
+export const LoadingText = styled.p`
+  color: ${colors.grey[300]};
+  font-size: ${typography.fontSize.base};
+  margin: 0;
+`;
+
+// 에러 상태 스타일
+export const ErrorContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
+
+export const ErrorText = styled.p`
+  color: ${colors.red};
+  font-size: ${typography.fontSize.base};
+  margin: 0;
+  text-align: center;
+`;
+
+// 빈 상태 스타일
+export const EmptyContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
+
+export const EmptyText = styled.p`
+  color: ${colors.grey[300]};
+  font-size: ${typography.fontSize.base};
+  margin: 0;
+  text-align: center;
 `;
