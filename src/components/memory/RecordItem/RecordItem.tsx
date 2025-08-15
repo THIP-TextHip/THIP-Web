@@ -90,16 +90,6 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     }
   }, [roomId, type, record.id, navigate]);
 
-  const handleDeleteConfirm = useCallback(() => {
-    const recordTypeName = type === 'poll' ? '투표' : '기록';
-
-    openConfirm({
-      title: `${recordTypeName}을 삭제하시겠어요?`,
-      disc: `삭제된 ${recordTypeName}은 복구할 수 없습니다.`,
-      onConfirm: () => handleDelete(),
-    });
-  }, [type, openConfirm]);
-
   const handleDelete = useCallback(async () => {
     const currentRoomId = roomId || '1';
     const recordId = parseInt(record.id);
@@ -141,6 +131,16 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     }
   }, [roomId, record.id, type, openSnackbar]);
 
+  const handleDeleteConfirm = useCallback(() => {
+    const recordTypeName = type === 'poll' ? '투표' : '기록';
+
+    openConfirm({
+      title: `${recordTypeName}을 삭제하시겠어요?`,
+      disc: `삭제된 ${recordTypeName}은 복구할 수 없습니다.`,
+      onConfirm: handleDelete,
+    });
+  }, [type, openConfirm, handleDelete]);
+
   const handleReport = useCallback(() => {
     openSnackbar({
       message: '신고가 접수되었습니다.',
@@ -151,22 +151,23 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
 
   const handleLongPress = useCallback(() => {
     if (isMyRecord) {
-      // 내 기록: 수정하기, 삭제하기 (기존 MoreMenuProps 타입에 맞게 수정)
+      // 내 기록: 수정하기, 삭제하기
       openMoreMenu({
         onEdit: handleEdit,
         onDelete: handleDeleteConfirm,
         onClose: () => {},
       });
     } else {
-      // 다른 사람 기록: 신고하기만 표시하는 경우
-      // 현재 MoreMenuProps 타입에는 신고 옵션이 없으므로 스낵바로 처리
+      // 다른 사람 기록: 신고하기
       handleReport();
     }
   }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm, handleReport]);
 
   const handleLongPressStart = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
-      e.preventDefault();
+      if ('touches' in e) {
+        e.preventDefault();
+      }
 
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
@@ -180,7 +181,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
           hasTriggeredLongPress.current = true;
           handleLongPress();
         }
-      }, 500); // 500ms 길게 누르기
+      }, 500);
     },
     [handleLongPress],
   );
@@ -193,17 +194,16 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     setIsPressed(false);
   }, []);
 
-  const handleLongPressMove = useCallback(
-    (e: React.MouseEvent | React.TouchEvent) => {
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
       if (!longPressTimer.current) return;
 
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const clientX = e.touches[0].clientX;
+      const clientY = e.touches[0].clientY;
 
       const deltaX = Math.abs(clientX - pressStartPos.current.x);
       const deltaY = Math.abs(clientY - pressStartPos.current.y);
 
-      // 10px 이상 움직이면 길게 누르기 취소
       if (deltaX > 10 || deltaY > 10) {
         handleLongPressEnd();
       }
@@ -217,13 +217,13 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       onMouseDown={handleLongPressStart}
       onMouseUp={handleLongPressEnd}
       onMouseLeave={handleLongPressEnd}
-      onMouseMove={handleLongPressMove}
       onTouchStart={handleLongPressStart}
       onTouchEnd={handleLongPressEnd}
-      onTouchMove={handleLongPressMove}
+      onTouchMove={handleTouchMove}
       style={{
         transform: isPressed ? 'scale(0.98)' : 'scale(1)',
         transition: 'transform 0.1s ease',
+        touchAction: 'manipulation',
       }}
     >
       <UserSection>
