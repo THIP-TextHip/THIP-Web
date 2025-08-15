@@ -94,12 +94,6 @@ const PollWrite = () => {
           isUploading: false, // API 호출이 완료되었으므로 false
         };
 
-        console.log('투표 생성 완료', newPollRecord);
-        console.log('페이지 범위:', isOverallEnabled ? '전체범위' : `${finalPage}p`);
-        console.log('투표 내용:', pollContent);
-        console.log('투표 옵션:', validOptions);
-        console.log('총평 설정:', isOverallEnabled);
-
         // 성공 시 기록장으로 이동
         navigate('/memory', {
           state: { newRecord: newPollRecord },

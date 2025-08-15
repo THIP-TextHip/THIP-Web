@@ -74,11 +74,6 @@ const RecordWrite = () => {
           isUploading: false, // API 호출이 완료되었으므로 false
         };
 
-        console.log('기록 작성 완료', newRecord);
-        console.log('페이지 범위:', isOverallEnabled ? '전체범위' : `${finalPage}p`);
-        console.log('내용:', content);
-        console.log('총평 설정:', isOverallEnabled);
-
         // 성공 시 기록장으로 이동
         navigate('/memory', {
           state: { newRecord },
