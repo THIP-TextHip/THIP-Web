@@ -95,7 +95,7 @@ const PollWrite = () => {
         };
 
         // 성공 시 기록장으로 이동
-        navigate('/memory', {
+        navigate(`/rooms/${roomId}/memory`, {
           state: { newRecord: newPollRecord },
           replace: true,
         });
