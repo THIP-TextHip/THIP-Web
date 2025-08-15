@@ -52,7 +52,7 @@ const Router = () => {
         <Route path="group/create" element={<CreateGroup />} />
         <Route path="post/update/:feedId" element={<UpdatePost />} />
         <Route path="group/search" element={<GroupSearch />} />
-        <Route path="group/detail" element={<GroupDetail />} />
+        <Route path="group/detail/:roomId" element={<GroupDetail />} />
         <Route path="group/detail/joined" element={<ParticipatedGroupDetail />} />
         <Route path="group/members" element={<GroupMembers />} />
         <Route path="memory" element={<Memory />} />

@@ -176,13 +176,14 @@ export const BookDetails = styled.div`
   font-weight: ${typography.fontWeight.medium};
   gap: 20px;
   color: ${colors.white};
-  margin: auto 0;
+  margin-top: 8px;
 `;
 
 export const BookIntro = styled.div`
   > p {
     margin-top: 4px;
     color: ${colors.grey[200]};
+    font-size: ${typography.fontSize['2xs']};
   }
 `;
 
