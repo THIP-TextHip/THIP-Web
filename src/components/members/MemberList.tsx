@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import type { KeyboardEvent } from 'react';
+import styled from '@emotion/styled';
 import rightChevron from '../../assets/member/right-chevron.svg';
 import type { Member } from '@/api/rooms/getRoomMembers';
 import {
@@ -68,8 +69,13 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
 };
 
 // 프로필 이미지가 있을 때 사용하는 스타일드 컴포넌트
-const ProfileImageWithSrc = ({ src, alt }: { src: string; alt: string }) => (
-  <ProfileImage as="img" src={src} alt={alt} style={{ objectFit: 'cover' }} />
-);
+const ProfileImageWithSrc = styled.img`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--color-grey-400);
+  flex-shrink: 0;
+  object-fit: cover;
+`;
 
 export default MemberList;
