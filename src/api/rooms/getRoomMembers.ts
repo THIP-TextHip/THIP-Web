@@ -5,7 +5,7 @@ export interface RoomMember {
   nickname: string;
   imageUrl: string;
   alias: string;
-  subscriberCount: number;
+  followerCount: number;
 }
 
 // 독서메이트 조회 응답 타입
@@ -29,20 +29,12 @@ export interface Member {
 
 export const convertRoomMembersToMembers = (roomMembers: RoomMember[]): Member[] => {
   const convertedMembers = roomMembers.map(member => {
-    const memberData = member as any;
-
-    // 다양한 가능한 필드명들을 체크
-    const alias = memberData.alias || memberData.aliasName || memberData.role || '독서메이트';
-    const followerCount =
-      memberData.subscriberCount || memberData.followerCount || memberData.followersCount || 0;
-    const imageUrl = memberData.imageUrl || memberData.profileImageUrl || memberData.image;
-
-    const convertedMember = {
+    const convertedMember: Member = {
       id: member.userId.toString(),
-      nickname: member.nickname,
-      role: alias,
-      followersCount: followerCount,
-      profileImageUrl: imageUrl,
+      nickname: member.nickname || '익명',
+      role: member.alias || '독서메이트',
+      followersCount: member.followerCount || 0,
+      profileImageUrl: member.imageUrl || undefined,
     };
 
     return convertedMember;
