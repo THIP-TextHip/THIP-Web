@@ -4,7 +4,7 @@ export interface RoomMember {
   userId: number;
   nickname: string;
   imageUrl: string;
-  alias: string;
+  aliasName: string;
   followerCount: number;
 }
 
@@ -32,7 +32,7 @@ export const convertRoomMembersToMembers = (roomMembers: RoomMember[]): Member[]
     const convertedMember: Member = {
       id: member.userId.toString(),
       nickname: member.nickname || '익명',
-      role: member.alias || '독서메이트',
+      role: member.aliasName || '독서메이트',
       followersCount: member.followerCount || 0,
       profileImageUrl: member.imageUrl || undefined,
     };
