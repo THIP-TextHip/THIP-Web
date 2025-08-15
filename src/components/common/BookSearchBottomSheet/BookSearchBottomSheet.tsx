@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import closeIcon from '../../../assets/group/close.svg';
 import whitesearchIcon from '../../../assets/group/search_white.svg';
 import { getSavedBooks, type SavedBook } from '@/api/books/getSavedBooks';
@@ -25,6 +26,7 @@ import {
   ErrorText,
   EmptyContainer,
   EmptyText,
+  ApplyButton,
 } from './BookSearchBottomSheet.styled.ts';
 
 // Types
@@ -40,11 +42,19 @@ interface BookSearchBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectBook: (book: Book) => void;
+  forceEmpty?: boolean; // 임시방편: 빈 상태 강제 표시
 }
 
 type TabType = 'saved' | 'group';
 
-const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBottomSheetProps) => {
+const BookSearchBottomSheet = ({
+  isOpen,
+  onClose,
+  onSelectBook,
+  forceEmpty = true,
+}: BookSearchBottomSheetProps) => {
+  const navigate = useNavigate();
+
   // State
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
@@ -107,17 +117,22 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
 
   // 컴포넌트가 열릴 때 초기 데이터 로드
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !forceEmpty) {
       if (activeTab === 'saved' && savedBooks.length === 0) {
         fetchSavedBooks();
       } else if (activeTab === 'group' && groupBooks.length === 0) {
         fetchGroupBooks();
       }
     }
-  }, [isOpen, activeTab, savedBooks.length, groupBooks.length]);
+  }, [isOpen, activeTab, savedBooks.length, groupBooks.length, forceEmpty]);
 
   // 필터링 로직
   useEffect(() => {
+    if (forceEmpty) {
+      setFilteredBooks([]);
+      return;
+    }
+
     const currentTabBooks = activeTab === 'saved' ? savedBooks : groupBooks;
     const convertedBooks = currentTabBooks.map(convertSavedBookToBook);
 
@@ -131,7 +146,7 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
       );
       setFilteredBooks(filtered);
     }
-  }, [searchQuery, activeTab, savedBooks, groupBooks]);
+  }, [searchQuery, activeTab, savedBooks, groupBooks, forceEmpty]);
 
   useEffect(() => {
     if (isOpen) {
@@ -181,19 +196,27 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     setError(null);
 
     // 탭 변경 시 해당 탭의 데이터가 없으면 API 호출
-    if (tab === 'saved' && savedBooks.length === 0) {
-      await fetchSavedBooks();
-    } else if (tab === 'group' && groupBooks.length === 0) {
-      await fetchGroupBooks();
+    if (!forceEmpty) {
+      if (tab === 'saved' && savedBooks.length === 0) {
+        await fetchSavedBooks();
+      } else if (tab === 'group' && groupBooks.length === 0) {
+        await fetchGroupBooks();
+      }
     }
   };
 
-  // 검색어가 없을 때만 탭 표시
-  const showTabs = searchQuery.trim() === '';
+  const handleApplyBook = () => {
+    navigate('/apply-book');
+    onClose();
+  };
 
-  // 현재 탭의 책 개수 확인
+  // 현재 탭의 책 개수 확인 (임시방편: forceEmpty가 true면 강제로 빈 상태)
   const currentTabBooks = activeTab === 'saved' ? savedBooks : groupBooks;
-  const hasBooks = currentTabBooks.length > 0;
+  const hasBooks = !forceEmpty && currentTabBooks.length > 0;
+  const showEmptyState = forceEmpty || (!isLoading && !error && !hasBooks);
+
+  // 검색어가 없을 때만 탭 표시 (단, 빈 상태일 때는 탭 숨김)
+  const showTabs = searchQuery.trim() === '' && !showEmptyState;
 
   return (
     <Overlay isVisible={isOpen} onClick={handleOverlayClick}>
@@ -219,7 +242,7 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
             </ButtonGroup>
           </SearchContainer>
 
-          {/* 탭 영역 - 검색어가 없을 때만 표시 */}
+          {/* 탭 영역 - 검색어가 없고 빈 상태가 아닐 때만 표시 */}
           {showTabs && (
             <TabContainer>
               <Tab active={activeTab === 'saved'} onClick={() => handleTabChange('saved')}>
@@ -233,7 +256,13 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
 
           {/* 책 목록 영역 */}
           <BookListContainer>
-            {isLoading ? (
+            {showEmptyState ? (
+              <EmptyContainer>
+                <EmptyText>현재 등록된 책이 아닙니다.</EmptyText>
+                <EmptyText>원하시는 책을 신청해주세요.</EmptyText>
+                <ApplyButton onClick={handleApplyBook}>책 신청하기</ApplyButton>
+              </EmptyContainer>
+            ) : isLoading ? (
               <LoadingContainer>
                 <LoadingText>책 목록을 불러오는 중...</LoadingText>
               </LoadingContainer>

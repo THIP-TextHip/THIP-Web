@@ -104,7 +104,7 @@ export const IconButton = styled.button`
 export const TabContainer = styled.div`
   display: flex;
   gap: 34px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   flex-shrink: 0;
 `;
 
@@ -241,14 +241,34 @@ export const ErrorText = styled.p`
 // 빈 상태 스타일
 export const EmptyContainer = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 200px;
+  gap: 8px;
 `;
 
 export const EmptyText = styled.p`
-  color: ${colors.grey[300]};
-  font-size: ${typography.fontSize.base};
+  color: #e0e0e0;};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
   margin: 0;
   text-align: center;
+`;
+
+export const ApplyButton = styled.button`
+  background-color: ${colors.purple.main};
+  color: ${colors.white};
+  padding: 10px 12px;
+  font-size: ${typography.fontSize.base};
+  font-weight: ${typography.fontWeight.semibold};
+  line-height: 24px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 16px;
+
+  &:hover {
+    background-color: ${colors.purple.dark};
+  }
 `;
