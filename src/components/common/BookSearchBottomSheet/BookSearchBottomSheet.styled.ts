@@ -159,7 +159,7 @@ export const BookListContainer = styled.div`
 export const BookList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
 `;
 
 export const BookItem = styled.div`
@@ -167,9 +167,13 @@ export const BookItem = styled.div`
   align-items: center;
   padding: 12px 2px;
   background-color: none;
-  border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  border-bottom: 1px solid ${colors.grey[400]};
+
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 export const BookCover = styled.div`
