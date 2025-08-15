@@ -193,7 +193,7 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
   };
 
   const handleApplyBook = () => {
-    navigate('/apply-book');
+    navigate('/search/applybook');
     onClose();
   };
 
