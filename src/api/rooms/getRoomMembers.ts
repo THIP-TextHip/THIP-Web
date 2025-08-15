@@ -1,6 +1,5 @@
 import { apiClient } from '../index';
 
-// 독서메이트 정보 타입
 export interface RoomMember {
   userId: number;
   nickname: string;
@@ -28,15 +27,28 @@ export interface Member {
   profileImageUrl?: string;
 }
 
-// API 데이터를 Member 형태로 변환하는 함수
 export const convertRoomMembersToMembers = (roomMembers: RoomMember[]): Member[] => {
-  return roomMembers.map(member => ({
-    id: member.userId.toString(),
-    nickname: member.nickname,
-    role: member.alias, // alias를 role로 사용
-    followersCount: member.subscriberCount,
-    profileImageUrl: member.imageUrl,
-  }));
+  const convertedMembers = roomMembers.map(member => {
+    const memberData = member as any;
+
+    // 다양한 가능한 필드명들을 체크
+    const alias = memberData.alias || memberData.aliasName || memberData.role || '독서메이트';
+    const followerCount =
+      memberData.subscriberCount || memberData.followerCount || memberData.followersCount || 0;
+    const imageUrl = memberData.imageUrl || memberData.profileImageUrl || memberData.image;
+
+    const convertedMember = {
+      id: member.userId.toString(),
+      nickname: member.nickname,
+      role: alias,
+      followersCount: followerCount,
+      profileImageUrl: imageUrl,
+    };
+
+    return convertedMember;
+  });
+
+  return convertedMembers;
 };
 
 export const getRoomMembers = async (roomId: number): Promise<RoomMembersResponse> => {
