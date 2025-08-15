@@ -30,7 +30,7 @@ interface RecordItemProps {
 const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
-  const { openMoreMenu, openConfirm, openSnackbar } = usePopupActions();
+  const { openMoreMenu, openConfirm, openSnackbar, closePopup } = usePopupActions();
 
   const {
     user,
@@ -155,13 +155,13 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       openMoreMenu({
         onEdit: handleEdit,
         onDelete: handleDeleteConfirm,
-        onClose: () => {},
+        onClose: closePopup,
       });
     } else {
       // 다른 사람 기록: 신고하기
       handleReport();
     }
-  }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm, handleReport]);
+  }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm, handleReport, closePopup]);
 
   const handleLongPressStart = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
