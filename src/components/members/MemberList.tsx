@@ -70,8 +70,8 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
 
 // 프로필 이미지가 있을 때 사용하는 스타일드 컴포넌트
 const ProfileImageWithSrc = styled.img`
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background-color: var(--color-grey-400);
   flex-shrink: 0;

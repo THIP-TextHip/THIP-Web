@@ -54,7 +54,7 @@ const Router = () => {
         <Route path="group/search" element={<GroupSearch />} />
         <Route path="group/detail/:roomId" element={<GroupDetail />} />
         <Route path="group/detail/joined/:roomId" element={<ParticipatedGroupDetail />} />
-        <Route path="group/members" element={<GroupMembers />} />
+        <Route path="group/:roomId/members" element={<GroupMembers />} />
         <Route path="memory" element={<Memory />} />
         <Route path="rooms/:roomId/memory" element={<Memory />} />
         <Route path="memory/record/write/:roomId" element={<RecordWrite />} />
