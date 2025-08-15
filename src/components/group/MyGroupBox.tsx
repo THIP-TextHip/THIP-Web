@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import rightChevron from '../../assets/common/right-Chevron.svg';
 import { useState, useEffect } from 'react';
 import { getJoinedRooms, type JoinedRoomItem } from '@/api/rooms/getJoinedRooms';
+import { colors, typography } from '@/styles/global/global';
 
 export interface Group {
   id: number | string;
@@ -105,7 +106,7 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
 }
 
 const Container = styled.div`
-  background-color: var(--color-main-black);
+  background-color: ${colors.black.main};
   position: relative;
   width: 100%;
   overflow-x: hidden;
@@ -119,9 +120,9 @@ const Header = styled.div`
 
 const Title = styled.h2`
   flex: 1;
-  font-size: var(--font-size-large02);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-white);
+  font-size: ${typography.fontSize.xl};
+  font-weight: ${typography.fontWeight.bold};
+  color: ${colors.white};
   margin: 0;
 `;
 
@@ -158,7 +159,7 @@ const Dot = styled.div<{ active: boolean }>`
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: ${({ active }) => (active ? 'var(--color-white)' : `var(--color-grey-300)`)};
+  background: ${({ active }) => (active ? colors.white : colors.grey[300])};
   transition: background-color 0.3s;
 `;
 
@@ -170,8 +171,8 @@ const LoadingContainer = styled.div`
 `;
 
 const LoadingText = styled.p`
-  color: var(--color-grey-300);
-  font-size: var(--font-size-medium02);
+  color: ${colors.grey[300]};
+  font-size: ${typography.fontSize.base};
   margin: 0;
 `;
 
@@ -183,8 +184,8 @@ const ErrorContainer = styled.div`
 `;
 
 const ErrorText = styled.p`
-  color: var(--color-red);
-  font-size: var(--font-size-medium02);
+  color: ${colors.red};
+  font-size: ${typography.fontSize.base};
   margin: 0;
 `;
 
@@ -196,7 +197,7 @@ const EmptyContainer = styled.div`
 `;
 
 const EmptyText = styled.p`
-  color: var(--color-grey-300);
-  font-size: var(--font-size-medium02);
+  color: ${colors.grey[300]};
+  font-size: ${typography.fontSize.base};
   margin: 0;
 `;
