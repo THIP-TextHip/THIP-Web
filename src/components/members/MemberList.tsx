@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import type { KeyboardEvent } from 'react';
+import styled from '@emotion/styled';
 import rightChevron from '../../assets/member/right-chevron.svg';
-import type { Member } from '../../mocks/members.mock';
+import type { Member } from '@/api/rooms/getRoomMembers';
 import {
   Container,
   MemberItem,
@@ -47,7 +48,11 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
           }}
         >
           <ProfileSection>
-            <ProfileImage />
+            {member.profileImageUrl ? (
+              <ProfileImageWithSrc src={member.profileImageUrl} alt={`${member.nickname} 프로필`} />
+            ) : (
+              <ProfileImage />
+            )}
             <MemberInfo>
               <MemberName>{member.nickname}</MemberName>
               <MemberRole>{member.role}</MemberRole>
@@ -62,5 +67,15 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
     </Container>
   );
 };
+
+// 프로필 이미지가 있을 때 사용하는 스타일드 컴포넌트
+const ProfileImageWithSrc = styled.img`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-grey-400);
+  flex-shrink: 0;
+  object-fit: cover;
+`;
 
 export default MemberList;
