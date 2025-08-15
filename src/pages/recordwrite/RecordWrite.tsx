@@ -12,6 +12,7 @@ import type { CreateRecordRequest } from '../../types/record';
 const RecordWrite = () => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
+
   const [pageRange, setPageRange] = useState('');
   const [content, setContent] = useState('');
   const [isOverallEnabled, setIsOverallEnabled] = useState(false);
@@ -49,6 +50,7 @@ const RecordWrite = () => {
       };
 
       console.log('기록 생성 API 호출:', recordData);
+      console.log('roomId:', roomId);
 
       // API 호출
       const response = await createRecord(parseInt(roomId), recordData);
