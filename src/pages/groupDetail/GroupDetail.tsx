@@ -76,9 +76,10 @@ const GroupDetail = () => {
     const diffTime = endDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
+    console.log(endDate);
     if (diffDays < 0) return '모집 종료';
-    if (diffDays === 0) return 'D-DAY';
-    return `D-${diffDays}`;
+    if (diffDays === 0) return '오늘 마감';
+    return `${diffDays}일 남음`;
   };
 
   useEffect(() => {

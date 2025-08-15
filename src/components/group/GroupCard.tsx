@@ -53,7 +53,9 @@ const Card = styled.div<{ cardType: 'main' | 'search' | 'modal' }>`
   box-sizing: border-box;
   padding: ${({ cardType }) => (cardType === 'search' ? '24px 12px 12px 12px' : '12px')};
   gap: 12px;
-  width: 100%;
+  min-width: 208px;
+  min-height: 80px;
+  padding: 12px;
 `;
 
 const Cover = styled.img<{ cardType: 'main' | 'search' | 'modal'; isRecommend?: boolean }>`
