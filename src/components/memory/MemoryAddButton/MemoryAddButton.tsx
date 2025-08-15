@@ -44,8 +44,13 @@ const MemoryAddButton = () => {
 
   const handlePollCreate = () => {
     setIsOpen(false);
-    navigate('/memory/poll/write');
-    console.log('투표 생성하기');
+
+    // 임시로 roomId 1을 사용해서 투표 생성 페이지로 이동
+    // TODO: 실제로는 현재 선택된 방의 roomId를 사용해야 함
+    const roomId = '1';
+
+    navigate(`/memory/poll/write/${roomId}`);
+    console.log('투표 생성하기 - roomId:', roomId);
   };
 
   return (
