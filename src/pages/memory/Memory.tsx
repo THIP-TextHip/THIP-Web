@@ -25,6 +25,7 @@ export interface Record {
   recordType?: 'page' | 'overall';
   pollOptions?: PollOption[];
   pageRange?: string;
+  isWriter?: boolean;
 }
 
 export interface PollOption {
@@ -48,6 +49,7 @@ const convertPostToRecord = (post: Post): Record => {
     type: post.postType === 'VOTE' ? 'poll' : 'text',
     recordType: post.isOverview ? 'overall' : 'page',
     pageRange: post.isOverview ? undefined : post.page.toString(),
+    isWriter: post.isWriter,
     pollOptions: post.voteItems.map((item, index) => ({
       id: item.voteItemId.toString(),
       text: item.itemName,
