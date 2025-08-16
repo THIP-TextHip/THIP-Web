@@ -40,6 +40,7 @@ import {
   type RecommendRoom,
 } from '@/api/rooms/getRoomDetail';
 import { postJoinRoom } from '@/api/rooms/postJoinRoom';
+import { postCloseRoom } from '@/api/rooms/postCloseRoom';
 import type { Group } from '@/components/group/MyGroupBox';
 
 const GroupDetail = () => {
@@ -153,13 +154,23 @@ const GroupDetail = () => {
 
   const handleBottomButtonClick = async () => {
     if (roomData.isHost) {
-      alert('모집 마감하기 API 호출');
+      try {
+        const result = await postCloseRoom(Number(roomId));
+        if (result.isSuccess) {
+          alert('모집 마감 성공!');
+        } else {
+          alert(`요청 실패: ${result.message}`);
+        }
+      } catch {
+        alert('네트워크 오류 또는 서버 오류');
+      }
       return;
     }
     const type = isJoining ? 'cancel' : 'join';
     try {
       const result = await postJoinRoom(Number(roomId), type);
       if (result.isSuccess) {
+        alert(`${type === 'join' ? '참여' : '참여 취소'} 성공!`);
         setIsJoining(type === 'join');
       } else {
         alert(`요청 실패: ${result.message}`);
