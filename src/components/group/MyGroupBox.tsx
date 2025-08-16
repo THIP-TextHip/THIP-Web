@@ -65,7 +65,7 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
     navigate(`detail/joined/${roomId}`);
   };
 
-  const { scrollRef, cardRefs, infiniteGroups } = useInfiniteCarousel(groups);
+  const { scrollRef, cardRefs, infiniteGroups, current } = useInfiniteCarousel(groups);
 
   return (
     <Container>
@@ -97,6 +97,11 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
               />
             ))}
           </Carousel>
+          <Dots>
+            {groups.map((_, i) => (
+              <Dot key={i} active={i === current} />
+            ))}
+          </Dots>
         </>
       ) : (
         <EmptyContainer>
@@ -148,6 +153,21 @@ const Carousel = styled.div`
     display: none;
   }
   scroll-snap-type: x mandatory;
+`;
+
+const Dots = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 30px 0;
+`;
+
+const Dot = styled.div<{ active: boolean }>`
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: ${({ active }) => (active ? colors.white : colors.grey[300])};
+  transition: background-color 0.3s;
 `;
 
 const LoadingContainer = styled.div`

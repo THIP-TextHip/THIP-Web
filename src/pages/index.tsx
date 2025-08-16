@@ -69,7 +69,7 @@ const Router = () => {
         <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
         <Route path="follow/:type/:userId" element={<FollowerListPage />} />
         <Route path="follow/:type" element={<FollowerListPage />} />
-        <Route path="today-words" element={<TodayWords />} />
+        <Route path="today-words/:roomId" element={<TodayWords />} />
         <Route path="mypage" element={<Mypage />} />
         <Route path="mypage/save" element={<SavePage />} />
         <Route path="mypage/alert" element={<AlertPage />} />

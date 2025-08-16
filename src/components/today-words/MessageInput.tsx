@@ -19,6 +19,7 @@ interface MessageInputProps {
   isReplying?: boolean;
   onCancelReply?: () => void;
   nickname?: string;
+  disabled?: boolean;
 }
 
 const MessageInput = ({
@@ -29,11 +30,13 @@ const MessageInput = ({
   isReplying = false,
   onCancelReply,
   nickname,
+  disabled = false,
 }: MessageInputProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (disabled) return;
     onChange(e.target.value);
 
     if (inputRef.current) {
@@ -43,7 +46,7 @@ const MessageInput = ({
   };
 
   const handleSend = () => {
-    if (!value.trim()) return;
+    if (!value.trim() || disabled) return;
     onSend();
     onChange('');
     if (inputRef.current) {
@@ -52,6 +55,7 @@ const MessageInput = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (disabled) return;
     if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
       e.preventDefault();
       handleSend();
@@ -83,15 +87,28 @@ const MessageInput = ({
         <MessageInputWrapper>
           <StyledMessageInput
             ref={inputRef}
-            placeholder={placeholder}
+            placeholder={disabled ? '전송 중...' : placeholder} // disabled일 때 placeholder 변경
             value={value}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={() => setIsComposing(false)}
+            onCompositionStart={() => !disabled && setIsComposing(true)} // disabled일 때는 composing 상태 변경 안함
+            onCompositionEnd={() => !disabled && setIsComposing(false)}
             rows={1}
+            disabled={disabled}
+            style={{
+              opacity: disabled ? 0.6 : 1,
+              cursor: disabled ? 'not-allowed' : 'text',
+            }}
           />
-          <SendButton onClick={handleSend} disabled={!value.trim()} active={!!value.trim()}>
+          <SendButton
+            onClick={handleSend}
+            disabled={!value.trim() || disabled}
+            active={!!value.trim() && !disabled}
+            style={{
+              opacity: disabled ? 0.6 : 1,
+              cursor: disabled ? 'not-allowed' : 'pointer',
+            }}
+          >
             <img src={sendIcon} alt="전송" />
           </SendButton>
         </MessageInputWrapper>

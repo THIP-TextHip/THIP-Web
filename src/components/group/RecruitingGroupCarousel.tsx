@@ -1,7 +1,7 @@
+import { useRef, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import type { Group } from './MyGroupBox';
 import { RecruitingGroupBox } from './RecruitingGroupBox';
-import { useInfiniteCarousel } from '../../hooks/useInfiniteCarousel';
 
 export interface Section {
   title: string;
@@ -13,28 +13,59 @@ interface Props {
 }
 
 export function RecruitingGroupCarousel({ sections }: Props) {
-  const groups = sections.map(sec => ({ ...sec.groups[0], title: sec.title, groups: sec.groups }));
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
 
-  const sectionGroups = sections.map(sec => ({
-    ...sec.groups[0],
-    title: sec.title,
-    groups: sec.groups,
-  }));
+  const handleScroll = useCallback(() => {
+    const container = scrollRef.current;
+    if (!container) return;
 
-  const { scrollRef, cardRefs, infiniteGroups } = useInfiniteCarousel(sectionGroups, {
-    scaleAmount: 0.08,
-  });
+    const centerX = container.offsetWidth / 2;
+    const scrollLeft = container.scrollLeft;
+
+    itemRefs.current.forEach(item => {
+      if (!item) return;
+      const itemCenter = item.offsetLeft + item.offsetWidth / 2;
+      const dist = Math.abs(itemCenter - scrollLeft - centerX);
+      const ratio = Math.min(dist / centerX, 1);
+      const scale = 1 - ratio * 0.1;
+      item.style.transform = `scale(${scale})`;
+    });
+  }, []);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || sections.length === 0) return;
+
+    const mid = Math.floor(sections.length / 2);
+    const midItem = itemRefs.current[mid];
+    if (midItem) {
+      const centerX = container.offsetWidth / 2;
+      const targetScroll = midItem.offsetLeft + midItem.offsetWidth / 2 - centerX;
+      container.scrollTo({ left: targetScroll, behavior: 'auto' });
+    }
+    handleScroll();
+  }, [sections.length, handleScroll]);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll]);
 
   return (
     <ScrollWrapper ref={scrollRef}>
-      {infiniteGroups.map((g, i) => (
+      {sections.map((sec, i) => (
         <Item
-          key={`${g.title}-${i}`}
+          key={i}
           ref={el => {
-            cardRefs.current[i] = el;
+            itemRefs.current[i] = el;
           }}
         >
-          <RecruitingGroupBox groups={g.groups} title={g.title} />
+          <RecruitingGroupBox groups={sec.groups} title={sec.title} />
         </Item>
       ))}
     </ScrollWrapper>
@@ -57,5 +88,4 @@ const Item = styled.div`
   max-width: 640px;
   scroll-snap-align: center;
   transition: transform 0.2s;
-  height: 800px;
 `;
