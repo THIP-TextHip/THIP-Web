@@ -131,6 +131,13 @@ const GroupDetail = () => {
     recommendRooms,
   } = roomData;
 
+  const handleBookSectionClick = () => {
+    const isbn = roomData?.isbn;
+    if (isbn) {
+      navigate(`/search/book/${isbn}`);
+    }
+  };
+
   return (
     <Wrapper>
       <TopBackground genre={category}>
@@ -175,10 +182,10 @@ const GroupDetail = () => {
           </TagRow>
         </BannerSection>
       </TopBackground>
-      <BookSection>
+      <BookSection onClick={handleBookSectionClick}>
         <BookHeader>
           <h3>{bookTitle}</h3>
-          <IconButton src={rightChevron} alt="책 이동 버튼"></IconButton>
+          <IconButton src={rightChevron} alt="책 이동 버튼" />
         </BookHeader>
         <BookInfo>
           <BookCover src={bookImageUrl} alt={bookTitle} />
