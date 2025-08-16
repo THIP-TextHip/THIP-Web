@@ -26,18 +26,18 @@ const CreateGroup = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  function convertBookDetailToBook(bookDetail: any): Book | null {
-    if (!bookDetail) return null;
+  function convertBookInfoToBook(bookInfo: any): Book | null {
+    if (!bookInfo) return null;
     return {
-      title: bookDetail.title,
-      author: bookDetail.authorName,
-      cover: bookDetail.imageUrl,
-      isbn: bookDetail.isbn,
+      title: bookInfo.title,
+      author: bookInfo.author,
+      cover: bookInfo.cover,
+      isbn: bookInfo.isbn,
     };
   }
 
   const [selectedBook, setSelectedBook] = useState<Book | null>(
-    convertBookDetailToBook(location.state?.selectedBook),
+    convertBookInfoToBook(location.state?.selectedBook ?? location.state?.bookInfo),
   );
   const [selectedGenre, setSelectedGenre] = useState('');
   const [roomTitle, setRoomTitle] = useState('');

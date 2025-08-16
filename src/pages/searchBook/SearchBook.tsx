@@ -182,7 +182,7 @@ const SearchBook = () => {
             <img src={rightChevron} alt="오른쪽 화살표 아이콘" />
           </RecruitingGroupButton>
           <RightArea>
-            <WritePostButton onClick={handleWritePostButton}>
+            <WritePostButton>
               피드에 글쓰기 <img src={plusIcon} alt="더하기 아이콘" />
             </WritePostButton>
             <SaveButton onClick={handleSaveButton} disabled={isSaving}>

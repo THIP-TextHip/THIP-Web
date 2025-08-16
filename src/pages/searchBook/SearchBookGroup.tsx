@@ -24,7 +24,15 @@ const SearchBookGroup = () => {
   const handleBackButton = () => {
     navigate(-1);
   };
-  const handleMakeGroup = () => {};
+  const handleMakeGroup = () => {
+    const selectedBook = {
+      title: bookInfo.title,
+      author: bookInfo.author,
+      cover: bookInfo.imageUrl,
+      isbn: bookInfo.isbn,
+    };
+    navigate('/group/create', { state: { selectedBook } });
+  };
 
   const groupList = recruitingRooms?.recruitingRoomList || [];
   const totalCount = recruitingRooms?.totalRoomCount || 0;
