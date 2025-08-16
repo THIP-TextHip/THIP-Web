@@ -38,6 +38,7 @@ import EditPage from './mypage/EditPage';
 import Notice from './notice/Notice';
 import ParticipatedGroupDetail from './groupDetail/ParticipatedGroupDetail';
 import GroupMembers from './groupMembers/GroupMembers';
+import Guide from './Guide';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -46,7 +47,8 @@ const Router = () => {
         <Route path="/" element={<Login />} />
         <Route path="signup" element={<SignupNickname />} />
         <Route path="signup/genre" element={<SignupGenre />} />
-        <Route path="signupdone" element={<SignupDone />} />
+        <Route path="signup/guide" element={<Guide />} />
+        <Route path="signup/done" element={<SignupDone />} />
         <Route path="post/create" element={<CreatePost />} />
         <Route path="group" element={<Group />} />
         <Route path="group/create" element={<CreateGroup />} />

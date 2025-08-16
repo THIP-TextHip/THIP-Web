@@ -12,18 +12,12 @@ const SignupDone = () => {
   const { nickName, aliasName } = location.state || {};
 
   const handleBackClick = () => {
-    navigate('/signup/genre');
+    navigate('/signup/guide');
   };
 
   const handleNextClick = () => {
     navigate('/feed');
   };
-
-  // state가 없으면 이전 페이지로 이동
-  if (!nickName || !aliasName) {
-    navigate('/signup/nickname');
-    return null;
-  }
 
   return (
     <Container>
