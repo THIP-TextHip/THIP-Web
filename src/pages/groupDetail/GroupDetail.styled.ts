@@ -225,4 +225,5 @@ export const BottomButton = styled.button`
   font-weight: ${typography.fontWeight.semibold};
   border: none;
   z-index: 10;
+  cursor: pointer;
 `;

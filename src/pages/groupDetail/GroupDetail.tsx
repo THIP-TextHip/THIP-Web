@@ -39,6 +39,8 @@ import {
   type RoomDetailResponse,
   type RecommendRoom,
 } from '@/api/rooms/getRoomDetail';
+import { postJoinRoom } from '@/api/rooms/postJoinRoom';
+import { postCloseRoom } from '@/api/rooms/postCloseRoom';
 import type { Group } from '@/components/group/MyGroupBox';
 
 const GroupDetail = () => {
@@ -48,6 +50,8 @@ const GroupDetail = () => {
   const [roomData, setRoomData] = useState<RoomDetailResponse['data'] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [isJoining, setIsJoining] = useState<boolean | null>(null);
 
   const handleBackButton = () => {
     navigate(-1);
@@ -106,6 +110,12 @@ const GroupDetail = () => {
     fetchRoomDetail();
   }, [roomId]);
 
+  useEffect(() => {
+    if (roomData) {
+      setIsJoining(roomData.isJoining);
+    }
+  }, [roomData]);
+
   if (isLoading) {
     return <div>로딩 중...</div>;
   }
@@ -140,6 +150,23 @@ const GroupDetail = () => {
 
   const handleRecommendGroupCardClick = (roomId: number | string) => {
     navigate(`/group/detail/${roomId}`);
+  };
+
+  const handleBottomButtonClick = async () => {
+    if (roomData.isHost) {
+      try {
+        await postCloseRoom(Number(roomId));
+      } catch {
+        alert('네트워크 오류 또는 서버 오류');
+      }
+      return;
+    }
+    const type = isJoining ? 'cancel' : 'join';
+    try {
+      await postJoinRoom(Number(roomId), type);
+    } catch {
+      alert('네트워크 오류 또는 서버 오류');
+    }
   };
 
   return (
@@ -217,7 +244,9 @@ const GroupDetail = () => {
           ))}
         </GroupCardBox>
       </RecommendSection>
-      <BottomButton>참여하기</BottomButton>
+      <BottomButton onClick={handleBottomButtonClick}>
+        {roomData.isHost ? '모집 마감하기' : isJoining ? '참여 취소하기' : '참여하기'}
+      </BottomButton>
     </Wrapper>
   );
 };
