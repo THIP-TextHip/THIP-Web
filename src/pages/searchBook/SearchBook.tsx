@@ -23,7 +23,6 @@ import {
 } from './SearchBook.styled';
 import { useNavigate, useParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import moreIcon from '../../assets/common/more.svg';
 import { IconButton } from '@/components/common/IconButton';
 import saveIcon from '../../assets/common/SaveIcon.svg';
 import filledSaveIcon from '../../assets/common/filledSaveIcon.svg';
@@ -100,8 +99,6 @@ const SearchBook = () => {
 
   const handleCloseIntroModal = () => setShowIntroModal(false);
 
-  const handleMoreButton = () => {};
-
   const handleRecruitingGroupButton = () => {
     if (bookDetail) {
       navigate('/search/book/group', {
@@ -155,7 +152,6 @@ const SearchBook = () => {
       <Wrapper>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
-          <IconButton src={moreIcon} onClick={handleMoreButton} />
         </Header>
         <div style={{ padding: '100px 20px', textAlign: 'center', color: 'white' }}>
           {isLoading ? '로딩 중...' : error || '책 정보를 찾을 수 없습니다.'}
@@ -169,7 +165,6 @@ const SearchBook = () => {
       <TopBackground bookImgUrl={bookDetail.imageUrl} />
       <Header>
         <IconButton src={leftArrow} onClick={handleBackButton} />
-        <IconButton src={moreIcon} onClick={handleMoreButton} />
       </Header>
       <BannerSection>
         <BookInfo>
