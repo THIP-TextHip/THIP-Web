@@ -18,6 +18,11 @@ export async function postJoinRoom(
   roomId: number | string,
   type: 'join' | 'cancel',
 ): Promise<PostJoinRoomResponse> {
-  const response = await apiClient.post<PostJoinRoomResponse>(`/rooms/${roomId}/join`, { type });
-  return response.data;
+  try {
+    const response = await apiClient.post<PostJoinRoomResponse>(`/rooms/${roomId}/join`, { type });
+    return response.data;
+  } catch (error) {
+    console.error('방 참여/취소 API 오류:', error);
+    throw error;
+  }
 }

@@ -155,12 +155,7 @@ const GroupDetail = () => {
   const handleBottomButtonClick = async () => {
     if (roomData.isHost) {
       try {
-        const result = await postCloseRoom(Number(roomId));
-        if (result.isSuccess) {
-          alert('모집 마감 성공!');
-        } else {
-          alert(`요청 실패: ${result.message}`);
-        }
+        await postCloseRoom(Number(roomId));
       } catch {
         alert('네트워크 오류 또는 서버 오류');
       }
@@ -168,13 +163,7 @@ const GroupDetail = () => {
     }
     const type = isJoining ? 'cancel' : 'join';
     try {
-      const result = await postJoinRoom(Number(roomId), type);
-      if (result.isSuccess) {
-        alert(`${type === 'join' ? '참여' : '참여 취소'} 성공!`);
-        setIsJoining(type === 'join');
-      } else {
-        alert(`요청 실패: ${result.message}`);
-      }
+      await postJoinRoom(Number(roomId), type);
     } catch {
       alert('네트워크 오류 또는 서버 오류');
     }
