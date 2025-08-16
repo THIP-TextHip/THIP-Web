@@ -3,6 +3,7 @@ import { useInfiniteCarousel } from '../../hooks/useInfiniteCarousel';
 import styled from '@emotion/styled';
 import rightChevron from '../../assets/common/right-Chevron.svg';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getJoinedRooms, type JoinedRoomItem } from '@/api/rooms/getJoinedRooms';
 import { colors, typography } from '@/styles/global/global';
 
@@ -35,6 +36,7 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const fetchJoinedRooms = async () => {
     try {
@@ -58,6 +60,10 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
   useEffect(() => {
     fetchJoinedRooms();
   }, []);
+
+  const handleCardClick = (roomId: number | string) => {
+    navigate(`detail/joined/${roomId}`);
+  };
 
   const { scrollRef, cardRefs, infiniteGroups } = useInfiniteCarousel(groups);
 
@@ -87,6 +93,7 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
                 ref={el => {
                   cardRefs.current[i] = el;
                 }}
+                onClick={() => handleCardClick(g.id)}
               />
             ))}
           </Carousel>

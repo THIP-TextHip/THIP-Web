@@ -5,11 +5,13 @@ import type { Group } from './MyGroupBox';
 
 interface MyGroupCardProps {
   group: Group;
+  onClick?: () => void;
 }
 
-export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>(({ group }, ref) => {
+export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>((props, ref) => {
+  const { group, onClick } = props;
   return (
-    <Card ref={ref}>
+    <Card ref={ref} onClick={onClick}>
       <Thumbnail src={group.coverUrl} alt="책 표지" />
       <Info>
         <div>
