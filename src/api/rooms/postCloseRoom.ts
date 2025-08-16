@@ -10,6 +10,11 @@ export interface PostCloseRoomResponse {
 }
 
 export async function postCloseRoom(roomId: number | string): Promise<PostCloseRoomResponse> {
-  const response = await apiClient.post<PostCloseRoomResponse>(`/rooms/${roomId}/close`);
-  return response.data;
+  try {
+    const response = await apiClient.post<PostCloseRoomResponse>(`/rooms/${roomId}/close`);
+    return response.data;
+  } catch (error) {
+    console.error('방 닫기 API 오류:', error);
+    throw error;
+  }
 }
