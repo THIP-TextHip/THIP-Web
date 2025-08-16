@@ -124,8 +124,8 @@ const SearchBook = () => {
   };
 
   const handleWritePostButton = () => {
-    if (isbn) {
-      navigate(`/group/create?isbn=${isbn}`);
+    if (bookDetail) {
+      navigate('/group/create', { state: { selectedBook: bookDetail } });
     } else {
       navigate('/group/create');
     }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import BookSearchBottomSheet from '../../components/common/BookSearchBottomSheet/BookSearchBottomSheet';
 import BookSelectionSection from '../../components/creategroup/BookSelectionSection';
@@ -24,7 +24,21 @@ interface Book {
 
 const CreateGroup = () => {
   const navigate = useNavigate();
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const location = useLocation();
+
+  function convertBookDetailToBook(bookDetail: any): Book | null {
+    if (!bookDetail) return null;
+    return {
+      title: bookDetail.title,
+      author: bookDetail.authorName,
+      cover: bookDetail.imageUrl,
+      isbn: bookDetail.isbn,
+    };
+  }
+
+  const [selectedBook, setSelectedBook] = useState<Book | null>(
+    convertBookDetailToBook(location.state?.selectedBook),
+  );
   const [selectedGenre, setSelectedGenre] = useState('');
   const [roomTitle, setRoomTitle] = useState('');
   const [roomDescription, setRoomDescription] = useState('');
