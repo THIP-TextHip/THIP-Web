@@ -27,7 +27,6 @@ import {
   BottomButton,
 } from './GroupDetail.styled';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import moreIcon from '../../assets/common/more.svg';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconButton } from '@/components/common/IconButton';
 import lockIcon from '../../assets/group/lock.svg';
@@ -53,8 +52,6 @@ const GroupDetail = () => {
   const handleBackButton = () => {
     navigate(-1);
   };
-
-  const handleMoreButton = () => {};
 
   const convertRecommendRoomToGroup = (room: RecommendRoom): Group => {
     return {
@@ -134,12 +131,22 @@ const GroupDetail = () => {
     recommendRooms,
   } = roomData;
 
+  const handleBookSectionClick = () => {
+    const isbn = roomData?.isbn;
+    if (isbn) {
+      navigate(`/search/book/${isbn}`);
+    }
+  };
+
+  const handleRecommendGroupCardClick = (roomId: number | string) => {
+    navigate(`/group/detail/${roomId}`);
+  };
+
   return (
     <Wrapper>
       <TopBackground genre={category}>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
-          <IconButton src={moreIcon} onClick={handleMoreButton} />
         </Header>
         <BannerSection>
           <GroupTitle>
@@ -179,10 +186,10 @@ const GroupDetail = () => {
           </TagRow>
         </BannerSection>
       </TopBackground>
-      <BookSection>
+      <BookSection onClick={handleBookSectionClick}>
         <BookHeader>
           <h3>{bookTitle}</h3>
-          <IconButton src={rightChevron} alt="책 이동 버튼"></IconButton>
+          <IconButton src={rightChevron} alt="책 이동 버튼" />
         </BookHeader>
         <BookInfo>
           <BookCover src={bookImageUrl} alt={bookTitle} />
@@ -205,6 +212,7 @@ const GroupDetail = () => {
               isOngoing={true}
               isRecommend={true}
               type={'modal'}
+              onClick={() => handleRecommendGroupCardClick(room.roomId)}
             />
           ))}
         </GroupCardBox>

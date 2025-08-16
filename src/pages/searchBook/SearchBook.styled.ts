@@ -59,7 +59,7 @@ export const BannerSection = styled.section`
   flex-direction: column;
   width: 100%;
   padding: 20px;
-  margin-top: 66px;
+  margin-top: 24%;
   gap: 32px;
   color: ${colors.white};
   z-index: 10;
