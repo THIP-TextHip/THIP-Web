@@ -36,7 +36,6 @@ const Group = () => {
   const [sections, setSections] = useState<Section[]>([
     { title: '마감 임박한 독서 모임방', groups: [] },
     { title: '인기 있는 독서 모임방', groups: [] },
-    { title: '인플루언서·작가 독서 모임방', groups: [] },
   ]);
 
   const fetchAllRoomsData = async () => {
@@ -62,14 +61,12 @@ const Group = () => {
       setSections([
         { title: '마감 임박한 독서 모임방', groups: deadlineRoomsData },
         { title: '인기 있는 독서 모임방', groups: popularRoomsData },
-        { title: '인플루언서·작가 독서 모임방', groups: [] },
       ]);
     } catch (error) {
       console.error('방 목록 조회 오류:', error);
       setSections([
         { title: '마감 임박한 독서 모임방', groups: [] },
         { title: '인기 있는 독서 모임방', groups: [] },
-        { title: '인플루언서·작가 독서 모임방', groups: [] },
       ]);
     }
   };
