@@ -27,7 +27,6 @@ import {
   BottomButton,
 } from './GroupDetail.styled';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import moreIcon from '../../assets/common/more.svg';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconButton } from '@/components/common/IconButton';
 import lockIcon from '../../assets/group/lock.svg';
@@ -53,8 +52,6 @@ const GroupDetail = () => {
   const handleBackButton = () => {
     navigate(-1);
   };
-
-  const handleMoreButton = () => {};
 
   const convertRecommendRoomToGroup = (room: RecommendRoom): Group => {
     return {
@@ -139,7 +136,6 @@ const GroupDetail = () => {
       <TopBackground genre={category}>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
-          <IconButton src={moreIcon} onClick={handleMoreButton} />
         </Header>
         <BannerSection>
           <GroupTitle>
