@@ -111,7 +111,7 @@ const ModalContainer = styled.div`
   padding: 20px 12px;
   border-radius: 16px;
   border: 1px solid ${colors.grey[200]};
-  background-color: ${colors.black.main};
+  background-color: rgba(18, 18, 18, 0.3);
   z-index: 1001;
 `;
 

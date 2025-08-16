@@ -6,7 +6,7 @@ import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import SearchBar from '@/components/search/SearchBar';
 import { colors, typography } from '@/styles/global/global';
 import styled from '@emotion/styled';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { getSearchBooks, convertToSearchedBooks } from '@/api/books/getSearchBooks';
@@ -31,8 +31,17 @@ const Search = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // 무한스크롤 관련 상태
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  // Intersection Observer를 위한 ref
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const lastBookElementRef = useRef<HTMLDivElement | null>(null);
 
   const fetchRecentSearches = async () => {
     try {
@@ -54,10 +63,63 @@ const Search = () => {
     fetchRecentSearches();
   }, []);
 
+  // 무한스크롤을 위한 Intersection Observer 설정
+  const lastBookElementCallback = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoadingMore || !hasMore) return;
+
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          loadMore();
+        }
+      });
+      if (node) observerRef.current.observe(node);
+      lastBookElementRef.current = node;
+    },
+    [isLoadingMore, hasMore],
+  );
+
+  // 추가 데이터 로드 함수
+  const loadMore = async () => {
+    if (!searchTerm.trim() || isLoadingMore || !hasMore) return;
+
+    try {
+      setIsLoadingMore(true);
+      const nextPage = page + 1;
+
+      const response = await getSearchBooks(searchTerm, nextPage, isFinalized);
+
+      if (response.isSuccess) {
+        const newResults = convertToSearchedBooks(response.data.searchResult);
+
+        if (newResults.length > 0) {
+          setSearchResults(prev => [...prev, ...newResults]);
+          setPage(nextPage);
+          // 더 이상 데이터가 없으면 hasMore를 false로 설정
+          setHasMore(newResults.length === 10); // size가 10이므로
+        } else {
+          setHasMore(false);
+        }
+      } else {
+        console.error('추가 데이터 로드 실패:', response.message);
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('추가 데이터 로드 중 오류 발생:', error);
+      setHasMore(false);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
   const handleChange = (value: string) => {
     setSearchTerm(value);
     setIsFinalized(false);
     setIsSearching(value.trim() !== '');
+    setHasMore(true); // 새로운 검색 시 hasMore 초기화
+    setPage(1); // 페이지 초기화
 
     if (value.trim()) {
       setSearchParams({ q: value.trim() }, { replace: true });
@@ -73,9 +135,10 @@ const Search = () => {
       setSearchTimeoutId(timeoutId);
     } else {
       setSearchParams({}, { replace: true });
-
       setSearchResults([]);
       setIsFinalized(false);
+      setHasMore(true);
+      setPage(1);
 
       if (searchTimeoutId) {
         clearTimeout(searchTimeoutId);
@@ -94,6 +157,8 @@ const Search = () => {
     }
 
     setIsLoading(true);
+    setPage(1); // 검색 시 페이지 초기화
+    setHasMore(true); // 검색 시 hasMore 초기화
 
     try {
       const response = await getSearchBooks(term, 1, isManualSearch);
@@ -101,9 +166,12 @@ const Search = () => {
       if (response.isSuccess) {
         const convertedResults = convertToSearchedBooks(response.data.searchResult);
         setSearchResults(convertedResults);
+        // 더 이상 데이터가 없으면 hasMore를 false로 설정
+        setHasMore(convertedResults.length === 10); // size가 10이므로
       } else {
         console.log('검색 실패:', response.message);
         setSearchResults([]);
+        setHasMore(false);
       }
 
       if (isManualSearch) {
@@ -112,6 +180,7 @@ const Search = () => {
     } catch (error) {
       console.error('검색 중 오류 발생:', error);
       setSearchResults([]);
+      setHasMore(false);
       if (isManualSearch) {
         setIsFinalized(true);
       }
@@ -176,6 +245,8 @@ const Search = () => {
     setIsSearching(false);
     setIsFinalized(false);
     setIsInitialized(false);
+    setHasMore(true);
+    setPage(1);
     setSearchParams({}, { replace: true });
   };
 
@@ -183,6 +254,9 @@ const Search = () => {
     return () => {
       if (searchTimeoutId) {
         clearTimeout(searchTimeoutId);
+      }
+      if (observerRef.current) {
+        observerRef.current.disconnect();
       }
     };
   }, [searchTimeoutId]);
@@ -210,12 +284,15 @@ const Search = () => {
       <Content>
         {isSearching ? (
           <>
-            {isLoading ? (
+            {isLoading && searchResults.length === 0 ? (
               <LoadingMessage>검색 중...</LoadingMessage>
             ) : (
               <BookSearchResult
                 type={isFinalized ? 'searched' : 'searching'}
                 searchedBookList={searchResults}
+                hasMore={hasMore}
+                isLoading={isLoadingMore}
+                lastBookElementCallback={lastBookElementCallback}
               />
             )}
           </>

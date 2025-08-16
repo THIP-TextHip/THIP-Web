@@ -69,7 +69,7 @@ const Wrapper = styled.div`
   min-width: 320px;
   max-width: 767px;
   margin: 0 auto;
-  background-color: rgba(18, 18, 18, 0.1);
+  background-color: rgba(18, 18, 18, 0.3);
   backdrop-filter: blur(2.5px);
   z-index: 1000;
 `;
