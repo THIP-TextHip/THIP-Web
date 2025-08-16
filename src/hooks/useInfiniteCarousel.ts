@@ -3,7 +3,7 @@ import type { Group } from '../components/group/MyGroupBox';
 
 const CLONE_COUNT = 10;
 
-export function useInfiniteCarousel(groups: Group[]) {
+export function useInfiniteCarousel(groups: Group[], options?: { scaleAmount?: number }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [current, setCurrent] = useState(0);
@@ -13,6 +13,8 @@ export function useInfiniteCarousel(groups: Group[]) {
   }, [groups]);
 
   const middleIndex = useMemo(() => Math.floor(infiniteGroups.length / 2), [infiniteGroups]);
+
+  const scaleAmount = options?.scaleAmount ?? 0.17;
 
   const handleScroll = useCallback(() => {
     const container = scrollRef.current;
@@ -28,7 +30,7 @@ export function useInfiniteCarousel(groups: Group[]) {
       if (!card) return;
       const cardCenter = card.offsetLeft + card.offsetWidth / 2;
       const distance = Math.abs(center - (cardCenter - scrollLeft));
-      const scale = Math.max(0.83, 1 - (distance / center) * 0.17);
+      const scale = Math.max(0.83, 1 - (distance / center) * scaleAmount);
       card.style.transform = `scale(${scale})`;
 
       if (distance < minDist) {
@@ -49,7 +51,7 @@ export function useInfiniteCarousel(groups: Group[]) {
         container.scrollLeft = left;
       }
     }
-  }, [groups.length, middleIndex]);
+  }, [groups.length, middleIndex, scaleAmount]);
 
   useEffect(() => {
     const container = scrollRef.current;
