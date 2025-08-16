@@ -93,7 +93,7 @@ const PollWrite = () => {
     };
 
     fetchBookPageInfo();
-  }, [roomId, navigate, openSnackbar]);
+  }, [roomId]);
 
   // 총평 모드가 변경될 때 isOverviewPossible 체크
   useEffect(() => {
