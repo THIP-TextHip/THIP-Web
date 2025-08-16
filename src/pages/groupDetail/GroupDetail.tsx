@@ -138,6 +138,10 @@ const GroupDetail = () => {
     }
   };
 
+  const handleRecommendGroupCardClick = (roomId: number | string) => {
+    navigate(`/group/detail/${roomId}`);
+  };
+
   return (
     <Wrapper>
       <TopBackground genre={category}>
@@ -208,6 +212,7 @@ const GroupDetail = () => {
               isOngoing={true}
               isRecommend={true}
               type={'modal'}
+              onClick={() => handleRecommendGroupCardClick(room.roomId)}
             />
           ))}
         </GroupCardBox>
