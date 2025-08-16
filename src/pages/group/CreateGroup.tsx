@@ -26,7 +26,7 @@ const CreateGroup = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  function convertBookInfoToBook(bookInfo: any): Book | null {
+  function convertBookInfoToBook(bookInfo: Book): Book | null {
     if (!bookInfo) return null;
     return {
       title: bookInfo.title,

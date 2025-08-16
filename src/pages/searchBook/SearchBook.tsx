@@ -122,9 +122,15 @@ const SearchBook = () => {
 
   const handleWritePostButton = () => {
     if (bookDetail) {
-      navigate('/group/create', { state: { selectedBook: bookDetail } });
+      const selectedBook = {
+        title: bookDetail.title,
+        author: bookDetail.authorName,
+        cover: bookDetail.imageUrl,
+        isbn: bookDetail.isbn,
+      };
+      navigate('/post/create', { state: { selectedBook } });
     } else {
-      navigate('/group/create');
+      navigate('/post/create');
     }
   };
 
@@ -182,7 +188,7 @@ const SearchBook = () => {
             <img src={rightChevron} alt="오른쪽 화살표 아이콘" />
           </RecruitingGroupButton>
           <RightArea>
-            <WritePostButton>
+            <WritePostButton onClick={handleWritePostButton}>
               피드에 글쓰기 <img src={plusIcon} alt="더하기 아이콘" />
             </WritePostButton>
             <SaveButton onClick={handleSaveButton} disabled={isSaving}>
