@@ -6,10 +6,20 @@ import { useNavigate } from 'react-router-dom';
 interface BookSearchResultProps {
   type: 'searching' | 'searched';
   searchedBookList: SearchedBook[];
+  hasMore?: boolean;
+  isLoading?: boolean;
+  lastBookElementCallback?: (node: HTMLDivElement | null) => void;
 }
 
-export function BookSearchResult({ type, searchedBookList }: BookSearchResultProps) {
+export function BookSearchResult({
+  type,
+  searchedBookList,
+  hasMore = false,
+  isLoading = false,
+  lastBookElementCallback,
+}: BookSearchResultProps) {
   const navigate = useNavigate();
+
   const isEmptySearchedBookList = () => {
     if (searchedBookList.length === 0) return true;
     else return false;
@@ -18,6 +28,7 @@ export function BookSearchResult({ type, searchedBookList }: BookSearchResultPro
   const handleApplyBook = () => {
     navigate('/search/applybook');
   };
+
   return (
     <Wrapper>
       <List>
@@ -30,8 +41,16 @@ export function BookSearchResult({ type, searchedBookList }: BookSearchResultPro
             <RequestButton onClick={handleApplyBook}>책 신청하기</RequestButton>
           </EmptyWrapper>
         ) : (
-          searchedBookList.map(book => (
-            <BookItem key={book.id} onClick={() => navigate(`/search/book/${book.isbn}`)}>
+          searchedBookList.map((book, index) => (
+            <BookItem
+              key={book.id}
+              onClick={() => navigate(`/search/book/${book.isbn}`)}
+              ref={
+                index === searchedBookList.length - 1 && lastBookElementCallback
+                  ? lastBookElementCallback
+                  : undefined
+              }
+            >
               <Cover src={book.coverUrl} alt={`${book.title} 커버`} />
               <BookInfo>
                 <Title>{book.title}</Title>
@@ -42,6 +61,12 @@ export function BookSearchResult({ type, searchedBookList }: BookSearchResultPro
             </BookItem>
           ))
         )}
+
+        {/* 로딩 상태 표시 */}
+        {isLoading && searchedBookList.length > 0 && <></>}
+
+        {/* 더 이상 데이터가 없음을 표시 */}
+        {!hasMore && searchedBookList.length > 0 && <></>}
       </List>
     </Wrapper>
   );
