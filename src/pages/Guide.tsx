@@ -172,7 +172,7 @@ const Guide = () => {
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      <Header active={currentStep === guideSteps.length - 1}>
+      <Header active={currentStep === guideSteps.length - 1} onClick={e => e.stopPropagation()}>
         <div className="next-button" onClick={handleNext}>
           다음
         </div>
@@ -205,7 +205,6 @@ const Guide = () => {
 
 export default Guide;
 
-// Styled Components
 const Container = styled.div<{ isDragging?: boolean }>`
   display: flex;
   flex-direction: column;
@@ -226,7 +225,7 @@ const Header = styled.div<{ active: boolean }>`
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 1100;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -237,7 +236,6 @@ const Header = styled.div<{ active: boolean }>`
   background-color: ${colors.black.main};
 
   .next-button {
-    cursor: ${({ active }) => (active ? 'pointer' : 'default')};
     width: 49px;
     height: 28px;
     padding: 4px 12px;
@@ -249,6 +247,7 @@ const Header = styled.div<{ active: boolean }>`
     line-height: 20px;
     text-align: center;
     margin-left: auto;
+    cursor: pointer;
   }
 `;
 
