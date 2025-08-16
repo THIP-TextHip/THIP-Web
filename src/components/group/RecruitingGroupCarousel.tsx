@@ -13,8 +13,6 @@ interface Props {
 }
 
 export function RecruitingGroupCarousel({ sections }: Props) {
-  const groups = sections.map(sec => ({ ...sec.groups[0], title: sec.title, groups: sec.groups }));
-
   const sectionGroups = sections.map(sec => ({
     ...sec.groups[0],
     title: sec.title,
