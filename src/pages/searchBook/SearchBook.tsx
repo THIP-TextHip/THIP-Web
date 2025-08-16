@@ -123,7 +123,13 @@ const SearchBook = () => {
     }
   };
 
-  const handleWritePostButton = () => {};
+  const handleWritePostButton = () => {
+    if (isbn) {
+      navigate(`/group/create?isbn=${isbn}`);
+    } else {
+      navigate('/group/create');
+    }
+  };
 
   const handleSaveButton = async () => {
     if (!isbn || isSaving) return;
