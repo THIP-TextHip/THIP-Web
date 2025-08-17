@@ -65,7 +65,7 @@ const GroupDetail = () => {
       participants: room.memberCount,
       maximumParticipants: room.recruitCount,
       coverUrl: room.roomImageUrl,
-      deadLine: 0,
+      deadLine: '',
       genre: '',
       isOnGoing: true,
     };
