@@ -6,6 +6,7 @@ import TitleHeader from '@/components/common/TitleHeader';
 import { useNavigate } from 'react-router-dom';
 import { postPassword } from '@/api/rooms/postPassword';
 import { postJoinRoom } from '@/api/rooms/postJoinRoom';
+import { usePopupActions } from '@/hooks/usePopupActions';
 
 interface PasswordModalProps {
   roomId: number;
@@ -17,6 +18,7 @@ const PasswordModal = ({ roomId }: PasswordModalProps) => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const navigate = useNavigate();
+  const { openSnackbar } = usePopupActions();
 
   // 컴포넌트 마운트 시 상태 초기화
   useEffect(() => {
@@ -59,10 +61,23 @@ const PasswordModal = ({ roomId }: PasswordModalProps) => {
         const joinResponse = await postJoinRoom(roomId, 'join');
 
         if (joinResponse.isSuccess) {
-          // 성공 후 처리 (이전페이지로 이동)
-          navigate(-1);
+          // 성공 후 처리 (방 상세 페이지로 이동)
+          navigate(`/group/detail/${roomId}`);
+          // 성공 snackbar 표시
+          openSnackbar({
+            message: '모임방 참여가 완료되었어요! 모집 마감 후 활동이 시작돼요.',
+            variant: 'top',
+            onClose: () => {},
+          });
         } else {
-          setErrorMessage('방 참가에 실패했습니다.');
+          // 실패 후 처리 (방 상세 페이지로 이동)
+          navigate(`/group/detail/${roomId}`);
+          // 실패 snackbar 표시
+          openSnackbar({
+            message: '모임방 참여에 실패했어요. 다시 시도해 주세요.',
+            variant: 'top',
+            onClose: () => {},
+          });
         }
       } else {
         setErrorMessage('비밀번호가 일치하지 않습니다.');
