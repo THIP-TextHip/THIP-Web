@@ -19,7 +19,7 @@ const FollowList = () => {
       const response = await getRecentFollowing();
 
       if (response.isSuccess) {
-        setMyFollowings(response.data.myFollowings);
+        setMyFollowings(response.data.myFollowingUsers);
       } else {
         console.error('최근 팔로우 작성자 조회 실패:', response.message);
         setMyFollowings([]);

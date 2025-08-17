@@ -13,7 +13,7 @@ export interface GetRecentFollowingResponse {
   code: number;
   message: string;
   data: {
-    myFollowings: RecentWriterData[];
+    myFollowingUsers: RecentWriterData[];
   };
 }
 
