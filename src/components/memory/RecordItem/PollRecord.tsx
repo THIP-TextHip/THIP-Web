@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import type { PollOption } from '../../../pages/memory/Memory';
+import type { PollOption } from '../../../types/memory';
 import {
   PollSection,
   PollQuestion,
