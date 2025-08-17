@@ -15,6 +15,7 @@ export interface MoreMenuProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onClose?: () => void;
+  onReport?: () => void;
 }
 
 export interface SnackbarProps {

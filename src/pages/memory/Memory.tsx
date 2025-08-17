@@ -7,33 +7,10 @@ import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddBu
 import Snackbar from '../../components/common/Modal/Snackbar';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
-import type { Post } from '../../types/memory';
+import type { Post, Record } from '../../types/memory';
 
 export type RecordType = 'group' | 'my';
 export type FilterType = 'page' | 'overall';
-
-export interface Record {
-  id: string;
-  user: string;
-  userPoints: number;
-  content: string;
-  likeCount: number;
-  commentCount: number;
-  timeAgo: string;
-  createdAt: Date;
-  type: 'text' | 'poll';
-  recordType?: 'page' | 'overall';
-  pollOptions?: PollOption[];
-  pageRange?: string;
-  isWriter?: boolean;
-}
-
-export interface PollOption {
-  id: string;
-  text: string;
-  percentage: number;
-  isHighest?: boolean;
-}
 
 // API 포스트를 기존 Record 타입으로 변환하는 함수
 const convertPostToRecord = (post: Post): Record => {
@@ -50,6 +27,7 @@ const convertPostToRecord = (post: Post): Record => {
     recordType: post.isOverview ? 'overall' : 'page',
     pageRange: post.isOverview ? undefined : post.page.toString(),
     isWriter: post.isWriter,
+    isLiked: post.isLiked,
     pollOptions: post.voteItems.map((item, index) => ({
       id: item.voteItemId.toString(),
       text: item.itemName,
@@ -90,7 +68,10 @@ const Memory = () => {
 
   // API 데이터 로드 함수
   const loadMemoryPosts = useCallback(async () => {
-    if (!roomId) return;
+    if (!roomId) {
+      setError('방 ID가 없습니다.');
+      return;
+    }
 
     setError(null);
 

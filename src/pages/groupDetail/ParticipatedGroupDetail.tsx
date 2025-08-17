@@ -124,25 +124,25 @@ const ParticipatedGroupDetail = () => {
   };
 
   const handleRecordSectionClick = () => {
-    navigate(`/memory/${roomId}`);
+    navigate(`/rooms/${roomId}/memory`);
+  };
+
+  const handleHotTopicSectionClick = () => {
+    navigate(`/rooms/${roomId}/memory`);
+  };
+
+  const handlePollClick = (pageNumber: number) => {
+    navigate(`/rooms/${roomId}/memory?page=${pageNumber}&filter=poll`);
   };
 
   const handleCommentSectionClick = () => {
     navigate(`/today-words/${roomId}`);
   };
 
-  const handleHotTopicSectionClick = () => {
-    navigate(`/memory/${roomId}`);
-  };
-
   const handleBookSectionClick = () => {
     if (roomData?.data.isbn) {
       navigate(`/book/${roomData.data.isbn}`);
     }
-  };
-
-  const handlePollClick = (pageNumber: number) => {
-    navigate(`/memory/${roomId}?page=${pageNumber}&filter=poll`);
   };
 
   const handleMembersClick = () => {

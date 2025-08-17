@@ -54,3 +54,29 @@ export interface GetMemoryPostsResponse {
   message: string;
   data: MemoryPostsData;
 }
+
+// Memory 페이지에서 사용하는 Record 타입 (좋아요 상태 포함)
+export interface Record {
+  id: string;
+  user: string;
+  userPoints: number;
+  content: string;
+  likeCount: number;
+  commentCount: number;
+  timeAgo: string;
+  createdAt: Date;
+  type: 'text' | 'poll';
+  recordType: 'page' | 'overall';
+  pageRange?: string;
+  isWriter: boolean;
+  isLiked: boolean; // 좋아요 상태 추가
+  pollOptions?: PollOption[];
+}
+
+// 투표 옵션 타입
+export interface PollOption {
+  id: string;
+  text: string;
+  percentage: number;
+  isHighest: boolean;
+}
