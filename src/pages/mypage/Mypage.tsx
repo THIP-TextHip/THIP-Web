@@ -54,7 +54,7 @@ const Mypage = () => {
   };
 
   const handleNotice = () => {
-    window.open('https://www.naver.com', '_blank');
+    window.open('https://slashpage.com/thip/7vgjr4m1nynpy2dwpy86', '_blank');
   };
 
   const handleSave = () => {
@@ -67,6 +67,14 @@ const Mypage = () => {
 
   const handleWithdraw = () => {
     navigate('/mypage/withdraw');
+  };
+
+  const handleGuide = () => {
+    window.open('https://slashpage.com/thip/ywk9j72989p6rmgpqvnd', '_blank');
+  };
+
+  const handleService = () => {
+    window.open('https://slashpage.com/thip/xjqy1g2vw7vejm6vd54z', '_blank');
   };
 
   return (
@@ -97,10 +105,15 @@ const Mypage = () => {
           <SectionTitle>메뉴</SectionTitle>
           <MenuGrid>
             <MenuButton src={alert} name="알림설정" isButton onClick={handleAlert} />
-            <MenuButton src={service} name="고객센터" isButton />
+            <MenuButton src={service} name="고객센터" isButton onClick={handleService} />
             <MenuButton src={notice} name="공지사항" isButton />
-            <MenuButton src={terms} name="이용약관" isButton onClick={handleNotice} />
-            <MenuButton src={guide} name="가이드" isButton />
+            <MenuButton
+              src={terms}
+              name="개인정보처리방침 & 이용약관"
+              isButton
+              onClick={handleNotice}
+            />
+            <MenuButton src={guide} name="가이드" isButton onClick={handleGuide} />
             <MenuButton src={ver} name="버젼 1.0" isButton={false} />
           </MenuGrid>
         </Section>

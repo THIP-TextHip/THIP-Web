@@ -9,7 +9,7 @@ import { getRecentFollowing, type RecentWriterData } from '@/api/users/getRecent
 
 const FollowList = () => {
   const navigate = useNavigate();
-  const [recentWriters, setRecentWriters] = useState<RecentWriterData[]>([]);
+  const [myFollowings, setMyFollowings] = useState<RecentWriterData[]>([]);
   const [loading, setLoading] = useState(false);
 
   // API에서 최근 글 작성한 팔로우 리스트 조회
@@ -19,14 +19,14 @@ const FollowList = () => {
       const response = await getRecentFollowing();
 
       if (response.isSuccess) {
-        setRecentWriters(response.data.recentWriters);
+        setMyFollowings(response.data.myFollowingUsers);
       } else {
         console.error('최근 팔로우 작성자 조회 실패:', response.message);
-        setRecentWriters([]);
+        setMyFollowings([]);
       }
     } catch (error) {
       console.error('최근 팔로우 작성자 조회 중 오류:', error);
-      setRecentWriters([]);
+      setMyFollowings([]);
     } finally {
       setLoading(false);
     }
@@ -37,8 +37,8 @@ const FollowList = () => {
     fetchRecentFollowing();
   }, []);
 
-  const hasFollowers = recentWriters.length > 0;
-  const visible = hasFollowers ? recentWriters.slice(0, 10) : [];
+  const hasFollowers = myFollowings.length > 0;
+  const visible = hasFollowers ? myFollowings.slice(0, 10) : [];
 
   const handleFindClick = () => {
     navigate('/feed/search');
