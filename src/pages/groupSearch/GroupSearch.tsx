@@ -1,7 +1,6 @@
 import TitleHeader from '@/components/common/TitleHeader';
 import { Modal, Overlay } from '@/components/group/Modal.styles';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import { useNavigate } from 'react-router-dom';
 import SearchBar from '@/components/search/SearchBar';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
@@ -13,8 +12,6 @@ import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms'
 type SortKey = 'deadline' | 'memberCount';
 
 const GroupSearch = () => {
-  const navigate = useNavigate();
-
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [isFinalized, setIsFinalized] = useState(false);
@@ -74,7 +71,7 @@ const GroupSearch = () => {
           setIsLast(true);
           setError(res.message || '검색 실패');
         }
-      } catch (e) {
+      } catch {
         setRooms([]);
         setNextCursor(null);
         setIsLast(true);
@@ -107,7 +104,7 @@ const GroupSearch = () => {
       } else {
         setIsLast(true);
       }
-    } catch (e) {
+    } catch {
       setIsLast(true);
     } finally {
       setIsLoadingMore(false);
