@@ -1,2 +1,1 @@
-export { setCookie } from './setCookie';
-export { exchangeTempToken } from './exchangeTempToken';
+export { getToken } from './getToken';

@@ -15,7 +15,7 @@ export interface Group {
   userName?: string;
   progress?: number;
   coverUrl: string;
-  deadLine?: number;
+  deadLine?: string;
   genre?: string;
   isOnGoing?: boolean;
 }
