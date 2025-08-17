@@ -16,7 +16,7 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
-const OtherFeedPage = () => {
+const MyFeedPage = () => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const [feedData, setFeedData] = useState<OtherFeedItem[]>([]);
@@ -40,11 +40,13 @@ const OtherFeedPage = () => {
       try {
         setLoading(true);
 
-        // 피드 데이터와 프로필 데이터를 병렬로 로드
         const [feedResponse, profileResponse] = await Promise.all([
           getOtherFeed(Number(userId)),
           getOtherProfile(Number(userId)),
         ]);
+
+        console.log('🔍 MyFeedPage - Profile Response:', profileResponse.data);
+        console.log('🔍 MyFeedPage - isWriter 값:', profileResponse.data.isWriter);
 
         setFeedData(feedResponse.data.feedList);
         setProfileData(profileResponse.data);
@@ -78,13 +80,13 @@ const OtherFeedPage = () => {
         userId={Number(userId)}
         showHeader={false}
         posts={feedData}
-        isMyFeed={false}
+        isMyFeed={true}
         profileData={profileData}
-        showFollowButton={!profileData?.isWriter} // isWriter가 true면 팔로우 버튼 숨김
+        showFollowButton={false} // 띱하기 버튼 숨김
       />
       <NavBar src={writefab} path="/post/create" />
     </Container>
   );
 };
 
-export default OtherFeedPage;
+export default MyFeedPage;

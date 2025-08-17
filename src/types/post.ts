@@ -15,6 +15,7 @@ export interface PostData {
   isSaved?: boolean;
   isLiked?: boolean;
   isPublic?: boolean;
+  isWriter?: boolean;
 }
 
 export interface FeedListProps {
@@ -50,6 +51,7 @@ export interface SubReplyDataProps {
   likeCount: number;
   replyId: number;
   isLike: boolean;
+  isWriter: boolean;
 }
 
 // 댓글(Reply)
@@ -65,6 +67,7 @@ export interface ReplyDataProps {
   likeCount: number;
   isLike: boolean;
   isDeleted: boolean;
+  isWriter: boolean;
   replyList: SubReplyDataProps[];
 }
 

@@ -18,7 +18,7 @@ export const useOAuthToken = () => {
 
       // 서버에 토큰 발급 요청
       apiClient
-        .post('/api/set-cookie', { loginTokenKey }, { withCredentials: true })
+        .post('/auth/set-cookie', { loginTokenKey }, { withCredentials: true })
         .then(response => {
           console.log('✅ 토큰 발급 성공:', response.data);
           // URL에서 code 파라미터 제거
