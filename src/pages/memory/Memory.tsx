@@ -59,14 +59,6 @@ const convertPostToRecord = (post: Post): Record => {
   };
 };
 
-const addRecordIfNotExists = (prevRecords: Record[], newRecord: Record) => {
-  const exists = prevRecords.some(record => record.id === newRecord.id);
-  if (exists) {
-    return prevRecords;
-  }
-  return [newRecord, ...prevRecords];
-};
-
 const Memory = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -76,13 +68,13 @@ const Memory = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType | null>(null);
   const [selectedSort, setSelectedSort] = useState<SortType>('latest');
   const [showSnackbar, setShowSnackbar] = useState(false);
-  const [readingProgress] = useState(70);
   const [selectedPageRange, setSelectedPageRange] = useState<{ start: number; end: number } | null>(
     null,
   );
 
   // API 관련 상태
   const [error, setError] = useState<string | null>(null);
+  const [isOverviewEnabled, setIsOverviewEnabled] = useState(false);
 
   // 업로드 프로그레스 상태
   const [showUploadProgress, setShowUploadProgress] = useState(false);
@@ -96,112 +88,95 @@ const Memory = () => {
   // 그룹 기록들을 별도로 관리
   const [groupRecords, setGroupRecords] = useState<Record[]>([]);
 
-  // API 데이터 로드
+  // API 데이터 로드 함수
   const loadMemoryPosts = useCallback(async () => {
-    // roomId가 없으면 기본값 1 사용 또는 API 호출 스킵
-    const currentRoomId = roomId || '1';
+    if (!roomId) return;
 
     setError(null);
 
     try {
-      // 정렬 타입 변환
-      let sortType: 'latest' | 'like' | 'comment' | undefined = undefined;
-      if (activeTab === 'group') {
-        if (selectedSort === 'latest') sortType = 'latest';
-        else if (selectedSort === 'popular') sortType = 'like';
-        else if (selectedSort === 'comments') sortType = 'comment';
-      }
-
-      // API 타입에 맞는 파라미터 구성
-      const requestParams: {
+      // API 파라미터 구성
+      const params: {
         roomId: number;
         type: 'group' | 'mine';
         sort?: 'latest' | 'like' | 'comment';
-        pageStart?: number | null;
-        pageEnd?: number | null;
         isOverview?: boolean;
+        pageStart?: number;
+        pageEnd?: number;
         isPageFilter?: boolean;
-        cursor?: string | null;
       } = {
-        roomId: parseInt(currentRoomId),
-        type: activeTab === 'my' ? 'mine' : 'group',
-        pageStart: selectedPageRange ? selectedPageRange.start : null,
-        pageEnd: selectedPageRange ? selectedPageRange.end : null,
-        isOverview: activeFilter === 'overall' ? true : false,
-        isPageFilter: activeFilter === 'page' ? true : false,
-        cursor: null,
+        roomId: parseInt(roomId),
+        type: activeTab === 'group' ? 'group' : 'mine',
       };
 
-      // sort는 group 타입일 때만 추가
-      if (activeTab === 'group' && sortType) {
-        requestParams.sort = sortType;
+      // 그룹 기록일 때만 정렬 파라미터 추가
+      if (activeTab === 'group') {
+        let sortType: 'latest' | 'like' | 'comment' = 'latest';
+        if (selectedSort === 'popular') sortType = 'like';
+        else if (selectedSort === 'comments') sortType = 'comment';
+
+        params.sort = sortType;
       }
 
-      console.log('API 호출 파라미터:', requestParams);
+      // 필터에 따른 파라미터 추가
+      if (activeFilter === 'overall') {
+        params.isOverview = true;
+      } else if (activeFilter === 'page' && selectedPageRange) {
+        params.pageStart = selectedPageRange.start;
+        params.pageEnd = selectedPageRange.end;
+        params.isPageFilter = true;
+      }
 
-      const response = await getMemoryPosts(requestParams);
+      const response = await getMemoryPosts(params);
 
       if (response.isSuccess) {
         const convertedRecords = response.data.postList.map(convertPostToRecord);
 
-        if (activeTab === 'my') {
-          setMyRecords(convertedRecords);
-        } else {
+        setIsOverviewEnabled(response.data.isOverviewEnabled);
+
+        if (activeTab === 'group') {
           setGroupRecords(convertedRecords);
+        } else {
+          setMyRecords(convertedRecords);
         }
-
-        setHasRecords(convertedRecords.length > 0);
-
-        console.log('API 응답 성공:', response.data);
       } else {
-        setError(response.message);
-        console.error('API 응답 실패:', response.message);
+        setError(response.message || '기록을 불러오는데 실패했습니다.');
       }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : '기록을 불러오는 중 오류가 발생했습니다.';
-      setError(errorMessage);
-      console.error('API 호출 오류:', error);
+    } catch (err) {
+      console.error('기록 조회 API 오류:', err);
+      setError('기록을 불러오는 중 오류가 발생했습니다.');
     }
-  }, [roomId, activeTab, selectedSort, selectedPageRange, activeFilter]);
+  }, [roomId, activeTab, selectedSort, activeFilter, selectedPageRange]);
 
-  // 컴포넌트 마운트 시 및 필터/탭 변경 시 데이터 로드
+  // 컴포넌트 마운트 시 및 탭 변경 시 데이터 로드
   useEffect(() => {
     loadMemoryPosts();
   }, [loadMemoryPosts]);
 
-  // location.state에서 새로 추가된 기록 확인
+  // 새로운 기록이 추가되었을 때 처리 (작성 완료 후 돌아왔을 때)
   useEffect(() => {
     if (location.state?.newRecord) {
-      const { isUploading, ...recordData } = location.state.newRecord as Record & {
-        isUploading?: boolean;
-      };
+      const newRecord = location.state.newRecord as Record;
+      setShowUploadProgress(true);
 
-      if (isUploading) {
-        setShowUploadProgress(true);
-        const finalRecord: Record = recordData;
-        setMyRecords(prev => addRecordIfNotExists(prev, finalRecord));
-        setGroupRecords(prev => addRecordIfNotExists(prev, finalRecord));
+      if (activeTab === 'group') {
+        setGroupRecords(prev => [newRecord, ...prev]);
+      } else {
+        setMyRecords(prev => [newRecord, ...prev]);
       }
 
-      setActiveTab('my');
-      navigate(location.pathname, { replace: true, state: null });
+      // 상태 정리
+      navigate(location.pathname, { replace: true });
     }
-  }, [location.state?.newRecord, location.pathname, navigate]);
+  }, [location.state, activeTab, navigate, location.pathname]);
 
-  // 업로드 완료 처리
-  const handleUploadComplete = useCallback(() => {
-    setShowUploadProgress(false);
-  }, []);
-
-  // 현재 표시할 기록들
+  // 현재 탭에 따른 기록 목록 결정
   const currentRecords = useMemo(() => {
-    if (activeTab === 'my') {
-      return myRecords;
-    } else {
-      return hasRecords ? groupRecords : [];
+    if (!hasRecords) {
+      return [];
     }
-  }, [activeTab, myRecords, hasRecords, groupRecords]);
+    return activeTab === 'group' ? groupRecords : myRecords;
+  }, [activeTab, hasRecords, groupRecords, myRecords]);
 
   // 정렬된 기록 목록
   const sortedRecords = useMemo(() => {
@@ -246,6 +221,7 @@ const Memory = () => {
 
   const handlePageRangeClear = useCallback(() => {
     setSelectedPageRange(null);
+    setActiveFilter(null);
   }, []);
 
   const handlePageRangeSet = useCallback((range: { start: number; end: number }) => {
@@ -256,6 +232,13 @@ const Memory = () => {
   const handleToggleRecords = useCallback(() => {
     setHasRecords(!hasRecords);
   }, [hasRecords]);
+
+  const handleUploadComplete = useCallback(() => {
+    setShowUploadProgress(false);
+  }, []);
+
+  // API에서 받은 isOverviewEnabled 값을 사용하여 readingProgress 계산
+  const readingProgress = isOverviewEnabled ? 85 : 70;
 
   if (error) {
     return (

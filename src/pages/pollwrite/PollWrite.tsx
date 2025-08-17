@@ -116,19 +116,38 @@ const PollWrite = () => {
     setIsSubmitting(true);
 
     try {
-      // 페이지 범위 결정: 총평이 아닌 경우 페이지 번호 필요
-      const finalPage = isOverallEnabled
-        ? 0 // 총평인 경우 페이지는 0
-        : pageRange.trim() !== ''
-          ? parseInt(pageRange.trim())
-          : lastRecordedPage; // 입력값이 없으면 마지막 기록 페이지 사용
-
       // 투표 옵션 필터링 (빈 옵션 제거)
       const validOptions = pollOptions.filter(option => option.trim() !== '');
 
       if (validOptions.length < 2) {
         openSnackbar({
           message: '투표 옵션은 최소 2개 이상이어야 합니다.',
+          variant: 'top',
+          onClose: () => {},
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 페이지 범위 결정
+      let finalPage: number;
+
+      if (isOverallEnabled) {
+        // 총평인 경우: 책의 마지막 페이지 또는 전체 페이지 수 사용
+        finalPage = totalPages;
+      } else {
+        // 일반 투표인 경우
+        if (pageRange.trim() !== '') {
+          finalPage = parseInt(pageRange.trim());
+        } else {
+          finalPage = lastRecordedPage;
+        }
+      }
+
+      // 페이지 유효성 검사
+      if (finalPage <= 0 || finalPage > totalPages) {
+        openSnackbar({
+          message: `유효하지 않은 페이지입니다. (1-${totalPages} 사이의 값을 입력해주세요)`,
           variant: 'top',
           onClose: () => {},
         });

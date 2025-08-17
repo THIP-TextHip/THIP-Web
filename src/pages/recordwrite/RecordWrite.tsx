@@ -115,12 +115,31 @@ const RecordWrite = () => {
     setIsSubmitting(true);
 
     try {
-      // 페이지 범위 결정: 총평이 아닌 경우 페이지 번호 필요
-      const finalPage = isOverallEnabled
-        ? 0 // 총평인 경우 페이지는 0
-        : pageRange.trim() !== ''
-          ? parseInt(pageRange.trim())
-          : lastRecordedPage; // 입력값이 없으면 마지막 기록 페이지 사용
+      // 페이지 범위 결정
+      let finalPage: number;
+
+      if (isOverallEnabled) {
+        // 총평인 경우: 책의 마지막 페이지 또는 전체 페이지 수 사용
+        finalPage = totalPages;
+      } else {
+        // 일반 기록인 경우
+        if (pageRange.trim() !== '') {
+          finalPage = parseInt(pageRange.trim());
+        } else {
+          finalPage = lastRecordedPage;
+        }
+      }
+
+      // 페이지 유효성 검사
+      if (finalPage <= 0 || finalPage > totalPages) {
+        openSnackbar({
+          message: `유효하지 않은 페이지입니다. (1-${totalPages} 사이의 값을 입력해주세요)`,
+          variant: 'top',
+          onClose: () => {},
+        });
+        setIsSubmitting(false);
+        return;
+      }
 
       // API 요청 데이터 생성
       const recordData: CreateRecordRequest = {
