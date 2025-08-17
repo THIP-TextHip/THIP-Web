@@ -17,26 +17,25 @@ export const apiClient = axios.create({
 // const TEMP_ACCESS_TOKEN =
 //   'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.BSGuoMWlrzc0oKgSJXHEycxdzzY9-e7gD4xh-wSDemc';
 
-// Request 인터셉터: 쿠키가 없을 때 임시 토큰을 헤더에 추가
+// Request 인터셉터: temp_token과 access_token 쿠키 처리
 apiClient.interceptors.request.use(
   config => {
-    // 쿠키에서 Authorization 확인
+    // 쿠키에서 temp_token과 access_token 확인
     const cookies = document.cookie.split(';');
-    const hasAuthCookie = cookies.some(cookie => cookie.trim().startsWith('Authorization='));
+    const hasTempToken = cookies.some(cookie => cookie.trim().startsWith('temp_token='));
+    const hasAccessToken = cookies.some(cookie => cookie.trim().startsWith('access_token='));
 
-    // 쿠키가 없으면 임시 토큰을 헤더에 추가 (현재 주석처리됨)
-    // if (!hasAuthCookie) {
-    //   console.log('🔑 쿠키가 없어서 임시 토큰을 헤더에 추가합니다.');
-    //   config.headers.Authorization = `Bearer ${TEMP_ACCESS_TOKEN}`;
-    // } else {
-    //   console.log('✅ Authorization 쿠키가 있어서 자동으로 전송됩니다.');
-    // }
-
-    // 쿠키만 테스트하기 위해 로그만 출력
-    if (hasAuthCookie) {
-      console.log('✅ Authorization 쿠키가 있어서 자동으로 전송됩니다.');
+    if (hasAccessToken) {
+      // access_token이 있으면 정상 토큰 사용
+      console.log('✅ access_token 쿠키가 있어서 정상 토큰을 사용합니다.');
+      // access_token은 withCredentials: true로 자동 전송되므로 별도 헤더 설정 불필요
+    } else if (hasTempToken) {
+      // temp_token이 있으면 임시 토큰 사용
+      console.log('🔑 temp_token 쿠키가 있어서 임시 토큰을 사용합니다.');
+      // temp_token도 withCredentials: true로 자동 전송되므로 별도 헤더 설정 불필요
     } else {
-      console.log('🔑 Authorization 쿠키가 없습니다.');
+      // 둘 다 없으면 인증 토큰 없음
+      console.log('❌ temp_token과 access_token 쿠키가 모두 없습니다.');
     }
 
     return config;
