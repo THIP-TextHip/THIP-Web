@@ -5,7 +5,6 @@ import PageRangeSection from '../../components/recordwrite/PageRangeSection';
 import PollCreationSection from '../../components/pollwrite/PollCreationSection';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { Container } from './PollWrite.styled';
-import type { Record } from '../memory/Memory';
 import { createVote } from '../../api/record/createVote';
 import type { CreateVoteRequest } from '../../types/record';
 import { getBookPage } from '../../api/rooms/getBookPage';
@@ -105,7 +104,7 @@ const PollWrite = () => {
         onClose: () => {},
       });
     }
-  }, [isOverallEnabled, isOverviewPossible, openSnackbar]);
+  }, [isOverallEnabled, isOverviewPossible]);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -154,34 +153,8 @@ const PollWrite = () => {
       if (response.isSuccess) {
         console.log('투표 생성 성공:', response.data);
 
-        // 투표 옵션 생성 (Memory 페이지 표시용)
-        const pollOptionsData = validOptions.map((option, index) => ({
-          id: `${index + 1}.`,
-          text: option.trim(),
-          percentage: index === 0 ? 90 : 10, // 첫 번째 옵션을 90%로 설정 (데모용)
-          isHighest: index === 0, // 첫 번째 옵션이 최고값
-        }));
-
-        // 임시로 Memory 페이지용 투표 객체 생성 (기존 인터페이스 호환성을 위해)
-        const newPollRecord: Record & { isUploading?: boolean } = {
-          id: response.data.voteId.toString(),
-          user: 'user.01', // TODO: 실제 사용자 정보로 변경
-          userPoints: 132, // TODO: 실제 사용자 포인트로 변경
-          content: pollContent,
-          likeCount: 0,
-          commentCount: 0,
-          timeAgo: '방금 전',
-          createdAt: new Date(),
-          type: 'poll',
-          recordType: isOverallEnabled ? 'overall' : 'page',
-          pageRange: isOverallEnabled ? undefined : finalPage.toString(),
-          pollOptions: pollOptionsData,
-          isUploading: false, // API 호출이 완료되었으므로 false
-        };
-
         // 성공 시 기록장으로 이동
         navigate(`/rooms/${roomId}/memory`, {
-          state: { newRecord: newPollRecord },
           replace: true,
         });
       } else {

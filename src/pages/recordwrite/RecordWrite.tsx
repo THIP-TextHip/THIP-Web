@@ -5,7 +5,6 @@ import PageRangeSection from '../../components/recordwrite/PageRangeSection';
 import RecordContentSection from '../../components/recordwrite/RecordContentSection';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { Container } from './RecordWrite.styled';
-import type { Record } from '../memory/Memory';
 import { createRecord } from '../../api/record/createRecord';
 import type { CreateRecordRequest } from '../../types/record';
 import { getBookPage } from '../../api/rooms/getBookPage';
@@ -104,7 +103,7 @@ const RecordWrite = () => {
         onClose: () => {},
       });
     }
-  }, [isOverallEnabled, isOverviewPossible, openSnackbar]);
+  }, [isOverallEnabled, isOverviewPossible]);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -139,25 +138,8 @@ const RecordWrite = () => {
       if (response.isSuccess) {
         console.log('기록 생성 성공:', response.data);
 
-        // 임시로 Memory 페이지용 기록 객체 생성 (기존 인터페이스 호환성을 위해)
-        const newRecord: Record & { isUploading?: boolean } = {
-          id: response.data.recordId.toString(),
-          user: 'user.01', // TODO: 실제 사용자 정보로 변경
-          userPoints: 132, // TODO: 실제 사용자 포인트로 변경
-          content: content,
-          likeCount: 0,
-          commentCount: 0,
-          timeAgo: '방금 전',
-          createdAt: new Date(),
-          type: 'text' as const,
-          recordType: isOverallEnabled ? 'overall' : 'page',
-          pageRange: isOverallEnabled ? undefined : finalPage.toString(),
-          isUploading: false, // API 호출이 완료되었으므로 false
-        };
-
         // 성공 시 기록장으로 이동
         navigate(`/rooms/${roomId}/memory`, {
-          state: { newRecord },
           replace: true,
         });
       } else {
