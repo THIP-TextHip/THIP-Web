@@ -9,6 +9,8 @@ import leftArrow from '../../assets/common/leftArrow.svg';
 import { UserSearchResult } from './UserSearchResult';
 import { useNavigate } from 'react-router-dom';
 import { useUserSearch } from '@/hooks/useUserSearch';
+import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
+import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
 
 const UserSearch = () => {
   const navigate = useNavigate();
@@ -23,13 +25,27 @@ const UserSearch = () => {
     isFinalized: isSearched,
   });
 
-  const [recentSearches, setRecentSearches] = useState<string[]>([
-    '닉네임',
-    '작가',
-    '하위',
-    'Thip',
-    '책벌레',
-  ]);
+  const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
+
+  const fetchRecentSearches = async () => {
+    try {
+      const response = await getRecentSearch('USER');
+
+      if (response.isSuccess) {
+        setRecentSearches(response.data.recentSearchList);
+      } else {
+        console.error('최근 검색어 조회 실패:', response.message);
+        setRecentSearches([]);
+      }
+    } catch (error) {
+      console.error('최근 검색어 조회 오류:', error);
+      setRecentSearches([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecentSearches();
+  }, []);
 
   const handleChange = (value: string) => {
     setSearchTerm(value);
@@ -41,14 +57,29 @@ const UserSearch = () => {
     if (!term.trim()) return;
     setIsSearching(true);
     setIsSearched(true);
-    setRecentSearches(prev => {
-      const filtered = prev.filter(t => t !== term);
-      return [term, ...filtered].slice(0, 5);
-    });
   };
 
-  const handleDelete = (recentSearch: string) => {
-    setRecentSearches(prev => prev.filter(t => t !== recentSearch));
+  const handleDelete = async (recentSearchId: number) => {
+    try {
+      const userId = 1; // 임시 userId
+
+      const response = await deleteRecentSearch(recentSearchId, userId);
+
+      if (response.isSuccess) {
+        setRecentSearches(prev => prev.filter(item => item.recentSearchId !== recentSearchId));
+      } else {
+        console.error('최근 검색어 삭제 실패:', response.message);
+      }
+    } catch (error) {
+      console.error('최근 검색어 삭제 오류:', error);
+    }
+  };
+
+  const handleDeleteWrapper = (searchTerm: string) => {
+    const recentSearchItem = recentSearches.find(item => item.searchTerm === searchTerm);
+    if (recentSearchItem) {
+      handleDelete(recentSearchItem.recentSearchId);
+    }
   };
 
   const handleRecentSearchClick = (recentSearch: string) => {
@@ -108,8 +139,8 @@ const UserSearch = () => {
         ) : (
           <>
             <RecentSearchTabs
-              recentSearches={recentSearches}
-              handleDelete={handleDelete}
+              recentSearches={recentSearches.map(item => item.searchTerm)}
+              handleDelete={handleDeleteWrapper}
               handleRecentSearchClick={handleRecentSearchClick}
             />
           </>

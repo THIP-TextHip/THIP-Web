@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import BookSearchBottomSheet from '../../components/common/BookSearchBottomSheet/BookSearchBottomSheet';
 import BookSelectionSection from '../../components/creategroup/BookSelectionSection';
@@ -24,7 +24,21 @@ interface Book {
 
 const CreateGroup = () => {
   const navigate = useNavigate();
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const location = useLocation();
+
+  function convertBookInfoToBook(bookInfo: Book): Book | null {
+    if (!bookInfo) return null;
+    return {
+      title: bookInfo.title,
+      author: bookInfo.author,
+      cover: bookInfo.cover,
+      isbn: bookInfo.isbn,
+    };
+  }
+
+  const [selectedBook, setSelectedBook] = useState<Book | null>(
+    convertBookInfoToBook(location.state?.selectedBook ?? location.state?.bookInfo),
+  );
   const [selectedGenre, setSelectedGenre] = useState('');
   const [roomTitle, setRoomTitle] = useState('');
   const [roomDescription, setRoomDescription] = useState('');
@@ -137,9 +151,8 @@ const CreateGroup = () => {
 
       if (isSuccessful) {
         // 성공 시 모집 중인 방 상세 페이지로 이동
-        navigate('/group/detail', {
+        navigate(`/group/detail/${response.data.roomId}`, {
           replace: true,
-          state: { roomId: response.data.roomId },
         });
       } else {
         alert(`방 생성에 실패했습니다: ${response.message} (코드: ${response.code})`);

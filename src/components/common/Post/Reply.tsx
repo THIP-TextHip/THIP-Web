@@ -12,6 +12,7 @@ import { deleteComment } from '@/api/comments/deleteComment';
 
 interface ReplyProps extends CommentData {
   onDelete?: () => void;
+  isWriter?: boolean;
 }
 
 const Reply = ({
@@ -27,6 +28,7 @@ const Reply = ({
   likeCount: initialLikeCount,
   isDeleted,
   onDelete,
+  isWriter,
 }: ReplyProps) => {
   const [liked, setLiked] = useState(isLike);
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
@@ -121,6 +123,7 @@ const Reply = ({
         aliasColor={aliasColor}
         postDate={postDate}
         creatorId={creatorId}
+        isWriter={isWriter}
         type="reply"
       />
       <ReplySection onClick={handleMoreClick}>

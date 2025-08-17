@@ -12,9 +12,16 @@ interface OtherFeedProps {
   isMyFeed?: boolean;
   profileData?: OtherProfileData | null;
   userId?: number;
+  showFollowButton?: boolean; // showFollowButton prop 추가
 }
 
-const OtherFeed = ({ posts = [], profileData, userId }: OtherFeedProps) => {
+const OtherFeed = ({
+  posts = [],
+  profileData,
+  userId,
+  showFollowButton,
+  isMyFeed,
+}: OtherFeedProps) => {
   const hasPosts = posts.length > 0;
 
   if (!profileData) {
@@ -25,7 +32,7 @@ const OtherFeed = ({ posts = [], profileData, userId }: OtherFeedProps) => {
     <Container>
       <Profile
         userId={userId}
-        showFollowButton={true}
+        showFollowButton={showFollowButton !== undefined ? showFollowButton : !profileData.isWriter}
         isFollowing={profileData.isFollowing}
         profileImageUrl={profileData.profileImageUrl}
         nickname={profileData.nickname}
@@ -33,11 +40,12 @@ const OtherFeed = ({ posts = [], profileData, userId }: OtherFeedProps) => {
         aliasColor={profileData.aliasColor}
         followerCount={profileData.followerCount}
         latestFollowerProfileImageUrls={profileData?.latestFollowerProfileImageUrls || []}
+        isMyFeed={isMyFeed}
       />
       <TotalBar count={profileData.totalFeedCount} />
       {hasPosts ? (
         posts.map(post => (
-          <FeedPost key={post.feedId} showHeader={false} isMyFeed={false} {...post} />
+          <FeedPost key={post.feedId} showHeader={false} isMyFeed={isMyFeed} {...post} />
         ))
       ) : (
         <EmptyState>

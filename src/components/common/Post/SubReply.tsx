@@ -13,6 +13,7 @@ import { deleteComment } from '@/api/comments/deleteComment';
 
 interface SubReplyProps extends ReplyData {
   onDelete?: () => void;
+  isWriter?: boolean;
 }
 
 const SubReply = ({
@@ -29,6 +30,7 @@ const SubReply = ({
   isLike,
   isDeleted,
   onDelete,
+  isWriter,
 }: SubReplyProps) => {
   const [liked, setLiked] = useState<boolean>(isLike);
   const [currentLikeCount, setCurrentLikeCount] = useState<number>(likeCount);
@@ -143,6 +145,7 @@ const SubReply = ({
           aliasColor={aliasColor}
           postDate={postDate}
           creatorId={creatorId}
+          isWriter={isWriter}
           type="reply"
         />
         <ReplySection onClick={handleMoreClick}>

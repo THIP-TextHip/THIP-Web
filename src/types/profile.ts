@@ -12,4 +12,5 @@ export interface MyProfileData {
 // 다른 사용자 프로필 정보 타입 (isFollowing 포함)
 export interface OtherProfileData extends MyProfileData {
   isFollowing: boolean;
+  isWriter?: boolean;
 }

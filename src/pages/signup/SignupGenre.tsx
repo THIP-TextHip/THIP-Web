@@ -67,11 +67,12 @@ const SignupGenre = () => {
       const result = await postSignup({
         aliasName: selectedAlias.subTitle,
         nickname: nickname,
+        isTokenRequired: false,
       });
 
       if (result.success) {
         console.log('🎉 회원가입 성공! 사용자 ID:', result.data.userId);
-        navigate('/signupdone', {
+        navigate('/signup/guide', {
           state: {
             aliasName: selectedAlias.subTitle,
             nickname: nickname,

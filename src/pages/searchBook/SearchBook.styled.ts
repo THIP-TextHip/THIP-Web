@@ -59,7 +59,7 @@ export const BannerSection = styled.section`
   flex-direction: column;
   width: 100%;
   padding: 20px;
-  margin-top: 66px;
+  margin-top: 24%;
   gap: 32px;
   color: ${colors.white};
   z-index: 10;
@@ -126,6 +126,7 @@ export const RecruitingGroupButton = styled.button`
   justify-content: center;
   align-items: center;
   padding: 10px 12px;
+  cursor: pointer;
 `;
 
 export const RightArea = styled.div`
@@ -150,17 +151,19 @@ export const WritePostButton = styled.button`
   gap: 8px;
   min-width: 200px;
   border: none;
+  cursor: pointer;
 `;
 
 export const SaveButton = styled.button`
   width: 48px;
   height: 48px;
   background: transparent;
-  border: 1px solid ${colors.grey[200]};
+  border: none;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 `;
 
 export const FeedSection = styled.section`

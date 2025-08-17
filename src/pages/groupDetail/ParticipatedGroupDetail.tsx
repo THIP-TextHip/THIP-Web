@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   TopBackground,
   Header,
@@ -25,29 +27,63 @@ import CommentSection from '../../components/group/CommentSection';
 import HotTopicSection from '../../components/group/HotTopicSection';
 import GroupBookSection from '../../components/group/GroupBookSection';
 import GroupActionBottomSheet from '../../components/group/GroupActionBottomSheet';
-import type { Poll } from '../../components/group/HotTopicSection';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import {
+  getRoomPlaying,
+  type RoomPlayingResponse,
+  convertVotesToPolls,
+  type Poll,
+} from '@/api/rooms/getRoomPlaying';
 import rightChevron from '../../assets/group/right-chevron.svg';
-
 import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
-import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@/components/common/IconButton';
-import { mockGroupDetail } from '../../mocks/groupDetail.mock';
 import lockIcon from '../../assets/group/lock.svg';
 import calendarIcon from '../../assets/group/calendar.svg';
 import peopleIcon from '../../assets/common/darkPeople.svg';
-import { useState } from 'react';
+import styled from '@emotion/styled';
 
 const ParticipatedGroupDetail = () => {
-  const { title, isPrivate, introduction, activityPeriod, members, genre, book } = mockGroupDetail;
   const { openConfirm } = usePopupActions();
-
   const navigate = useNavigate();
+  const { roomId } = useParams<{ roomId: string }>();
+
+  // API 상태 관리
+  const [roomData, setRoomData] = useState<RoomPlayingResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // UI 상태 관리
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
-  // 모임방 생성자 여부 (실제로는 API에서 받아와야 함)
-  const [isGroupOwner] = useState(false); // true면 생성자, false면 참여자
+  // API 호출
+  useEffect(() => {
+    const fetchRoomDetail = async () => {
+      if (!roomId) {
+        setError('방 ID가 없습니다.');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await getRoomPlaying(parseInt(roomId));
+
+        if (response.isSuccess) {
+          setRoomData(response);
+        } else {
+          setError(response.message);
+        }
+      } catch (err) {
+        setError('방 정보를 불러오는 중 오류가 발생했습니다.');
+        console.error('방 상세 정보 조회 오류:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoomDetail();
+  }, [roomId]);
 
   const handleBackButton = () => {
     navigate(-1);
@@ -67,7 +103,6 @@ const ParticipatedGroupDetail = () => {
       disc: '방을 삭제하게 되면\n독서메이트들과의 추억이 사라집니다.',
       onConfirm: () => {
         console.log('방 삭제 확정');
-        // 실제 삭제 API 호출 후 홈으로 이동
         navigate('/group');
       },
     });
@@ -79,107 +114,96 @@ const ParticipatedGroupDetail = () => {
       disc: '방을 나가시게 되면\n독서메이트들과의 추억이 사라집니다.',
       onConfirm: () => {
         console.log('방 나가기 확정');
-        // 실제 나가기 API 호출 후 홈으로 이동
         navigate('/group');
       },
     });
   };
 
   const handleReportGroup = () => {
-    // 방 신고하기 로직
     console.log('방 신고하기');
-    // 실제로는 신고 모달이나 페이지로 이동
   };
 
   const handleRecordSectionClick = () => {
-    navigate('/memory');
+    navigate(`/memory/${roomId}`);
   };
 
   const handleCommentSectionClick = () => {
-    navigate('/today-words');
+    navigate(`/today-words/${roomId}`);
   };
 
   const handleHotTopicSectionClick = () => {
-    // 뜨거운 감자 전체 페이지로 이동
-    navigate('/memory'); // 또는 투표 전체 리스트 페이지
+    navigate(`/memory/${roomId}`);
   };
 
   const handleBookSectionClick = () => {
-    navigate(`/book/123`);
+    if (roomData?.data.isbn) {
+      navigate(`/book/${roomData.data.isbn}`);
+    }
   };
 
-  // 투표 클릭 시 해당 페이지의 기록장으로 이동
   const handlePollClick = (pageNumber: number) => {
-    // 해당 투표가 위치한 페이지 번호로 필터를 씌운 기록장 화면으로 이동
-    navigate(`/memory?page=${pageNumber}&filter=poll`);
+    navigate(`/memory/${roomId}?page=${pageNumber}&filter=poll`);
   };
 
   const handleMembersClick = () => {
-    navigate('/group/members'); // 또는 실제 독서메이트 페이지 경로
+    navigate(`/group/${roomId}/members`);
   };
 
-  // 모킹 데이터
-  const recordData = {
-    currentPage: 1,
-    progress: 30,
+  // 로딩 상태
+  if (loading) {
+    return (
+      <ParticipatedWrapper>
+        <LoadingContainer>로딩 중...</LoadingContainer>
+      </ParticipatedWrapper>
+    );
+  }
+
+  // 에러 상태
+  if (error || !roomData) {
+    return (
+      <ParticipatedWrapper>
+        <ErrorContainer>{error || '데이터를 불러올 수 없습니다.'}</ErrorContainer>
+      </ParticipatedWrapper>
+    );
+  }
+
+  const { data } = roomData;
+
+  // API 데이터를 컴포넌트에 맞게 변환
+  const polls: Poll[] = convertVotesToPolls(data.currentVotes);
+  const hasPolls = polls.length > 0;
+
+  // 날짜 포맷팅 (YYYY-MM-DD -> YYYY.MM.DD)
+  const formatDate = (dateString: string) => {
+    return dateString.replace(/-/g, '.');
   };
 
+  // 장르에 따른 배경색 결정 (카테고리 컬러 사용)
+  const getGenreForBackground = () => {
+    // categoryColor를 사용하거나 기본값으로 장르명 사용
+    return data.category;
+  };
+
+  // 댓글 섹션 메시지
   const commentData = {
     message: '모임방 멤버들과 간단한 인사를 나눠보세요!',
   };
 
-  // 투표 데이터 (투표 결과 없이 질문과 선택지만)
-  const mockPolls: Poll[] = [
-    {
-      id: '1',
-      question: '3연에 나오는 심장은 무엇을 의미하는 걸까요?',
-      options: [
-        { id: '1', text: '김땡땡' },
-        { id: '2', text: '김땡땡' },
-      ],
-      pageNumber: 456, // 해당 투표가 위치한 페이지
-    },
-    {
-      id: '2',
-      question: '또 다른 투표 질문입니다',
-      options: [
-        { id: '1', text: '선택지 1' },
-        { id: '2', text: '선택지 2' },
-        { id: '3', text: '선택지 3' },
-      ],
-      pageNumber: 123,
-    },
-    {
-      id: '3',
-      question: '세 번째 투표입니다',
-      options: [
-        { id: '1', text: 'A 답변' },
-        { id: '2', text: 'B 답변' },
-      ],
-      pageNumber: 789,
-    },
-  ];
-
-  // 투표가 없을 때 테스트하려면 이걸 사용
-  // const mockPolls: Poll[] = [];
-
-  const hasPolls = mockPolls.length > 0;
-
   return (
     <ParticipatedWrapper>
-      <TopBackground genre={genre}>
+      <TopBackground genre={getGenreForBackground()}>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
           <IconButton src={moreIcon} onClick={handleMoreButton} />
         </Header>
         <BannerSection>
           <GroupTitle>
-            {title} {isPrivate && <img src={lockIcon} alt="자물쇠 아이콘"></img>}
+            {data.roomName} {!data.isPublic && <img src={lockIcon} alt="자물쇠 아이콘"></img>}
           </GroupTitle>
           <SubTitle>
             <div>소개글</div>
             <br />
-            <Intro>{introduction}</Intro>
+            <Intro>{data.roomDescription}</Intro>
           </SubTitle>
           <MetaInfo>
             <Meta>
@@ -187,7 +211,7 @@ const ParticipatedGroupDetail = () => {
                 <IconButton src={calendarIcon} alt="달력 아이콘" /> 모임 활동기간
               </span>
               <MetaDate>
-                {activityPeriod.start} ~ {activityPeriod.end}
+                {formatDate(data.progressStartDate)} ~ {formatDate(data.progressEndDate)}
               </MetaDate>
             </Meta>
             <Meta>
@@ -201,7 +225,7 @@ const ParticipatedGroupDetail = () => {
                     <MetaChevron src={rightChevron} alt="독서메이트 목록 보기" />
                   </MetaTopRow>
                   <span>
-                    <MetaMember>{members.current}</MetaMember>
+                    <MetaMember>{data.memberCount}</MetaMember>
                     <MetaTotalMember>명 참여 중</MetaTotalMember>
                   </span>
                 </div>
@@ -210,24 +234,28 @@ const ParticipatedGroupDetail = () => {
           </MetaInfo>
           <TagRow>
             <Tag>
-              장르 <TagGenre>{genre}</TagGenre>
+              장르 <TagGenre>{data.category}</TagGenre>
             </Tag>
           </TagRow>
         </BannerSection>
       </TopBackground>
 
-      <GroupBookSection title={book.title} author={book.author} onClick={handleBookSectionClick} />
+      <GroupBookSection
+        title={data.bookTitle}
+        author={data.authorName}
+        onClick={handleBookSectionClick}
+      />
 
       <RecordSection
-        currentPage={recordData.currentPage}
-        progress={recordData.progress}
+        currentPage={data.currentPage}
+        progress={data.userPercentage}
         onClick={handleRecordSectionClick}
       />
 
       <CommentSection message={commentData.message} onClick={handleCommentSectionClick} />
 
       <HotTopicSection
-        polls={mockPolls}
+        polls={polls}
         hasPolls={hasPolls}
         onClick={handleHotTopicSectionClick}
         onPollClick={handlePollClick}
@@ -235,7 +263,7 @@ const ParticipatedGroupDetail = () => {
 
       <GroupActionBottomSheet
         isOpen={isBottomSheetOpen}
-        isGroupOwner={isGroupOwner}
+        isGroupOwner={data.isHost}
         onClose={handleCloseBottomSheet}
         onDeleteGroup={handleDeleteGroup}
         onLeaveGroup={handleLeaveGroup}
@@ -244,5 +272,25 @@ const ParticipatedGroupDetail = () => {
     </ParticipatedWrapper>
   );
 };
+
+const LoadingContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--color-grey-200);
+  font-size: var(--string-size-base, 16px);
+`;
+
+const ErrorContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--color-red);
+  font-size: var(--string-size-base, 16px);
+  text-align: center;
+  padding: 20px;
+`;
 
 export default ParticipatedGroupDetail;

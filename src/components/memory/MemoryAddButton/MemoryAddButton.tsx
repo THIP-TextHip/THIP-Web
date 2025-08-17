@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import plusIcon from '../../../assets/memory/plus.svg';
 import penIcon from '../../../assets/memory/pen.svg';
 import voteIcon from '../../../assets/memory/vote.svg';
@@ -7,6 +7,7 @@ import { AddButton, DropdownContainer, DropdownItem } from './MemoryAddButton.st
 
 const MemoryAddButton = () => {
   const navigate = useNavigate();
+  const { roomId } = useParams<{ roomId: string }>(); // useParams 추가
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -33,14 +34,22 @@ const MemoryAddButton = () => {
 
   const handleRecordWrite = () => {
     setIsOpen(false);
-    navigate('/memory/record/write');
-    console.log('기록 작성하기');
+
+    // URL에서 roomId를 가져오거나 기본값 1 사용
+    const currentRoomId = roomId || '1';
+
+    navigate(`/memory/record/write/${currentRoomId}`);
+    console.log('기록 작성하기 - roomId:', currentRoomId);
   };
 
   const handlePollCreate = () => {
     setIsOpen(false);
-    navigate('/memory/poll/write');
-    console.log('투표 생성하기');
+
+    // URL에서 roomId를 가져오거나 기본값 1 사용
+    const currentRoomId = roomId || '1';
+
+    navigate(`/memory/poll/write/${currentRoomId}`);
+    console.log('투표 생성하기 - roomId:', currentRoomId);
   };
 
   return (

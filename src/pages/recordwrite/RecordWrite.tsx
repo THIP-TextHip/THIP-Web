@@ -1,14 +1,18 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import PageRangeSection from '../../components/recordwrite/PageRangeSection';
 import RecordContentSection from '../../components/recordwrite/RecordContentSection';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { Container } from './RecordWrite.styled';
 import type { Record } from '../memory/Memory';
+import { createRecord } from '../../api/record/createRecord';
+import type { CreateRecordRequest } from '../../types/record';
 
 const RecordWrite = () => {
   const navigate = useNavigate();
+  const { roomId } = useParams<{ roomId: string }>();
+
   const [pageRange, setPageRange] = useState('');
   const [content, setContent] = useState('');
   const [isOverallEnabled, setIsOverallEnabled] = useState(false);
@@ -26,55 +30,90 @@ const RecordWrite = () => {
   };
 
   const handleCompleteClick = async () => {
-    if (isSubmitting) return; // 중복 실행 방지
+    if (isSubmitting || !roomId) return; // 중복 실행 방지 및 roomId 체크
 
     setIsSubmitting(true);
 
     try {
-      // 페이지 범위 결정: 입력값이 없으면 마지막 기록 페이지 사용
-      const finalPageRange = isOverallEnabled
-        ? undefined
+      // 페이지 범위 결정: 총평이 아닌 경우 페이지 번호 필요
+      const finalPage = isOverallEnabled
+        ? 0 // 총평인 경우 페이지는 0
         : pageRange.trim() !== ''
-          ? pageRange
-          : lastRecordedPage.toString();
+          ? parseInt(pageRange.trim())
+          : lastRecordedPage; // 입력값이 없으면 마지막 기록 페이지 사용
 
-      // 새 기록 객체 생성 (업로드 중 상태로)
-      const newRecord: Record & { isUploading?: boolean } = {
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // 고유한 ID
-        user: 'user.01', // TODO: 실제 사용자 이름으로 변경
-        userPoints: 132, // TODO: 실제 사용자 포인트로 변경
-        content: content,
-        likeCount: 0,
-        commentCount: 0,
-        timeAgo: '12시간 전',
-        createdAt: new Date(),
-        type: 'text',
-        recordType: isOverallEnabled ? 'overall' : 'page',
-        pageRange: finalPageRange, // 최종 페이지 범위 저장
-        isUploading: true, // 업로드 중 표시
+      // API 요청 데이터 생성
+      const recordData: CreateRecordRequest = {
+        page: finalPage,
+        isOverview: isOverallEnabled,
+        content: content.trim(),
       };
 
-      console.log('기록 작성 완료', newRecord);
-      console.log('페이지 범위:', isOverallEnabled ? '전체범위' : `${finalPageRange}p`);
-      console.log('내용:', content);
-      console.log('총평 설정:', isOverallEnabled);
+      console.log('기록 생성 API 호출:', recordData);
+      console.log('roomId:', roomId);
 
-      // TODO: API 호출하여 서버에 기록 저장
-      // await api.createRecord(newRecord);
+      // API 호출
+      const response = await createRecord(parseInt(roomId), recordData);
 
-      // 바로 기록장으로 이동 (업로드 중인 기록과 함께)
-      navigate('/memory', {
-        state: { newRecord },
-        replace: true,
-      });
+      if (response.isSuccess) {
+        console.log('기록 생성 성공:', response.data);
+
+        // 임시로 Memory 페이지용 기록 객체 생성 (기존 인터페이스 호환성을 위해)
+        const newRecord: Record & { isUploading?: boolean } = {
+          id: response.data.recordId.toString(),
+          user: 'user.01', // TODO: 실제 사용자 정보로 변경
+          userPoints: 132, // TODO: 실제 사용자 포인트로 변경
+          content: content,
+          likeCount: 0,
+          commentCount: 0,
+          timeAgo: '방금 전',
+          createdAt: new Date(),
+          type: 'text',
+          recordType: isOverallEnabled ? 'overall' : 'page',
+          pageRange: isOverallEnabled ? undefined : finalPage.toString(),
+          isUploading: false, // API 호출이 완료되었으므로 false
+        };
+
+        // 성공 시 기록장으로 이동
+        navigate(`/rooms/${roomId}/memory`, {
+          state: { newRecord },
+          replace: true,
+        });
+      } else {
+        // API 에러 응답 처리
+        console.error('기록 생성 실패:', response.message);
+        alert(`기록 생성에 실패했습니다: ${response.message}`);
+        setIsSubmitting(false);
+      }
     } catch (error) {
       console.error('기록 저장 실패:', error);
+
+      // 에러 타입에 따른 메시지 처리
+      let errorMessage = '기록 저장 중 오류가 발생했습니다.';
+
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as {
+          response?: {
+            status: number;
+            data?: { message?: string };
+          };
+        };
+
+        if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
+        } else if (axiosError.response?.status) {
+          errorMessage = `서버 오류 (${axiosError.response.status})`;
+        }
+      }
+
+      alert(errorMessage);
       setIsSubmitting(false);
     }
   };
 
-  // 총평이 켜져있으면 내용만 필요, 아니면 내용은 필수 (페이지는 기본값 사용 가능)
-  const isFormValid = content.trim() !== '';
+  // 폼 유효성 검사: 내용은 필수, 총평이 아닌 경우 페이지 번호도 확인
+  const isFormValid =
+    content.trim() !== '' && (isOverallEnabled || pageRange.trim() !== '' || lastRecordedPage > 0);
 
   return (
     <>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import BookSearchBottomSheet from '../../components/common/BookSearchBottomSheet/BookSearchBottomSheet';
 import BookSelectionSection from '../../components/creategroup/BookSelectionSection';
@@ -34,7 +34,7 @@ const makeIsbnCandidates = (raw: string) => {
 };
 
 interface Book {
-  id: number;
+  id?: number;
   title: string;
   author: string;
   cover: string;
@@ -43,7 +43,21 @@ interface Book {
 
 const CreatePost = () => {
   const navigate = useNavigate();
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const location = useLocation();
+
+  function convertBookInfoToBook(bookInfo: Book): Book | null {
+    if (!bookInfo) return null;
+    return {
+      title: bookInfo.title,
+      author: bookInfo.author,
+      cover: bookInfo.cover,
+      isbn: bookInfo.isbn,
+    };
+  }
+
+  const [selectedBook, setSelectedBook] = useState<Book | null>(
+    convertBookInfoToBook(location.state?.selectedBook),
+  );
   const [postContent, setPostContent] = useState('');
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);

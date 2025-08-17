@@ -48,8 +48,8 @@ export const ProfileSection = styled.div`
 `;
 
 export const ProfileImage = styled.div`
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background-color: ${colors.grey['400']};
   flex-shrink: 0;

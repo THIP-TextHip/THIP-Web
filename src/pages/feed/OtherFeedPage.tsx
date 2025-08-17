@@ -80,6 +80,7 @@ const OtherFeedPage = () => {
         posts={feedData}
         isMyFeed={false}
         profileData={profileData}
+        showFollowButton={!profileData?.isWriter} // isWriter가 true면 팔로우 버튼 숨김
       />
       <NavBar src={writefab} path="/post/create" />
     </Container>

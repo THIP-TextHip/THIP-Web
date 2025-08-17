@@ -18,6 +18,7 @@ import GroupSearch from './groupSearch/GroupSearch';
 import Search from './search/Search';
 import ApplyBook from './search/ApplyBook';
 import OtherFeedPage from './feed/OtherFeedPage';
+import MyFeedPage from './feed/MyFeedPage';
 import FollowerListPage from './feed/FollowerListPage';
 import TodayWords from './today-words/TodayWords';
 import SearchBook from './searchBook/SearchBook';
@@ -38,6 +39,7 @@ import EditPage from './mypage/EditPage';
 import Notice from './notice/Notice';
 import ParticipatedGroupDetail from './groupDetail/ParticipatedGroupDetail';
 import GroupMembers from './groupMembers/GroupMembers';
+import Guide from './Guide';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -46,29 +48,32 @@ const Router = () => {
         <Route path="/" element={<Login />} />
         <Route path="signup" element={<SignupNickname />} />
         <Route path="signup/genre" element={<SignupGenre />} />
-        <Route path="signupdone" element={<SignupDone />} />
+        <Route path="signup/guide" element={<Guide />} />
+        <Route path="signup/done" element={<SignupDone />} />
         <Route path="post/create" element={<CreatePost />} />
         <Route path="group" element={<Group />} />
         <Route path="group/create" element={<CreateGroup />} />
         <Route path="post/update/:feedId" element={<UpdatePost />} />
         <Route path="group/search" element={<GroupSearch />} />
-        <Route path="group/detail" element={<GroupDetail />} />
-        <Route path="group/detail/joined" element={<ParticipatedGroupDetail />} />
-        <Route path="group/members" element={<GroupMembers />} />
+        <Route path="group/detail/:roomId" element={<GroupDetail />} />
+        <Route path="group/detail/joined/:roomId" element={<ParticipatedGroupDetail />} />
+        <Route path="group/:roomId/members" element={<GroupMembers />} />
         <Route path="memory" element={<Memory />} />
-        <Route path="memory/record/write" element={<RecordWrite />} />
-        <Route path="memory/poll/write" element={<PollWrite />} />
+        <Route path="rooms/:roomId/memory" element={<Memory />} />
+        <Route path="memory/record/write/:roomId" element={<RecordWrite />} />
+        <Route path="memory/poll/write/:roomId" element={<PollWrite />} />
         <Route path="feed" element={<Feed />} />
         <Route path="feed/search" element={<UserSearch />} />
         <Route path="feed/:feedId" element={<FeedDetailPage />} />
         <Route path="search" element={<Search />} />
         <Route path="search/applybook" element={<ApplyBook />} />
-        <Route path="search/book" element={<SearchBook />} />
+        <Route path="search/book/:isbn" element={<SearchBook />} />
         <Route path="search/book/group" element={<SearchBookGroup />} />
         <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
+        <Route path="myfeed/:userId" element={<MyFeedPage />} />
         <Route path="follow/:type/:userId" element={<FollowerListPage />} />
         <Route path="follow/:type" element={<FollowerListPage />} />
-        <Route path="today-words" element={<TodayWords />} />
+        <Route path="today-words/:roomId" element={<TodayWords />} />
         <Route path="mypage" element={<Mypage />} />
         <Route path="mypage/save" element={<SavePage />} />
         <Route path="mypage/alert" element={<AlertPage />} />

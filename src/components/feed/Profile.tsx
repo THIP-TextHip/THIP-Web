@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import MyFollower from './MyFollower';
 import { postFollow } from '@/api/users/postFollow';
+import { usePopupStore } from '@/stores/usePopupStore';
 
 export interface ProfileProps {
   showFollowButton?: boolean;
@@ -13,6 +14,7 @@ export interface ProfileProps {
   followerCount: number;
   latestFollowerProfileImageUrls?: string[];
   userId?: number;
+  isMyFeed?: boolean;
 }
 
 const Profile = ({
@@ -25,8 +27,10 @@ const Profile = ({
   followerCount,
   latestFollowerProfileImageUrls = [],
   userId,
+  isMyFeed,
 }: ProfileProps) => {
   const [followed, setFollowed] = useState(isFollowing);
+  const { openPopup } = usePopupStore();
 
   useEffect(() => {
     setFollowed(isFollowing);
@@ -50,6 +54,17 @@ const Profile = ({
       // API 응답으로 팔로우 상태 업데이트
       setFollowed(response.data.isFollowing);
       console.log(`${nickname} - ${response.data.isFollowing ? '띱 완료' : '띱 취소'}`);
+
+      // Snackbar 표시
+      const message = response.data.isFollowing
+        ? `${nickname}님을 띱 했어요.`
+        : `${nickname}님을 띱 취소했어요.`;
+
+      openPopup('snackbar', {
+        message,
+        variant: 'top',
+        onClose: () => {},
+      });
     } catch (error) {
       console.error('팔로우/언팔로우 실패:', error);
       // 에러 발생 시 상태 변경하지 않음
@@ -68,7 +83,7 @@ const Profile = ({
             </div>
           </div>
         </div>
-        {showFollowButton && (
+        {showFollowButton && !isMyFeed && (
           <div className="followbutton" onClick={toggleFollow}>
             {followed ? '띱 취소' : '띱 하기'}
           </div>
