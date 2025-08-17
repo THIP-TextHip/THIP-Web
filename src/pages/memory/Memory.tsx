@@ -74,7 +74,7 @@ const Memory = () => {
 
   // API 관련 상태
   const [error, setError] = useState<string | null>(null);
-  const [isOverviewEnabled, setIsOverviewEnabled] = useState(false);
+  const [isOverviewEnabled, setIsOverviewEnabled] = useState(false); // API에서 받아올 총평 활성화 여부
 
   // 업로드 프로그레스 상태
   const [showUploadProgress, setShowUploadProgress] = useState(false);
@@ -100,10 +100,6 @@ const Memory = () => {
         roomId: number;
         type: 'group' | 'mine';
         sort?: 'latest' | 'like' | 'comment';
-        isOverview?: boolean;
-        pageStart?: number;
-        pageEnd?: number;
-        isPageFilter?: boolean;
       } = {
         roomId: parseInt(roomId),
         type: activeTab === 'group' ? 'group' : 'mine',
@@ -116,15 +112,6 @@ const Memory = () => {
         else if (selectedSort === 'comments') sortType = 'comment';
 
         params.sort = sortType;
-      }
-
-      // 필터에 따른 파라미터 추가
-      if (activeFilter === 'overall') {
-        params.isOverview = true;
-      } else if (activeFilter === 'page' && selectedPageRange) {
-        params.pageStart = selectedPageRange.start;
-        params.pageEnd = selectedPageRange.end;
-        params.isPageFilter = true;
       }
 
       const response = await getMemoryPosts(params);
@@ -146,7 +133,7 @@ const Memory = () => {
       console.error('기록 조회 API 오류:', err);
       setError('기록을 불러오는 중 오류가 발생했습니다.');
     }
-  }, [roomId, activeTab, selectedSort, activeFilter, selectedPageRange]);
+  }, [roomId, activeTab, selectedSort]);
 
   // 컴포넌트 마운트 시 및 탭 변경 시 데이터 로드
   useEffect(() => {
@@ -185,8 +172,20 @@ const Memory = () => {
 
   // 필터링된 기록 목록
   const filteredRecords = useMemo(() => {
-    return sortedRecords;
-  }, [sortedRecords]);
+    let filtered = sortedRecords;
+
+    if (activeFilter === 'overall') {
+      filtered = filtered.filter(record => record.recordType === 'overall');
+    } else if (activeFilter === 'page' && selectedPageRange) {
+      filtered = filtered.filter(record => {
+        if (record.recordType === 'overall') return false;
+        const page = parseInt(record.pageRange || '0');
+        return page >= selectedPageRange.start && page <= selectedPageRange.end;
+      });
+    }
+
+    return filtered;
+  }, [sortedRecords, activeFilter, selectedPageRange]);
 
   const handleBackClick = useCallback(() => {
     if (roomId) {
@@ -237,7 +236,6 @@ const Memory = () => {
     setShowUploadProgress(false);
   }, []);
 
-  // API에서 받은 isOverviewEnabled 값을 사용하여 readingProgress 계산
   const readingProgress = isOverviewEnabled ? 85 : 70;
 
   if (error) {
