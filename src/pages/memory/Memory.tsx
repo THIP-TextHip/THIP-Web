@@ -7,7 +7,7 @@ import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddBu
 import Snackbar from '../../components/common/Modal/Snackbar';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
-import type { Post, Record } from '../../types/memory';
+import type { GetMemoryPostsParams, Post, Record } from '../../types/memory';
 
 export type RecordType = 'group' | 'my';
 export type FilterType = 'page' | 'overall';
@@ -42,6 +42,7 @@ const Memory = () => {
   const location = useLocation();
   const { roomId } = useParams<{ roomId: string }>();
 
+  // 상태 관리
   const [activeTab, setActiveTab] = useState<RecordType>('group');
   const [activeFilter, setActiveFilter] = useState<FilterType | null>(null);
   const [selectedSort, setSelectedSort] = useState<SortType>('latest');
@@ -60,72 +61,75 @@ const Memory = () => {
   // 개발용 상태 - 기록 유무 전환
   const [hasRecords, setHasRecords] = useState(true);
 
-  // 내 기록들을 별도로 관리
+  // 기록 데이터
   const [myRecords, setMyRecords] = useState<Record[]>([]);
-
-  // 그룹 기록들을 별도로 관리
   const [groupRecords, setGroupRecords] = useState<Record[]>([]);
 
   // API 데이터 로드 함수
   const loadMemoryPosts = useCallback(async () => {
     if (!roomId) {
-      setError('방 ID가 없습니다.');
+      console.log('❌ roomId가 없습니다:', roomId);
       return;
     }
-
     setError(null);
 
     try {
       // API 파라미터 구성
-      const params: {
-        roomId: number;
-        type: 'group' | 'mine';
-        sort?: 'latest' | 'like' | 'comment';
-        isOverview?: boolean;
-      } = {
+      const params: GetMemoryPostsParams = {
         roomId: parseInt(roomId),
         type: activeTab === 'group' ? 'group' : 'mine',
       };
 
-      // 그룹 기록일 때만 정렬 파라미터 추가
+      // group 탭인 경우에만 sort 파라미터 추가
       if (activeTab === 'group') {
-        let sortType: 'latest' | 'like' | 'comment' = 'latest';
-        if (selectedSort === 'popular') sortType = 'like';
-        else if (selectedSort === 'comments') sortType = 'comment';
-
-        params.sort = sortType;
+        params.sort = selectedSort;
       }
 
-      // 일반 기록과 총평 기록을 모두 가져오기 위해 두 번 호출
-      const [generalResponse, overviewResponse] = await Promise.all([
-        getMemoryPosts(params), // 일반 기록 (isOverview: false 기본값)
-        getMemoryPosts({ ...params, isOverview: true }), // 총평 기록
-      ]);
+      // 필터 적용
+      if (activeFilter === 'overall') {
+        params.isOverview = true;
+        console.log('🎯 총평 필터 적용 - 독서 진행률 80% 이상 필요');
+      } else if (selectedPageRange) {
+        params.pageStart = selectedPageRange.start;
+        params.pageEnd = selectedPageRange.end;
+        params.isPageFilter = true;
+        console.log('📖 페이지 필터 적용:', selectedPageRange);
+      }
 
-      if (generalResponse.isSuccess && overviewResponse.isSuccess) {
-        // 일반 기록과 총평 기록을 합치기
-        const allPosts = [...generalResponse.data.postList, ...overviewResponse.data.postList];
-        const convertedRecords = allPosts.map(convertPostToRecord);
+      console.log('📤 API 요청 파라미터:', params);
 
-        setIsOverviewEnabled(generalResponse.data.isOverviewEnabled);
+      const response = await getMemoryPosts(params);
+      console.log('📨 API 응답 성공:', response);
+
+      if (response.isSuccess) {
+        const convertedRecords = response.data.postList.map(convertPostToRecord);
 
         if (activeTab === 'group') {
           setGroupRecords(convertedRecords);
         } else {
           setMyRecords(convertedRecords);
         }
+
+        setIsOverviewEnabled(response.data.isOverviewEnabled);
       } else {
-        setError(
-          generalResponse.message || overviewResponse.message || '기록을 불러오는데 실패했습니다.',
-        );
+        setError(response.message);
       }
-    } catch (err) {
-      console.error('기록 조회 API 오류:', err);
+    } catch (error) {
+      // Axios 에러인 경우 상세 정보 출력
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { code?: number } } };
+        if (axiosError.response?.data?.code === 40002) {
+          setError('독서 진행률이 80% 이상이어야 총평을 볼 수 있습니다.');
+          setActiveFilter(null); // 총평 필터를 자동으로 해제
+          return; // 다른 에러 메시지 설정하지 않음
+        }
+      }
+
       setError('기록을 불러오는 중 오류가 발생했습니다.');
     }
-  }, [roomId, activeTab, selectedSort]);
+  }, [roomId, activeTab, selectedSort, activeFilter, selectedPageRange]);
 
-  // 컴포넌트 마운트 시 및 탭 변경 시 데이터 로드
+  // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     loadMemoryPosts();
   }, [loadMemoryPosts]);
@@ -179,6 +183,7 @@ const Memory = () => {
     return filtered;
   }, [sortedRecords, activeFilter, selectedPageRange]);
 
+  // 이벤트 핸들러들
   const handleBackClick = useCallback(() => {
     if (roomId) {
       navigate(`/rooms/${roomId}`);
@@ -228,9 +233,11 @@ const Memory = () => {
     setShowUploadProgress(false);
   }, []);
 
+  // 독서 진행률 계산
   const readingProgress = isOverviewEnabled ? 85 : 70;
   const currentUserPage = 350; // 임시로 350으로 설정 (나중에 API에서 가져올 것)
 
+  // 에러 상태 렌더링
   if (error) {
     return (
       <Container>
@@ -247,6 +254,7 @@ const Memory = () => {
     );
   }
 
+  // 메인 렌더링
   return (
     <Container>
       <FixedHeader>
