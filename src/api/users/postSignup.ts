@@ -3,6 +3,7 @@ import { apiClient } from '../index';
 export interface PostSignupRequest {
   aliasName: string;
   nickname: string;
+  isTokenRequired: boolean;
 }
 
 export interface PostSignupResponse {
