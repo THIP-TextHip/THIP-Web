@@ -20,6 +20,7 @@ export const mockPosts: PostData[] = [
     isSaved: false,
     isLiked: true,
     isPublic: true,
+    isWriter: false,
   },
   {
     feedId: 56,
@@ -39,6 +40,7 @@ export const mockPosts: PostData[] = [
     isSaved: true,
     isLiked: false,
     isPublic: false,
+    isWriter: false,
   },
   {
     feedId: 58,
@@ -58,6 +60,7 @@ export const mockPosts: PostData[] = [
     isSaved: false,
     isLiked: false,
     isPublic: true,
+    isWriter: false,
   },
 ];
 
@@ -80,6 +83,7 @@ export const mockFeedPost: FeedPostProps = {
   isSaved: true,
   isLiked: false,
   isPublic: true,
+  isWriter: false,
 };
 
 // 📌 댓글/대댓글(Mock)
@@ -97,6 +101,7 @@ export const mockCommentList: ReplyDataProps[] = [
     likeCount: 1,
     isLike: false,
     isDeleted: false,
+    isWriter: false,
     replyList: [
       {
         parentCommentCreatorNickname: 'User31',
@@ -110,6 +115,7 @@ export const mockCommentList: ReplyDataProps[] = [
         content: '맞아요, 저도 너무 좋았어요!맞아요, 저도 너무 좋았어요!',
         likeCount: 2,
         isLike: false,
+        isWriter: false,
       },
       {
         parentCommentCreatorNickname: 'User35',
@@ -123,6 +129,7 @@ export const mockCommentList: ReplyDataProps[] = [
         content: '추천 감사합니다!',
         likeCount: 123,
         isLike: true,
+        isWriter: false,
       },
     ],
   },
@@ -139,5 +146,6 @@ export const mockCommentList: ReplyDataProps[] = [
     isLike: true,
     replyList: [],
     isDeleted: false,
+    isWriter: false,
   },
 ];
