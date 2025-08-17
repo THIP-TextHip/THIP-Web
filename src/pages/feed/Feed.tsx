@@ -48,7 +48,7 @@ const Feed = () => {
   };
 
   // 전체 피드 로드 함수
-  const loadTotalFeeds = async (_cursor?: string) => {
+  const loadTotalFeeds = useCallback(async (_cursor?: string) => {
     try {
       setTotalLoading(true);
 
@@ -74,10 +74,10 @@ const Feed = () => {
     } finally {
       setTotalLoading(false);
     }
-  };
+  }, []);
 
   // 내 피드 로드 함수
-  const loadMyFeeds = async (_cursor?: string) => {
+  const loadMyFeeds = useCallback(async (_cursor?: string) => {
     try {
       setMyLoading(true);
       const response = await getMyFeeds(_cursor ? { cursor: _cursor } : undefined);
@@ -97,7 +97,7 @@ const Feed = () => {
     } finally {
       setMyLoading(false);
     }
-  };
+  }, []);
 
   // 다음 페이지 로드 (무한 스크롤용)
   const loadMoreFeeds = useCallback(() => {
@@ -150,6 +150,13 @@ const Feed = () => {
       // 토큰 발급 완료 대기
       await waitForToken();
 
+      // localStorage에 토큰이 있는지 확인
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) {
+        console.log('❌ 토큰이 없어서 피드를 로드할 수 없습니다.');
+        return;
+      }
+
       if (activeTab === '피드') {
         loadTotalFeeds();
       } else if (activeTab === '내 피드') {
@@ -158,7 +165,7 @@ const Feed = () => {
     };
 
     loadFeedsWithToken();
-  }, [activeTab, waitForToken]);
+  }, [activeTab, waitForToken, loadTotalFeeds, loadMyFeeds]);
 
   return (
     <Container>

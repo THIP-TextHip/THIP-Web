@@ -61,25 +61,26 @@ const SignupGenre = () => {
   const handleNextClick = async () => {
     if (!selectedAlias || !nickname) return;
 
-    console.log('=== 🚀 다음 버튼 클릭 ===');
-    console.log('🎭 선택된 alias:', selectedAlias);
-    console.log('👤 nickname:', nickname);
-
     try {
-      console.log('🚀 postSignup API 호출 시작...');
-      // ✅ 쿠키는 브라우저가 자동으로 전송
       const result = await postSignup({
         aliasName: selectedAlias.subTitle,
         nickname: nickname,
         isTokenRequired: false,
       });
 
-      if (result.success) {
+      if (result.isSuccess) {
         console.log('🎉 회원가입 성공! 사용자 ID:', result.data.userId);
+
+        // 회원가입 성공 시 새로운 access 토큰을 localStorage에 저장
+        if (result.data.accessToken) {
+          localStorage.setItem('authToken', result.data.accessToken);
+          console.log('✅ 새로운 access 토큰이 localStorage에 저장되었습니다.');
+        }
+
         navigate('/signup/guide', {
           state: {
-            aliasName: selectedAlias.subTitle,
             nickname: nickname,
+            aliasName: selectedAlias.subTitle,
           },
         });
       } else {

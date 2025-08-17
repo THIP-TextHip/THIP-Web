@@ -17,25 +17,18 @@ export const apiClient = axios.create({
 // const TEMP_ACCESS_TOKEN =
 //   'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.BSGuoMWlrzc0oKgSJXHEycxdzzY9-e7gD4xh-wSDemc';
 
-// Request 인터셉터: temp_token과 access_token 쿠키 처리
+// Request 인터셉터: localStorage의 토큰을 헤더에 자동 추가
 apiClient.interceptors.request.use(
   config => {
-    // 쿠키에서 temp_token과 access_token 확인
-    const cookies = document.cookie.split(';');
-    const hasTempToken = cookies.some(cookie => cookie.trim().startsWith('temp_token='));
-    const hasAccessToken = cookies.some(cookie => cookie.trim().startsWith('access_token='));
+    // localStorage에서 토큰 확인
+    const authToken = localStorage.getItem('authToken');
 
-    if (hasAccessToken) {
-      // access_token이 있으면 정상 토큰 사용
-      console.log('✅ access_token 쿠키가 있어서 정상 토큰을 사용합니다.');
-      // access_token은 withCredentials: true로 자동 전송되므로 별도 헤더 설정 불필요
-    } else if (hasTempToken) {
-      // temp_token이 있으면 임시 토큰 사용
-      console.log('🔑 temp_token 쿠키가 있어서 임시 토큰을 사용합니다.');
-      // temp_token도 withCredentials: true로 자동 전송되므로 별도 헤더 설정 불필요
+    if (authToken) {
+      // 토큰이 있으면 Authorization 헤더에 추가
+      console.log('🔑 Authorization 헤더에 토큰 추가');
+      config.headers.Authorization = `Bearer ${authToken}`;
     } else {
-      // 둘 다 없으면 인증 토큰 없음
-      console.log('❌ temp_token과 access_token 쿠키가 모두 없습니다.');
+      console.log('❌ localStorage에 토큰이 없습니다.');
     }
 
     return config;
@@ -50,8 +43,7 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // 인증 실패 시 로그인 페이지로 리다이렉트
-      // window.location.href = '/';
+      window.location.href = '/';
     }
     return Promise.reject(error);
   },
