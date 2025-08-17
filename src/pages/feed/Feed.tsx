@@ -21,7 +21,7 @@ const Feed = () => {
   const [activeTab, setActiveTab] = useState<string>(initialTabFromState ?? tabs[0]);
 
   // 소셜 로그인 토큰 발급 처리
-  useSocialLoginToken();
+  const { waitForToken } = useSocialLoginToken();
 
   // 최초 마운트 시에만 history state 제거하여 이후 재방문 시 영향 없도록 처리
   useEffect(() => {
@@ -146,12 +146,19 @@ const Feed = () => {
 
   // 탭별로 API 호출
   useEffect(() => {
-    if (activeTab === '피드') {
-      loadTotalFeeds();
-    } else if (activeTab === '내 피드') {
-      loadMyFeeds();
-    }
-  }, [activeTab]);
+    const loadFeedsWithToken = async () => {
+      // 토큰 발급 완료 대기
+      await waitForToken();
+
+      if (activeTab === '피드') {
+        loadTotalFeeds();
+      } else if (activeTab === '내 피드') {
+        loadMyFeeds();
+      }
+    };
+
+    loadFeedsWithToken();
+  }, [activeTab, waitForToken]);
 
   return (
     <Container>

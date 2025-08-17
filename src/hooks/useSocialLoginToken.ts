@@ -1,10 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { apiClient } from '@/api/index';
 
 export const useSocialLoginToken = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // 토큰 발급 완료를 기다리는 Promise
+  const tokenPromise = useRef<Promise<void> | null>(null);
 
   useEffect(() => {
     const handleSocialLoginToken = async () => {
@@ -72,7 +75,17 @@ export const useSocialLoginToken = () => {
     const isSocialLoginComplete = urlParams.get('loginTokenKey');
 
     if (isSocialLoginComplete) {
-      handleSocialLoginToken();
+      // 토큰 발급 Promise를 저장
+      tokenPromise.current = handleSocialLoginToken();
     }
-  }, [location.pathname, navigate]); // location.pathname과 navigate만 의존성으로 설정
+  }, [location.pathname, navigate]);
+
+  // 토큰 발급 완료를 기다리는 함수 반환
+  const waitForToken = async (): Promise<void> => {
+    if (tokenPromise.current) {
+      await tokenPromise.current;
+    }
+  };
+
+  return { waitForToken };
 };
