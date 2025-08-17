@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import type { Record } from '../../../pages/memory/Memory';
+import type { Record } from '../../../types/memory';
 import TextRecord from './TextRecord';
 import PollRecord from './PollRecord';
 import heartIcon from '../../../assets/memory/heart.svg';
@@ -21,6 +21,7 @@ import {
 import { usePopupActions } from '@/hooks/usePopupActions';
 import { deleteRecord } from '@/api/record/deleteRecord';
 import { deleteVote } from '@/api/record/deleteVote';
+import { postRoomPostLike } from '@/api/roomPosts/postRoomPostLike';
 
 interface RecordItemProps {
   record: Record;
@@ -30,9 +31,10 @@ interface RecordItemProps {
 const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
-  const { openMoreMenu, openConfirm, openSnackbar, closePopup } = usePopupActions();
+  const { openMoreMenu, openConfirm, openSnackbar } = usePopupActions();
 
   const {
+    id,
     user,
     content,
     likeCount,
@@ -45,8 +47,8 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     isWriter,
   } = record;
 
-  // 좋아요 상태 관리
-  const [isLiked, setIsLiked] = useState(false);
+  // 좋아요 상태 관리 - record 객체에서 isLiked 속성 가져오기
+  const [isLiked, setIsLiked] = useState(record.isLiked || false);
   const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
 
   // 길게 누르기 상태 관리
@@ -58,15 +60,55 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   // API에서 받은 isWriter 속성으로 내 기록인지 판단
   const isMyRecord = isWriter ?? false;
 
-  const handleLikeClick = () => {
-    if (isLiked) {
-      // 좋아요 취소
-      setIsLiked(false);
-      setCurrentLikeCount(prev => prev - 1);
-    } else {
-      // 좋아요 추가
-      setIsLiked(true);
-      setCurrentLikeCount(prev => prev + 1);
+  // 좋아요 클릭 핸들러 - API 연동
+  const handleLikeClick = async () => {
+    try {
+      const postId = parseInt(id);
+      const roomPostType = type === 'poll' ? 'VOTE' : 'RECORD';
+
+      const response = await postRoomPostLike(postId, {
+        type: !isLiked, // 현재 상태 반대로 전송
+        roomPostType,
+      });
+
+      if (response.isSuccess) {
+        // 서버 응답으로 상태 업데이트
+        setIsLiked(response.data.isLiked);
+        setCurrentLikeCount((prev: number) => (response.data.isLiked ? prev + 1 : prev - 1));
+        console.log('좋아요 상태 변경 성공:', response.data.isLiked);
+      } else {
+        console.error('좋아요 상태 변경 실패:', response.message);
+
+        // 에러 메시지에 따른 사용자 알림
+        let errorMessage = '좋아요 처리 중 오류가 발생했습니다.';
+
+        if (response.code === 140011) {
+          errorMessage = '방 접근 권한이 없습니다.';
+        } else if (response.code === 185001) {
+          errorMessage = '이미 좋아요한 게시물입니다.';
+        } else if (response.code === 185002) {
+          errorMessage = '좋아요하지 않은 게시물은 취소할 수 없습니다.';
+        } else if (response.code === 100009) {
+          errorMessage = '잘못된 게시물 타입입니다.';
+        } else if (response.code === 110009) {
+          errorMessage = '존재하지 않는 게시물입니다.';
+        } else if (response.code === 40500) {
+          errorMessage = '허용되지 않는 HTTP 메소드입니다.';
+        }
+
+        openSnackbar({
+          message: errorMessage,
+          variant: 'top',
+          onClose: () => {},
+        });
+      }
+    } catch (error) {
+      console.error('좋아요 API 호출 실패:', error);
+      openSnackbar({
+        message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
+        variant: 'top',
+        onClose: () => {},
+      });
     }
   };
 
@@ -149,44 +191,46 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     });
   }, [openSnackbar]);
 
-  const handleLongPress = useCallback(() => {
-    if (isMyRecord) {
-      // 내 기록: 수정하기, 삭제하기
-      openMoreMenu({
-        onEdit: handleEdit,
-        onDelete: handleDeleteConfirm,
-        onClose: closePopup,
-      });
-    } else {
-      // 다른 사람 기록: 신고하기
-      handleReport();
-    }
-  }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm, handleReport, closePopup]);
+  // 길게 누르기 이벤트 핸들러
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (isMyRecord) return;
 
-  const handleLongPressStart = useCallback(
-    (e: React.MouseEvent | React.TouchEvent) => {
-      if ('touches' in e) {
-        e.preventDefault();
-      }
-
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-
-      pressStartPos.current = { x: clientX, y: clientY };
-      hasTriggeredLongPress.current = false;
       setIsPressed(true);
+      hasTriggeredLongPress.current = false;
+      pressStartPos.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
 
       longPressTimer.current = setTimeout(() => {
-        if (!hasTriggeredLongPress.current) {
-          hasTriggeredLongPress.current = true;
-          handleLongPress();
-        }
-      }, 500);
+        hasTriggeredLongPress.current = true;
+        setIsPressed(false);
+
+        openMoreMenu({
+          onReport: handleReport,
+        });
+      }, 800);
     },
-    [handleLongPress],
+    [isMyRecord, openMoreMenu, handleReport],
   );
 
-  const handleLongPressEnd = useCallback(() => {
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!longPressTimer.current) return;
+
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const deltaX = Math.abs(currentX - pressStartPos.current.x);
+    const deltaY = Math.abs(currentY - pressStartPos.current.y);
+
+    if (deltaX > 10 || deltaY > 10) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+      setIsPressed(false);
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
@@ -194,33 +238,28 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     setIsPressed(false);
   }, []);
 
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (!longPressTimer.current) return;
+  const handleClick = useCallback(() => {
+    if (hasTriggeredLongPress.current) {
+      hasTriggeredLongPress.current = false;
+      return;
+    }
 
-      const clientX = e.touches[0].clientX;
-      const clientY = e.touches[0].clientY;
-
-      const deltaX = Math.abs(clientX - pressStartPos.current.x);
-      const deltaY = Math.abs(clientY - pressStartPos.current.y);
-
-      if (deltaX > 10 || deltaY > 10) {
-        handleLongPressEnd();
-      }
-    },
-    [handleLongPressEnd],
-  );
+    if (isMyRecord) {
+      openMoreMenu({
+        onEdit: handleEdit,
+        onDelete: handleDeleteConfirm,
+      });
+    }
+  }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm]);
 
   return (
     <Container
-      shouldBlur={shouldBlur}
-      onMouseDown={handleLongPressStart}
-      onMouseUp={handleLongPressEnd}
-      onMouseLeave={handleLongPressEnd}
-      onTouchStart={handleLongPressStart}
-      onTouchEnd={handleLongPressEnd}
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       style={{
+        filter: shouldBlur ? 'blur(4px)' : 'none',
         transform: isPressed ? 'scale(0.98)' : 'scale(1)',
         transition: 'transform 0.1s ease',
         touchAction: 'manipulation',
