@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { colors, typography } from '@/styles/global/global';
 import MenuButton from '@/components/Mypage/MenuButton';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import { useLogout } from '@/hooks/useLogout';
 import alert from '../../assets/mypage/alert.svg';
 import guide from '../../assets/mypage/guide.svg';
 import save from '../../assets/mypage/save.svg';
@@ -18,6 +19,7 @@ const Mypage = () => {
   const [profile, setProfile] = useState<GetMyProfileResponse['data'] | null>(null);
   const { openConfirm, closePopup } = usePopupActions();
   const navigate = useNavigate();
+  const { handleLogout: logout } = useLogout();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -40,10 +42,9 @@ const Mypage = () => {
       title: '로그아웃',
       disc: '또 THIP 해주실거죠?',
       onConfirm: () => {
-        //실제 로그아웃 로직 구현
         console.log('로그아웃 실행');
         closePopup();
-        //토큰 삭제, 메인 페이지로 이동
+        logout(); // 실제 로그아웃 로직 실행
       },
       onClose: () => {
         console.log('로그아웃 취소');
