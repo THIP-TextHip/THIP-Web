@@ -56,7 +56,7 @@ const SearchBookGroup = () => {
                 title: room.roomName,
                 participants: room.memberCount,
                 maximumParticipants: room.recruitCount,
-                deadLine: 0,
+                deadLine: '',
                 coverUrl: room.bookImageUrl || bookInfo?.imageUrl,
               }}
               isOngoing={true}

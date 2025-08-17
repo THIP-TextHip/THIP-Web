@@ -25,7 +25,7 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
       participants: room.memberCount,
       maximumParticipants: room.recruitCount,
       coverUrl: room.bookImageUrl,
-      deadLine: 0,
+      deadLine: '',
       isOnGoing: false,
     };
   };
