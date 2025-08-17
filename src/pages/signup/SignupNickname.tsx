@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, InputBox, StyledInput, CharCount } from './Signup.styled';
 import Header from '../../components/common/TitleHeader';
@@ -12,16 +12,9 @@ const SignupNickname = () => {
   const navigate = useNavigate();
 
   // 소셜 로그인 토큰 발급 처리
-  useSocialLoginToken();
+  const { waitForToken } = useSocialLoginToken();
 
   const isNextActive = nickname.length >= 2 && nickname.length <= maxLength;
-
-  // 페이지 로드 시 간단한 확인
-  useEffect(() => {
-    console.log('=== 🔍 SignupNickname 페이지 로드 ===');
-    console.log('📍 현재 페이지:', window.location.pathname);
-    console.log('✅ 토큰 발급 후 쿠키는 브라우저가 자동으로 처리합니다.');
-  }, []);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -35,7 +28,18 @@ const SignupNickname = () => {
     console.log('👤 입력된 닉네임:', nickname);
 
     try {
-      // ✅ 쿠키는 브라우저가 자동으로 전송
+      // 토큰 발급 완료 대기
+      await waitForToken();
+
+      // localStorage에 토큰이 있는지 확인
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) {
+        console.log('❌ 토큰이 없어서 닉네임 검증을 할 수 없습니다.');
+        setError('인증 토큰이 없습니다. 다시 시도해주세요.');
+        return;
+      }
+
+      console.log('✅ 토큰 확인 완료, 닉네임 검증 API 호출');
       const result = await postNickname(nickname);
 
       if (result.data.isVerified) {

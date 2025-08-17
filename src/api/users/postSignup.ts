@@ -7,11 +7,12 @@ export interface PostSignupRequest {
 }
 
 export interface PostSignupResponse {
-  success: boolean;
+  isSuccess: boolean;
   code: number;
   message: string;
   data: {
     userId: number;
+    accessToken: string; // 회원가입 완료 후 받는 access 토큰
   };
 }
 
