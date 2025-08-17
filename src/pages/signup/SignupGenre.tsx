@@ -67,6 +67,7 @@ const SignupGenre = () => {
       const result = await postSignup({
         aliasName: selectedAlias.subTitle,
         nickname: nickname,
+        isTokenRequired: false,
       });
 
       if (result.success) {
