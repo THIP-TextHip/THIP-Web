@@ -28,6 +28,7 @@ interface PageRangeSectionProps {
   isOverallEnabled: boolean;
   onOverallToggle: () => void;
   readingProgress: number;
+  isOverviewPossible: boolean;
 }
 
 const PageRangeSection = ({
