@@ -23,9 +23,7 @@ const convertRoomItemToGroup = (
   participants: room.memberCount,
   maximumParticipants: room.recruitCount,
   coverUrl: room.bookImageUrl,
-  deadLine: Math.ceil(
-    (new Date(room.deadlineDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
-  ),
+  deadLine: room.deadlineDate,
   genre: category,
 });
 
