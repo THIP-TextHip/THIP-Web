@@ -9,7 +9,7 @@ import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
 import { getMyFeeds } from '@/api/feeds/getMyFeed';
-import { useOAuthToken } from '@/hooks/useOAuthToken';
+import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
 import type { PostData } from '@/types/post';
 
 const tabs = ['피드', '내 피드'];
@@ -21,7 +21,7 @@ const Feed = () => {
   const [activeTab, setActiveTab] = useState<string>(initialTabFromState ?? tabs[0]);
 
   // 소셜 로그인 토큰 발급 처리
-  useOAuthToken();
+  useSocialLoginToken();
 
   // 최초 마운트 시에만 history state 제거하여 이후 재방문 시 영향 없도록 처리
   useEffect(() => {

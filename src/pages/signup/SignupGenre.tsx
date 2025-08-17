@@ -4,6 +4,7 @@ import { Container } from './Signup.styled';
 import leftarrow from '../../assets/common/leftArrow.svg';
 import TitleHeader from '../../components/common/TitleHeader';
 import { postSignup } from '@/api/users/postSignup';
+import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
 
 const SignupGenre = () => {
   const [genres, setGenres] = useState<
@@ -21,6 +22,9 @@ const SignupGenre = () => {
   } | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // 소셜 로그인 토큰 발급 처리
+  useSocialLoginToken();
 
   // SignupNickname에서 넘어온 nickname 받기
   const nickname = location.state?.nickname;

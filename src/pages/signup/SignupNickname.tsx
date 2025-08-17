@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container, InputBox, StyledInput, CharCount } from './Signup.styled';
 import Header from '../../components/common/TitleHeader';
 import { postNickname } from '@/api/users/postNickname';
-import { useOAuthToken } from '@/hooks/useOAuthToken';
+import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
 
 const SignupNickname = () => {
   const [nickname, setNickname] = useState('');
@@ -12,7 +12,7 @@ const SignupNickname = () => {
   const navigate = useNavigate();
 
   // 소셜 로그인 토큰 발급 처리
-  useOAuthToken();
+  useSocialLoginToken();
 
   const isNextActive = nickname.length >= 2 && nickname.length <= maxLength;
 
