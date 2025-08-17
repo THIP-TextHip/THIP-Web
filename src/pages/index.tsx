@@ -18,6 +18,7 @@ import GroupSearch from './groupSearch/GroupSearch';
 import Search from './search/Search';
 import ApplyBook from './search/ApplyBook';
 import OtherFeedPage from './feed/OtherFeedPage';
+import MyFeedPage from './feed/MyFeedPage';
 import FollowerListPage from './feed/FollowerListPage';
 import TodayWords from './today-words/TodayWords';
 import SearchBook from './searchBook/SearchBook';
@@ -69,6 +70,7 @@ const Router = () => {
         <Route path="search/book/:isbn" element={<SearchBook />} />
         <Route path="search/book/group" element={<SearchBookGroup />} />
         <Route path="otherfeed/:userId" element={<OtherFeedPage />} />
+        <Route path="myfeed/:userId" element={<MyFeedPage />} />
         <Route path="follow/:type/:userId" element={<FollowerListPage />} />
         <Route path="follow/:type" element={<FollowerListPage />} />
         <Route path="today-words/:roomId" element={<TodayWords />} />

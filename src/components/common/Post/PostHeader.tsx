@@ -8,6 +8,7 @@ interface PostHeaderProps {
   postDate: string;
   creatorId?: number;
   type?: 'post' | 'reply';
+  isWriter?: boolean;
 }
 
 const PostHeader = ({
@@ -18,12 +19,18 @@ const PostHeader = ({
   postDate,
   creatorId,
   type = 'post',
+  isWriter,
 }: PostHeaderProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
     if (creatorId) {
-      navigate(`/otherfeed/${creatorId}`);
+      // isWriter가 true면 MyFeedPage로, false면 OtherFeedPage로 이동
+      if (isWriter) {
+        navigate(`/myfeed/${creatorId}`);
+      } else {
+        navigate(`/otherfeed/${creatorId}`);
+      }
     }
   };
 
