@@ -74,7 +74,7 @@ const Memory = () => {
 
   // API 관련 상태
   const [error, setError] = useState<string | null>(null);
-  const [isOverviewEnabled, setIsOverviewEnabled] = useState(false); // API에서 받아올 총평 활성화 여부
+  const [isOverviewEnabled, setIsOverviewEnabled] = useState(false);
 
   // 업로드 프로그레스 상태
   const [showUploadProgress, setShowUploadProgress] = useState(false);
@@ -100,6 +100,7 @@ const Memory = () => {
         roomId: number;
         type: 'group' | 'mine';
         sort?: 'latest' | 'like' | 'comment';
+        isOverview?: boolean;
       } = {
         roomId: parseInt(roomId),
         type: activeTab === 'group' ? 'group' : 'mine',
@@ -114,12 +115,18 @@ const Memory = () => {
         params.sort = sortType;
       }
 
-      const response = await getMemoryPosts(params);
+      // 일반 기록과 총평 기록을 모두 가져오기 위해 두 번 호출
+      const [generalResponse, overviewResponse] = await Promise.all([
+        getMemoryPosts(params), // 일반 기록 (isOverview: false 기본값)
+        getMemoryPosts({ ...params, isOverview: true }), // 총평 기록
+      ]);
 
-      if (response.isSuccess) {
-        const convertedRecords = response.data.postList.map(convertPostToRecord);
+      if (generalResponse.isSuccess && overviewResponse.isSuccess) {
+        // 일반 기록과 총평 기록을 합치기
+        const allPosts = [...generalResponse.data.postList, ...overviewResponse.data.postList];
+        const convertedRecords = allPosts.map(convertPostToRecord);
 
-        setIsOverviewEnabled(response.data.isOverviewEnabled);
+        setIsOverviewEnabled(generalResponse.data.isOverviewEnabled);
 
         if (activeTab === 'group') {
           setGroupRecords(convertedRecords);
@@ -127,7 +134,9 @@ const Memory = () => {
           setMyRecords(convertedRecords);
         }
       } else {
-        setError(response.message || '기록을 불러오는데 실패했습니다.');
+        setError(
+          generalResponse.message || overviewResponse.message || '기록을 불러오는데 실패했습니다.',
+        );
       }
     } catch (err) {
       console.error('기록 조회 API 오류:', err);
@@ -172,16 +181,18 @@ const Memory = () => {
 
   // 필터링된 기록 목록
   const filteredRecords = useMemo(() => {
-    let filtered = sortedRecords;
+    const filtered = sortedRecords;
 
     if (activeFilter === 'overall') {
-      filtered = filtered.filter(record => record.recordType === 'overall');
+      const overallRecords = filtered.filter(record => record.recordType === 'overall');
+      return overallRecords;
     } else if (activeFilter === 'page' && selectedPageRange) {
-      filtered = filtered.filter(record => {
+      const pageRecords = filtered.filter(record => {
         if (record.recordType === 'overall') return false;
         const page = parseInt(record.pageRange || '0');
         return page >= selectedPageRange.start && page <= selectedPageRange.end;
       });
+      return pageRecords;
     }
 
     return filtered;
@@ -237,6 +248,7 @@ const Memory = () => {
   }, []);
 
   const readingProgress = isOverviewEnabled ? 85 : 70;
+  const currentUserPage = 350; // 임시로 350으로 설정 (나중에 API에서 가져올 것)
 
   if (error) {
     return (
@@ -270,6 +282,7 @@ const Memory = () => {
           selectedPageRange={selectedPageRange}
           hasRecords={hasRecords}
           showUploadProgress={showUploadProgress}
+          currentUserPage={currentUserPage}
           onTabChange={handleTabChange}
           onFilterChange={handleFilterChange}
           onSortChange={handleSortChange}

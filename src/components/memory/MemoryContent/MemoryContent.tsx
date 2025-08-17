@@ -17,6 +17,7 @@ interface MemoryContentProps {
   selectedPageRange: { start: number; end: number } | null;
   hasRecords: boolean;
   showUploadProgress: boolean;
+  currentUserPage: number;
   onTabChange: (tab: RecordType) => void;
   onFilterChange: (filter: FilterType) => void;
   onSortChange: (sort: SortType) => void;
