@@ -3,78 +3,121 @@ import { Modal, Overlay } from '@/components/group/Modal.styles';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { useNavigate } from 'react-router-dom';
 import SearchBar from '@/components/search/SearchBar';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import GroupSearchResult from '@/components/search/GroupSearchResult';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
 
+import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms';
+
+type SortKey = 'deadline' | 'memberCount';
+
 const GroupSearch = () => {
   const navigate = useNavigate();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingRecent, setIsLoadingRecent] = useState(false);
 
-  const fetchRecentSearches = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getRecentSearch('ROOM');
+  const [rooms, setRooms] = useState<SearchRoomItem[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [isLast, setIsLast] = useState(true);
+  const [isLoadingList, setIsLoadingList] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-      if (response.isSuccess) {
-        setRecentSearches(response.data.recentSearchList);
-      } else {
-        console.error('최근 검색어 조회 실패:', response.message);
-        setRecentSearches([]);
-      }
-    } catch (error) {
-      console.error('최근 검색어 조회 오류:', error);
-      setRecentSearches([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [selectedFilter, setSelectedFilter] = useState<string>('마감임박순');
+  const toSortKey = useCallback(
+    (f: string): SortKey => (f === '인기순' ? 'memberCount' : 'deadline'),
+    [],
+  );
+
+  const [category, setCategory] = useState<string>('');
+  const [isFinalized] = useState(false);
 
   useEffect(() => {
-    fetchRecentSearches();
+    (async () => {
+      try {
+        setIsLoadingRecent(true);
+        const response = await getRecentSearch('ROOM');
+        setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
+      } finally {
+        setIsLoadingRecent(false);
+      }
+    })();
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSearch = (_term: string) => {
-    setIsSearching(true);
-    // 검색 로직만 수행, 최근 검색어는 서버에서 관리
-  };
+  const runSearch = useCallback(
+    async (keyword: string, sortKey: SortKey, cursor?: string, append = false) => {
+      if (!keyword.trim()) return;
+      try {
+        setIsLoadingList(true);
+        setError(null);
 
-  const handleDelete = async (recentSearchId: number) => {
-    try {
-      const userId = 1; // 임시 userId
+        const res = await getSearchRooms(keyword.trim(), sortKey, cursor, isFinalized, category);
 
-      const response = await deleteRecentSearch(recentSearchId, userId);
+        if (!res.isSuccess) {
+          if (!append) {
+            setRooms([]);
+            setNextCursor(null);
+            setIsLast(true);
+          }
+          setError(res.message || '검색 실패');
+          return;
+        }
 
-      if (response.isSuccess) {
-        setRecentSearches(prev => prev.filter(item => item.recentSearchId !== recentSearchId));
-      } else {
-        console.error('최근 검색어 삭제 실패:', response.message);
+        const { roomList, nextCursor: nc, isLast: last } = res.data;
+        setRooms(prev => (append ? [...prev, ...roomList] : roomList));
+        setNextCursor(nc);
+        setIsLast(last);
+      } catch {
+        if (!append) {
+          setRooms([]);
+          setNextCursor(null);
+          setIsLast(true);
+        }
+        setError('네트워크 오류가 발생했습니다.');
+      } finally {
+        setIsLoadingList(false);
       }
-    } catch (error) {
-      console.error('최근 검색어 삭제 오류:', error);
-    }
+    },
+    [category, isFinalized],
+  );
+
+  const handleSearch = () => {
+    if (!searchTerm.trim()) return;
+    setIsSearching(true);
+    runSearch(searchTerm, toSortKey(selectedFilter), undefined, false);
   };
 
   const handleRecentSearchClick = (recentSearch: string) => {
     setSearchTerm(recentSearch);
+    setIsSearching(true);
+    runSearch(recentSearch, toSortKey(selectedFilter), undefined, false);
   };
 
-  const handleDeleteWrapper = (searchTerm: string) => {
-    const recentSearchItem = recentSearches.find(item => item.searchTerm === searchTerm);
-    if (recentSearchItem) {
-      handleDelete(recentSearchItem.recentSearchId);
+  useEffect(() => {
+    if (isSearching && searchTerm.trim()) {
+      runSearch(searchTerm, toSortKey(selectedFilter), undefined, false);
+    }
+  }, [selectedFilter, isSearching, searchTerm, runSearch, toSortKey]);
+
+  useEffect(() => {
+    if (isSearching && searchTerm.trim()) {
+      runSearch(searchTerm, toSortKey(selectedFilter), undefined, false);
+    }
+  }, [category, isSearching, searchTerm, runSearch, toSortKey, selectedFilter]);
+
+  const handleLoadMore = () => {
+    if (!isLast && nextCursor && searchTerm.trim()) {
+      runSearch(searchTerm, toSortKey(selectedFilter), nextCursor, true);
     }
   };
 
-  const handleBackButton = () => {
-    navigate('/group');
-  };
+  const handleBackButton = () => navigate('/group');
+
   return (
     <Overlay>
       <Modal>
@@ -83,22 +126,42 @@ const GroupSearch = () => {
           leftIcon={<img src={leftArrow} alt="뒤로 가기" />}
           onLeftClick={handleBackButton}
         />
+
         <SearchBar
           placeholder="방제목 혹은 책제목을 검색해보세요."
           value={searchTerm}
           onChange={setSearchTerm}
-          onSearch={() => {
-            if (searchTerm.trim()) handleSearch(searchTerm.trim());
-          }}
+          onSearch={handleSearch}
         />
+
         {isSearching ? (
-          <GroupSearchResult></GroupSearchResult>
+          <GroupSearchResult
+            rooms={rooms}
+            isLoading={isLoadingList}
+            isLast={isLast}
+            onLoadMore={handleLoadMore}
+            error={error}
+            selectedFilter={selectedFilter}
+            setSelectedFilter={setSelectedFilter}
+            onChangeCategory={setCategory}
+            currentCategory={category}
+          />
         ) : (
           <RecentSearchTabs
-            recentSearches={isLoading ? [] : recentSearches.map(item => item.searchTerm)}
-            handleDelete={handleDeleteWrapper}
+            recentSearches={isLoadingRecent ? [] : recentSearches.map(i => i.searchTerm)}
+            handleDelete={(term: string) => {
+              const x = recentSearches.find(i => i.searchTerm === term);
+              if (x)
+                deleteRecentSearch(x.recentSearchId, 1).then(res => {
+                  if (res.isSuccess) {
+                    setRecentSearches(prev =>
+                      prev.filter(it => it.recentSearchId !== x.recentSearchId),
+                    );
+                  }
+                });
+            }}
             handleRecentSearchClick={handleRecentSearchClick}
-          ></RecentSearchTabs>
+          />
         )}
       </Modal>
     </Overlay>
