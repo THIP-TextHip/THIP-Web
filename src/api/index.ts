@@ -14,8 +14,8 @@ export const apiClient = axios.create({
 });
 
 // 임시 하드코딩된 토큰 (쿠키가 없을 때 사용)
-const TEMP_ACCESS_TOKEN =
-  'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.BSGuoMWlrzc0oKgSJXHEycxdzzY9-e7gD4xh-wSDemc';
+// const TEMP_ACCESS_TOKEN =
+//   'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.BSGuoMWlrzc0oKgSJXHEycxdzzY9-e7gD4xh-wSDemc';
 
 // Request 인터셉터: 쿠키가 없을 때 임시 토큰을 헤더에 추가
 apiClient.interceptors.request.use(
@@ -24,12 +24,19 @@ apiClient.interceptors.request.use(
     const cookies = document.cookie.split(';');
     const hasAuthCookie = cookies.some(cookie => cookie.trim().startsWith('Authorization='));
 
-    // 쿠키가 없으면 임시 토큰을 헤더에 추가
-    if (!hasAuthCookie) {
-      console.log('🔑 쿠키가 없어서 임시 토큰을 헤더에 추가합니다.');
-      config.headers.Authorization = `Bearer ${TEMP_ACCESS_TOKEN}`;
-    } else {
+    // 쿠키가 없으면 임시 토큰을 헤더에 추가 (현재 주석처리됨)
+    // if (!hasAuthCookie) {
+    //   console.log('🔑 쿠키가 없어서 임시 토큰을 헤더에 추가합니다.');
+    //   config.headers.Authorization = `Bearer ${TEMP_ACCESS_TOKEN}`;
+    // } else {
+    //   console.log('✅ Authorization 쿠키가 있어서 자동으로 전송됩니다.');
+    // }
+
+    // 쿠키만 테스트하기 위해 로그만 출력
+    if (hasAuthCookie) {
       console.log('✅ Authorization 쿠키가 있어서 자동으로 전송됩니다.');
+    } else {
+      console.log('🔑 Authorization 쿠키가 없습니다.');
     }
 
     return config;
