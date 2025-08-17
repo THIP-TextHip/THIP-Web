@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DropdownContainer, DropdownItem } from './SortDropdown.styled';
 
-export type SortType = 'latest' | 'popular' | 'comments';
+export type SortType = 'latest' | 'like' | 'comment';
 
 interface SortDropdownProps {
   isOpen: boolean;
@@ -33,8 +33,8 @@ const SortDropdown = ({ isOpen, selectedSort, onSortSelect }: SortDropdownProps)
 
   const sortOptions = [
     { value: 'latest' as SortType, label: '최신순' },
-    { value: 'popular' as SortType, label: '인기순' },
-    { value: 'comments' as SortType, label: '댓글 많은순' },
+    { value: 'like' as SortType, label: '인기순' },
+    { value: 'comment' as SortType, label: '댓글 많은순' },
   ];
 
   return (

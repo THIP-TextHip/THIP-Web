@@ -1,4 +1,4 @@
-import type { Record } from '../../../pages/memory/Memory';
+import type { Record } from '../../../types/memory';
 import RecordItem from '../RecordItem/RecordItem';
 import { RecordListContainer } from './RecordList.styled';
 

@@ -1,4 +1,5 @@
-import type { RecordType, FilterType, Record } from '../../../pages/memory/Memory';
+import type { RecordType, FilterType } from '../../../pages/memory/Memory';
+import type { Record } from '../../../types/memory';
 import type { SortType } from '../SortDropdown';
 import RecordTabs from '../RecordTabs';
 import RecordFilters from '../RecordFilters/RecordFilters';
@@ -17,6 +18,7 @@ interface MemoryContentProps {
   selectedPageRange: { start: number; end: number } | null;
   hasRecords: boolean;
   showUploadProgress: boolean;
+  currentUserPage: number;
   onTabChange: (tab: RecordType) => void;
   onFilterChange: (filter: FilterType) => void;
   onSortChange: (sort: SortType) => void;

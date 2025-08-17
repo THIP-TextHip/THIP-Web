@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { colors, typography } from '@/styles/global/global';
 import MenuButton from '@/components/Mypage/MenuButton';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import { useLogout } from '@/hooks/useLogout';
 import alert from '../../assets/mypage/alert.svg';
 import guide from '../../assets/mypage/guide.svg';
 import save from '../../assets/mypage/save.svg';
@@ -18,6 +19,7 @@ const Mypage = () => {
   const [profile, setProfile] = useState<GetMyProfileResponse['data'] | null>(null);
   const { openConfirm, closePopup } = usePopupActions();
   const navigate = useNavigate();
+  const { handleLogout: logout } = useLogout();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -40,10 +42,9 @@ const Mypage = () => {
       title: '로그아웃',
       disc: '또 THIP 해주실거죠?',
       onConfirm: () => {
-        //실제 로그아웃 로직 구현
         console.log('로그아웃 실행');
         closePopup();
-        //토큰 삭제, 메인 페이지로 이동
+        logout(); // 실제 로그아웃 로직 실행
       },
       onClose: () => {
         console.log('로그아웃 취소');
@@ -53,7 +54,7 @@ const Mypage = () => {
   };
 
   const handleNotice = () => {
-    window.open('https://www.naver.com', '_blank');
+    window.open('https://slashpage.com/thip/7vgjr4m1nynpy2dwpy86', '_blank');
   };
 
   const handleSave = () => {
@@ -66,6 +67,14 @@ const Mypage = () => {
 
   const handleWithdraw = () => {
     navigate('/mypage/withdraw');
+  };
+
+  const handleGuide = () => {
+    window.open('https://slashpage.com/thip/ywk9j72989p6rmgpqvnd', '_blank');
+  };
+
+  const handleService = () => {
+    window.open('https://slashpage.com/thip/xjqy1g2vw7vejm6vd54z', '_blank');
   };
 
   return (
@@ -96,10 +105,15 @@ const Mypage = () => {
           <SectionTitle>메뉴</SectionTitle>
           <MenuGrid>
             <MenuButton src={alert} name="알림설정" isButton onClick={handleAlert} />
-            <MenuButton src={service} name="고객센터" isButton />
+            <MenuButton src={service} name="고객센터" isButton onClick={handleService} />
             <MenuButton src={notice} name="공지사항" isButton />
-            <MenuButton src={terms} name="이용약관" isButton onClick={handleNotice} />
-            <MenuButton src={guide} name="가이드" isButton />
+            <MenuButton
+              src={terms}
+              name="개인정보처리방침 & 이용약관"
+              isButton
+              onClick={handleNotice}
+            />
+            <MenuButton src={guide} name="가이드" isButton onClick={handleGuide} />
             <MenuButton src={ver} name="버젼 1.0" isButton={false} />
           </MenuGrid>
         </Section>

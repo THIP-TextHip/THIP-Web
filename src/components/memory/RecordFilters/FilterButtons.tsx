@@ -40,9 +40,9 @@ const FilterButtons = ({
     switch (sort) {
       case 'latest':
         return '최신순';
-      case 'popular':
+      case 'like':
         return '인기순';
-      case 'comments':
+      case 'comment':
         return '댓글 많은순';
       default:
         return '최신순';

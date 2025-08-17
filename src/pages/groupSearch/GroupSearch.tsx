@@ -1,122 +1,232 @@
 import TitleHeader from '@/components/common/TitleHeader';
 import { Modal, Overlay } from '@/components/group/Modal.styles';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import { useNavigate } from 'react-router-dom';
 import SearchBar from '@/components/search/SearchBar';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import GroupSearchResult from '@/components/search/GroupSearchResult';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
-
 import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms';
 
 type SortKey = 'deadline' | 'memberCount';
 
 const GroupSearch = () => {
-  const navigate = useNavigate();
-
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
-
-  const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
-  const [isLoadingRecent, setIsLoadingRecent] = useState(false);
+  const [isFinalized, setIsFinalized] = useState(false);
 
   const [rooms, setRooms] = useState<SearchRoomItem[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [isLast, setIsLast] = useState(true);
-  const [isLoadingList, setIsLoadingList] = useState(false);
+
+  // 로딩
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 정렬/카테고리
   const [selectedFilter, setSelectedFilter] = useState<string>('마감임박순');
   const toSortKey = useCallback(
     (f: string): SortKey => (f === '인기순' ? 'memberCount' : 'deadline'),
     [],
   );
-
   const [category, setCategory] = useState<string>('');
-  const [isFinalized] = useState(false);
 
+  const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
+  const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const fetchRecentSearches = async () => {
+    try {
+      const response = await getRecentSearch('ROOM');
+      setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
+    } catch {
+      setRecentSearches([]);
+    }
+  };
   useEffect(() => {
-    (async () => {
-      try {
-        setIsLoadingRecent(true);
-        const response = await getRecentSearch('ROOM');
-        setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
-      } finally {
-        setIsLoadingRecent(false);
-      }
-    })();
+    fetchRecentSearches();
   }, []);
 
-  const runSearch = useCallback(
-    async (keyword: string, sortKey: SortKey, cursor?: string, append = false) => {
-      if (!keyword.trim()) return;
+  const searchFirstPage = useCallback(
+    async (term: string, sortKey: SortKey, manual: boolean) => {
+      if (!term.trim()) return;
+      setIsSearching(true);
+      if (manual) setIsFinalized(false);
+
+      setIsLoading(true);
+      setError(null);
       try {
-        setIsLoadingList(true);
-        setError(null);
-
-        const res = await getSearchRooms(keyword.trim(), sortKey, cursor, isFinalized, category);
-
-        if (!res.isSuccess) {
-          if (!append) {
-            setRooms([]);
-            setNextCursor(null);
-            setIsLast(true);
-          }
-          setError(res.message || '검색 실패');
-          return;
-        }
-
-        const { roomList, nextCursor: nc, isLast: last } = res.data;
-        setRooms(prev => (append ? [...prev, ...roomList] : roomList));
-        setNextCursor(nc);
-        setIsLast(last);
-      } catch {
-        if (!append) {
+        const res = await getSearchRooms(term.trim(), sortKey, undefined, isFinalized, category);
+        if (res.isSuccess) {
+          const { roomList, nextCursor: nc, isLast: last } = res.data;
+          setRooms(roomList);
+          setNextCursor(nc);
+          setIsLast(last);
+        } else {
           setRooms([]);
           setNextCursor(null);
           setIsLast(true);
+          setError(res.message || '검색 실패');
         }
+      } catch {
+        setRooms([]);
+        setNextCursor(null);
+        setIsLast(true);
         setError('네트워크 오류가 발생했습니다.');
       } finally {
-        setIsLoadingList(false);
+        setIsLoading(false);
+        if (manual) setIsFinalized(true);
       }
     },
     [category, isFinalized],
   );
 
+  const loadMore = useCallback(async () => {
+    if (!searchTerm.trim() || !nextCursor || isLast || isLoadingMore) return;
+
+    try {
+      setIsLoadingMore(true);
+      const res = await getSearchRooms(
+        searchTerm.trim(),
+        toSortKey(selectedFilter),
+        nextCursor,
+        isFinalized,
+        category,
+      );
+      if (res.isSuccess) {
+        const { roomList, nextCursor: nc, isLast: last } = res.data;
+        setRooms(prev => [...prev, ...roomList]);
+        setNextCursor(nc);
+        setIsLast(last);
+      } else {
+        setIsLast(true);
+      }
+    } catch {
+      setIsLast(true);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [
+    searchTerm,
+    nextCursor,
+    isLast,
+    isLoadingMore,
+    selectedFilter,
+    toSortKey,
+    isFinalized,
+    category,
+  ]);
+
+  const lastRoomElementCallback = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoadingMore || isLast) return;
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && !isLoadingMore && !isLast) {
+          loadMore();
+        }
+      });
+      if (node) observerRef.current.observe(node);
+    },
+    [isLoadingMore, isLast, loadMore],
+  );
+
+  const handleChange = (value: string) => {
+    setSearchTerm(value);
+    setIsFinalized(false);
+    const trimmed = value.trim();
+    setIsSearching(trimmed !== '');
+    setNextCursor(null);
+    setIsLast(true);
+    setRooms([]);
+
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+    }
+
+    if (trimmed) {
+      const id = setTimeout(() => {
+        searchFirstPage(trimmed, toSortKey(selectedFilter), false);
+      }, 300);
+      setSearchTimeoutId(id);
+    } else {
+      setError(null);
+    }
+  };
+
   const handleSearch = () => {
-    if (!searchTerm.trim()) return;
-    setIsSearching(true);
-    runSearch(searchTerm, toSortKey(selectedFilter), undefined, false);
+    const term = searchTerm.trim();
+    if (!term) return;
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+      setSearchTimeoutId(null);
+    }
+    searchFirstPage(term, toSortKey(selectedFilter), true);
   };
 
-  const handleRecentSearchClick = (recentSearch: string) => {
-    setSearchTerm(recentSearch);
+  const handleRecentSearchClick = (recent: string) => {
+    setSearchTerm(recent);
     setIsSearching(true);
-    runSearch(recentSearch, toSortKey(selectedFilter), undefined, false);
+    setIsFinalized(false);
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+      setSearchTimeoutId(null);
+    }
+    searchFirstPage(recent, toSortKey(selectedFilter), true);
   };
 
   useEffect(() => {
     if (isSearching && searchTerm.trim()) {
-      runSearch(searchTerm, toSortKey(selectedFilter), undefined, false);
+      if (searchTimeoutId) {
+        clearTimeout(searchTimeoutId);
+        setSearchTimeoutId(null);
+      }
+      searchFirstPage(searchTerm.trim(), toSortKey(selectedFilter), false);
     }
-  }, [selectedFilter, isSearching, searchTerm, runSearch, toSortKey]);
+  }, [selectedFilter, isSearching, searchTerm, searchFirstPage, toSortKey, searchTimeoutId]);
 
   useEffect(() => {
     if (isSearching && searchTerm.trim()) {
-      runSearch(searchTerm, toSortKey(selectedFilter), undefined, false);
+      if (searchTimeoutId) {
+        clearTimeout(searchTimeoutId);
+        setSearchTimeoutId(null);
+      }
+      searchFirstPage(searchTerm.trim(), toSortKey(selectedFilter), false);
     }
-  }, [category, isSearching, searchTerm, runSearch, toSortKey, selectedFilter]);
+  }, [
+    category,
+    isSearching,
+    searchTerm,
+    searchFirstPage,
+    toSortKey,
+    selectedFilter,
+    searchTimeoutId,
+  ]);
 
-  const handleLoadMore = () => {
-    if (!isLast && nextCursor && searchTerm.trim()) {
-      runSearch(searchTerm, toSortKey(selectedFilter), nextCursor, true);
+  const handleBackButton = () => {
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+      setSearchTimeoutId(null);
     }
+    setSearchTerm('');
+    setIsSearching(false);
+    setIsFinalized(false);
+    setRooms([]);
+    setNextCursor(null);
+    setIsLast(true);
+    setError(null);
   };
 
-  const handleBackButton = () => navigate('/group');
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutId) clearTimeout(searchTimeoutId);
+      if (observerRef.current) observerRef.current.disconnect();
+    };
+  }, [searchTimeoutId]);
 
   return (
     <Overlay>
@@ -130,16 +240,19 @@ const GroupSearch = () => {
         <SearchBar
           placeholder="방제목 혹은 책제목을 검색해보세요."
           value={searchTerm}
-          onChange={setSearchTerm}
+          onChange={handleChange}
           onSearch={handleSearch}
+          isSearched={isFinalized}
         />
 
         {isSearching ? (
           <GroupSearchResult
+            type={isFinalized ? 'searched' : 'searching'}
             rooms={rooms}
-            isLoading={isLoadingList}
-            isLast={isLast}
-            onLoadMore={handleLoadMore}
+            isLoading={isLoading}
+            isLoadingMore={isLoadingMore}
+            hasMore={!isLast}
+            lastRoomElementCallback={lastRoomElementCallback}
             error={error}
             selectedFilter={selectedFilter}
             setSelectedFilter={setSelectedFilter}
@@ -148,17 +261,18 @@ const GroupSearch = () => {
           />
         ) : (
           <RecentSearchTabs
-            recentSearches={isLoadingRecent ? [] : recentSearches.map(i => i.searchTerm)}
+            recentSearches={recentSearches.map(i => i.searchTerm)}
             handleDelete={(term: string) => {
               const x = recentSearches.find(i => i.searchTerm === term);
-              if (x)
-                deleteRecentSearch(x.recentSearchId, 1).then(res => {
-                  if (res.isSuccess) {
-                    setRecentSearches(prev =>
-                      prev.filter(it => it.recentSearchId !== x.recentSearchId),
-                    );
-                  }
-                });
+              if (!x) return;
+              const userId = 1;
+              deleteRecentSearch(x.recentSearchId, userId).then(res => {
+                if (res.isSuccess) {
+                  setRecentSearches(prev =>
+                    prev.filter(it => it.recentSearchId !== x.recentSearchId),
+                  );
+                }
+              });
             }}
             handleRecentSearchClick={handleRecentSearchClick}
           />
