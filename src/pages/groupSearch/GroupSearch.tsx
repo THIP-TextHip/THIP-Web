@@ -265,6 +265,7 @@ const GroupSearch = () => {
                 setSelectedFilter={setSelectedFilter}
                 onChangeCategory={setCategory}
                 currentCategory={category}
+                onClickRoom={roomId => navigate(`/group/detail/${roomId}`)}
               />
             )}
           </>

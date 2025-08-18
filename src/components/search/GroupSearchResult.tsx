@@ -17,14 +17,13 @@ interface Props {
   isLoadingMore?: boolean;
   hasMore?: boolean;
   lastRoomElementCallback?: (node: HTMLDivElement | null) => void;
-
   error: string | null;
   selectedFilter: string;
   setSelectedFilter: (v: string) => void;
   onChangeCategory: (category: string) => void;
   currentCategory: string;
-
   showTabs: boolean;
+  onClickRoom: (roomId: number) => void;
 }
 
 const mapToGroupCardModel = (r: SearchRoomItem) => ({
@@ -51,6 +50,7 @@ const GroupSearchResult = ({
   onChangeCategory,
   currentCategory,
   showTabs,
+  onClickRoom,
 }: Props) => {
   const mapped = useMemo(() => rooms.map(mapToGroupCardModel), [rooms]);
   const isEmpty = !isLoading && mapped.length === 0;
@@ -103,6 +103,7 @@ const GroupSearchResult = ({
                   ? lastRoomElementCallback
                   : undefined
               }
+              onClick={() => onClickRoom(Number(group.id))}
             >
               <GroupCard group={group} isOngoing={group.isOnGoing} type="search" />
             </div>
