@@ -184,6 +184,13 @@ export const BookIntro = styled.div`
     margin-top: 4px;
     color: ${colors.grey[200]};
     font-size: ${typography.fontSize['2xs']};
+
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
   }
 `;
 
