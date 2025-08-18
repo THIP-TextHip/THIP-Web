@@ -138,7 +138,7 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
                 {groupedMessages[date].map(message => (
                   <MessageItem key={message.id}>
                     <UserInfo>
-                      <UserAvatar />
+                      <UserAvatar profileImageUrl={message.profileImageUrl} />
                       <UserDetails>
                         <UserName>{message.user}</UserName>
                         <TimeStamp>{message.timeAgo}</TimeStamp>
