@@ -44,7 +44,6 @@ import { postJoinRoom } from '@/api/rooms/postJoinRoom';
 import { postCloseRoom } from '@/api/rooms/postCloseRoom';
 import type { Group } from '@/components/group/MyGroupBox';
 
-// ✅ 추가: 비밀번호 모달
 import PasswordModal from '@/components/group/PasswordModal';
 
 const GroupDetail = () => {
@@ -76,16 +75,6 @@ const GroupDetail = () => {
       genre: '',
       isOnGoing: true,
     };
-  };
-
-  const calculateDday = (recruitEndDate: string): string => {
-    const today = new Date();
-    const endDate = new Date(recruitEndDate);
-    const diffTime = endDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return '모집 종료';
-    if (diffDays === 0) return '오늘 마감';
-    return `${diffDays}일 남음`;
   };
 
   useEffect(() => {
@@ -159,7 +148,6 @@ const GroupDetail = () => {
   const handleBottomButtonClick = async () => {
     if (!roomId) return;
 
-    // 호스트면 모집 마감
     if (roomData.isHost) {
       try {
         setIsSubmitting(true);
@@ -242,7 +230,7 @@ const GroupDetail = () => {
           </MetaInfo>
           <TagRow>
             <Tag>
-              모집 <strong>{calculateDday(recruitEndDate)}</strong>
+              모집 <strong>{recruitEndDate}</strong>
             </Tag>
             <Tag>
               장르 <TagGenre>{category}</TagGenre>
