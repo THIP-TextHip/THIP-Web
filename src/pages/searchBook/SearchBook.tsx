@@ -37,7 +37,7 @@ import { Filter } from '@/components/common/Filter';
 import FeedPost from '@/components/feed/FeedPost';
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
-import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByISBN';
+import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
 
 const FILTER = ['최신순', '인기순'] as const;
 const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
