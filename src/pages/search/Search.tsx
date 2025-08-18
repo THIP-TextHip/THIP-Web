@@ -30,10 +30,10 @@ const Search = () => {
   const [searchResults, setSearchResults] = useState<SearchedBook[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-
+  const [totalElements, setTotalElements] = useState(0);
   // 무한스크롤 관련 상태
   const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1); // 1부터 시작
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
@@ -59,9 +59,38 @@ const Search = () => {
     }
   };
 
-  useEffect(() => {
-    fetchRecentSearches();
-  }, []);
+  // 추가 데이터 로드 함수
+  const loadMore = useCallback(async () => {
+    if (!searchTerm.trim() || isLoadingMore || !hasMore) return;
+
+    try {
+      setIsLoadingMore(true);
+      const nextPage = page + 1;
+
+      const response = await getSearchBooks(searchTerm, nextPage, isFinalized);
+
+      if (response.isSuccess) {
+        const newResults = convertToSearchedBooks(response.data.searchResult);
+
+        if (newResults.length > 0) {
+          setSearchResults(prev => [...prev, ...newResults]);
+          setPage(nextPage);
+          // API 응답의 last 필드를 사용하여 hasMore 설정
+          setHasMore(!response.data.last);
+        } else {
+          setHasMore(false);
+        }
+      } else {
+        console.error('추가 데이터 로드 실패:', response.message);
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('추가 데이터 로드 중 오류 발생:', error);
+      setHasMore(false);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [searchTerm, isLoadingMore, hasMore, page, isFinalized]);
 
   // 무한스크롤을 위한 Intersection Observer 설정
   const lastBookElementCallback = useCallback(
@@ -78,48 +107,19 @@ const Search = () => {
       if (node) observerRef.current.observe(node);
       lastBookElementRef.current = node;
     },
-    [isLoadingMore, hasMore],
+    [isLoadingMore, hasMore, loadMore],
   );
 
-  // 추가 데이터 로드 함수
-  const loadMore = async () => {
-    if (!searchTerm.trim() || isLoadingMore || !hasMore) return;
-
-    try {
-      setIsLoadingMore(true);
-      const nextPage = page + 1;
-
-      const response = await getSearchBooks(searchTerm, nextPage, isFinalized);
-
-      if (response.isSuccess) {
-        const newResults = convertToSearchedBooks(response.data.searchResult);
-
-        if (newResults.length > 0) {
-          setSearchResults(prev => [...prev, ...newResults]);
-          setPage(nextPage);
-          // 더 이상 데이터가 없으면 hasMore를 false로 설정
-          setHasMore(newResults.length === 10); // size가 10이므로
-        } else {
-          setHasMore(false);
-        }
-      } else {
-        console.error('추가 데이터 로드 실패:', response.message);
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error('추가 데이터 로드 중 오류 발생:', error);
-      setHasMore(false);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  };
+  useEffect(() => {
+    fetchRecentSearches();
+  }, []);
 
   const handleChange = (value: string) => {
     setSearchTerm(value);
     setIsFinalized(false);
     setIsSearching(value.trim() !== '');
     setHasMore(true); // 새로운 검색 시 hasMore 초기화
-    setPage(1); // 페이지 초기화
+    setPage(1); // 페이지를 1로 초기화
 
     if (value.trim()) {
       setSearchParams({ q: value.trim() }, { replace: true });
@@ -157,17 +157,18 @@ const Search = () => {
     }
 
     setIsLoading(true);
-    setPage(1); // 검색 시 페이지 초기화
+    setPage(1); // 검색 시 페이지를 1로 초기화
     setHasMore(true); // 검색 시 hasMore 초기화
 
     try {
-      const response = await getSearchBooks(term, 1, isManualSearch);
+      const response = await getSearchBooks(term, 1, isManualSearch); // 첫 페이지는 1
 
       if (response.isSuccess) {
         const convertedResults = convertToSearchedBooks(response.data.searchResult);
         setSearchResults(convertedResults);
-        // 더 이상 데이터가 없으면 hasMore를 false로 설정
-        setHasMore(convertedResults.length === 10); // size가 10이므로
+        // API 응답의 last 필드를 사용하여 hasMore 설정
+        setHasMore(!response.data.last);
+        setTotalElements(response.data.totalElements);
       } else {
         console.log('검색 실패:', response.message);
         setSearchResults([]);
@@ -208,9 +209,7 @@ const Search = () => {
 
   const handleDelete = async (recentSearchId: number) => {
     try {
-      const userId = 1; // 임시 userId
-
-      const response = await deleteRecentSearch(recentSearchId, userId);
+      const response = await deleteRecentSearch(recentSearchId);
 
       if (response.isSuccess) {
         setRecentSearches(prev => prev.filter(item => item.recentSearchId !== recentSearchId));
@@ -293,6 +292,7 @@ const Search = () => {
                 hasMore={hasMore}
                 isLoading={isLoadingMore}
                 lastBookElementCallback={lastBookElementCallback}
+                totalElements={totalElements}
               />
             )}
           </>
