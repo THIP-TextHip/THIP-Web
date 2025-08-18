@@ -81,9 +81,10 @@ const Wrapper = styled.div`
   display: flex;
   position: relative;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 320px;
   max-width: 767px;
+  min-height: 100vh;
   height: 100%;
   margin: 0 auto;
   background-color: ${colors.black.main};

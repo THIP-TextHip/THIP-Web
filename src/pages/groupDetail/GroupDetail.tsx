@@ -1,3 +1,4 @@
+// src/pages/group/GroupDetail.tsx
 import { useState, useEffect } from 'react';
 import {
   Wrapper,
@@ -43,6 +44,8 @@ import { postJoinRoom } from '@/api/rooms/postJoinRoom';
 import { postCloseRoom } from '@/api/rooms/postCloseRoom';
 import type { Group } from '@/components/group/MyGroupBox';
 
+import PasswordModal from '@/components/group/PasswordModal';
+
 const GroupDetail = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
@@ -53,6 +56,8 @@ const GroupDetail = () => {
 
   const [isJoining, setIsJoining] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const handleBackButton = () => {
     navigate(-1);
@@ -70,16 +75,6 @@ const GroupDetail = () => {
       genre: '',
       isOnGoing: true,
     };
-  };
-
-  const calculateDday = (recruitEndDate: string): string => {
-    const today = new Date();
-    const endDate = new Date(recruitEndDate);
-    const diffTime = endDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return '모집 종료';
-    if (diffDays === 0) return '오늘 마감';
-    return `${diffDays}일 남음`;
   };
 
   useEffect(() => {
@@ -157,13 +152,7 @@ const GroupDetail = () => {
       try {
         setIsSubmitting(true);
         await postCloseRoom(Number(roomId));
-        setRoomData(prev =>
-          prev
-            ? {
-                ...prev,
-              }
-            : prev,
-        );
+        setRoomData(prev => (prev ? { ...prev } : prev));
         alert('모집을 마감했습니다.');
       } catch {
         alert('네트워크 오류 또는 서버 오류');
@@ -174,6 +163,11 @@ const GroupDetail = () => {
     }
 
     const nextType: 'join' | 'cancel' = isJoining ? 'cancel' : 'join';
+
+    if (nextType === 'join' && !isPublic) {
+      setShowPasswordModal(true);
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -208,7 +202,7 @@ const GroupDetail = () => {
         </Header>
         <BannerSection>
           <GroupTitle>
-            {roomName} {!isPublic && <img src={lockIcon} alt="자물쇠 아이콘"></img>}
+            {roomName} {!isPublic && <img src={lockIcon} alt="자물쇠 아이콘" />}
           </GroupTitle>
           <SubTitle>
             <div>소개글</div>
@@ -236,7 +230,7 @@ const GroupDetail = () => {
           </MetaInfo>
           <TagRow>
             <Tag>
-              모집 <strong>{calculateDday(recruitEndDate)}</strong>
+              모집 <strong>{recruitEndDate}</strong>
             </Tag>
             <Tag>
               장르 <TagGenre>{category}</TagGenre>
@@ -271,7 +265,7 @@ const GroupDetail = () => {
               group={convertRecommendRoomToGroup(room)}
               isOngoing={true}
               isRecommend={true}
-              type={'modal'}
+              type="modal"
               onClick={() => handleRecommendGroupCardClick(room.roomId)}
             />
           ))}
@@ -281,6 +275,25 @@ const GroupDetail = () => {
       <BottomButton onClick={handleBottomButtonClick} disabled={isSubmitting}>
         {roomData.isHost ? '모집 마감하기' : isJoining ? '참여 취소하기' : '참여하기'}
       </BottomButton>
+
+      {showPasswordModal && roomId && (
+        <PasswordModal
+          roomId={Number(roomId)}
+          onClose={() => setShowPasswordModal(false)}
+          onJoined={() => {
+            setIsJoining(true);
+            setRoomData(prev =>
+              prev
+                ? {
+                    ...prev,
+                    isJoining: true,
+                    memberCount: Math.min(prev.memberCount + 1, prev.recruitCount),
+                  }
+                : prev,
+            );
+          }}
+        />
+      )}
     </Wrapper>
   );
 };

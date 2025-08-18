@@ -105,7 +105,7 @@ const GroupSearchResult = ({
               }
               onClick={() => onClickRoom(Number(group.id))}
             >
-              <GroupCard group={group} isOngoing={group.isOnGoing} type="search" />
+              <GroupCard group={group} isOngoing={true} type="search" />
             </div>
           ))
         )}
