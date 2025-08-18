@@ -7,9 +7,10 @@ export const Wrapper = styled.div`
   position: relative;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 320px;
   max-width: 767px;
+  min-height: 100vh;
   height: 100%;
   margin: 0 auto;
   background-color: ${colors.black.main};
