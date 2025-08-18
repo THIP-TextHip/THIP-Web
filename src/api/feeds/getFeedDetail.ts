@@ -10,6 +10,7 @@ export interface FeedDetailData {
   aliasColor: string;
   postDate: string;
   isbn: string;
+  bookImageUrl: string;
   bookTitle: string;
   bookAuthor: string;
   contentBody: string;
@@ -20,6 +21,7 @@ export interface FeedDetailData {
   isLiked: boolean;
   isPublic: boolean;
   tagList: string[];
+  isWriter: boolean;
 }
 
 // API 응답 타입

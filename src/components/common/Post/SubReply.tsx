@@ -37,7 +37,7 @@ const SubReply = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { startReply } = useReplyActions();
-  const { openMoreMenu, closePopup, openConfirm, openSnackbar } = usePopupActions();
+  const { openMoreMenu, closePopup, openSnackbar } = usePopupActions();
 
   const handleReplyClick = () => {
     startReply(creatorNickname, commentId);
@@ -56,6 +56,7 @@ const SubReply = ({
     }
   };
 
+  // 이전 더보기 모달
   // const handleMoreClick = () => {
   //   if (containerRef.current) {
   //     const rect = containerRef.current.getBoundingClientRect();
@@ -110,17 +111,30 @@ const SubReply = ({
   };
 
   const handleMoreClick = () => {
-    openMoreMenu({
-      onDelete: () => {
-        openConfirm({
-          title: '이 댓글을 삭제하시겠어요?',
-          disc: '삭제 후에는 되돌릴 수 없어요',
-          onConfirm: handleDelete,
-          onClose: closePopup,
-        });
-      },
-      onClose: closePopup,
-    });
+    if (isWriter) {
+      // 작성자인 경우: 삭제하기만 표시
+      openMoreMenu({
+        onDelete: handleDelete,
+        type: 'reply',
+        isWriter: true,
+        onClose: closePopup,
+      });
+    } else {
+      // 작성자가 아닌 경우: 신고하기만 표시
+      openMoreMenu({
+        onReport: () => {
+          closePopup();
+          openSnackbar({
+            message: '신고가 접수되었어요.',
+            variant: 'top',
+            onClose: closePopup,
+          });
+        },
+        type: 'reply',
+        isWriter: false,
+        onClose: closePopup,
+      });
+    }
   };
 
   // 삭제된 댓글인 경우 처리
