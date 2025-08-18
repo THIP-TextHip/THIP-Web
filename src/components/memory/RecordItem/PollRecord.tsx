@@ -151,8 +151,7 @@ const PollRecord = ({ content, pollOptions, postId, onVoteUpdate }: PollRecordPr
             onClick={() => handleOptionClick(option)}
             style={{ 
               cursor: isVoting ? 'not-allowed' : 'pointer',
-              opacity: isVoting ? 0.7 : 1,
-              border: option.isVoted ? '2px solid #007AFF' : '1px solid #E5E5EA'
+              opacity: isVoting ? 0.7 : 1
             }}
           >
             <PollBar>
@@ -164,14 +163,13 @@ const PollRecord = ({ content, pollOptions, postId, onVoteUpdate }: PollRecordPr
               />
             </PollBar>
             <PollContent>
-              <PollNumber isHighest={option.isHighest || option.isVoted}>
+              <PollNumber isHighest={option.isHighest}>
                 {option.id}
-                {option.isVoted && ' ✓'}
               </PollNumber>
-              <PollText isHighest={option.isHighest || option.isVoted}>
+              <PollText isHighest={option.isHighest}>
                 {option.text}
               </PollText>
-              <PollPercentage isHighest={option.isHighest || option.isVoted}>
+              <PollPercentage isHighest={option.isHighest}>
                 {option.percentage}%
               </PollPercentage>
             </PollContent>
