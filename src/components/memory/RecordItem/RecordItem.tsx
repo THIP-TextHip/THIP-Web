@@ -278,7 +278,15 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
         {type === 'text' ? (
           <TextRecord content={content} />
         ) : (
-          <PollRecord content={content} pollOptions={pollOptions || []} />
+          <PollRecord 
+            content={content} 
+            pollOptions={pollOptions || []} 
+            postId={parseInt(id)}
+            onVoteUpdate={(updatedOptions) => {
+              // TODO: 부모 컴포넌트로 투표 결과 업데이트 전달
+              console.log('투표 결과 업데이트:', updatedOptions);
+            }}
+          />
         )}
       </ContentSection>
 
