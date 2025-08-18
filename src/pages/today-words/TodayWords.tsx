@@ -9,7 +9,6 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import leftarrow from '../../assets/common/leftArrow.svg';
 import { Container, ContentArea } from './TodayWords.styled';
 import type { Message, TodayCommentItem } from '../../types/today';
-import { dummyMessages } from '../../constants/today-constants';
 import { createDailyGreeting } from '../../api/rooms/createDailyGreeting';
 import { getDailyGreeting } from '../../api/rooms/getDailyGreeting';
 import { usePopupActions } from '../../hooks/usePopupActions';
@@ -28,8 +27,6 @@ const TodayWords = () => {
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   const { openSnackbar } = usePopupActions();
 
-  // 개발용: 빈 상태와 글 있는 상태 토글
-  const [showMessages, setShowMessages] = useState(false);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -73,8 +70,6 @@ const TodayWords = () => {
       });
 
       if (response.isSuccess) {
-        // 디버깅을 위한 로그
-        console.log('API 응답 데이터:', response.data.todayCommentList);
         const newMessages = response.data.todayCommentList.map(convertToMessage);
         
         if (isRefresh) {
@@ -137,16 +132,14 @@ const TodayWords = () => {
 
   // 컴포넌트 마운트 시 초기 데이터 로드
   useEffect(() => {
-    if (!showMessages && roomId && !hasInitiallyLoaded) {
+    if (roomId && !hasInitiallyLoaded) {
       loadMessages(undefined, true);
     }
-  }, [roomId, showMessages, hasInitiallyLoaded]);
+  }, [roomId, hasInitiallyLoaded]);
 
   // 무한 스크롤 처리
   useEffect(() => {
     const handleScroll = () => {
-      if (showMessages) return;
-      
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
       
       // 스크롤이 하단 근처에 도달했을 때 더 많은 데이터 로드
@@ -157,7 +150,7 @@ const TodayWords = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [loadMoreMessages, isLoadingMore, isLast, hasInitiallyLoaded, showMessages]);
+  }, [loadMoreMessages, isLoadingMore, isLast, hasInitiallyLoaded]);
 
   const handleSendMessage = useCallback(async () => {
     if (inputValue.trim() === '' || isSubmitting) return;
@@ -244,33 +237,12 @@ const TodayWords = () => {
     }
   }, [inputValue, roomId, isSubmitting, openSnackbar]);
 
-  // 더미 모드에서 메시지 전송 처리 (개발용)
-  const handleDummySendMessage = useCallback(() => {
-    if (inputValue.trim() === '') return;
-
-    if (messageListRef.current) {
-      messageListRef.current.addMessage(inputValue.trim());
-    }
-    setInputValue('');
-
-    // 자동으로 스크롤을 아래로 이동
-    setTimeout(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }, 100);
-  }, [inputValue]);
-
-  // 최종 메시지 전송 핸들러
-  const finalHandleSendMessage = showMessages ? handleDummySendMessage : handleSendMessage;
 
   // MessageList에서 메시지가 삭제되었을 때 호출될 콜백
   const handleMessageDelete = (messageId: string) => {
-    if (!showMessages) {
-      setMessages(prevMessages => prevMessages.filter(message => message.id !== messageId));
-    }
+    setMessages(prevMessages => prevMessages.filter(message => message.id !== messageId));
   };
 
-  // 실제 메시지가 있으면 실제 메시지를, 더미 모드면 더미 메시지를 표시
-  const displayMessages = showMessages ? dummyMessages : messages;
 
   return (
     <>
@@ -285,15 +257,15 @@ const TodayWords = () => {
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
               <LoadingSpinner />
             </div>
-          ) : displayMessages.length === 0 ? (
+          ) : messages.length === 0 ? (
             <EmptyState />
           ) : (
             <>
               <MessageList
                 ref={messageListRef}
-                messages={displayMessages}
+                messages={messages}
                 onMessageDelete={handleMessageDelete}
-                isRealTimeMode={!showMessages}
+                isRealTimeMode={true}
               />
               {isLoadingMore && (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
@@ -307,38 +279,10 @@ const TodayWords = () => {
         <MessageInput
           value={inputValue}
           onChange={setInputValue}
-          onSend={finalHandleSendMessage}
+          onSend={handleSendMessage}
           placeholder="메이트들과 간단한 인사를 나눠 보세요!"
           disabled={isSubmitting}
         />
-
-        {/* 개발용 토글 버튼 */}
-        <button
-          onClick={() => {
-            setShowMessages(!showMessages);
-            // 더미 모드에서 실제 모드로 전환할 때 초기화
-            if (showMessages) {
-              setMessages([]);
-              setNextCursor(null);
-              setIsLast(false);
-              setHasInitiallyLoaded(false);
-            }
-          }}
-          style={{
-            position: 'fixed',
-            top: '200px',
-            right: '20px',
-            background: '#6868FF',
-            color: 'white',
-            border: 'none',
-            padding: '10px',
-            borderRadius: '5px',
-            fontSize: '12px',
-            zIndex: 1000,
-          }}
-        >
-          {showMessages ? '실제 데이터' : '더미 데이터'}
-        </button>
       </Container>
     </>
   );
