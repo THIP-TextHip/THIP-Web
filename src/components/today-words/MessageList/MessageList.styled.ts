@@ -25,13 +25,17 @@ export const UserInfo = styled.div`
   gap: 4px;
 `;
 
-export const UserAvatar = styled.div`
+export const UserAvatar = styled.div<{ profileImageUrl?: string }>`
   width: 36px;
   height: 36px;
   border-radius: 50%;
   background-color: ${semanticColors.background.card};
   border: 1px solid #3d3d3d;
   flex-shrink: 0;
+  background-image: ${props => props.profileImageUrl ? `url(${props.profileImageUrl})` : 'none'};
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 `;
 
 export const UserDetails = styled.div`
