@@ -9,7 +9,7 @@ interface LoadingSpinnerProps {
 }
 
 const LoadingSpinner = ({
-  message = '로딩 중...',
+  message = '',
   size = 'medium',
   fullHeight = false,
 }: LoadingSpinnerProps) => {

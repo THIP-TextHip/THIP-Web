@@ -74,12 +74,20 @@ const Mypage = () => {
   };
 
   const handleService = () => {
-    window.open('https://slashpage.com/thip/xjqy1g2vw7vejm6vd54z', '_blank');
+    window.open('https://slashpage.com/thip/dk58wg2e6yy3zmnqevxz', '_blank');
+  };
+
+  const handleTerms = () => {
+    window.open('https://slashpage.com/thip/7916x82r8y74n24kpyg3', '_blank');
+  };
+
+  const handleVersion = () => {
+    window.open('https://slashpage.com/thip/1q3vdn2p9w93pmxy49pr', '_blank');
   };
 
   return (
     <Wrapper>
-      <Header>마이페이지</Header>
+      <Header>내 정보</Header>
       <Container>
         <UserProfile>
           <div className="userInfo">
@@ -106,15 +114,15 @@ const Mypage = () => {
           <MenuGrid>
             <MenuButton src={alert} name="알림설정" isButton onClick={handleAlert} />
             <MenuButton src={service} name="고객센터" isButton onClick={handleService} />
-            <MenuButton src={notice} name="공지사항" isButton />
+            <MenuButton src={notice} name="공지사항" isButton onClick={handleNotice} />
             <MenuButton
               src={terms}
               name="개인정보처리방침 & 이용약관"
               isButton
-              onClick={handleNotice}
+              onClick={handleTerms}
             />
             <MenuButton src={guide} name="가이드" isButton onClick={handleGuide} />
-            <MenuButton src={ver} name="버젼 1.0" isButton={false} />
+            <MenuButton src={ver} name="버젼 1.0.0" isButton onClick={handleVersion} />
           </MenuGrid>
         </Section>
         <BottomMenu>
