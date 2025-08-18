@@ -27,6 +27,24 @@ const TodayWords = () => {
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   const { openSnackbar } = usePopupActions();
 
+  // 하루 5개 제한 관련
+  const DAILY_LIMIT = 5;
+  
+  // 오늘 작성한 내 메시지 개수 계산
+  const getTodayMyMessageCount = useCallback(() => {
+    const today = new Date().toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).replace(/\. /g, '.').replace(/\.$/, '');
+    
+    return messages.filter(message => 
+      message.isWriter === true && message.timestamp === today
+    ).length;
+  }, [messages]);
+
+  const todayMyMessageCount = getTodayMyMessageCount();
+
 
   const handleBackClick = () => {
     navigate(-1);
@@ -165,6 +183,17 @@ const TodayWords = () => {
       return;
     }
 
+    // 6개 작성 시도 시 빨간색 토스트로 차단
+    if (todayMyMessageCount >= DAILY_LIMIT) {
+      openSnackbar({
+        message: '오늘의 한마디는 하루에 다섯번까지 작성할 수 있어요',
+        variant: 'top',
+        isError: true,
+        onClose: () => {},
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -175,18 +204,26 @@ const TodayWords = () => {
         // 입력 필드 초기화
         setInputValue('');
 
-        // 성공 메시지 표시
-        openSnackbar({
-          message: '오늘의 한마디가 작성되었습니다.',
-          variant: 'top',
-          onClose: () => {},
-        });
-
         // 최신 목록 다시 불러오기 위해 상태 초기화
         setMessages([]);
         setNextCursor(null);
         setIsLast(false);
         setHasInitiallyLoaded(false);
+
+        // 5개 도달 시 흰색 토스트, 아니면 일반 성공 메시지
+        if (todayMyMessageCount + 1 >= DAILY_LIMIT) {
+          openSnackbar({
+            message: '오늘의 한마디는 하루에 다섯번까지 작성할 수 있어요',
+            variant: 'top',
+            onClose: () => {},
+          });
+        } else {
+          openSnackbar({
+            message: '오늘의 한마디가 작성되었습니다.',
+            variant: 'top',
+            onClose: () => {},
+          });
+        }
 
         // 자동으로 스크롤을 아래로 이동
         setTimeout(() => {
@@ -235,7 +272,7 @@ const TodayWords = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [inputValue, roomId, isSubmitting, openSnackbar]);
+  }, [inputValue, roomId, isSubmitting, openSnackbar, todayMyMessageCount, DAILY_LIMIT]);
 
 
 
