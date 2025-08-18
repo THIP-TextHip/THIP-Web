@@ -74,7 +74,7 @@ const Mypage = () => {
   };
 
   const handleService = () => {
-    window.open('https://slashpage.com/thip/xjqy1g2vw7vejm6vd54z', '_blank');
+    window.open('https://slashpage.com/thip/dk58wg2e6yy3zmnqevxz', '_blank');
   };
 
   const handleTerms = () => {
@@ -122,7 +122,7 @@ const Mypage = () => {
               onClick={handleTerms}
             />
             <MenuButton src={guide} name="가이드" isButton onClick={handleGuide} />
-            <MenuButton src={ver} name="버젼 1.0" isButton onClick={handleVersion} />
+            <MenuButton src={ver} name="버젼 1.0.0" isButton onClick={handleVersion} />
           </MenuGrid>
         </Section>
         <BottomMenu>
