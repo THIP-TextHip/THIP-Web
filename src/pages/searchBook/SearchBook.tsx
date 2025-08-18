@@ -28,29 +28,42 @@ import saveIcon from '../../assets/common/SaveIcon.svg';
 import filledSaveIcon from '../../assets/common/filledSaveIcon.svg';
 import rightChevron from '../../assets/common/right-Chevron.svg';
 import plusIcon from '../../assets/common/plus.svg';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { IntroModal } from '@/components/search/IntroModal';
 import { getBookDetail, type BookDetail } from '@/api/books/getBookDetail';
 import { getRecruitingRooms, type RecruitingRoomsData } from '@/api/books/getRecruitingRooms';
 import { postSaveBook } from '@/api/books/postSaveBook';
 import { Filter } from '@/components/common/Filter';
 import FeedPost from '@/components/feed/FeedPost';
-import { mockSearchBook } from '@/mocks/searchBook.mock';
+import styled from '@emotion/styled';
+import { colors, typography } from '@/styles/global/global';
+import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByISBN';
 
-const FILTER = ['최신순', '인기순'];
+const FILTER = ['최신순', '인기순'] as const;
+const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
 
 const SearchBook = () => {
   const { isbn } = useParams<{ isbn: string }>();
-  const [selectedFilter, setSelectedFilter] = useState<string>('인기순');
+  const navigate = useNavigate();
+
+  const [selectedFilter, setSelectedFilter] = useState<(typeof FILTER)[number]>('인기순');
   const [showIntroModal, setShowIntroModal] = useState(false);
+
   const [bookDetail, setBookDetail] = useState<BookDetail | null>(null);
   const [recruitingRoomsData, setRecruitingRoomsData] = useState<RecruitingRoomsData | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const navigate = useNavigate();
+  const [feeds, setFeeds] = useState<FeedItem[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [isLast, setIsLast] = useState(true);
+  const [isLoadingFeeds, setIsLoadingFeeds] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     const fetchBookDetail = async () => {
@@ -62,6 +75,7 @@ const SearchBook = () => {
 
       try {
         setIsLoading(true);
+        setError(null);
 
         const [bookResponse, recruitingResponse] = await Promise.all([
           getBookDetail(isbn),
@@ -80,8 +94,8 @@ const SearchBook = () => {
         } else {
           console.error('모집중인 모임방 조회 실패:', recruitingResponse.message);
         }
-      } catch (error) {
-        console.error('데이터 조회 오류:', error);
+      } catch (err) {
+        console.error('데이터 조회 오류:', err);
         setError('정보를 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
@@ -91,12 +105,70 @@ const SearchBook = () => {
     fetchBookDetail();
   }, [isbn]);
 
-  const handleBackButton = () => {
-    navigate(-1);
-  };
+  const loadFirstFeeds = useCallback(async () => {
+    if (!isbn) return;
+    try {
+      setIsLoadingFeeds(true);
+      setFeeds([]);
+      setNextCursor(null);
+      setIsLast(true);
 
+      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), null);
+      if (res.isSuccess) {
+        setFeeds(res.data.feeds);
+        setNextCursor(res.data.nextCursor);
+        setIsLast(res.data.isLast);
+      } else {
+        console.error('피드 조회 실패:', res.message);
+      }
+    } catch (e) {
+      console.error('피드 조회 오류:', e);
+    } finally {
+      setIsLoadingFeeds(false);
+    }
+  }, [isbn, selectedFilter]);
+
+  useEffect(() => {
+    loadFirstFeeds();
+  }, [loadFirstFeeds]);
+
+  const loadMore = useCallback(async () => {
+    if (!isbn || !nextCursor || isLast || isLoadingMore) return;
+    try {
+      setIsLoadingMore(true);
+      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), nextCursor);
+      if (res.isSuccess) {
+        setFeeds(prev => [...prev, ...res.data.feeds]);
+        setNextCursor(res.data.nextCursor);
+        setIsLast(res.data.isLast);
+      } else {
+        console.error('피드 추가 로드 실패:', res.message);
+      }
+    } catch (e) {
+      console.error('피드 추가 로드 오류:', e);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isbn, nextCursor, isLast, isLoadingMore, selectedFilter]);
+
+  const lastFeedElementCallback = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoadingMore || isLast) return;
+
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && !isLoadingMore && !isLast) {
+          loadMore();
+        }
+      });
+      if (node) observerRef.current.observe(node);
+    },
+    [isLoadingMore, isLast, loadMore],
+  );
+
+  const handleBackButton = () => navigate(-1);
   const handleIntroClick = () => setShowIntroModal(true);
-
   const handleCloseIntroModal = () => setShowIntroModal(false);
 
   const handleRecruitingGroupButton = () => {
@@ -136,11 +208,9 @@ const SearchBook = () => {
 
   const handleSaveButton = async () => {
     if (!isbn || isSaving) return;
-
     try {
       setIsSaving(true);
       const response = await postSaveBook(isbn, !isSaved);
-
       if (response.isSuccess) {
         setIsSaved(response.data.isSaved);
       } else {
@@ -172,11 +242,13 @@ const SearchBook = () => {
       <Header>
         <IconButton src={leftArrow} onClick={handleBackButton} />
       </Header>
+
       <BannerSection>
         <BookInfo>
           <BookTitle>{bookDetail.title}</BookTitle>
           <Author>{bookDetail.authorName}</Author>
         </BookInfo>
+
         <Intro onClick={handleIntroClick}>
           <SubTitle>소개</SubTitle>
           <SubText>{bookDetail.description}</SubText>
@@ -197,20 +269,46 @@ const SearchBook = () => {
           </RightArea>
         </ButtonSection>
       </BannerSection>
+
       <FeedSection>
         <FeedTitle>피드 글 둘러보기</FeedTitle>
+
         <FilterContainer>
           <Filter
-            filters={FILTER}
+            filters={FILTER as unknown as string[]}
             selectedFilter={selectedFilter}
-            setSelectedFilter={setSelectedFilter}
+            setSelectedFilter={filter => setSelectedFilter(filter as (typeof FILTER)[number])}
           />
         </FilterContainer>
 
-        {mockSearchBook.posts.length > 0 ? (
+        {isLoadingFeeds && feeds.length === 0 ? (
+          <LoadingBox>불러오는 중...</LoadingBox>
+        ) : feeds.length > 0 ? (
           <>
-            {mockSearchBook.posts.map((post, index) => (
-              <FeedPost key={index} showHeader={true} isMyFeed={false} {...post} />
+            {feeds.map((post, idx) => (
+              <div
+                key={post.feedId}
+                ref={idx === feeds.length - 1 ? el => lastFeedElementCallback(el) : undefined}
+              >
+                <FeedPost
+                  showHeader={true}
+                  isMyFeed={false}
+                  feedId={post.feedId}
+                  creatorNickname={post.creatorNickname}
+                  creatorProfileImageUrl={post.creatorProfileImageUrl}
+                  postDate={post.postDate}
+                  isbn={post.isbn}
+                  bookTitle={post.bookTitle}
+                  bookAuthor={post.bookAuthor}
+                  contentBody={post.contentBody}
+                  contentUrls={post.contentUrls}
+                  likeCount={post.likeCount}
+                  commentCount={post.commentCount}
+                  isSaved={post.isSaved}
+                  isLiked={post.isLiked}
+                  isWriter={post.isWriter}
+                />
+              </div>
             ))}
           </>
         ) : (
@@ -219,7 +317,8 @@ const SearchBook = () => {
             <EmptySubText>첫 번째 피드를 작성해보세요!</EmptySubText>
           </EmptyState>
         )}
-      </FeedSection>{' '}
+      </FeedSection>
+
       {showIntroModal && (
         <IntroModal title="소개" content={bookDetail.description} onClose={handleCloseIntroModal} />
       )}
@@ -228,3 +327,12 @@ const SearchBook = () => {
 };
 
 export default SearchBook;
+
+const LoadingBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 20px;
+  color: ${colors.white};
+  font-size: ${typography.fontSize.base};
+`;
