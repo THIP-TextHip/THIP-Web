@@ -1,3 +1,4 @@
+// src/pages/group/GroupDetail.tsx
 import { useState, useEffect } from 'react';
 import {
   Wrapper,
@@ -43,6 +44,9 @@ import { postJoinRoom } from '@/api/rooms/postJoinRoom';
 import { postCloseRoom } from '@/api/rooms/postCloseRoom';
 import type { Group } from '@/components/group/MyGroupBox';
 
+// ✅ 추가: 비밀번호 모달
+import PasswordModal from '@/components/group/PasswordModal';
+
 const GroupDetail = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
@@ -53,6 +57,8 @@ const GroupDetail = () => {
 
   const [isJoining, setIsJoining] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const handleBackButton = () => {
     navigate(-1);
@@ -153,17 +159,12 @@ const GroupDetail = () => {
   const handleBottomButtonClick = async () => {
     if (!roomId) return;
 
+    // 호스트면 모집 마감
     if (roomData.isHost) {
       try {
         setIsSubmitting(true);
         await postCloseRoom(Number(roomId));
-        setRoomData(prev =>
-          prev
-            ? {
-                ...prev,
-              }
-            : prev,
-        );
+        setRoomData(prev => (prev ? { ...prev } : prev));
         alert('모집을 마감했습니다.');
       } catch {
         alert('네트워크 오류 또는 서버 오류');
@@ -174,6 +175,11 @@ const GroupDetail = () => {
     }
 
     const nextType: 'join' | 'cancel' = isJoining ? 'cancel' : 'join';
+
+    if (nextType === 'join' && !isPublic) {
+      setShowPasswordModal(true);
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -208,7 +214,7 @@ const GroupDetail = () => {
         </Header>
         <BannerSection>
           <GroupTitle>
-            {roomName} {!isPublic && <img src={lockIcon} alt="자물쇠 아이콘"></img>}
+            {roomName} {!isPublic && <img src={lockIcon} alt="자물쇠 아이콘" />}
           </GroupTitle>
           <SubTitle>
             <div>소개글</div>
@@ -271,7 +277,7 @@ const GroupDetail = () => {
               group={convertRecommendRoomToGroup(room)}
               isOngoing={true}
               isRecommend={true}
-              type={'modal'}
+              type="modal"
               onClick={() => handleRecommendGroupCardClick(room.roomId)}
             />
           ))}
@@ -281,6 +287,25 @@ const GroupDetail = () => {
       <BottomButton onClick={handleBottomButtonClick} disabled={isSubmitting}>
         {roomData.isHost ? '모집 마감하기' : isJoining ? '참여 취소하기' : '참여하기'}
       </BottomButton>
+
+      {showPasswordModal && roomId && (
+        <PasswordModal
+          roomId={Number(roomId)}
+          onClose={() => setShowPasswordModal(false)}
+          onJoined={() => {
+            setIsJoining(true);
+            setRoomData(prev =>
+              prev
+                ? {
+                    ...prev,
+                    isJoining: true,
+                    memberCount: Math.min(prev.memberCount + 1, prev.recruitCount),
+                  }
+                : prev,
+            );
+          }}
+        />
+      )}
     </Wrapper>
   );
 };
