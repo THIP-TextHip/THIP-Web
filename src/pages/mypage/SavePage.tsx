@@ -28,6 +28,9 @@ const SavePage = () => {
   // 책 관련 상태
   const [savedBooks, setSavedBooks] = useState<SavedBookInMy[]>([]);
 
+  // 초기 로딩 상태
+  const [initialLoading, setInitialLoading] = useState(true);
+
   // Intersection Observer ref
   const feedObserverRef = useRef<HTMLDivElement>(null);
 
@@ -58,29 +61,34 @@ const SavePage = () => {
     }
   }, []);
 
-  // 저장된 책 로드
-  const loadSavedBooks = useCallback(async () => {
-    try {
-      const response = await getSavedBooksInMy();
-      setSavedBooks(response.data.bookList);
-    } catch (error) {
-      console.error('저장된 책 로드 실패:', error);
-    }
-  }, []);
-
-  // 피드 무한스크롤
+  // 페이지 진입 시 모든 데이터 로드
   useEffect(() => {
-    if (activeTab === '피드') {
-      loadSavedFeeds(null);
-    }
-  }, [activeTab, loadSavedFeeds]);
+    const loadAllData = async () => {
+      try {
+        setInitialLoading(true);
 
-  // 책 로드
-  useEffect(() => {
-    if (activeTab === '책') {
-      loadSavedBooks();
-    }
-  }, [activeTab, loadSavedBooks]);
+        // 두 API를 병렬로 호출
+        const [feedsResponse, booksResponse] = await Promise.all([
+          getSavedFeedsInMy(null),
+          getSavedBooksInMy(),
+        ]);
+
+        // 피드 데이터 설정
+        setSavedFeeds(feedsResponse.data.feedList);
+        setFeedNextCursor(feedsResponse.data.nextCursor);
+        setFeedIsLast(feedsResponse.data.isLast);
+
+        // 책 데이터 설정
+        setSavedBooks(booksResponse.data.bookList);
+      } catch (error) {
+        console.error('초기 데이터 로드 실패:', error);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    loadAllData();
+  }, []); // 한 번만 실행
 
   // Intersection Observer 설정 (피드)
   useEffect(() => {
@@ -108,7 +116,6 @@ const SavePage = () => {
 
   const handleSaveToggle = async (isbn: string) => {
     try {
-      // 현재 저장 상태의 반대값을 전달 (true면 저장, false면 취소)
       const currentBook = savedBooks.find(book => book.isbn === isbn);
       if (!currentBook) return;
 
@@ -134,7 +141,9 @@ const SavePage = () => {
         title="저장"
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-      {activeTab === '피드' ? (
+      {initialLoading ? (
+        <LoadingSpinner fullHeight={true} size="large" />
+      ) : activeTab === '피드' ? (
         <>
           {savedFeeds.length > 0 ? (
             <FeedContainer>
