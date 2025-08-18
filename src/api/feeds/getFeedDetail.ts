@@ -21,6 +21,7 @@ export interface FeedDetailData {
   isLiked: boolean;
   isPublic: boolean;
   tagList: string[];
+  isWriter: boolean;
 }
 
 // API 응답 타입
