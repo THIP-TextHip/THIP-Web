@@ -45,7 +45,7 @@ export function BookSearchResult({
         ) : (
           searchedBookList.map((book, index) => (
             <BookItem
-              key={book.id}
+              key={`book-${book.isbn}-${index}`}
               onClick={() => navigate(`/search/book/${book.isbn}`)}
               ref={
                 index === searchedBookList.length - 1 && lastBookElementCallback
