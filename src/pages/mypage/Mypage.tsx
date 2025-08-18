@@ -81,6 +81,10 @@ const Mypage = () => {
     window.open('https://slashpage.com/thip/7916x82r8y74n24kpyg3', '_blank');
   };
 
+  const handleVersion = () => {
+    window.open('https://slashpage.com/thip/1q3vdn2p9w93pmxy49pr', '_blank');
+  };
+
   return (
     <Wrapper>
       <Header>내 정보</Header>
@@ -118,7 +122,7 @@ const Mypage = () => {
               onClick={handleTerms}
             />
             <MenuButton src={guide} name="가이드" isButton onClick={handleGuide} />
-            <MenuButton src={ver} name="버젼 1.0" isButton={false} />
+            <MenuButton src={ver} name="버젼 1.0" isButton onClick={handleVersion} />
           </MenuGrid>
         </Section>
         <BottomMenu>
