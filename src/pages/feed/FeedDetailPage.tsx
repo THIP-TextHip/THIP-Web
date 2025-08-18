@@ -86,51 +86,71 @@ const FeedDetailPage = () => {
   };
 
   const handleMoreClick = () => {
-    openMoreMenu({
-      onEdit: () => {
-        closePopup();
-        navigate(`/post/update/${feedId}`);
-      },
-      onClose: () => {
-        closePopup();
-      },
-      onDelete: () => {
-        openConfirm({
-          title: '이 피드를 삭제하시겠어요?',
-          disc: '삭제 후에는 되돌릴 수 없어요',
-          onClose: closePopup,
-          onConfirm: async () => {
-            try {
-              if (!feedId) return;
-              const resp = await deleteFeedPost(Number(feedId));
-              if (resp.isSuccess) {
-                closePopup();
+    if (feedData?.isWriter) {
+      // 작성자인 경우: 수정하기, 삭제하기 메뉴
+      openMoreMenu({
+        onEdit: () => {
+          closePopup();
+          // navigate(`/post/update/${feedId}`);
+        },
+        onClose: () => {
+          closePopup();
+        },
+        onDelete: () => {
+          openConfirm({
+            title: '이 피드를 삭제하시겠어요?',
+            disc: '삭제 후에는 되돌릴 수 없어요',
+            onClose: closePopup,
+            onConfirm: async () => {
+              try {
+                if (!feedId) return;
+                const resp = await deleteFeedPost(Number(feedId));
+                if (resp.isSuccess) {
+                  closePopup();
+                  openSnackbar({
+                    message: '피드 삭제를 완료했어요.',
+                    variant: 'top',
+                    onClose: closePopup,
+                  });
+                  navigate('/feed', { state: { initialTab: '내 피드' } });
+                } else {
+                  openSnackbar({
+                    message: '피드 삭제를 실패했어요.',
+                    variant: 'top',
+                    onClose: closePopup,
+                  });
+                }
+              } catch (e) {
+                console.error('피드 삭제 실패:', e);
                 openSnackbar({
-                  message: '피드 삭제를 완료했어요.',
-                  variant: 'top',
-                  onClose: closePopup,
-                });
-                // 즉시 /feed로 리다이렉트
-                navigate('/feed', { state: { initialTab: '내 피드' } });
-              } else {
-                openSnackbar({
-                  message: '피드 삭제를 실패했어요.',
+                  message: '피드 삭제 중 오류가 발생했어요.',
                   variant: 'top',
                   onClose: closePopup,
                 });
               }
-            } catch (e) {
-              console.error('피드 삭제 실패:', e);
-              openSnackbar({
-                message: '피드 삭제 중 오류가 발생했어요.',
-                variant: 'top',
-                onClose: closePopup,
-              });
-            }
-          },
-        });
-      },
-    });
+            },
+          });
+        },
+        isWriter: true,
+        type: 'post',
+      });
+    } else {
+      openMoreMenu({
+        onClose: () => {
+          closePopup();
+        },
+        onReport: () => {
+          closePopup();
+          openSnackbar({
+            message: '신고가 접수되었어요.',
+            variant: 'top',
+            onClose: closePopup,
+          });
+        },
+        isWriter: false,
+        type: 'post',
+      });
+    }
   };
 
   const handleBackClick = () => {

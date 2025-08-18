@@ -16,6 +16,8 @@ export interface MoreMenuProps {
   onDelete?: () => void;
   onClose?: () => void;
   onReport?: () => void;
+  isWriter?: boolean;
+  type?: 'post' | 'reply';
 }
 
 export interface SnackbarProps {
