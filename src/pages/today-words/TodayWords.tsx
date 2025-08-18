@@ -183,12 +183,11 @@ const TodayWords = () => {
       return;
     }
 
-    // 6개 작성 시도 시 빨간색 토스트로 차단
+    // 6개 작성 시도 시 토스트로 차단
     if (todayMyMessageCount >= DAILY_LIMIT) {
       openSnackbar({
         message: '오늘의 한마디는 하루에 다섯번까지 작성할 수 있어요',
         variant: 'top',
-        isError: true,
         onClose: () => {},
       });
       return;
@@ -253,14 +252,14 @@ const TodayWords = () => {
           };
         };
 
-        if (axiosError.response?.data?.message) {
-          errorMessage = axiosError.response.data.message;
-        } else if (axiosError.response?.data?.code === 400) {
-          errorMessage = '오늘의 한마디 작성 가능 횟수를 초과했습니다.';
+        if (axiosError.response?.data?.code === 400) {
+          errorMessage = '오늘의 한마디는 하루에 다섯번까지 작성할 수 있어요';
         } else if (axiosError.response?.data?.code === 403) {
           errorMessage = '방 접근 권한이 없습니다.';
         } else if (axiosError.response?.data?.code === 404) {
           errorMessage = '존재하지 않는 방입니다.';
+        } else if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
         }
       }
 
