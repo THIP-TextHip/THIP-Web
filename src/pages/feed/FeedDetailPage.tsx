@@ -91,7 +91,7 @@ const FeedDetailPage = () => {
       openMoreMenu({
         onEdit: () => {
           closePopup();
-          // navigate(`/post/update/${feedId}`);
+          navigate(`/post/update/${feedId}`);
         },
         onClose: () => {
           closePopup();
