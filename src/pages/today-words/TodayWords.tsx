@@ -132,21 +132,21 @@ const TodayWords = () => {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [roomId, openSnackbar]);
+  }, [roomId]);
 
   // 더 많은 메시지 로드
   const loadMoreMessages = useCallback(() => {
-    if (!isLoadingMore && !isLast && nextCursor) {
+    if (!isLoadingMore && !isLast && nextCursor && roomId) {
       loadMessages(nextCursor);
     }
-  }, [loadMessages, isLoadingMore, isLast, nextCursor]);
+  }, [isLoadingMore, isLast, nextCursor, roomId]);
 
   // 컴포넌트 마운트 시 초기 데이터 로드
   useEffect(() => {
-    if (!showMessages) {
+    if (!showMessages && roomId && !hasInitiallyLoaded) {
       loadMessages(undefined, true);
     }
-  }, [loadMessages, showMessages]);
+  }, [roomId, showMessages, hasInitiallyLoaded]);
 
   // 무한 스크롤 처리
   useEffect(() => {
@@ -195,8 +195,11 @@ const TodayWords = () => {
           onClose: () => {},
         });
 
-        // 최신 목록 다시 불러오기
-        await loadMessages(undefined, true);
+        // 최신 목록 다시 불러오기 위해 상태 초기화
+        setMessages([]);
+        setNextCursor(null);
+        setIsLast(false);
+        setHasInitiallyLoaded(false);
 
         // 자동으로 스크롤을 아래로 이동
         setTimeout(() => {
@@ -274,17 +277,6 @@ const TodayWords = () => {
 
   // 실제 메시지가 있으면 실제 메시지를, 더미 모드면 더미 메시지를 표시
   const displayMessages = showMessages ? dummyMessages : messages;
-  
-  // 새로 고침 함수
-  const handleRefresh = useCallback(() => {
-    if (!showMessages) {
-      setMessages([]);
-      setNextCursor(null);
-      setIsLast(false);
-      setHasInitiallyLoaded(false);
-      loadMessages(undefined, true);
-    }
-  }, [loadMessages, showMessages]);
 
   return (
     <>
@@ -330,9 +322,12 @@ const TodayWords = () => {
         <button
           onClick={() => {
             setShowMessages(!showMessages);
-            // 더미 모드에서 실제 모드로 전환할 때 새로고침
+            // 더미 모드에서 실제 모드로 전환할 때 초기화
             if (showMessages) {
-              handleRefresh();
+              setMessages([]);
+              setNextCursor(null);
+              setIsLast(false);
+              setHasInitiallyLoaded(false);
             }
           }}
           style={{
@@ -350,29 +345,6 @@ const TodayWords = () => {
         >
           {showMessages ? '실제 데이터' : '더미 데이터'}
         </button>
-        
-        {/* 새로고침 버튼 (실제 모드에서만) */}
-        {!showMessages && (
-          <button
-            onClick={handleRefresh}
-            disabled={isLoading}
-            style={{
-              position: 'fixed',
-              top: '250px',
-              right: '20px',
-              background: '#28a745',
-              color: 'white',
-              border: 'none',
-              padding: '10px',
-              borderRadius: '5px',
-              fontSize: '12px',
-              zIndex: 1000,
-              opacity: isLoading ? 0.6 : 1,
-            }}
-          >
-            새로고침
-          </button>
-        )}
       </Container>
     </>
   );
