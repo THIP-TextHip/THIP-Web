@@ -10,6 +10,7 @@ export interface FeedDetailData {
   aliasColor: string;
   postDate: string;
   isbn: string;
+  bookImageUrl: string;
   bookTitle: string;
   bookAuthor: string;
   contentBody: string;
