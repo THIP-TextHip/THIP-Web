@@ -79,4 +79,6 @@ export interface PollOption {
   text: string;
   percentage: number;
   isHighest: boolean;
+  voteItemId: number; // 투표 API에 필요한 ID
+  isVoted: boolean; // 현재 사용자가 투표했는지 여부
 }

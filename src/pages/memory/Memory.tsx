@@ -33,6 +33,8 @@ const convertPostToRecord = (post: Post): Record => {
       text: item.itemName,
       percentage: item.percentage,
       isHighest: index === 0,
+      voteItemId: item.voteItemId,
+      isVoted: item.isVoted,
     })),
   };
 };
