@@ -29,6 +29,7 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     setSearchQuery,
     handleTabChange,
     loadInitialData,
+    performSearch,
   } = useBookSearch();
 
   // 컴포넌트가 열릴 때 초기 데이터 로드
@@ -64,7 +65,9 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
   };
 
   const handleSearch = () => {
-    console.log('검색:', searchQuery);
+    if (searchQuery.trim()) {
+      performSearch(searchQuery.trim());
+    }
   };
 
   const handleClearSearch = () => {
