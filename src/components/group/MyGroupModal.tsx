@@ -140,7 +140,7 @@ const Content = styled.div`
   display: grid;
   gap: 20px;
   overflow-y: auto;
-  padding: 0 20px;
+  padding: 0 20px 20px 20px;
 
   grid-template-columns: 1fr;
 
