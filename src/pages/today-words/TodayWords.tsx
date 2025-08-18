@@ -37,20 +37,12 @@ const TodayWords = () => {
 
   // API 데이터를 Message 타입으로 변환하는 함수
   const convertToMessage = (item: TodayCommentItem): Message => {
-    const createdAt = new Date(item.postDate);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60));
+    // 네트워크 응답에서 postDate가 "1일 전" 형태의 문자열로 오는 것으로 보임
+    // 따라서 postDate를 그대로 timeAgo로 사용
+    const timeAgo = item.postDate || '방금 전';
     
-    let timeAgo: string;
-    if (diffInMinutes < 1) {
-      timeAgo = '방금 전';
-    } else if (diffInMinutes < 60) {
-      timeAgo = `${diffInMinutes}분 전`;
-    } else if (diffInMinutes < 1440) {
-      timeAgo = `${Math.floor(diffInMinutes / 60)}시간 전`;
-    } else {
-      timeAgo = `${Math.floor(diffInMinutes / 1440)}일 전`;
-    }
+    // createdAt은 현재 시간으로 설정 (정확한 시간이 필요하다면 다른 API 필드 사용)
+    const createdAt = new Date();
 
     return {
       id: item.attendanceCheckId.toString(),
@@ -81,6 +73,8 @@ const TodayWords = () => {
       });
 
       if (response.isSuccess) {
+        // 디버깅을 위한 로그
+        console.log('API 응답 데이터:', response.data.todayCommentList);
         const newMessages = response.data.todayCommentList.map(convertToMessage);
         
         if (isRefresh) {
