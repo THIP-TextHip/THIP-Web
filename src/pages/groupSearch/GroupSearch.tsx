@@ -11,6 +11,7 @@ import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms'
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import { useNavigate } from 'react-router-dom';
+import lockedBookImg from '../../assets/books/lockedBook.svg';
 
 type SortKey = 'deadline' | 'memberCount';
 type SearchStatus = 'idle' | 'searching' | 'searched';
@@ -69,7 +70,13 @@ const GroupSearch = () => {
         const res = await getSearchRooms(term.trim(), sortKey, undefined, isFinalized, category);
         if (res.isSuccess) {
           const { roomList, nextCursor: nc, isLast: last } = res.data;
-          setRooms(roomList);
+
+          const processed = roomList.map(room => ({
+            ...room,
+            bookImageUrl: room.isPublic ? room.bookImageUrl : lockedBookImg,
+          }));
+
+          setRooms(processed);
           setNextCursor(nc);
           setIsLast(last);
         } else {
@@ -158,7 +165,14 @@ const GroupSearch = () => {
       );
       if (res.isSuccess) {
         const { roomList, nextCursor: nc, isLast: last } = res.data;
-        setRooms(prev => [...prev, ...roomList]);
+
+        // 🔒 비공개 방 이미지를 lockedBook으로
+        const processed = roomList.map(room => ({
+          ...room,
+          bookImageUrl: room.isPublic ? room.bookImageUrl : lockedBookImg,
+        }));
+
+        setRooms(prev => [...prev, ...processed]); // ✅ processed 사용
         setNextCursor(nc);
         setIsLast(last);
       } else {
@@ -215,7 +229,7 @@ const GroupSearch = () => {
       setShowTabs(false);
       return;
     }
-    const idx = window.history.state && window.history.state.idx;
+    const idx = (window.history.state && window.history.state.idx) as number | undefined;
     if (typeof idx === 'number' && idx > 0) {
       navigate(-1);
     } else {

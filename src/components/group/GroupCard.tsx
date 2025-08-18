@@ -27,12 +27,10 @@ export const GroupCard = forwardRef<HTMLDivElement, Props>(
             </Participant>
             {isOngoing === true ? (
               <RecruitingDeadline isRecommend={isRecommend}>
-                {group.deadLine}일 뒤 모집 마감
+                {group.deadLine} 마감
               </RecruitingDeadline>
             ) : (
-              <OngoingDeadline isRecommend={isRecommend}>
-                {group.deadLine}일 뒤 종료
-              </OngoingDeadline>
+              <OngoingDeadline isRecommend={isRecommend}>{group.deadLine} 종료</OngoingDeadline>
             )}
           </Bottom>
         </Info>
@@ -48,7 +46,7 @@ const Card = styled.div<{ cardType: 'main' | 'search' | 'modal' }>`
     cardType === 'search' ? colors.black.main : colors.darkgrey.main};
   border-top: ${({ cardType }) =>
     cardType === 'search' ? `1px solid ${colors.darkgrey.dark}` : 'none'};
-  border: ${({ cardType }) => (cardType === 'main' ? `1px solid ${colors.grey[300]}` : 'none')};
+  border: ${({ cardType }) => (cardType === 'main' ? `1px solid ${colors.grey[300]}` : '')};
   border-radius: ${({ cardType }) => (cardType === 'search' ? `none` : '12px')};
   box-sizing: border-box;
   padding: ${({ cardType }) => (cardType === 'search' ? '24px 12px 12px 12px' : '12px')};
