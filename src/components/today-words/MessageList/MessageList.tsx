@@ -72,10 +72,9 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
       addMessage,
     }));
 
-    // 먼저 모든 메시지를 시간순으로 정렬
-    const sortedMessages = messages.sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    );
+    // 먼저 모든 메시지를 시간순으로 정렬 (아래로 올수록 최신)
+    // ID를 기준으로 정렬 (ID가 클수록 최신)
+    const sortedMessages = messages.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
     // 날짜별로 메시지 그룹화
     const groupedMessages = sortedMessages.reduce(
@@ -90,7 +89,7 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
       {} as Record<string, Message[]>,
     );
 
-    // 날짜를 최신순으로 정렬
+    // 날짜를 오래된 순으로 정렬 (아래로 올수록 최신)
     const sortedDates = Object.keys(groupedMessages).sort((a, b) => a.localeCompare(b));
 
     const handleMoreClick = (messageId: string) => {
