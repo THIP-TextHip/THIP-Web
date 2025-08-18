@@ -289,8 +289,7 @@ const GroupSearch = () => {
             handleDelete={(term: string) => {
               const x = recentSearches.find(i => i.searchTerm === term);
               if (!x) return;
-              const userId = 1;
-              deleteRecentSearch(x.recentSearchId, userId).then(res => {
+              deleteRecentSearch(x.recentSearchId).then(res => {
                 if (res.isSuccess) {
                   setRecentSearches(prev =>
                     prev.filter(it => it.recentSearchId !== x.recentSearchId),

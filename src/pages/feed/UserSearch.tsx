@@ -61,9 +61,7 @@ const UserSearch = () => {
 
   const handleDelete = async (recentSearchId: number) => {
     try {
-      const userId = 1; // 임시 userId
-
-      const response = await deleteRecentSearch(recentSearchId, userId);
+      const response = await deleteRecentSearch(recentSearchId);
 
       if (response.isSuccess) {
         setRecentSearches(prev => prev.filter(item => item.recentSearchId !== recentSearchId));
