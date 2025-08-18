@@ -7,12 +7,14 @@ import { GroupCard } from './GroupCard';
 import { Modal, Overlay } from './Modal.styles';
 import { getMyRooms, type Room, type RoomType } from '@/api/rooms/getMyRooms';
 import { colors, typography } from '@/styles/global/global';
+import { useNavigate } from 'react-router-dom';
 
 interface MyGroupModalProps {
   onClose: () => void;
 }
 
 export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
+  const navigate = useNavigate();
   const [selected, setSelected] = useState<'진행중' | '모집중' | ''>('');
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,6 +66,20 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
   }, [selected]);
 
   const convertedGroups = rooms.map(convertRoomToGroup);
+
+  const handleGroupCardClick = (group: Group) => {
+    if (selected === '모집중') {
+      navigate(`/group/detail/${group.id}`);
+    } else if (selected === '진행중') {
+      navigate(`/group/detail/joined/${group.id}`);
+    } else {
+      if (group.isOnGoing) {
+        navigate(`/group/detail/joined/${group.id}`);
+      } else {
+        navigate(`/group/detail/${group.id}`);
+      }
+    }
+  };
   return (
     <Overlay>
       <Modal>
@@ -92,7 +108,13 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
             <ErrorMessage>{error}</ErrorMessage>
           ) : convertedGroups.length > 0 ? (
             convertedGroups.map(group => (
-              <GroupCard key={group.id} group={group} isOngoing={group.isOnGoing} type={'modal'} />
+              <GroupCard
+                key={group.id}
+                group={group}
+                isOngoing={group.isOnGoing}
+                type={'modal'}
+                onClick={() => handleGroupCardClick(group)}
+              />
             ))
           ) : (
             <EmptyState>
@@ -140,7 +162,7 @@ const Content = styled.div`
   display: grid;
   gap: 20px;
   overflow-y: auto;
-  padding: 0 20px;
+  padding: 0 20px 20px 20px;
 
   grid-template-columns: 1fr;
 

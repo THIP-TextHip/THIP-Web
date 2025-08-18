@@ -52,6 +52,7 @@ const GroupDetail = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [isJoining, setIsJoining] = useState<boolean | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleBackButton = () => {
     navigate(-1);
@@ -76,8 +77,6 @@ const GroupDetail = () => {
     const endDate = new Date(recruitEndDate);
     const diffTime = endDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    console.log(endDate);
     if (diffDays < 0) return '모집 종료';
     if (diffDays === 0) return '오늘 마감';
     return `${diffDays}일 남음`;
@@ -92,7 +91,6 @@ const GroupDetail = () => {
         setError(null);
 
         const response = await getRoomDetail(Number(roomId));
-        console.log(response);
 
         if (response.isSuccess) {
           setRoomData(response.data);
@@ -153,19 +151,52 @@ const GroupDetail = () => {
   };
 
   const handleBottomButtonClick = async () => {
+    if (!roomId) return;
+
     if (roomData.isHost) {
       try {
+        setIsSubmitting(true);
         await postCloseRoom(Number(roomId));
+        setRoomData(prev =>
+          prev
+            ? {
+                ...prev,
+              }
+            : prev,
+        );
+        alert('모집을 마감했습니다.');
       } catch {
         alert('네트워크 오류 또는 서버 오류');
+      } finally {
+        setIsSubmitting(false);
       }
       return;
     }
-    const type = isJoining ? 'cancel' : 'join';
+
+    const nextType: 'join' | 'cancel' = isJoining ? 'cancel' : 'join';
+
     try {
-      await postJoinRoom(Number(roomId), type);
+      setIsSubmitting(true);
+      await postJoinRoom(Number(roomId), nextType);
+
+      setIsJoining(prev => !prev);
+
+      setRoomData(prev =>
+        prev
+          ? {
+              ...prev,
+              isJoining: !prev.isJoining,
+              memberCount:
+                nextType === 'join'
+                  ? Math.min(prev.memberCount + 1, prev.recruitCount)
+                  : Math.max(prev.memberCount - 1, 0),
+            }
+          : prev,
+      );
     } catch {
       alert('네트워크 오류 또는 서버 오류');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -213,6 +244,7 @@ const GroupDetail = () => {
           </TagRow>
         </BannerSection>
       </TopBackground>
+
       <BookSection onClick={handleBookSectionClick}>
         <BookHeader>
           <h3>{bookTitle}</h3>
@@ -229,6 +261,7 @@ const GroupDetail = () => {
           </BookDetails>
         </BookInfo>
       </BookSection>
+
       <RecommendSection>
         <RecommendText>이런 모임방은 어때요?</RecommendText>
         <GroupCardBox>
@@ -244,7 +277,8 @@ const GroupDetail = () => {
           ))}
         </GroupCardBox>
       </RecommendSection>
-      <BottomButton onClick={handleBottomButtonClick}>
+
+      <BottomButton onClick={handleBottomButtonClick} disabled={isSubmitting}>
         {roomData.isHost ? '모집 마감하기' : isJoining ? '참여 취소하기' : '참여하기'}
       </BottomButton>
     </Wrapper>
