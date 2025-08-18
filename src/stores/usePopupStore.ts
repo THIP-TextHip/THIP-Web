@@ -16,6 +16,7 @@ export interface MoreMenuProps {
   onDelete?: () => void;
   onClose?: () => void;
   onReport?: () => void;
+  onPin?: () => void;
   isWriter?: boolean;
   type?: 'post' | 'reply';
 }

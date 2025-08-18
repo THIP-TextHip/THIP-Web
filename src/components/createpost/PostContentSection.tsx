@@ -4,9 +4,10 @@ import { TextAreaBox, TextArea, CharacterCount } from './PostContentSection.styl
 interface PostContentSectionProps {
   content: string;
   onContentChange: (value: string) => void;
+  readOnly?: boolean;
 }
 
-const PostContentSection = ({ content, onContentChange }: PostContentSectionProps) => {
+const PostContentSection = ({ content, onContentChange, readOnly = false }: PostContentSectionProps) => {
   const maxLength = 2000;
 
   return (
@@ -19,6 +20,11 @@ const PostContentSection = ({ content, onContentChange }: PostContentSectionProp
           onChange={e => onContentChange(e.target.value)}
           maxLength={maxLength}
           rows={4}
+          readOnly={readOnly}
+          style={{ 
+            backgroundColor: readOnly ? '#f5f5f5' : 'transparent',
+            cursor: readOnly ? 'not-allowed' : 'text'
+          }}
         />
         <CharacterCount>
           {content.length} / {maxLength}
