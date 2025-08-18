@@ -10,11 +10,14 @@ import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
 import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms';
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
+import { useNavigate } from 'react-router-dom';
 
 type SortKey = 'deadline' | 'memberCount';
 type SearchStatus = 'idle' | 'searching' | 'searched';
 
 const GroupSearch = () => {
+  const navigate = useNavigate();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [searchStatus, setSearchStatus] = useState<SearchStatus>('idle');
 
@@ -199,13 +202,25 @@ const GroupSearch = () => {
       clearTimeout(searchTimeoutId);
       setSearchTimeoutId(null);
     }
-    setSearchTerm('');
-    setSearchStatus('idle');
-    setRooms([]);
-    setNextCursor(null);
-    setIsLast(true);
-    setError(null);
-    setShowTabs(false);
+
+    const isIdleView = searchStatus === 'idle' && !searchTerm.trim();
+
+    if (!isIdleView) {
+      setSearchTerm('');
+      setSearchStatus('idle');
+      setRooms([]);
+      setNextCursor(null);
+      setIsLast(true);
+      setError(null);
+      setShowTabs(false);
+      return;
+    }
+    const idx = window.history.state && window.history.state.idx;
+    if (typeof idx === 'number' && idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/group');
+    }
   };
 
   useEffect(() => {
