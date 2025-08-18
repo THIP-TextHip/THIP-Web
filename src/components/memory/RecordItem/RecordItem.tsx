@@ -312,6 +312,8 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
         onEdit: handleEdit,
         onDelete: handleDeleteConfirm,
         onPin: handlePinConfirm,
+        type: 'post', // 중요: post 타입으로 설정해야 핀하기 버튼이 표시됨
+        isWriter: true, // 내 기록임을 명시
       });
     }
   }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm, handlePinConfirm]);
@@ -355,7 +357,10 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       </ContentSection>
 
       <ActionSection>
-        <ActionButton onClick={handleLikeClick}>
+        <ActionButton onClick={(e) => {
+          e.stopPropagation();
+          handleLikeClick();
+        }}>
           <img
             src={isLiked ? heartFilledIcon : heartIcon}
             alt={isLiked ? '좋아요 취소' : '좋아요'}
@@ -367,7 +372,12 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
           <span>{commentCount}</span>
         </ActionButton>
         {isMyRecord && (
-          <ActionButton onClick={handlePinConfirm}>
+          <ActionButton 
+            onClick={(e) => {
+              e.stopPropagation(); // 이벤트 버블링 방지
+              handlePinConfirm();
+            }}
+          >
             <img src={pinIcon} alt="피드에 핀하기" />
           </ActionButton>
         )}
