@@ -6,6 +6,7 @@ import PollRecord from './PollRecord';
 import heartIcon from '../../../assets/memory/heart.svg';
 import heartFilledIcon from '../../../assets/memory/heart-filled.svg';
 import commentIcon from '../../../assets/memory/comment.svg';
+import pinIcon from '../../../assets/feed/pin.svg';
 import {
   Container,
   UserSection,
@@ -22,6 +23,7 @@ import { usePopupActions } from '@/hooks/usePopupActions';
 import { deleteRecord } from '@/api/record/deleteRecord';
 import { deleteVote } from '@/api/record/deleteVote';
 import { postRoomPostLike } from '@/api/roomPosts/postRoomPostLike';
+import { pinRecordToFeed } from '@/api/record/pinRecordToFeed';
 
 interface RecordItemProps {
   record: Record;
@@ -191,6 +193,67 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     });
   }, [openSnackbar]);
 
+  // 기록을 피드에 핀하기 핸들러
+  const handlePinRecord = useCallback(async () => {
+    const currentRoomId = roomId || '1';
+    const recordId = parseInt(record.id);
+
+    try {
+      const response = await pinRecordToFeed(parseInt(currentRoomId), recordId);
+      
+      if (response.isSuccess) {
+        // 피드 작성 페이지로 이동하면서 데이터 전달
+        navigate('/feed/write', {
+          state: {
+            pinData: {
+              bookTitle: response.data.bookTitle,
+              authorName: response.data.authorName,
+              bookImageUrl: response.data.bookImageUrl,
+              isbn: response.data.isbn,
+              recordContent: content,
+              roomId: currentRoomId,
+              recordId: record.id,
+            }
+          }
+        });
+      } else {
+        let errorMessage = '핀하기에 실패했습니다.';
+        
+        if (response.code === 130000) {
+          errorMessage = '존재하지 않는 기록입니다.';
+        } else if (response.code === 130003) {
+          errorMessage = '기록 접근 권한이 없습니다.';
+        } else if (response.code === 140011) {
+          errorMessage = '방 접근 권한이 없습니다.';
+        } else if (response.code === 80010) {
+          errorMessage = '존재하지 않는 책입니다.';
+        }
+
+        openSnackbar({
+          message: errorMessage,
+          variant: 'top',
+          onClose: () => {},
+        });
+      }
+    } catch (error) {
+      console.error('핀하기 API 호출 실패:', error);
+      openSnackbar({
+        message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
+        variant: 'top',
+        onClose: () => {},
+      });
+    }
+  }, [roomId, record.id, content, navigate, openSnackbar]);
+
+  // 핀하기 확인 팝업 핸들러
+  const handlePinConfirm = useCallback(() => {
+    openConfirm({
+      title: '기록을 피드에 핀하시겠어요?',
+      disc: '기록의 내용으로 피드 글 작성 페이지가 열립니다.',
+      onConfirm: handlePinRecord,
+    });
+  }, [openConfirm, handlePinRecord]);
+
   // 길게 누르기 이벤트 핸들러
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
@@ -248,9 +311,12 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       openMoreMenu({
         onEdit: handleEdit,
         onDelete: handleDeleteConfirm,
+        onPin: handlePinConfirm,
+        type: 'post', // 중요: post 타입으로 설정해야 핀하기 버튼이 표시됨
+        isWriter: true, // 내 기록임을 명시
       });
     }
-  }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm]);
+  }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm, handlePinConfirm]);
 
   return (
     <Container
@@ -291,7 +357,10 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       </ContentSection>
 
       <ActionSection>
-        <ActionButton onClick={handleLikeClick}>
+        <ActionButton onClick={(e) => {
+          e.stopPropagation();
+          handleLikeClick();
+        }}>
           <img
             src={isLiked ? heartFilledIcon : heartIcon}
             alt={isLiked ? '좋아요 취소' : '좋아요'}
@@ -302,6 +371,16 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
           <img src={commentIcon} alt="댓글" />
           <span>{commentCount}</span>
         </ActionButton>
+        {isMyRecord && (
+          <ActionButton 
+            onClick={(e) => {
+              e.stopPropagation(); // 이벤트 버블링 방지
+              handlePinConfirm();
+            }}
+          >
+            <img src={pinIcon} alt="피드에 핀하기" />
+          </ActionButton>
+        )}
       </ActionSection>
     </Container>
   );
