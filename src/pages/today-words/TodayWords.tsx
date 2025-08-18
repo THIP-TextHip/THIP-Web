@@ -238,10 +238,6 @@ const TodayWords = () => {
   }, [inputValue, roomId, isSubmitting, openSnackbar]);
 
 
-  // MessageList에서 메시지가 삭제되었을 때 호출될 콜백
-  const handleMessageDelete = (messageId: string) => {
-    setMessages(prevMessages => prevMessages.filter(message => message.id !== messageId));
-  };
 
 
   return (
@@ -264,8 +260,6 @@ const TodayWords = () => {
               <MessageList
                 ref={messageListRef}
                 messages={messages}
-                onMessageDelete={handleMessageDelete}
-                isRealTimeMode={true}
               />
               {isLoadingMore && (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>

@@ -34,8 +34,6 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
     {
       messages: initialMessages,
       currentUserId = 'user.01',
-      onMessageDelete,
-      isRealTimeMode = false,
     },
     ref,
   ) => {
@@ -102,16 +100,9 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
 
     const handleDelete = () => {
       if (selectedMessageId) {
-        if (isRealTimeMode && onMessageDelete) {
-          // 실시간 모드일 때는 부모 컴포넌트의 상태를 업데이트
-          onMessageDelete(selectedMessageId);
-        } else {
-          // 더미 모드일 때는 내부 상태만 업데이트
-          setMessages(prevMessages =>
-            prevMessages.filter(message => message.id !== selectedMessageId),
-          );
-        }
-        console.log(`메시지 ID ${selectedMessageId} 삭제됨`);
+        // TODO: 실제 삭제 API 연동 필요
+        console.log(`메시지 ID ${selectedMessageId} 삭제 요청 (API 개발 대기중)`);
+        alert('삭제 기능은 현재 개발 중입니다.');
       }
       setSelectedMessageId(null);
     };
@@ -122,7 +113,7 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
     };
 
     const selectedMessage = messages.find(msg => msg.id === selectedMessageId);
-    const isMyMessage = selectedMessage?.user === currentUserId;
+    const isMyMessage = selectedMessage?.isWriter === true;
 
     return (
       <>
