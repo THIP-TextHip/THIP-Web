@@ -245,7 +245,7 @@ const GroupSearch = () => {
   }, [searchTimeoutId]);
 
   return (
-    <Overlay>
+    <Overlay $whiteBg>
       <Modal>
         <TitleHeader
           title="모임 검색"
