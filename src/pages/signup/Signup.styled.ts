@@ -140,7 +140,7 @@ export const Container = styled.div`
 
       img.bg {
         position: absolute;
-        bottom: 0px;
+        bottom: -1px;
         left: 5px;
         width: 80px;
         height: 70px;
