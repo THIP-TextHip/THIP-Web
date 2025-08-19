@@ -58,6 +58,7 @@ const SearchBookGroup = () => {
                 maximumParticipants: room.recruitCount,
                 deadLine: '',
                 coverUrl: room.bookImageUrl || bookInfo?.imageUrl,
+                isOnGoing: room.isPublic,
               }}
               isOngoing={true}
               type={'modal'}
