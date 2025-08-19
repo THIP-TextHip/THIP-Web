@@ -14,6 +14,7 @@ const Container = styled.div`
   gap: 20px;
   padding: 88px 20px 0 20px;
   background-color: var(--color-black-main);
+  z-index: 1;
 `;
 
 const TabButton = styled.div`

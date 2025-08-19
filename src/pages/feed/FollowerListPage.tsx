@@ -156,10 +156,8 @@ const Wrapper = styled.div`
 const TotalBar = styled.div`
   position: fixed;
   top: 0;
-  width: calc(100% - 40px);
-  min-width: 320px;
-  max-width: 540px;
-  padding: 76px 0 4px 0;
+  width: 727px;
+  padding: 76px 0px 4px 0px;
   border-bottom: 1px solid var(--color-darkgrey-dark);
   background-color: var(--color-black-main);
 
@@ -172,8 +170,8 @@ const TotalBar = styled.div`
 const UserProfileList = styled.div`
   width: 100%;
   height: 100vh;
-  min-width: 320px;
-  max-width: 540px;
+  /* min-width: 320px;
+  max-width: 540px; */
   padding-top: 105px;
   padding-bottom: 20px;
 `;

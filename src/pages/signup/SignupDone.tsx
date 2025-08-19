@@ -1,7 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Container } from './Signup.styled';
 import leftarrow from '../../assets/common/leftArrow.svg';
-import art from '../../assets/genre/art.svg';
 import TitleHeader from '../../components/common/TitleHeader';
 
 const SignupDone = () => {
@@ -9,7 +8,7 @@ const SignupDone = () => {
   const location = useLocation();
 
   // SignupGenre에서 전달된 데이터 받기
-  const { nickName, aliasName } = location.state || {};
+  const { nickName, aliasName, aliasColor, aliasIconUrl } = location.state || {};
 
   const handleBackClick = () => {
     navigate('/signup/guide');
@@ -30,10 +29,12 @@ const SignupDone = () => {
       <div className="content">
         <div className="userInfo">
           <div className="profile">
-            <img src={art} />
+            <img src={aliasIconUrl} alt="프로필 아이콘" />
           </div>
           <div className="username">{nickName}</div>
-          <div className="subname">{aliasName}</div>
+          <div className="subname" style={{ color: aliasColor }}>
+            {aliasName}
+          </div>
         </div>
         <div className="startBtn" onClick={handleNextClick}>
           지금 바로 Thip 시작하기
