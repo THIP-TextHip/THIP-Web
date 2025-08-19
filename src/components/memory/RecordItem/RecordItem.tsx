@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import type { Record } from '../../../types/memory';
 import TextRecord from './TextRecord';
 import PollRecord from './PollRecord';
-import CommentModal from '../CommentModal/CommentModal';
+import CommentBottomSheet from '../CommentBottomSheet/CommentBottomSheet';
 import heartIcon from '../../../assets/memory/heart.svg';
 import heartFilledIcon from '../../../assets/memory/heart-filled.svg';
 import commentIcon from '../../../assets/memory/comment.svg';
@@ -400,8 +400,8 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
         )}
       </ActionSection>
 
-      {/* 댓글 모달 */}
-      <CommentModal
+      {/* 댓글 바텀시트 */}
+      <CommentBottomSheet
         isOpen={isCommentModalOpen}
         onClose={handleCommentModalClose}
         postId={parseInt(id)}
