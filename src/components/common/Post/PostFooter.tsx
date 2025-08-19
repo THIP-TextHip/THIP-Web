@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import like from '../../../assets/feed/like.svg';
 import activeLike from '../../../assets/feed/activeLike.svg';
@@ -65,8 +64,6 @@ const PostFooter = ({
   isPublic = true,
   isDetail = false,
 }: PostFooterProps) => {
-  const navigate = useNavigate();
-
   const [liked, setLiked] = useState(isLiked);
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
   const [saved, setSaved] = useState(isSaved);
@@ -106,7 +103,7 @@ const PostFooter = ({
 
   const handleComment = () => {
     if (isDetail) return;
-    navigate(`/feed/${feedId}`);
+    window.open(`/feed/${feedId}`, '_blank');
   };
 
   return (

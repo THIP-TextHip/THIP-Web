@@ -4,6 +4,7 @@ import {
   Route,
   RouterProvider,
 } from 'react-router-dom';
+import Layout from '../components/common/Layout';
 import Login from './login/Login';
 // import Signup from './signup/Signup';
 import SignupGenre from './signup/SignupGenre';
@@ -25,7 +26,6 @@ import SearchBook from './searchBook/SearchBook';
 import SearchBookGroup from './searchBook/SearchBookGroup';
 import GroupDetail from './groupDetail/GroupDetail';
 import FeedDetailPage from './feed/FeedDetailPage';
-import ScrollToTop from '../components/common/ScrollToTop';
 import UserSearch from './feed/UserSearch';
 import Memory from './memory/Memory';
 import RecordWrite from './recordwrite/RecordWrite';
@@ -44,8 +44,8 @@ import Guide from './Guide';
 const Router = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <>
-        <Route path="/" element={<Login />} />
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Login />} />
         <Route path="signup" element={<SignupNickname />} />
         <Route path="signup/genre" element={<SignupGenre />} />
         <Route path="signup/guide" element={<Guide />} />
@@ -82,15 +82,10 @@ const Router = () => {
         <Route path="mypage/withdraw/done" element={<WithdrawDonePage />} />
         <Route path="mypage/edit" element={<EditPage />} />
         <Route path="notice" element={<Notice />} />
-      </>,
+      </Route>,
     ),
   );
-  return (
-    <>
-      <ScrollToTop />
-      <RouterProvider router={router} />
-    </>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default Router;

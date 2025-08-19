@@ -102,8 +102,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-width: 320px;
-  max-width: 540px;
+  /* min-width: 320px;
+  max-width: 540px; */
   height: 166px;
   padding: 0 20px;
   padding-top: 32px;
@@ -120,7 +120,7 @@ const UserProfile = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
 
     img {
       width: 54px;
@@ -135,17 +135,17 @@ const UserProfile = styled.div`
       gap: 4px;
 
       .username {
-        color: var(--color-white);
-        font-size: var(--font-size-xs);
-        font-weight: var(--font-weight-medium);
-        line-height: normal;
+        color: var(--color-text-primary_white, #fefefe);
+        font-size: var(--string-size-large01, 18px);
+        font-weight: var(--string-weight-semibold, 600);
+        line-height: var(--string-lineheight-height24, 24px); /* 133.333% */
+        letter-spacing: 0.018px;
       }
 
       .usertitle {
-        color: var(--color-text-humanities_skyblue, #a1d5ff);
-        font-size: var(--font-size-xs);
+        font-size: var(--string-size-medium01, 14px);
         font-weight: var(--string-weight-regular, 400);
-        line-height: normal;
+        line-height: var(--string-lineheight-feedcontent_height20, 20px); /* 142.857% */
       }
     }
   }

@@ -2,7 +2,15 @@ import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import type { MoreMenuProps } from '@/stores/usePopupStore';
 
-const MoreMenu = ({ onEdit, onDelete, onClose, onReport, onPin, isWriter, type }: MoreMenuProps) => {
+const MoreMenu = ({
+  onEdit,
+  onDelete,
+  onClose,
+  onReport,
+  onPin,
+  isWriter,
+  type,
+}: MoreMenuProps) => {
   return (
     <Overlay onClick={onClose}>
       {type === 'post' ? (
@@ -71,7 +79,6 @@ const Overlay = styled.div`
   z-index: 1200;
 `;
 
-
 const ReportContainer = styled.div`
   position: fixed;
   left: 0;
@@ -102,7 +109,6 @@ const RecordContainer = styled.div`
   min-width: 320px;
   max-width: 767px;
   width: 100%;
-  height: 192px;
   padding: 20px;
   border-radius: 12px 12px 0px 0px;
   background-color: ${colors.darkgrey.main};

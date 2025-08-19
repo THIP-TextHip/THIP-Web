@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
+import { useRef, useEffect, useState } from 'react';
 import BookInfoCard from '../../feed/BookInfoCard';
 import type { PostBodyProps } from '@/types/post';
+import lookmore from '../../../assets/feed/lookmore.svg';
 
 const Container = styled.div`
   display: flex;
@@ -14,6 +15,7 @@ const PostContent = styled.div<{ hasImage: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative; // lookmore.svg를 위한 relative 설정
 
   .content {
     height: auto;
@@ -31,16 +33,25 @@ const PostContent = styled.div<{ hasImage: boolean }>`
     text-overflow: ellipsis;
   }
 
-  .imgContainer {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    overflow: hidden;
-    img {
-      width: 100px;
-      height: 100px;
-      flex-shrink: 0; //고정사이즈
-    }
+  .lookmore-icon {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    /* width: 20px;
+    height: 20px; */
+    pointer-events: none; // 클릭 이벤트 방지
+  }
+`;
+
+const ImageContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  overflow: hidden;
+  img {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0; //고정사이즈
   }
 `;
 
@@ -52,20 +63,35 @@ const PostBody = ({
   feedId,
   contentUrls = [],
 }: PostBodyProps) => {
-  const navigate = useNavigate();
   const hasImage = contentUrls.length > 0;
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
 
   const handlePostClick = (feedId: number) => {
-    // if (!isClickable) return;
-    navigate(`/feed/${feedId}`);
-    // API 연동시 경로 수정 필요
+    // 새 탭에서 피드 상세 페이지 열기
+    window.open(`/feed/${feedId}`, '_blank');
   };
+
+  // 말줄임 여부 감지
+  useEffect(() => {
+    if (contentRef.current) {
+      const element = contentRef.current;
+      const isOverflowing = element.scrollHeight > element.clientHeight;
+      setIsTruncated(isOverflowing);
+    }
+  }, [contentBody]);
 
   return (
     <Container>
       <BookInfoCard bookTitle={bookTitle} bookAuthor={bookAuthor} isbn={isbn} />
       <PostContent hasImage={hasImage} onClick={() => handlePostClick(feedId)}>
-        <div className="content">{contentBody}</div>
+        <div className="content" ref={contentRef}>
+          {contentBody}
+        </div>
+        {/* 말줄임이 될 때만 표시되는 lookmore 아이콘 */}
+        {isTruncated && <img src={lookmore} alt="더보기" className="lookmore-icon" />}
+      </PostContent>
+      <ImageContainer>
         {hasImage && (
           <div className="imgContainer">
             {contentUrls.map((src: string, i: number) => (
@@ -73,7 +99,7 @@ const PostBody = ({
             ))}
           </div>
         )}
-      </PostContent>
+      </ImageContainer>
     </Container>
   );
 };

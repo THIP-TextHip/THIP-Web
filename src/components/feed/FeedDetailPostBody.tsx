@@ -61,7 +61,6 @@ const TagContainer = styled.div`
       color: var(--color-white);
       font-size: var(--string-size-small03, 12px);
       font-weight: var(--string-weight-regular, 400);
-      line-height: normal;
     }
   }
 

@@ -87,8 +87,6 @@ const Container = styled.div`
   flex-direction: column;
   gap: 4px;
   width: 100%;
-  min-width: 320px;
-  max-width: 540px;
   margin: 0 auto;
   padding: 0 20px;
   padding-top: 20px;

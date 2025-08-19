@@ -41,8 +41,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-width: 360px;
-  max-width: 540px;
+  /* min-width: 360px;
+  max-width: 540px; */
   padding: 40px 20px;
   margin: 0 auto;
   margin-bottom: 56px;

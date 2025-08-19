@@ -81,13 +81,14 @@ const List = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-width: 320px;
-  max-width: 540px;
+  /* min-width: 320px;
+  max-width: 540px; */
   margin: 0 auto;
   margin-bottom: 72px;
 `;
 
 const ResultHeader = styled.div`
+  width: 100%;
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.medium};
   color: ${colors.white};
@@ -100,6 +101,7 @@ const EmptyWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
   height: 100%;
   padding-top: 40%;
   color: var(--color-text-primary_white, #fefefe);

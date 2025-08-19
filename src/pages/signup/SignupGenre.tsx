@@ -31,20 +31,11 @@ const SignupGenre = () => {
 
   // 페이지 로드 시 간단한 확인
   useEffect(() => {
-    console.log('=== 🔍 SignupGenre 페이지 로드 ===');
-    console.log('📍 현재 페이지:', window.location.pathname);
-    console.log('👤 받은 nickname:', nickname);
-
     // nickname이 없으면 이전 페이지로 돌아가기
     if (!nickname) {
-      console.log('❌ nickname이 전달되지 않았습니다.');
-      console.log('❌ 이전 페이지로 돌아갑니다.');
       navigate(-1);
       return;
     }
-
-    console.log('✅ nickname이 정상적으로 전달되었습니다.');
-    console.log('✅ 쿠키는 브라우저가 자동으로 처리합니다.');
   }, [nickname, navigate]);
 
   useEffect(() => {
@@ -81,6 +72,8 @@ const SignupGenre = () => {
           state: {
             nickname: nickname,
             aliasName: selectedAlias.subTitle,
+            aliasColor: genres.find(g => g.id === selectedAlias.id)?.color,
+            aliasIconUrl: genres.find(g => g.id === selectedAlias.id)?.iconUrl,
           },
         });
       } else {

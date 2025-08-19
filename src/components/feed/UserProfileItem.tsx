@@ -36,14 +36,14 @@ const UserProfileItem = ({
       console.log(`${nickname} - ${response.data.isFollowing ? '띱 완료' : '띱 취소'}`);
 
       // Snackbar 표시
-      const message = response.data.isFollowing 
-        ? `${nickname}님을 띱 했어요.` 
+      const message = response.data.isFollowing
+        ? `${nickname}님을 띱 했어요.`
         : `${nickname}님을 띱 취소했어요.`;
-      
+
       openPopup('snackbar', {
         message,
         variant: 'top',
-        onClose: () => {}
+        onClose: () => {},
       });
     } catch (error) {
       console.error('팔로우/언팔로우 실패:', error);
@@ -80,8 +80,8 @@ const UserProfileItem = ({
 
 const Wrapper = styled.div<{ isLast?: boolean }>`
   width: 100%;
-  max-width: 500px;
-  min-width: 320px;
+  /* max-width: 500px;
+  min-width: 320px; */
   margin: 0 auto;
   height: 78px;
   padding: 20px 0;

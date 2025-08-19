@@ -2,8 +2,8 @@ import styled from '@emotion/styled';
 
 const Container = styled.div`
   width: 100%;
-  min-width: 320px;
-  max-width: 540px;
+  /* min-width: 320px;
+  max-width: 540px; */
   padding: 0 20px;
   margin: 0 auto;
 `;
