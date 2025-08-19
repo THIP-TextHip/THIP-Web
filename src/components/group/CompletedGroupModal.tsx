@@ -54,7 +54,7 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
 
   const convertedGroups = rooms.map(convertRoomToGroup);
   return (
-    <Overlay>
+    <Overlay $whiteBg>
       <Modal>
         <TitleHeader
           title="완료된 모임방"
@@ -129,7 +129,10 @@ const EmptyState = styled.div`
   padding: 40px 20px;
   color: ${colors.grey[100]};
   text-align: center;
-  height: 100%;
+  height: 70%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 `;
 
 const EmptyTitle = styled.p`
