@@ -58,9 +58,9 @@ export const getSearchBooks = async (
   }
 };
 
-export const convertToSearchedBooks = (apiBooks: BookSearchItem[]): SearchedBook[] => {
+export const convertToSearchedBooks = (apiBooks: BookSearchItem[], startIndex: number = 0): SearchedBook[] => {
   return apiBooks.map((book, index) => ({
-    id: index + 1,
+    id: startIndex + index + 1,
     title: book.title,
     author: book.authorName,
     publisher: book.publisher,
