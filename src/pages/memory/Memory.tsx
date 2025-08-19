@@ -5,6 +5,7 @@ import MemoryHeader from '../../components/memory/MemoryHeader/MemoryHeader';
 import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
 import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddButton';
 import Snackbar from '../../components/common/Modal/Snackbar';
+import GlobalCommentBottomSheet from '../../components/common/CommentBottomSheet/GlobalCommentBottomSheet';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
 import type { GetMemoryPostsParams, Post, Record } from '../../types/memory';
@@ -295,6 +296,8 @@ const Memory = () => {
           onClose={() => setShowSnackbar(false)}
         />
       )}
+      
+      <GlobalCommentBottomSheet />
     </Container>
   );
 };
