@@ -78,7 +78,7 @@ const MyFollower = ({
         <img src={people} />
         <div className="textContainer">
           <div className="followerNum">{followerCount}명</div>
-          <div className="disc">이 구독중</div>
+          <div className="disc">이 띱하는 중</div>
         </div>
       </div>
       {followerCount > 0 && (

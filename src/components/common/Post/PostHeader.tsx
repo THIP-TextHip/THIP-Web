@@ -65,9 +65,9 @@ const Container = styled.div<{ type?: 'post' | 'reply' }>`
     align-items: center;
     gap: ${({ type }) => (type === 'reply' ? '4px' : '8px')};
     img {
-      width: ${({ type }) => (type === 'reply' ? '24px' : '36px')};
-      height: ${({ type }) => (type === 'reply' ? '24px' : '36px')};
-      border-radius: ${({ type }) => (type === 'reply' ? '24px' : '36px')};
+      width: ${({ type }) => (type === 'reply' ? '31.5px' : '36px')};
+      height: ${({ type }) => (type === 'reply' ? '31.5px' : '36px')};
+      border-radius: ${({ type }) => (type === 'reply' ? '31.5px' : '36px')};
       border: 0.5px solid var(--color-grey-300);
     }
 
