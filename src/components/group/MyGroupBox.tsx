@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getJoinedRooms, type JoinedRoomItem } from '@/api/rooms/getJoinedRooms';
 import { colors, typography } from '@/styles/global/global';
+import noneMyGroupCharacter from '../../assets/group/noneMyGroupCharacter.svg';
 
 export interface Group {
   id: number | string;
@@ -141,13 +142,23 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
                   cardRefs.current[i] = el;
                 }}
                 onClick={() => handleCardClick(g.id)}
+                isMine
               />
             ))}
           </Carousel>
         </>
       ) : (
         <EmptyContainer>
-          <EmptyText>가입한 모임방이 없어요</EmptyText>
+          <EmptyCard role="status" aria-live="polite">
+            <EmptyTexts>
+              <EmptyTitle>참여 중인 모임방이 없어요</EmptyTitle>
+              <EmptySubtitle>모임방을 찾아 참여해보세요!</EmptySubtitle>
+            </EmptyTexts>
+
+            <ArtworkWrapper>
+              <Artwork src={noneMyGroupCharacter} alt="" draggable={false} decoding="async" />
+            </ArtworkWrapper>
+          </EmptyCard>
         </EmptyContainer>
       )}
     </Container>
@@ -227,11 +238,71 @@ const EmptyContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 60px 20px;
+  padding: 24px 20px 12px;
 `;
 
-const EmptyText = styled.p`
-  color: ${colors.grey[300]};
-  font-size: ${typography.fontSize.base};
+const EmptyCard = styled.div`
+  position: relative;
+  width: 90%;
+  max-width: 640px;
+  min-height: 180px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        120% 80% at 50% -40%,
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(255, 255, 255, 0) 60%
+      ),
+      radial-gradient(80% 60% at 50% 120%, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0) 55%);
+    pointer-events: none;
+  }
+`;
+
+const EmptyTexts = styled.div`
+  position: relative;
+  z-index: 1;
+  padding: 32px 24px 96px;
+  text-align: center;
+`;
+
+const EmptyTitle = styled.h3`
+  margin: 0 0 10px;
+  color: ${colors.black.main};
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
+  letter-spacing: -0.2px;
+`;
+
+const EmptySubtitle = styled.p`
   margin: 0;
+  color: ${colors.grey[300]};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
+`;
+
+const ArtworkWrapper = styled.div`
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 12%);
+  width: clamp(90px, 42%, 90px);
+  pointer-events: none;
+  z-index: 0;
+`;
+
+const Artwork = styled.img`
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-user-drag: none;
+  user-select: none;
+  opacity: 0.98;
 `;
