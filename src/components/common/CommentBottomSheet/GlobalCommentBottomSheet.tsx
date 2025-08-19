@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import MessageInput from '@/components/today-words/MessageInput';
 import ReplyList from '@/components/common/Post/ReplyList';
 import { getComments, type CommentData } from '@/api/comments/getComments';
+import { postReply } from '@/api/comments/postReply';
 import { useReplyActions } from '@/hooks/useReplyActions';
+import { useReplyStore } from '@/stores/useReplyStore';
 import { useCommentBottomSheetStore } from '@/stores/useCommentBottomSheetStore';
 import {
   Overlay,
@@ -22,7 +24,8 @@ const GlobalCommentBottomSheet = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   
-  const { nickname, isReplying, cancelReply, setReplyContent, submitComment } = useReplyActions();
+  const { nickname, isReplying, cancelReply } = useReplyActions();
+  const { parentId } = useReplyStore();
 
   // 댓글 목록 로드
   const loadComments = useCallback(async () => {
@@ -51,19 +54,21 @@ const GlobalCommentBottomSheet = () => {
 
     setIsSending(true);
     try {
-      // useReplyActions의 replyContent를 현재 inputValue로 설정
-      setReplyContent(inputValue.trim());
+      const requestData = {
+        content: inputValue.trim(),
+        isReplyRequest: isReplying,
+        parentId: isReplying ? parentId : null,
+        postType: postType as 'FEED' | 'RECORD' | 'VOTE'
+      };
+
+      const response = await postReply(postId, requestData);
       
-      // submitComment 사용
-      await submitComment({
-        postId,
-        postType,
-        onSuccess: async () => {
-          setInputValue('');
-          // 댓글 목록 새로고침
-          await loadComments();
-        }
-      });
+      if (response.isSuccess) {
+        setInputValue('');
+        cancelReply(); // 답글 상태 초기화
+        // 댓글 목록 새로고침
+        await loadComments();
+      }
     } catch (error) {
       console.error('댓글 전송 실패:', error);
     } finally {
