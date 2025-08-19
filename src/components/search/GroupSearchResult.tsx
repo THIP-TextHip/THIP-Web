@@ -96,17 +96,15 @@ const GroupSearchResult = ({
           </EmptyContent>
         ) : (
           mapped.map((group, idx) => (
-            <div
+            <GroupCard
               key={group.id}
-              ref={
-                lastRoomElementCallback && idx === mapped.length - 1
-                  ? lastRoomElementCallback
-                  : undefined
-              }
+              group={group}
+              type={'search'}
+              isOngoing={group.isOnGoing}
+              isFirstCard={type === 'searching' && idx === 0}
               onClick={() => onClickRoom(Number(group.id))}
-            >
-              <GroupCard group={group} isOngoing={true} type="search" />
-            </div>
+              ref={idx === mapped.length - 1 ? lastRoomElementCallback : undefined}
+            />
           ))
         )}
 

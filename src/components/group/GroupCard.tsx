@@ -10,12 +10,13 @@ interface Props {
   type?: 'main' | 'search' | 'modal';
   isRecommend?: boolean;
   onClick?: () => void;
+  isFirstCard?: boolean;
 }
 
 export const GroupCard = forwardRef<HTMLDivElement, Props>(
-  ({ group, isOngoing, type = 'main', isRecommend = false, onClick }, ref) => {
+  ({ group, isOngoing, type = 'main', isRecommend = false, onClick, isFirstCard }, ref) => {
     return (
-      <Card ref={ref} cardType={type} onClick={onClick}>
+      <Card ref={ref} cardType={type} isFirstCard={isFirstCard} onClick={onClick}>
         <Cover src={group.coverUrl} alt="cover" cardType={type} isRecommend={isRecommend} />
         <Info>
           <Title isRecommend={isRecommend}>{group.title}</Title>
@@ -39,13 +40,17 @@ export const GroupCard = forwardRef<HTMLDivElement, Props>(
   },
 );
 
-const Card = styled.div<{ cardType: 'main' | 'search' | 'modal' }>`
+const Card = styled.div<{ cardType: 'main' | 'search' | 'modal'; isFirstCard?: boolean }>`
   display: flex;
   align-items: center;
   background: ${({ cardType }) =>
     cardType === 'search' ? colors.black.main : colors.darkgrey.main};
-  border-top: ${({ cardType }) =>
-    cardType === 'search' ? `1px solid ${colors.darkgrey.dark}` : 'none'};
+  border-top: ${({ cardType, isFirstCard }) =>
+    cardType === 'search' && isFirstCard
+      ? 'none'
+      : cardType === 'search'
+        ? `1px solid ${colors.darkgrey.dark}`
+        : 'none'};
   border: ${({ cardType }) => (cardType === 'main' ? `1px solid ${colors.grey[300]}` : '')};
   border-radius: ${({ cardType }) => (cardType === 'search' ? `none` : '12px')};
   box-sizing: border-box;
