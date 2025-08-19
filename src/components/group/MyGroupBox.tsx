@@ -66,7 +66,8 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
     navigate(`detail/joined/${roomId}`);
   };
 
-  const { scrollRef, cardRefs, infiniteGroups } = useInfiniteCarousel(groups);
+  const isSingle = groups.length === 1;
+  const { scrollRef, cardRefs, infiniteGroups } = useInfiniteCarousel(isSingle ? [] : groups);
 
   let isDragging = false;
   let startX = 0;
@@ -124,28 +125,38 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
         </ErrorContainer>
       ) : groups.length > 0 ? (
         <>
-          <Carousel
-            ref={scrollRef}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            {infiniteGroups.map((g, i) => (
+          {isSingle ? (
+            <Carousel>
               <MyGroupCard
-                key={`${g.id}-${i}`}
-                group={g}
-                ref={el => {
-                  cardRefs.current[i] = el;
-                }}
-                onClick={() => handleCardClick(g.id)}
+                group={groups[0]}
                 isMine
+                onClick={() => navigate(`detail/joined/${groups[0].id}`)}
               />
-            ))}
-          </Carousel>
+            </Carousel>
+          ) : (
+            <Carousel
+              ref={scrollRef}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {infiniteGroups.map((g, i) => (
+                <MyGroupCard
+                  key={`${g.id}-${i}`}
+                  group={g}
+                  isMine
+                  ref={el => {
+                    cardRefs.current[i] = el;
+                  }}
+                  onClick={() => handleCardClick(g.id)}
+                />
+              ))}
+            </Carousel>
+          )}
         </>
       ) : (
         <EmptyContainer>
@@ -206,6 +217,8 @@ const Carousel = styled.div`
     display: none;
   }
   scroll-snap-type: x mandatory;
+
+  justify-content: center;
 `;
 
 const LoadingContainer = styled.div`
