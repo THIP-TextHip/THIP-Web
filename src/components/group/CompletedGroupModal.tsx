@@ -111,7 +111,6 @@ const Content = styled.div<{ isEmpty?: boolean }>`
   gap: 20px;
   overflow-y: ${({ isEmpty }) => (isEmpty ? 'visible' : 'auto')};
   padding: 0 20px;
-  flex: 1;
   grid-template-columns: 1fr;
 
   @media (min-width: 584px) {
