@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import type { Record } from '../../../types/memory';
 import TextRecord from './TextRecord';
 import PollRecord from './PollRecord';
+import CommentModal from '../CommentModal/CommentModal';
 import heartIcon from '../../../assets/memory/heart.svg';
 import heartFilledIcon from '../../../assets/memory/heart-filled.svg';
 import commentIcon from '../../../assets/memory/comment.svg';
@@ -52,6 +53,9 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   // 좋아요 상태 관리 - record 객체에서 isLiked 속성 가져오기
   const [isLiked, setIsLiked] = useState(record.isLiked || false);
   const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
+  
+  // 댓글 모달 상태 관리
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
 
   // 길게 누르기 상태 관리
   const [isPressed, setIsPressed] = useState(false);
@@ -254,6 +258,16 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     });
   }, [openConfirm, handlePinRecord]);
 
+  // 댓글 버튼 클릭 핸들러
+  const handleCommentClick = useCallback(() => {
+    setIsCommentModalOpen(true);
+  }, []);
+
+  // 댓글 모달 닫기 핸들러
+  const handleCommentModalClose = useCallback(() => {
+    setIsCommentModalOpen(false);
+  }, []);
+
   // 길게 누르기 이벤트 핸들러
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
@@ -367,7 +381,10 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
           />
           <span>{currentLikeCount}</span>
         </ActionButton>
-        <ActionButton>
+        <ActionButton onClick={(e) => {
+          e.stopPropagation();
+          handleCommentClick();
+        }}>
           <img src={commentIcon} alt="댓글" />
           <span>{commentCount}</span>
         </ActionButton>
@@ -382,6 +399,14 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
           </ActionButton>
         )}
       </ActionSection>
+
+      {/* 댓글 모달 */}
+      <CommentModal
+        isOpen={isCommentModalOpen}
+        onClose={handleCommentModalClose}
+        postId={parseInt(id)}
+        postType={type === 'poll' ? 'VOTE' : 'RECORD'}
+      />
     </Container>
   );
 };
