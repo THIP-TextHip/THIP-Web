@@ -11,7 +11,6 @@ import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms'
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import { useNavigate } from 'react-router-dom';
-import lockedBookImg from '../../assets/books/lockedBook.svg';
 
 type SortKey = 'deadline' | 'memberCount';
 type SearchStatus = 'idle' | 'searching' | 'searched';
@@ -71,12 +70,7 @@ const GroupSearch = () => {
         if (res.isSuccess) {
           const { roomList, nextCursor: nc, isLast: last } = res.data;
 
-          const processed = roomList.map(room => ({
-            ...room,
-            bookImageUrl: room.isPublic ? room.bookImageUrl : lockedBookImg,
-          }));
-
-          setRooms(processed);
+          setRooms(roomList);
           setNextCursor(nc);
           setIsLast(last);
         } else {
@@ -166,13 +160,7 @@ const GroupSearch = () => {
       if (res.isSuccess) {
         const { roomList, nextCursor: nc, isLast: last } = res.data;
 
-        // 🔒 비공개 방 이미지를 lockedBook으로
-        const processed = roomList.map(room => ({
-          ...room,
-          bookImageUrl: room.isPublic ? room.bookImageUrl : lockedBookImg,
-        }));
-
-        setRooms(prev => [...prev, ...processed]); // ✅ processed 사용
+        setRooms(prev => [...prev, ...roomList]);
         setNextCursor(nc);
         setIsLast(last);
       } else {
