@@ -6,6 +6,7 @@ import { GroupCard } from './GroupCard';
 import TitleHeader from '../common/TitleHeader';
 import { Modal, Overlay } from './Modal.styles';
 import { getMyRooms, type Room } from '@/api/rooms/getMyRooms';
+import { getMyProfile } from '@/api/users/getMyProfile';
 import { colors, typography } from '@/styles/global/global';
 
 interface CompletedGroupModalProps {
@@ -16,6 +17,7 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nickname, setNickname] = useState<string>('');
 
   const convertRoomToGroup = (room: Room): Group => {
     return {
@@ -49,7 +51,17 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
       }
     };
 
+    const fetchNickname = async () => {
+      try {
+        const profile = await getMyProfile();
+        setNickname(profile.nickname);
+      } catch {
+        setNickname('');
+      }
+    };
+
     fetchCompletedRooms();
+    fetchNickname();
   }, []);
 
   const convertedGroups = rooms.map(convertRoomToGroup);
@@ -61,7 +73,11 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
           leftIcon={<img src={leftArrow} alt="뒤로 가기" />}
           onLeftClick={onClose}
         />
-        <Text>00님이 참여했던 모임방들을 확인해보세요.</Text>
+        <Text>
+          {nickname
+            ? `${nickname}님이 참여했던 모임방들을 확인해보세요.`
+            : '참여했던 모임방들을 확인해보세요.'}
+        </Text>
         <Content isEmpty={!isLoading && !error && convertedGroups.length === 0}>
           {isLoading ? (
             <LoadingMessage>로딩 중...</LoadingMessage>
