@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import MessageInput from '@/components/today-words/MessageInput';
 import ReplyList from '@/components/common/Post/ReplyList';
 import { getComments, type CommentData } from '@/api/comments/getComments';
-import { postReply } from '@/api/comments/postReply';
 import { useReplyActions } from '@/hooks/useReplyActions';
 
 interface CommentModalProps {
@@ -20,10 +19,10 @@ const CommentModal = ({ isOpen, onClose, postId, postType }: CommentModalProps) 
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
-  const { replyTarget, isReplying, endReply } = useReplyActions();
+  const { nickname, isReplying, cancelReply, setReplyContent, submitComment } = useReplyActions();
 
   // 댓글 목록 로드
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     if (!isOpen) return;
 
     setIsLoading(true);
@@ -41,7 +40,7 @@ const CommentModal = ({ isOpen, onClose, postId, postType }: CommentModalProps) 
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isOpen, postId, postType]);
 
   // 댓글 전송
   const handleSendComment = async () => {
@@ -49,21 +48,19 @@ const CommentModal = ({ isOpen, onClose, postId, postType }: CommentModalProps) 
 
     setIsSending(true);
     try {
-      const requestData = {
-        content: inputValue.trim(),
-        isReplyRequest: isReplying,
-        parentId: isReplying ? replyTarget?.commentId || null : null,
+      // useReplyActions의 replyContent를 현재 inputValue로 설정
+      setReplyContent(inputValue.trim());
+      
+      // submitComment 사용
+      await submitComment({
+        postId,
         postType,
-      };
-
-      const response = await postReply(postId, requestData);
-
-      if (response.isSuccess) {
-        setInputValue('');
-        endReply();
-        // 댓글 목록 새로고침
-        await loadComments();
-      }
+        onSuccess: async () => {
+          setInputValue('');
+          // 댓글 목록 새로고침
+          await loadComments();
+        }
+      });
     } catch (error) {
       console.error('댓글 전송 실패:', error);
     } finally {
@@ -73,7 +70,7 @@ const CommentModal = ({ isOpen, onClose, postId, postType }: CommentModalProps) 
 
   // 답글 취소
   const handleCancelReply = () => {
-    endReply();
+    cancelReply();
   };
 
   // 모달이 열릴 때 댓글 로드
@@ -81,16 +78,16 @@ const CommentModal = ({ isOpen, onClose, postId, postType }: CommentModalProps) 
     if (isOpen) {
       loadComments();
     }
-  }, [isOpen, postId]);
+  }, [isOpen, postId, loadComments]);
 
   // 모달이 닫힐 때 상태 초기화
   useEffect(() => {
     if (!isOpen) {
       setInputValue('');
-      endReply();
+      cancelReply();
       setCommentList([]);
     }
-  }, [isOpen]);
+  }, [isOpen, cancelReply]);
 
   if (!isOpen) return null;
 
@@ -112,14 +109,14 @@ const CommentModal = ({ isOpen, onClose, postId, postType }: CommentModalProps) 
         <InputSection>
           <MessageInput
             placeholder={
-              isReplying ? `@${replyTarget?.nickname}님에게 답글을 남겨보세요` : '댓글을 남겨보세요'
+              isReplying ? `@${nickname}님에게 답글을 남겨보세요` : '댓글을 남겨보세요'
             }
             value={inputValue}
             onChange={setInputValue}
             onSend={handleSendComment}
             isReplying={isReplying}
             onCancelReply={handleCancelReply}
-            nickname={replyTarget?.nickname}
+            nickname={nickname}
             disabled={isSending}
           />
         </InputSection>
