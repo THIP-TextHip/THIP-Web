@@ -9,7 +9,7 @@ const Snackbar = ({ message, actionText, variant, onActionClick, onClose }: Snac
   useEffect(() => {
     setVisible(true);
 
-    const showDuration = variant === 'bottom' ? 7000 : 4000;
+    const showDuration = variant === 'bottom' ? 5000 : 2000;
     const timer = setTimeout(() => {
       setVisible(false);
       setTimeout(() => onClose(), 2000); // 애니메이션 끝난 후 닫힘
