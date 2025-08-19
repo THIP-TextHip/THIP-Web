@@ -7,9 +7,10 @@ export const Wrapper = styled.div`
   position: relative;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 320px;
   max-width: 767px;
+  min-height: 100vh;
   height: 100%;
   margin: 0 auto;
   background-color: ${colors.black.main};
@@ -184,6 +185,13 @@ export const BookIntro = styled.div`
     margin-top: 4px;
     color: ${colors.grey[200]};
     font-size: ${typography.fontSize['2xs']};
+
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
   }
 `;
 

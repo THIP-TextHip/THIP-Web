@@ -5,6 +5,7 @@ import MemoryHeader from '../../components/memory/MemoryHeader/MemoryHeader';
 import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
 import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddButton';
 import Snackbar from '../../components/common/Modal/Snackbar';
+import GlobalCommentBottomSheet from '../../components/common/CommentBottomSheet/GlobalCommentBottomSheet';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
 import type { GetMemoryPostsParams, Post, Record } from '../../types/memory';
@@ -33,6 +34,8 @@ const convertPostToRecord = (post: Post): Record => {
       text: item.itemName,
       percentage: item.percentage,
       isHighest: index === 0,
+      voteItemId: item.voteItemId,
+      isVoted: item.isVoted,
     })),
   };
 };
@@ -293,6 +296,8 @@ const Memory = () => {
           onClose={() => setShowSnackbar(false)}
         />
       )}
+      
+      <GlobalCommentBottomSheet />
     </Container>
   );
 };

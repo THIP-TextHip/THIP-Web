@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import type { MoreMenuProps } from '@/stores/usePopupStore';
 
-const MoreMenu = ({ onEdit, onDelete, onClose, onReport, isWriter, type }: MoreMenuProps) => {
+const MoreMenu = ({ onEdit, onDelete, onClose, onReport, onPin, isWriter, type }: MoreMenuProps) => {
   return (
     <Overlay onClick={onClose}>
       {type === 'post' ? (
@@ -10,14 +10,19 @@ const MoreMenu = ({ onEdit, onDelete, onClose, onReport, isWriter, type }: MoreM
         <>
           {isWriter ? (
             <>
-              <Container onClick={e => e.stopPropagation()}>
+              <RecordContainer onClick={e => e.stopPropagation()}>
                 <Button variant="edit" onClick={onEdit}>
                   수정하기
                 </Button>
                 <Button variant="delete" onClick={onDelete}>
                   삭제하기
                 </Button>
-              </Container>
+                {onPin && (
+                  <Button variant="pin" onClick={onPin}>
+                    피드에 핀하기
+                  </Button>
+                )}
+              </RecordContainer>
             </>
           ) : (
             <ReportContainer onClick={e => e.stopPropagation()}>
@@ -66,23 +71,6 @@ const Overlay = styled.div`
   z-index: 1200;
 `;
 
-const Container = styled.div`
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  display: flex;
-  flex-direction: column;
-  min-width: 320px;
-  max-width: 767px;
-  width: 100%;
-  height: 141px;
-  padding: 20px;
-  border-radius: 12px 12px 0px 0px;
-  background-color: ${colors.darkgrey.main};
-  z-index: 1201;
-`;
 
 const ReportContainer = styled.div`
   position: fixed;
@@ -102,7 +90,26 @@ const ReportContainer = styled.div`
   z-index: 1201;
 `;
 
-const Button = styled.div<{ variant: 'edit' | 'delete' | 'report' }>`
+// 3개 버튼을 위한 컨테이너 (핀하기 포함)
+const RecordContainer = styled.div`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  max-width: 767px;
+  width: 100%;
+  height: 192px;
+  padding: 20px;
+  border-radius: 12px 12px 0px 0px;
+  background-color: ${colors.darkgrey.main};
+  z-index: 1201;
+`;
+
+const Button = styled.div<{ variant: 'edit' | 'delete' | 'report' | 'pin' }>`
   display: flex;
   height: 50px;
   align-items: center;
@@ -110,6 +117,7 @@ const Button = styled.div<{ variant: 'edit' | 'delete' | 'report' }>`
     if (variant === 'edit') return colors.white;
     if (variant === 'delete') return colors.red;
     if (variant === 'report') return colors.red;
+    if (variant === 'pin') return colors.white;
     return colors.white;
   }};
   font-size: ${typography.fontSize.base};
@@ -125,8 +133,28 @@ const Button = styled.div<{ variant: 'edit' | 'delete' | 'report' }>`
         border-bottom: none;
       `;
     }
+    if (variant === 'pin') {
+      return `
+        &:first-of-type {
+          padding: 8px 12px 16px 12px;
+        }
+        
+        &:nth-of-type(2) {
+          padding: 8px 12px 16px 12px;
+        }
+
+        &:last-of-type {
+          padding: 16px 12px 8px 12px;
+          border-bottom: none;
+        }
+      `;
+    }
     return `
       &:first-of-type {
+        padding: 8px 12px 16px 12px;
+      }
+      
+      &:nth-of-type(2) {
         padding: 8px 12px 16px 12px;
       }
 

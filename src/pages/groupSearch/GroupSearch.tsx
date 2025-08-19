@@ -8,24 +8,28 @@ import GroupSearchResult from '@/components/search/GroupSearchResult';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
 import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms';
+import styled from '@emotion/styled';
+import { colors, typography } from '@/styles/global/global';
+import { useNavigate } from 'react-router-dom';
+import lockedBookImg from '../../assets/books/lockedBook.svg';
 
 type SortKey = 'deadline' | 'memberCount';
+type SearchStatus = 'idle' | 'searching' | 'searched';
 
 const GroupSearch = () => {
+  const navigate = useNavigate();
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [isFinalized, setIsFinalized] = useState(false);
+  const [searchStatus, setSearchStatus] = useState<SearchStatus>('idle');
 
   const [rooms, setRooms] = useState<SearchRoomItem[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [isLast, setIsLast] = useState(true);
 
-  // 로딩
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 정렬/카테고리
   const [selectedFilter, setSelectedFilter] = useState<string>('마감임박순');
   const toSortKey = useCallback(
     (f: string): SortKey => (f === '인기순' ? 'memberCount' : 'deadline'),
@@ -36,59 +40,122 @@ const GroupSearch = () => {
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
+  const [showTabs, setShowTabs] = useState(false);
+
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const fetchRecentSearches = async () => {
-    try {
-      const response = await getRecentSearch('ROOM');
-      setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
-    } catch {
-      setRecentSearches([]);
-    }
-  };
   useEffect(() => {
-    fetchRecentSearches();
+    (async () => {
+      try {
+        const response = await getRecentSearch('ROOM');
+        setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
+      } catch {
+        setRecentSearches([]);
+      }
+    })();
   }, []);
 
   const searchFirstPage = useCallback(
-    async (term: string, sortKey: SortKey, manual: boolean) => {
+    async (term: string, sortKey: SortKey, status: 'searching' | 'searched') => {
       if (!term.trim()) return;
-      setIsSearching(true);
-      if (manual) setIsFinalized(false);
 
       setIsLoading(true);
       setError(null);
+      setRooms([]);
+      setNextCursor(null);
+      setIsLast(true);
+
       try {
+        const isFinalized = status === 'searched';
         const res = await getSearchRooms(term.trim(), sortKey, undefined, isFinalized, category);
         if (res.isSuccess) {
           const { roomList, nextCursor: nc, isLast: last } = res.data;
-          setRooms(roomList);
+
+          const processed = roomList.map(room => ({
+            ...room,
+            bookImageUrl: room.isPublic ? room.bookImageUrl : lockedBookImg,
+          }));
+
+          setRooms(processed);
           setNextCursor(nc);
           setIsLast(last);
         } else {
-          setRooms([]);
-          setNextCursor(null);
-          setIsLast(true);
           setError(res.message || '검색 실패');
         }
       } catch {
-        setRooms([]);
-        setNextCursor(null);
-        setIsLast(true);
         setError('네트워크 오류가 발생했습니다.');
       } finally {
         setIsLoading(false);
-        if (manual) setIsFinalized(true);
       }
     },
-    [category, isFinalized],
+    [category],
   );
+
+  const handleChange = (value: string) => {
+    setSearchTerm(value);
+    if (searchTimeoutId) clearTimeout(searchTimeoutId);
+
+    const trimmed = value.trim();
+    if (!trimmed) {
+      setSearchStatus('idle');
+      setRooms([]);
+      setError(null);
+      setNextCursor(null);
+      setIsLast(true);
+      setShowTabs(false);
+      setSearchTimeoutId(null);
+      return;
+    }
+
+    setSearchStatus('searching');
+    setShowTabs(false);
+    const id = setTimeout(() => {
+      searchFirstPage(trimmed, toSortKey(selectedFilter), 'searching');
+    }, 300);
+    setSearchTimeoutId(id);
+  };
+
+  const handleSearch = () => {
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+      setSearchTimeoutId(null);
+    }
+    const term = searchTerm.trim();
+    if (!term) return;
+
+    setSearchStatus('searched');
+    setShowTabs(true);
+    searchFirstPage(term, toSortKey(selectedFilter), 'searched');
+  };
+
+  const handleRecentSearchClick = (recent: string) => {
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+      setSearchTimeoutId(null);
+    }
+    setSearchTerm(recent);
+    setSearchStatus('searched');
+    setShowTabs(true);
+    searchFirstPage(recent.trim(), toSortKey(selectedFilter), 'searched');
+  };
+
+  useEffect(() => {
+    const term = searchTerm.trim();
+    if (!term) return;
+
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+      setSearchTimeoutId(null);
+    }
+    setSearchStatus('searching');
+    searchFirstPage(term, toSortKey(selectedFilter), 'searching');
+  }, [selectedFilter, category, searchTerm, searchFirstPage, toSortKey, searchTimeoutId]);
 
   const loadMore = useCallback(async () => {
     if (!searchTerm.trim() || !nextCursor || isLast || isLoadingMore) return;
-
     try {
       setIsLoadingMore(true);
+      const isFinalized = searchStatus === 'searched';
       const res = await getSearchRooms(
         searchTerm.trim(),
         toSortKey(selectedFilter),
@@ -98,7 +165,14 @@ const GroupSearch = () => {
       );
       if (res.isSuccess) {
         const { roomList, nextCursor: nc, isLast: last } = res.data;
-        setRooms(prev => [...prev, ...roomList]);
+
+        // 🔒 비공개 방 이미지를 lockedBook으로
+        const processed = roomList.map(room => ({
+          ...room,
+          bookImageUrl: room.isPublic ? room.bookImageUrl : lockedBookImg,
+        }));
+
+        setRooms(prev => [...prev, ...processed]); // ✅ processed 사용
         setNextCursor(nc);
         setIsLast(last);
       } else {
@@ -116,13 +190,14 @@ const GroupSearch = () => {
     isLoadingMore,
     selectedFilter,
     toSortKey,
-    isFinalized,
+    searchStatus,
     category,
   ]);
 
   const lastRoomElementCallback = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoadingMore || isLast) return;
+
       if (observerRef.current) observerRef.current.disconnect();
 
       observerRef.current = new IntersectionObserver(entries => {
@@ -130,95 +205,36 @@ const GroupSearch = () => {
           loadMore();
         }
       });
+
       if (node) observerRef.current.observe(node);
     },
     [isLoadingMore, isLast, loadMore],
   );
-
-  const handleChange = (value: string) => {
-    setSearchTerm(value);
-    setIsFinalized(false);
-    const trimmed = value.trim();
-    setIsSearching(trimmed !== '');
-    setNextCursor(null);
-    setIsLast(true);
-    setRooms([]);
-
-    if (searchTimeoutId) {
-      clearTimeout(searchTimeoutId);
-    }
-
-    if (trimmed) {
-      const id = setTimeout(() => {
-        searchFirstPage(trimmed, toSortKey(selectedFilter), false);
-      }, 300);
-      setSearchTimeoutId(id);
-    } else {
-      setError(null);
-    }
-  };
-
-  const handleSearch = () => {
-    const term = searchTerm.trim();
-    if (!term) return;
-    if (searchTimeoutId) {
-      clearTimeout(searchTimeoutId);
-      setSearchTimeoutId(null);
-    }
-    searchFirstPage(term, toSortKey(selectedFilter), true);
-  };
-
-  const handleRecentSearchClick = (recent: string) => {
-    setSearchTerm(recent);
-    setIsSearching(true);
-    setIsFinalized(false);
-    if (searchTimeoutId) {
-      clearTimeout(searchTimeoutId);
-      setSearchTimeoutId(null);
-    }
-    searchFirstPage(recent, toSortKey(selectedFilter), true);
-  };
-
-  useEffect(() => {
-    if (isSearching && searchTerm.trim()) {
-      if (searchTimeoutId) {
-        clearTimeout(searchTimeoutId);
-        setSearchTimeoutId(null);
-      }
-      searchFirstPage(searchTerm.trim(), toSortKey(selectedFilter), false);
-    }
-  }, [selectedFilter, isSearching, searchTerm, searchFirstPage, toSortKey, searchTimeoutId]);
-
-  useEffect(() => {
-    if (isSearching && searchTerm.trim()) {
-      if (searchTimeoutId) {
-        clearTimeout(searchTimeoutId);
-        setSearchTimeoutId(null);
-      }
-      searchFirstPage(searchTerm.trim(), toSortKey(selectedFilter), false);
-    }
-  }, [
-    category,
-    isSearching,
-    searchTerm,
-    searchFirstPage,
-    toSortKey,
-    selectedFilter,
-    searchTimeoutId,
-  ]);
 
   const handleBackButton = () => {
     if (searchTimeoutId) {
       clearTimeout(searchTimeoutId);
       setSearchTimeoutId(null);
     }
-    setSearchTerm('');
-    setIsSearching(false);
-    setIsFinalized(false);
-    setRooms([]);
-    setNextCursor(null);
-    setIsLast(true);
-    setError(null);
+
+    const isIdleView = searchStatus === 'idle' && !searchTerm.trim();
+
+    if (!isIdleView) {
+      setSearchTerm('');
+      setSearchStatus('idle');
+      setRooms([]);
+      setNextCursor(null);
+      setIsLast(true);
+      setError(null);
+      setShowTabs(false);
+      return;
+    }
+    const idx = (window.history.state && window.history.state.idx) as number | undefined;
+    if (typeof idx === 'number' && idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/group');
+    }
   };
 
   useEffect(() => {
@@ -242,31 +258,38 @@ const GroupSearch = () => {
           value={searchTerm}
           onChange={handleChange}
           onSearch={handleSearch}
-          isSearched={isFinalized}
+          isSearched={searchStatus === 'searched'}
         />
 
-        {isSearching ? (
-          <GroupSearchResult
-            type={isFinalized ? 'searched' : 'searching'}
-            rooms={rooms}
-            isLoading={isLoading}
-            isLoadingMore={isLoadingMore}
-            hasMore={!isLast}
-            lastRoomElementCallback={lastRoomElementCallback}
-            error={error}
-            selectedFilter={selectedFilter}
-            setSelectedFilter={setSelectedFilter}
-            onChangeCategory={setCategory}
-            currentCategory={category}
-          />
+        {searchStatus !== 'idle' ? (
+          <>
+            {isLoading && rooms.length === 0 ? (
+              <LoadingMessage>검색 중...</LoadingMessage>
+            ) : (
+              <GroupSearchResult
+                type={searchStatus}
+                showTabs={showTabs}
+                rooms={rooms}
+                isLoading={isLoading}
+                isLoadingMore={isLoadingMore}
+                hasMore={!isLast}
+                lastRoomElementCallback={lastRoomElementCallback}
+                error={error}
+                selectedFilter={selectedFilter}
+                setSelectedFilter={setSelectedFilter}
+                onChangeCategory={setCategory}
+                currentCategory={category}
+                onClickRoom={roomId => navigate(`/group/detail/${roomId}`)}
+              />
+            )}
+          </>
         ) : (
           <RecentSearchTabs
             recentSearches={recentSearches.map(i => i.searchTerm)}
             handleDelete={(term: string) => {
               const x = recentSearches.find(i => i.searchTerm === term);
               if (!x) return;
-              const userId = 1;
-              deleteRecentSearch(x.recentSearchId, userId).then(res => {
+              deleteRecentSearch(x.recentSearchId).then(res => {
                 if (res.isSuccess) {
                   setRecentSearches(prev =>
                     prev.filter(it => it.recentSearchId !== x.recentSearchId),
@@ -283,3 +306,12 @@ const GroupSearch = () => {
 };
 
 export default GroupSearch;
+
+const LoadingMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  color: ${colors.white};
+  font-size: ${typography.fontSize.base};
+`;

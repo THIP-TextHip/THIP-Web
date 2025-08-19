@@ -26,9 +26,13 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     error,
     showEmptyState,
     showTabs,
+    hasNextPage,
+    isLoadingMore,
     setSearchQuery,
     handleTabChange,
     loadInitialData,
+    performSearch,
+    loadMoreSearchResults,
   } = useBookSearch();
 
   // 컴포넌트가 열릴 때 초기 데이터 로드
@@ -64,7 +68,9 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
   };
 
   const handleSearch = () => {
-    console.log('검색:', searchQuery);
+    if (searchQuery.trim()) {
+      performSearch(searchQuery.trim());
+    }
   };
 
   const handleClearSearch = () => {
@@ -98,7 +104,16 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
               onClose={onClose}
             />
 
-            {showBookList && <BookList books={filteredBooks} onBookSelect={handleBookSelect} />}
+            {showBookList && (
+              <BookList 
+                books={filteredBooks} 
+                onBookSelect={handleBookSelect}
+                onLoadMore={loadMoreSearchResults}
+                hasNextPage={hasNextPage}
+                isLoadingMore={isLoadingMore}
+                isSearchMode={searchQuery.trim() !== ''}
+              />
+            )}
           </BookListContainer>
         </Content>
       </BottomSheetContainer>

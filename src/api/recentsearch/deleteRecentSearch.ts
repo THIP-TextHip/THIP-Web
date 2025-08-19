@@ -10,11 +10,10 @@ export interface DeleteRecentSearchResponse {
 
 export const deleteRecentSearch = async (
   recentSearchId: number,
-  userId: number,
 ): Promise<DeleteRecentSearchResponse> => {
   try {
     const response = await apiClient.delete<DeleteRecentSearchResponse>(
-      `/recent-searches/${recentSearchId}?userId=${userId}`,
+      `/recent-searches/${recentSearchId}`,
     );
     return response.data;
   } catch (error) {

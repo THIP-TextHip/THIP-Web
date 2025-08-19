@@ -45,6 +45,9 @@ const CreatePost = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 핀 데이터가 있는지 확인
+  const pinData = location.state?.pinData;
+
   function convertBookInfoToBook(bookInfo: Book): Book | null {
     if (!bookInfo) return null;
     return {
@@ -55,14 +58,24 @@ const CreatePost = () => {
     };
   }
 
+  // 핀 데이터가 있으면 초기값으로 설정
   const [selectedBook, setSelectedBook] = useState<Book | null>(
-    convertBookInfoToBook(location.state?.selectedBook),
+    pinData ? {
+      title: pinData.bookTitle,
+      author: pinData.authorName,
+      cover: pinData.bookImageUrl,
+      isbn: pinData.isbn,
+    } : convertBookInfoToBook(location.state?.selectedBook),
   );
-  const [postContent, setPostContent] = useState('');
+  
+  const [postContent, setPostContent] = useState(pinData?.recordContent || '');
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
+
+  // 핀 데이터가 있는 경우 책 선택 및 내용 입력 비활성화
+  const isFromPin = !!pinData;
 
   const { openSnackbar, closePopup } = usePopupActions();
   const { createNewFeed, loading } = useCreateFeed({
@@ -168,11 +181,16 @@ const CreatePost = () => {
           selectedBook={selectedBook}
           onSearchClick={handleBookSearchOpen}
           onChangeClick={handleChangeBook}
+          readOnly={isFromPin}
         />
 
         <Section showDivider />
 
-        <PostContentSection content={postContent} onContentChange={setPostContent} />
+        <PostContentSection 
+          content={postContent} 
+          onContentChange={setPostContent}
+          readOnly={isFromPin}
+        />
 
         <Section showDivider />
 

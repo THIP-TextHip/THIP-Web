@@ -51,6 +51,7 @@ const Router = () => {
         <Route path="signup/guide" element={<Guide />} />
         <Route path="signup/done" element={<SignupDone />} />
         <Route path="post/create" element={<CreatePost />} />
+        <Route path="feed/write" element={<CreatePost />} />
         <Route path="group" element={<Group />} />
         <Route path="group/create" element={<CreateGroup />} />
         <Route path="post/update/:feedId" element={<UpdatePost />} />

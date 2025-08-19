@@ -9,6 +9,7 @@ interface BookSearchResultProps {
   hasMore?: boolean;
   isLoading?: boolean;
   lastBookElementCallback?: (node: HTMLDivElement | null) => void;
+  totalElements?: number;
 }
 
 export function BookSearchResult({
@@ -17,6 +18,7 @@ export function BookSearchResult({
   hasMore = false,
   isLoading = false,
   lastBookElementCallback,
+  totalElements,
 }: BookSearchResultProps) {
   const navigate = useNavigate();
 
@@ -32,7 +34,7 @@ export function BookSearchResult({
   return (
     <Wrapper>
       <List>
-        {type === 'searching' ? <></> : <ResultHeader>전체 {searchedBookList.length}</ResultHeader>}
+        {type === 'searching' ? <></> : <ResultHeader>전체 {totalElements}</ResultHeader>}
 
         {isEmptySearchedBookList() ? (
           <EmptyWrapper>
@@ -43,7 +45,7 @@ export function BookSearchResult({
         ) : (
           searchedBookList.map((book, index) => (
             <BookItem
-              key={book.id}
+              key={`book-${book.isbn}-${index}`}
               onClick={() => navigate(`/search/book/${book.isbn}`)}
               ref={
                 index === searchedBookList.length - 1 && lastBookElementCallback

@@ -17,12 +17,13 @@ interface Props {
   isLoadingMore?: boolean;
   hasMore?: boolean;
   lastRoomElementCallback?: (node: HTMLDivElement | null) => void;
-
   error: string | null;
   selectedFilter: string;
   setSelectedFilter: (v: string) => void;
   onChangeCategory: (category: string) => void;
   currentCategory: string;
+  showTabs: boolean;
+  onClickRoom: (roomId: number) => void;
 }
 
 const mapToGroupCardModel = (r: SearchRoomItem) => ({
@@ -33,7 +34,7 @@ const mapToGroupCardModel = (r: SearchRoomItem) => ({
   maximumParticipants: r.recruitCount,
   coverUrl: r.bookImageUrl,
   deadLine: r.deadlineDate,
-  genre: r.genre ?? '',
+  genre: (r as SearchRoomItem)?.genre ?? '',
   isOnGoing: r.isPublic,
 });
 
@@ -42,43 +43,48 @@ const GroupSearchResult = ({
   rooms,
   isLoading,
   isLoadingMore = false,
-  hasMore = false,
   lastRoomElementCallback,
   error,
   selectedFilter,
   setSelectedFilter,
   onChangeCategory,
   currentCategory,
+  showTabs,
+  onClickRoom,
 }: Props) => {
   const mapped = useMemo(() => rooms.map(mapToGroupCardModel), [rooms]);
   const isEmpty = !isLoading && mapped.length === 0;
 
   return (
     <>
-      <TabContainer>
-        {CATEGORIES.map(tab => {
-          const selected = tab === currentCategory;
-          return (
-            <Tab
-              key={tab}
-              selected={selected}
-              onClick={() => onChangeCategory(selected ? '' : tab)}
-              aria-pressed={selected}
-            >
-              {tab}
-            </Tab>
-          );
-        })}
-      </TabContainer>
+      {showTabs && (
+        <TabContainer>
+          {CATEGORIES.map(tab => {
+            const selected = tab === currentCategory;
+            return (
+              <Tab
+                key={tab}
+                selected={selected}
+                onClick={() => onChangeCategory(selected ? '' : tab)}
+                aria-pressed={selected}
+              >
+                {tab}
+              </Tab>
+            );
+          })}
+        </TabContainer>
+      )}
 
-      <GroupCardHeader>
-        {type === 'searched' && <GroupNum>전체 {mapped.length}</GroupNum>}
-        <Filter
-          filters={FILTER}
-          selectedFilter={selectedFilter}
-          setSelectedFilter={setSelectedFilter}
-        />
-      </GroupCardHeader>
+      {(showTabs || type === 'searched') && (
+        <GroupCardHeader>
+          <GroupNum>전체 {mapped.length}</GroupNum>
+          <Filter
+            filters={FILTER}
+            selectedFilter={selectedFilter}
+            setSelectedFilter={setSelectedFilter}
+          />
+        </GroupCardHeader>
+      )}
 
       <Content>
         {error && <ErrorText>{error}</ErrorText>}
@@ -97,14 +103,14 @@ const GroupSearchResult = ({
                   ? lastRoomElementCallback
                   : undefined
               }
+              onClick={() => onClickRoom(Number(group.id))}
             >
-              <GroupCard group={group} isOngoing={group.isOnGoing} type="search" />
+              <GroupCard group={group} isOngoing={true} type="search" />
             </div>
           ))
         )}
 
         {isLoadingMore && mapped.length > 0 && <LoadingText>불러오는 중...</LoadingText>}
-        {!hasMore && mapped.length > 0 && <EndText>더 이상 결과가 없어요</EndText>}
       </Content>
     </>
   );
@@ -127,8 +133,7 @@ const Tab = styled.button<{ selected?: boolean }>`
   font-weight: ${typography.fontWeight.regular};
   border: none;
   border-radius: 16px;
-  background: ${({ selected }) =>
-    selected ? 'var(--color-purple-main)' : 'var(--color-darkgrey-main)'};
+  background: ${({ selected }) => (selected ? `${colors.purple.main}` : `${colors.darkgrey.main}`)};
   color: #fff;
   cursor: pointer;
 `;
@@ -182,12 +187,6 @@ const EmptySubText = styled.p`
 const LoadingText = styled.p`
   color: ${colors.grey[100]};
   font-size: ${typography.fontSize.sm};
-  text-align: center;
-`;
-
-const EndText = styled.p`
-  color: ${colors.grey[200]};
-  font-size: ${typography.fontSize.xs};
   text-align: center;
 `;
 

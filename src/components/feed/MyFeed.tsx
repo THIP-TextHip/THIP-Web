@@ -9,7 +9,7 @@ import { getMyProfile } from '@/api/feeds/getMyProfile';
 import type { MyProfileData } from '@/types/profile';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
-const MyFeed = ({ showHeader, posts = [], isMyFeed, isLast = false }: FeedListProps) => {
+const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
   const [profileData, setProfileData] = useState<MyProfileData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -55,7 +55,7 @@ const MyFeed = ({ showHeader, posts = [], isMyFeed, isLast = false }: FeedListPr
           <FeedPost
             key={`${post.feedId}-${index}`}
             showHeader={showHeader}
-            isMyFeed={isMyFeed}
+            isMyFeed={true}
             isLast={isLast && index === posts.length - 1}
             {...post}
           />
