@@ -3,6 +3,7 @@ import MessageInput from '@/components/today-words/MessageInput';
 import ReplyList from '@/components/common/Post/ReplyList';
 import { getComments, type CommentData } from '@/api/comments/getComments';
 import { useReplyActions } from '@/hooks/useReplyActions';
+import { useCommentBottomSheetStore } from '@/stores/useCommentBottomSheetStore';
 import {
   Overlay,
   BottomSheet,
@@ -11,16 +12,11 @@ import {
   Content,
   LoadingState,
   InputSection,
-} from './CommentBottomSheet.styled';
+} from './GlobalCommentBottomSheet.styled';
 
-interface CommentBottomSheetProps {
-  isOpen: boolean;
-  onClose: () => void;
-  postId: number;
-  postType: 'RECORD' | 'VOTE';
-}
-
-const CommentBottomSheet = ({ isOpen, onClose, postId, postType }: CommentBottomSheetProps) => {
+const GlobalCommentBottomSheet = () => {
+  const { isOpen, postId, postType, closeCommentBottomSheet } = useCommentBottomSheetStore();
+  
   const [commentList, setCommentList] = useState<CommentData[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +26,7 @@ const CommentBottomSheet = ({ isOpen, onClose, postId, postType }: CommentBottom
 
   // 댓글 목록 로드
   const loadComments = useCallback(async () => {
-    if (!isOpen) return;
+    if (!isOpen || !postId || !postType) return;
 
     setIsLoading(true);
     try {
@@ -51,7 +47,7 @@ const CommentBottomSheet = ({ isOpen, onClose, postId, postType }: CommentBottom
 
   // 댓글 전송
   const handleSendComment = async () => {
-    if (!inputValue.trim() || isSending) return;
+    if (!inputValue.trim() || isSending || !postId || !postType) return;
 
     setIsSending(true);
     try {
@@ -83,7 +79,7 @@ const CommentBottomSheet = ({ isOpen, onClose, postId, postType }: CommentBottom
   // Overlay 클릭 처리
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      closeCommentBottomSheet();
     }
   };
 
@@ -142,4 +138,4 @@ const CommentBottomSheet = ({ isOpen, onClose, postId, postType }: CommentBottom
   );
 };
 
-export default CommentBottomSheet;
+export default GlobalCommentBottomSheet;

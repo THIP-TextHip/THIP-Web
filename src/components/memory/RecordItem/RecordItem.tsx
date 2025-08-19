@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import type { Record } from '../../../types/memory';
 import TextRecord from './TextRecord';
 import PollRecord from './PollRecord';
-import CommentBottomSheet from '../CommentBottomSheet/CommentBottomSheet';
+import { useCommentBottomSheetStore } from '@/stores/useCommentBottomSheetStore';
 import heartIcon from '../../../assets/memory/heart.svg';
 import heartFilledIcon from '../../../assets/memory/heart-filled.svg';
 import commentIcon from '../../../assets/memory/comment.svg';
@@ -54,8 +54,8 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   const [isLiked, setIsLiked] = useState(record.isLiked || false);
   const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
   
-  // 댓글 모달 상태 관리
-  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+  // 전역 댓글 바텀시트
+  const { openCommentBottomSheet } = useCommentBottomSheetStore();
 
   // 길게 누르기 상태 관리
   const [isPressed, setIsPressed] = useState(false);
@@ -260,13 +260,8 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
 
   // 댓글 버튼 클릭 핸들러
   const handleCommentClick = useCallback(() => {
-    setIsCommentModalOpen(true);
-  }, []);
-
-  // 댓글 모달 닫기 핸들러
-  const handleCommentModalClose = useCallback(() => {
-    setIsCommentModalOpen(false);
-  }, []);
+    openCommentBottomSheet(parseInt(id), type === 'poll' ? 'VOTE' : 'RECORD');
+  }, [openCommentBottomSheet, id, type]);
 
   // 길게 누르기 이벤트 핸들러
   const handleTouchStart = useCallback(
@@ -400,13 +395,6 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
         )}
       </ActionSection>
 
-      {/* 댓글 바텀시트 */}
-      <CommentBottomSheet
-        isOpen={isCommentModalOpen}
-        onClose={handleCommentModalClose}
-        postId={parseInt(id)}
-        postType={type === 'poll' ? 'VOTE' : 'RECORD'}
-      />
     </Container>
   );
 };
