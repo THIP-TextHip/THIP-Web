@@ -7,14 +7,14 @@ export const Overlay = styled.div<{ isOpen: boolean }>`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, ${props => props.isOpen ? '0.5' : '0'});
+  background: rgba(0, 0, 0, ${props => (props.isOpen ? '0.5' : '0')});
   z-index: 1000;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   transition: background-color 0.3s ease;
-  opacity: ${props => props.isOpen ? 1 : 0};
-  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+  opacity: ${props => (props.isOpen ? 1 : 0)};
+  visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
 `;
 
 export const BottomSheet = styled.div<{ isOpen: boolean }>`
@@ -22,26 +22,26 @@ export const BottomSheet = styled.div<{ isOpen: boolean }>`
   max-width: 540px;
   min-width: 360px;
   background: ${colors.darkgrey.main};
-  border-radius: 16px 16px 0 0;
+  border-radius: 20px 20px 0 0;
   display: flex;
   flex-direction: column;
   max-height: 80vh;
   min-height: 50vh;
-  transform: translateY(${props => props.isOpen ? '0' : '100%'});
+  transform: translateY(${props => (props.isOpen ? '0' : '100%')});
   transition: transform 0.3s ease;
   overflow: hidden;
 `;
 
 export const Header = styled.div`
   padding: 20px;
-  border-bottom: 1px solid ${colors.grey[400]};
+  padding-bottom: 10px;
   flex-shrink: 0;
 `;
 
 export const Title = styled.h2`
   color: ${colors.white};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
+  font-size: 20px;
+  font-weight: ${typography.fontWeight.bold};
   line-height: 24px;
   margin: 0;
 `;
