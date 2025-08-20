@@ -328,21 +328,23 @@ const GroupDetail = () => {
         </BookInfo>
       </BookSection>
 
-      <RecommendSection>
-        <RecommendText>이런 모임방은 어때요?</RecommendText>
-        <GroupCardBox>
-          {recommendRooms.map(room => (
-            <GroupCard
-              key={room.roomId}
-              group={convertRecommendRoomToGroup(room)}
-              isOngoing={false}
-              isRecommend={true}
-              type="modal"
-              onClick={() => handleRecommendGroupCardClick(room.roomId)}
-            />
-          ))}
-        </GroupCardBox>
-      </RecommendSection>
+      {recommendRooms.length > 0 && (
+        <RecommendSection>
+          <RecommendText>이런 모임방은 어때요?</RecommendText>
+          <GroupCardBox>
+            {recommendRooms.map(room => (
+              <GroupCard
+                key={room.roomId}
+                group={convertRecommendRoomToGroup(room)}
+                isOngoing={false}
+                isRecommend={true}
+                type="modal"
+                onClick={() => handleRecommendGroupCardClick(room.roomId)}
+              />
+            ))}
+          </GroupCardBox>
+        </RecommendSection>
+      )}
 
       <BottomButton onClick={handleBottomButtonClick} disabled={isSubmitting}>
         {roomData.isHost ? '모집 마감하기' : isJoining ? '참여 취소하기' : '참여하기'}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import TitleHeader from '../common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -14,11 +14,20 @@ interface MyGroupModalProps {
 }
 
 export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
   const navigate = useNavigate();
   const [selected, setSelected] = useState<'진행중' | '모집중' | ''>('');
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [isLast, setIsLast] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const convertRoomToGroup = (room: Room): Group => {
     return {
@@ -31,6 +40,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
       deadLine: room.endDate || '',
       genre: '',
       isOnGoing: room.type === 'playing' || room.type === 'playingAndRecruiting',
+      isPublic: room.isPublic,
     };
   };
 
@@ -39,6 +49,8 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
       try {
         setIsLoading(true);
         setError(null);
+        setNextCursor(null);
+        setIsLast(false);
 
         const roomType: RoomType =
           selected === '진행중'
@@ -51,6 +63,8 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
 
         if (response.isSuccess) {
           setRooms(response.data.roomList);
+          setNextCursor(response.data.nextCursor);
+          setIsLast(response.data.isLast);
         } else {
           setError(response.message);
         }
@@ -63,6 +77,104 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     };
 
     fetchRooms();
+  }, [selected]);
+
+  const isFetchingRef = useRef(false);
+
+  const loadMore = async () => {
+    if (isFetchingRef.current || isLast || !nextCursor) return;
+
+    isFetchingRef.current = true;
+    setIsLoading(true);
+    try {
+      const roomType: RoomType =
+        selected === '진행중'
+          ? 'playing'
+          : selected === '모집중'
+            ? 'recruiting'
+            : 'playingAndRecruiting';
+
+      const res = await getMyRooms(roomType, nextCursor);
+      if (res.isSuccess) {
+        setRooms(prev => [...prev, ...res.data.roomList]);
+        setNextCursor(res.data.nextCursor);
+        setIsLast(res.data.isLast);
+      } else {
+        setError(res.message);
+      }
+    } catch (e) {
+      console.log(e);
+      setError('방 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+      isFetchingRef.current = false;
+    }
+  };
+
+  const handleScroll = async (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    if (scrollHeight - scrollTop - clientHeight < 100) {
+      await loadMore();
+    }
+  };
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        setNextCursor(null);
+        setIsLast(false);
+
+        const roomType: RoomType =
+          selected === '진행중'
+            ? 'playing'
+            : selected === '모집중'
+              ? 'recruiting'
+              : 'playingAndRecruiting';
+
+        const res = await getMyRooms(roomType, null);
+        if (res.isSuccess) {
+          setRooms(res.data.roomList);
+          setNextCursor(res.data.nextCursor);
+          setIsLast(res.data.isLast);
+        } else {
+          setError(res.message);
+        }
+      } catch (e) {
+        console.log(e);
+        setError('방 목록을 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, [selected]);
+
+  useEffect(() => {
+    const tryFill = async () => {
+      if (!contentRef.current || isLast) return;
+      let guard = 2; // 최대 3페이지까지 자동 프리로드(필요시 늘리기)
+      while (
+        guard-- > 0 &&
+        contentRef.current &&
+        contentRef.current.scrollHeight <= contentRef.current.clientHeight &&
+        !isLast &&
+        nextCursor
+      ) {
+        await loadMore();
+        await new Promise(requestAnimationFrame);
+      }
+    };
+    tryFill();
+  }, [rooms, nextCursor, isLast]);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }, [selected]);
 
   const convertedGroups = rooms.map(convertRoomToGroup);
@@ -101,22 +213,22 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
           ))}
         </TabContainer>
 
-        <Content>
-          {isLoading ? (
-            <LoadingMessage>로딩 중...</LoadingMessage>
-          ) : error ? (
-            <ErrorMessage>{error}</ErrorMessage>
-          ) : convertedGroups.length > 0 ? (
-            convertedGroups.map(group => (
-              <GroupCard
-                key={group.id}
-                group={group}
-                isOngoing={group.isOnGoing}
-                type={'modal'}
-                onClick={() => handleGroupCardClick(group)}
-              />
-            ))
-          ) : (
+        <Content ref={contentRef} onScroll={handleScroll}>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+
+          {convertedGroups.map(group => (
+            <GroupCard
+              key={group.id}
+              group={group}
+              isOngoing={group.isOnGoing}
+              type="modal"
+              onClick={() => handleGroupCardClick(group)}
+            />
+          ))}
+
+          {isLoading && <BottomSpinner>불러오는 중…</BottomSpinner>}
+
+          {!isLoading && convertedGroups.length === 0 && (
             <EmptyState>
               <EmptyTitle>
                 {selected === '진행중'
@@ -163,21 +275,24 @@ const Content = styled.div`
   gap: 20px;
   overflow-y: auto;
   padding: 0 20px 20px 20px;
-
   grid-template-columns: 1fr;
-
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
   @media (min-width: 584px) {
     grid-template-columns: 1fr 1fr;
   }
 `;
 
-const LoadingMessage = styled.div`
+const BottomSpinner = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 20px;
-  color: #fff;
-  font-size: ${typography.fontSize.base};
+  padding: 16px 0 24px;
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.sm};
 `;
 
 const ErrorMessage = styled.div`

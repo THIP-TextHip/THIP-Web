@@ -169,11 +169,27 @@ export const BookSection = styled.section`
 
 export const BookHeader = styled.div`
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
   color: ${colors.white};
   font-size: ${typography.fontSize['base']};
   font-weight: ${typography.fontWeight.medium};
+  width: 100%;
+  gap: 0;
+
+  h3 {
+    flex: 1 1 0%;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  img {
+    flex-shrink: 0;
+  }
 `;
 
 export const BookInfo = styled.div`
