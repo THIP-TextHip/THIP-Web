@@ -9,6 +9,7 @@ const Container = styled.div`
   flex-direction: column;
   width: 100%;
   gap: 16px;
+  cursor: pointer;
 `;
 
 const PostContent = styled.div<{ hasImage: boolean }>`
@@ -82,9 +83,11 @@ const PostBody = ({
   }, [contentBody]);
 
   return (
-    <Container>
-      <BookInfoCard bookTitle={bookTitle} bookAuthor={bookAuthor} isbn={isbn} />
-      <PostContent hasImage={hasImage} onClick={() => handlePostClick(feedId)}>
+    <Container onClick={() => handlePostClick(feedId)}>
+      <div onClick={(e) => e.stopPropagation()}>
+        <BookInfoCard bookTitle={bookTitle} bookAuthor={bookAuthor} isbn={isbn} />
+      </div>
+      <PostContent hasImage={hasImage}>
         <div className="content" ref={contentRef}>
           {contentBody}
         </div>
