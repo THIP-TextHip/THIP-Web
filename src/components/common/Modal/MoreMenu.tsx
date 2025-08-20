@@ -142,30 +142,30 @@ const Button = styled.div<{ variant: 'edit' | 'delete' | 'report' | 'pin' }>`
     if (variant === 'pin') {
       return `
         &:first-of-type {
-          padding: 8px 12px 16px 12px;
+          padding: 13px 12px 21px 12px;
         }
         
         &:nth-of-type(2) {
-          padding: 8px 12px 16px 12px;
+          padding: 13px 12px 21px 12px;
         }
 
         &:last-of-type {
-          padding: 16px 12px 8px 12px;
+          padding: 21px 12px 13px 12px;
           border-bottom: none;
         }
       `;
     }
     return `
       &:first-of-type {
-        padding: 8px 12px 16px 12px;
+        padding: 13px 12px 21px 12px;
       }
       
       &:nth-of-type(2) {
-        padding: 8px 12px 16px 12px;
+        padding: 13px 12px 21px 12px;
       }
 
       &:last-of-type {
-        padding: 16px 12px 8px 12px;
+        padding: 21px 12px 13px 12px;
         border-bottom: none;
       }
     `;
