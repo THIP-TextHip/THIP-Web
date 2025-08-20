@@ -31,7 +31,7 @@ export interface RoomDetailResponse {
 
 export interface RecommendRoom {
   roomId: number;
-  roomImageUrl: string;
+  bookImageUrl: string;
   roomName: string;
   memberCount: number;
   recruitCount: number;

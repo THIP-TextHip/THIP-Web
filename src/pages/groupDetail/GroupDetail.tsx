@@ -71,8 +71,8 @@ const GroupDetail = () => {
       userName: '',
       participants: room.memberCount,
       maximumParticipants: room.recruitCount,
-      coverUrl: room.roomImageUrl,
-      deadLine: '',
+      coverUrl: room.bookImageUrl,
+      deadLine: room.recruitEndDate,
       genre: '',
       isOnGoing: true,
     };
@@ -267,7 +267,7 @@ const GroupDetail = () => {
             <GroupCard
               key={room.roomId}
               group={convertRecommendRoomToGroup(room)}
-              isOngoing={true}
+              isOngoing={false}
               isRecommend={true}
               type="modal"
               onClick={() => handleRecommendGroupCardClick(room.roomId)}
