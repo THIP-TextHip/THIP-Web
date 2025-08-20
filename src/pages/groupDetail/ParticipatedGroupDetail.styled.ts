@@ -9,7 +9,7 @@ export const ParticipatedWrapper = styled.div`
   justify-content: center;
   min-width: 320px;
   max-width: 767px;
-  height: 100%;
+  min-height: 100vh;
   margin: 0 auto;
   background-color: ${colors.black.main};
   overflow: hidden;
