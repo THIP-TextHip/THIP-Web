@@ -166,7 +166,7 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
             </PollBar>
             <PollContent>
               <PollNumber isHighest={option.isHighest}>
-                {option.id}
+                {index + 1}
               </PollNumber>
               <PollText isHighest={option.isHighest}>
                 {option.text}
