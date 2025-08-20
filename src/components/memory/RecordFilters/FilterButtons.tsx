@@ -59,7 +59,7 @@ const FilterButtons = ({
         <FilterButton
           active={activeFilter === 'overall'}
           $disabled={!isOverallEnabled}
-          onClick={onOverallFilterClick}
+          onClick={isOverallEnabled ? onOverallFilterClick : undefined}
         >
           총평 보기
         </FilterButton>
