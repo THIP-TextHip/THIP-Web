@@ -86,7 +86,7 @@ const ParticipatedGroupDetail = () => {
   }, [roomId]);
 
   const handleBackButton = () => {
-    navigate(-1);
+    navigate('/group');
   };
 
   const handleMoreButton = () => {

@@ -1,9 +1,14 @@
+// usePopupStore.ts
 import { create } from 'zustand';
 
-// Popup 타입 정의
-export type PopupType = 'confirm-modal' | 'moremenu' | 'snackbar' | 'reply-modal' | null;
+export type PopupType =
+  | 'confirm-modal'
+  | 'moremenu'
+  | 'snackbar'
+  | 'reply-modal'
+  | 'counting-bar'
+  | null;
 
-// 모달 & 스낵바 Props 타입
 export interface ConfirmModalProps {
   title: string;
   disc: string;
@@ -34,29 +39,36 @@ export interface ReplyModalProps {
   isOpen: boolean;
   userId: number;
   commentId: number;
-  position?: {
-    x: number;
-    y: number;
-  };
+  position?: { x: number; y: number };
   onClose: () => void;
 }
 
-// 통합 상태 타입
+/* 추가 */
+export interface CountingBarProps {
+  message: string;
+  duration?: number;
+  onClose: () => void;
+}
+
+type PopupPropsUnion =
+  | ConfirmModalProps
+  | MoreMenuProps
+  | SnackbarProps
+  | ReplyModalProps
+  | CountingBarProps;
+
 interface PopupState {
   popupType: PopupType;
-  popupProps?: ConfirmModalProps | MoreMenuProps | SnackbarProps | ReplyModalProps;
+  popupProps?: PopupPropsUnion;
   isOpen: boolean;
-  openPopup: (
-    type: PopupType,
-    props?: ConfirmModalProps | MoreMenuProps | SnackbarProps | ReplyModalProps,
-  ) => void;
+  openPopup: (type: PopupType, props?: PopupPropsUnion) => void;
   closePopup: () => void;
 }
 
 export const usePopupStore = create<PopupState>(set => ({
   popupType: null,
-  popupProps: {},
+  popupProps: {} as PopupPropsUnion,
   isOpen: false,
   openPopup: (type, props) => set({ popupType: type, popupProps: props, isOpen: true }),
-  closePopup: () => set({ popupType: null, popupProps: {}, isOpen: false }),
+  closePopup: () => set({ popupType: null, popupProps: {} as PopupPropsUnion, isOpen: false }),
 }));

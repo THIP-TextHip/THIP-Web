@@ -4,19 +4,21 @@ import ConfirmModal from './ConfirmModal';
 import MoreMenu from './MoreMenu';
 import Snackbar from './Snackbar';
 import ReplyModal from './ReplyModal';
+import CountingBar from './CountingBar';
 import styled from '@emotion/styled';
 import type {
   ConfirmModalProps,
   MoreMenuProps,
   SnackbarProps,
   ReplyModalProps,
+  CountingBarProps,
 } from '@/stores/usePopupStore';
 
 const PopupContainer = () => {
-  const { popupType, popupProps, isOpen } = usePopupStore();
+  const { popupType, popupProps, isOpen, closePopup } = usePopupStore();
 
   useEffect(() => {
-    if (isOpen && popupType !== 'snackbar') {
+    if (isOpen && popupType !== 'snackbar' && popupType !== 'counting-bar') {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
@@ -26,28 +28,38 @@ const PopupContainer = () => {
     };
   }, [isOpen, popupType]);
 
+  useEffect(() => {
+    if (isOpen && popupType === 'snackbar') {
+      const timer = setTimeout(() => closePopup(), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, popupType, closePopup]);
+
   if (!isOpen || !popupType) return null;
 
   const renderPopup = () => {
     switch (popupType) {
-      case 'confirm-modal': {
+      case 'confirm-modal':
         return (
           <Wrapper>
             <ConfirmModal {...(popupProps as ConfirmModalProps)} />
           </Wrapper>
         );
-      }
-      case 'moremenu': {
+      case 'moremenu':
         return <MoreMenu {...(popupProps as MoreMenuProps)} />;
-      }
-      case 'reply-modal': {
+      case 'reply-modal':
         return <ReplyModal {...(popupProps as ReplyModalProps)} />;
-      }
       case 'snackbar':
         return (
           <SnackbarWrapper>
             <Snackbar {...(popupProps as SnackbarProps)} />
           </SnackbarWrapper>
+        );
+      case 'counting-bar':
+        return (
+          <PassThroughOverlay>
+            <CountingBar {...(popupProps as CountingBarProps)} />
+          </PassThroughOverlay>
         );
       default:
         return null;
@@ -80,9 +92,9 @@ const SnackbarWrapper = styled.div`
   right: 0;
   top: 0;
   bottom: 0;
-  pointer-events: none; /* 배경 클릭 가능 */
+  pointer-events: none;
   display: flex;
-  justify-content: center;
+  align-items: flex-start;
   align-items: center;
   min-width: 320px;
   max-width: 767px;
@@ -90,8 +102,21 @@ const SnackbarWrapper = styled.div`
   z-index: 1000;
 
   & > div {
-    pointer-events: auto; /* Snackbar 자체 클릭 가능 */
+    pointer-events: auto;
   }
+`;
+
+const PassThroughOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 320px;
+  max-width: 767px;
+  margin: 0 auto;
+  z-index: 1000;
 `;
 
 export default PopupContainer;
