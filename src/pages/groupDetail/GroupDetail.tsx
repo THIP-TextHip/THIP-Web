@@ -155,7 +155,7 @@ const GroupDetail = () => {
         setIsSubmitting(true);
         await postCloseRoom(Number(roomId));
         setRoomData(prev => (prev ? { ...prev } : prev));
-        alert('모집을 마감했습니다.');
+        navigate(`/group/detail/joined/${roomId}`);
       } catch {
         alert('네트워크 오류 또는 서버 오류');
       } finally {
