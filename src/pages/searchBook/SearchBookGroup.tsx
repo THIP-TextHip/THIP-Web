@@ -33,6 +33,9 @@ const SearchBookGroup = () => {
     };
     navigate('/group/create', { state: { selectedBook } });
   };
+  const handleGroupCardClick = (roomId: number) => {
+    navigate(`/group/detail/${roomId}`);
+  };
 
   const groupList = recruitingRooms?.recruitingRoomList || [];
   const totalCount = recruitingRooms?.totalRoomCount || 0;
@@ -56,11 +59,13 @@ const SearchBookGroup = () => {
                 title: room.roomName,
                 participants: room.memberCount,
                 maximumParticipants: room.recruitCount,
-                deadLine: '',
+                deadLine: room.deadlineEndDate,
                 coverUrl: room.bookImageUrl || bookInfo?.imageUrl,
+                isOnGoing: room.isPublic,
               }}
-              isOngoing={true}
+              isOngoing={false}
               type={'modal'}
+              onClick={() => handleGroupCardClick(room.roomId)}
             />
           ))}
         </Content>

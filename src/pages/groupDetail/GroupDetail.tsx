@@ -43,8 +43,10 @@ import {
 import { postJoinRoom } from '@/api/rooms/postJoinRoom';
 import { postCloseRoom } from '@/api/rooms/postCloseRoom';
 import type { Group } from '@/components/group/MyGroupBox';
+import bookCoverLargeImg from '../../assets/books/bookCoverLarge.svg';
 
 import PasswordModal from '@/components/group/PasswordModal';
+import { usePopupStore } from '@/stores/usePopupStore';
 
 const GroupDetail = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -59,6 +61,9 @@ const GroupDetail = () => {
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
+  const openPopup = usePopupStore(state => state.openPopup);
+  const closePopup = usePopupStore(state => state.closePopup);
+
   const handleBackButton = () => {
     navigate(-1);
   };
@@ -70,8 +75,8 @@ const GroupDetail = () => {
       userName: '',
       participants: room.memberCount,
       maximumParticipants: room.recruitCount,
-      coverUrl: room.roomImageUrl,
-      deadLine: '',
+      coverUrl: room.bookImageUrl,
+      deadLine: room.recruitEndDate,
       genre: '',
       isOnGoing: true,
     };
@@ -130,6 +135,7 @@ const GroupDetail = () => {
     bookTitle,
     authorName,
     bookDescription,
+    publisher,
     bookImageUrl,
     recommendRooms,
   } = roomData;
@@ -149,20 +155,61 @@ const GroupDetail = () => {
     if (!roomId) return;
 
     if (roomData.isHost) {
-      try {
-        setIsSubmitting(true);
-        await postCloseRoom(Number(roomId));
-        setRoomData(prev => (prev ? { ...prev } : prev));
-        alert('모집을 마감했습니다.');
-      } catch {
-        alert('네트워크 오류 또는 서버 오류');
-      } finally {
-        setIsSubmitting(false);
-      }
+      openPopup('confirm-modal', {
+        title: '모집을 마감하시겠습니까?',
+        disc: `독서메이트 모집을 마감하면 <br> 지금 바로 모임방 활동을 시작할 수 있어요.`,
+        onClose: () => closePopup(),
+        onConfirm: async () => {
+          closePopup();
+          try {
+            setIsSubmitting(true);
+            await postCloseRoom(Number(roomId));
+            setRoomData(prev => (prev ? { ...prev } : prev));
+            openPopup('snackbar', {
+              message: '독서메이트 모집을 성공적으로 마감했어요.',
+              variant: 'top',
+              onClose: () => closePopup(),
+            });
+            navigate(`/group/detail/joined/${roomId}`);
+          } catch {
+            alert('네트워크 오류 또는 서버 오류');
+          } finally {
+            setIsSubmitting(false);
+          }
+        },
+      });
       return;
     }
 
     const nextType: 'join' | 'cancel' = isJoining ? 'cancel' : 'join';
+
+    if (nextType === 'cancel') {
+      openPopup('confirm-modal', {
+        title: '모임방 참여를 취소하시겠어요?',
+        disc: '지금 취소해도, 활동 시작 전에 다시 참여 가능해요.',
+        onClose: () => closePopup(),
+        onConfirm: async () => {
+          closePopup();
+          try {
+            setIsSubmitting(true);
+            await postJoinRoom(Number(roomId), 'cancel');
+            navigate('/group');
+            setTimeout(() => {
+              openPopup('snackbar', {
+                message: '모임방 참여가 취소되었습니다! 다른 방을 찾아보세요.',
+                variant: 'top',
+                onClose: () => closePopup(),
+              });
+            }, 300);
+          } catch {
+            alert('네트워크 오류 또는 서버 오류');
+          } finally {
+            setIsSubmitting(false);
+          }
+        },
+      });
+      return;
+    }
 
     if (nextType === 'join' && !isPublic) {
       setShowPasswordModal(true);
@@ -187,11 +234,34 @@ const GroupDetail = () => {
             }
           : prev,
       );
+      openPopup('snackbar', {
+        message: '모임방 참여가 완료되었어요!',
+        variant: 'top',
+        onClose: () => closePopup(),
+      });
     } catch {
       alert('네트워크 오류 또는 서버 오류');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleJoinSuccess = () => {
+    setIsJoining(true);
+    setRoomData(prev =>
+      prev
+        ? {
+            ...prev,
+            isJoining: true,
+            memberCount: Math.min(prev.memberCount + 1, prev.recruitCount),
+          }
+        : prev,
+    );
+    openPopup('snackbar', {
+      message: '모임방 참여가 완료되었어요! 모집 마감 후 활동이 시작돼요.',
+      variant: 'top',
+      onClose: () => closePopup(),
+    });
   };
 
   return (
@@ -245,9 +315,11 @@ const GroupDetail = () => {
           <IconButton src={rightChevron} alt="책 이동 버튼" />
         </BookHeader>
         <BookInfo>
-          <BookCover src={bookImageUrl} alt={bookTitle} />
+          <BookCover src={bookImageUrl ? bookImageUrl : bookCoverLargeImg} alt={bookTitle} />
           <BookDetails>
-            <div>{authorName}</div>
+            <div>
+              {authorName} 저 · {publisher}
+            </div>
             <BookIntro>
               도서 소개 <br />
               <p>{bookDescription}</p>
@@ -263,7 +335,7 @@ const GroupDetail = () => {
             <GroupCard
               key={room.roomId}
               group={convertRecommendRoomToGroup(room)}
-              isOngoing={true}
+              isOngoing={false}
               isRecommend={true}
               type="modal"
               onClick={() => handleRecommendGroupCardClick(room.roomId)}
@@ -280,18 +352,7 @@ const GroupDetail = () => {
         <PasswordModal
           roomId={Number(roomId)}
           onClose={() => setShowPasswordModal(false)}
-          onJoined={() => {
-            setIsJoining(true);
-            setRoomData(prev =>
-              prev
-                ? {
-                    ...prev,
-                    isJoining: true,
-                    memberCount: Math.min(prev.memberCount + 1, prev.recruitCount),
-                  }
-                : prev,
-            );
-          }}
+          onJoined={handleJoinSuccess}
         />
       )}
     </Wrapper>

@@ -6,6 +6,7 @@ import { GroupCard } from './GroupCard';
 import TitleHeader from '../common/TitleHeader';
 import { Modal, Overlay } from './Modal.styles';
 import { getMyRooms, type Room } from '@/api/rooms/getMyRooms';
+import { getMyProfile } from '@/api/users/getMyProfile';
 import { colors, typography } from '@/styles/global/global';
 
 interface CompletedGroupModalProps {
@@ -16,6 +17,7 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nickname, setNickname] = useState<string>('');
 
   const convertRoomToGroup = (room: Room): Group => {
     return {
@@ -49,19 +51,33 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
       }
     };
 
+    const fetchNickname = async () => {
+      try {
+        const profile = await getMyProfile();
+        setNickname(profile.nickname);
+      } catch {
+        setNickname('');
+      }
+    };
+
     fetchCompletedRooms();
+    fetchNickname();
   }, []);
 
   const convertedGroups = rooms.map(convertRoomToGroup);
   return (
-    <Overlay>
+    <Overlay $whiteBg>
       <Modal>
         <TitleHeader
           title="완료된 모임방"
           leftIcon={<img src={leftArrow} alt="뒤로 가기" />}
           onLeftClick={onClose}
         />
-        <Text>00님이 참여했던 모임방들을 확인해보세요.</Text>
+        <Text>
+          {nickname
+            ? `${nickname}님이 참여했던 모임방들을 확인해보세요.`
+            : '참여했던 모임방들을 확인해보세요.'}
+        </Text>
         <Content isEmpty={!isLoading && !error && convertedGroups.length === 0}>
           {isLoading ? (
             <LoadingMessage>로딩 중...</LoadingMessage>
@@ -95,7 +111,6 @@ const Content = styled.div<{ isEmpty?: boolean }>`
   gap: 20px;
   overflow-y: ${({ isEmpty }) => (isEmpty ? 'visible' : 'auto')};
   padding: 0 20px;
-  flex: 1;
   grid-template-columns: 1fr;
 
   @media (min-width: 584px) {
@@ -129,7 +144,10 @@ const EmptyState = styled.div`
   padding: 40px 20px;
   color: ${colors.grey[100]};
   text-align: center;
-  height: 100%;
+  height: 70%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 `;
 
 const EmptyTitle = styled.p`

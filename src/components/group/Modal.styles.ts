@@ -1,7 +1,7 @@
 import { colors } from '@/styles/global/global';
 import styled from '@emotion/styled';
 
-export const Overlay = styled.div`
+export const Overlay = styled.div<{ $whiteBg?: boolean }>`
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -10,7 +10,7 @@ export const Overlay = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: ${colors.black.main};
+  background: ${({ $whiteBg }) => ($whiteBg ? 'white' : colors.black.main)};
   z-index: 110;
 `;
 

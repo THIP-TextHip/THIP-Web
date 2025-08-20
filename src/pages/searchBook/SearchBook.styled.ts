@@ -68,12 +68,13 @@ export const BannerSection = styled.section`
 export const BookInfo = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 `;
 
 export const BookTitle = styled.h1`
   font-size: ${typography.fontSize['2xl']};
   font-weight: ${typography.fontWeight.bold};
+  line-height: 26px;
 `;
 
 export const Author = styled.p`
@@ -104,6 +105,7 @@ export const SubText = styled.p`
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 20px;
 `;
 
 export const ButtonSection = styled.div`

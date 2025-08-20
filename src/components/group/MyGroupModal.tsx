@@ -28,7 +28,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
       participants: room.memberCount,
       maximumParticipants: room.recruitCount,
       coverUrl: room.bookImageUrl,
-      deadLine: '',
+      deadLine: room.endDate || '',
       genre: '',
       isOnGoing: room.type === 'playing' || room.type === 'playingAndRecruiting',
     };
