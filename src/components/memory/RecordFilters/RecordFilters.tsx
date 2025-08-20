@@ -77,6 +77,15 @@ const RecordFilters = ({
     }
   };
 
+  const handleCancel = () => {
+    setShowInputMode(false);
+    setStartPage('');
+    setEndPage('');
+    if (onPageRangeClear) {
+      onPageRangeClear();
+    }
+  };
+
   const handleOverallFilterClick = () => {
     onFilterChange('overall');
   };
@@ -95,31 +104,48 @@ const RecordFilters = ({
   const isPageInputMode = showInputMode && activeFilter === 'page' && !selectedPageRange;
 
   return (
-    <Container>
-      {isPageInputMode ? (
-        <PageInputMode
-          startPage={startPage}
-          endPage={endPage}
-          onInputChange={handleInputChange}
-          onReset={handleReset}
-          onConfirm={handleConfirm}
-          hasAnyInput={hasAnyInput}
-          isValid={isValid}
-        />
-      ) : (
-        <FilterButtons
-          activeFilter={activeFilter}
-          showInputMode={showInputMode}
-          readingProgress={readingProgress}
-          selectedSort={selectedSort}
-          isDropdownOpen={isDropdownOpen}
-          onPageFilterClick={handlePageFilterClick}
-          onOverallFilterClick={handleOverallFilterClick}
-          onSortButtonClick={handleSortButtonClick}
-          onSortSelect={handleSortSelect}
+    <>
+      {isPageInputMode && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'transparent',
+            zIndex: 999,
+          }}
+          onClick={handleCancel}
         />
       )}
-    </Container>
+      <Container style={{ position: 'relative', zIndex: 1000 }}>
+        {isPageInputMode ? (
+          <PageInputMode
+            startPage={startPage}
+            endPage={endPage}
+            onInputChange={handleInputChange}
+            onReset={handleReset}
+            onConfirm={handleConfirm}
+            onCancel={handleCancel}
+            hasAnyInput={hasAnyInput}
+            isValid={isValid}
+          />
+        ) : (
+          <FilterButtons
+            activeFilter={activeFilter}
+            showInputMode={showInputMode}
+            readingProgress={readingProgress}
+            selectedSort={selectedSort}
+            isDropdownOpen={isDropdownOpen}
+            onPageFilterClick={handlePageFilterClick}
+            onOverallFilterClick={handleOverallFilterClick}
+            onSortButtonClick={handleSortButtonClick}
+            onSortSelect={handleSortSelect}
+          />
+        )}
+      </Container>
+    </>
   );
 };
 

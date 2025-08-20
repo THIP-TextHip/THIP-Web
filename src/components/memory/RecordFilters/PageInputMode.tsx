@@ -16,6 +16,7 @@ interface PageInputModeProps {
   onInputChange: (type: 'start' | 'end', value: string) => void;
   onReset: () => void;
   onConfirm: () => void;
+  onCancel: () => void;
   hasAnyInput: boolean;
   isValid: boolean;
 }
@@ -26,6 +27,7 @@ const PageInputMode = ({
   onInputChange,
   onReset,
   onConfirm,
+  onCancel,
   hasAnyInput,
   isValid,
 }: PageInputModeProps) => {
