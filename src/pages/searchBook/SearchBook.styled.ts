@@ -157,8 +157,8 @@ export const WritePostButton = styled.button`
 `;
 
 export const SaveButton = styled.button`
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   background: transparent;
   border: none;
   border-radius: 12px;
@@ -170,7 +170,7 @@ export const SaveButton = styled.button`
 
 export const FeedSection = styled.section`
   display: flex;
-  width: 96%;
+  width: 100%;
   flex-direction: column;
   margin-top: 20px;
 `;
@@ -179,7 +179,7 @@ export const FeedTitle = styled.h2`
   color: ${colors.white};
   font-size: ${typography.fontSize.lg};
   font-weight: ${typography.fontWeight.semibold};
-  padding: 20px;
+  padding: 24px 20px 8px 20px;
 `;
 
 export const FilterContainer = styled.div`
