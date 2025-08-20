@@ -189,7 +189,7 @@ const Memory = () => {
   // 이벤트 핸들러들
   const handleBackClick = useCallback(() => {
     if (roomId) {
-      navigate(`/rooms/${roomId}`);
+      navigate(`/group/detail/joined/${roomId}`);
     } else {
       navigate('/group');
     }
