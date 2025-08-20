@@ -31,6 +31,7 @@ export interface FeedPostProps extends PostData {
   isMyFeed?: boolean;
   isTotalFeed?: boolean;
   isLast?: boolean;
+  onSaveToggle?: (feedId: number, newSaveState: boolean) => void;
 }
 
 export type PostBodyProps = Pick<
