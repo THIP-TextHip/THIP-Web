@@ -141,7 +141,7 @@ const ParticipatedGroupDetail = () => {
 
   const handleBookSectionClick = () => {
     if (roomData?.data.isbn) {
-      navigate(`/book/${roomData.data.isbn}`);
+      navigate(`/search/book/${roomData.data.isbn}`);
     }
   };
 
