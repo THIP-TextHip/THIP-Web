@@ -153,15 +153,16 @@ export const InputGroup = styled.div`
   padding: 12px 16px;
 `;
 
-export const PageInput = styled.input<{ active?: boolean }>`
+export const PageInput = styled.input<{ active?: boolean; inputLength?: number }>`
   background: none;
   border: none;
   outline: none;
   color: ${semanticColors.text.primary};
   font-size: ${typography.fontSize.base};
-  width: 40px;
+  width: ${props => props.inputLength ? `${Math.max(40, props.inputLength * 12 + 10)}px` : '40px'};
   text-align: center;
   caret-color: ${colors.neongreen};
+  transition: width 0.2s ease;
 
   ${({ active }) =>
     active &&

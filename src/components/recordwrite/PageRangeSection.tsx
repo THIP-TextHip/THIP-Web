@@ -88,6 +88,7 @@ const PageRangeSection = ({
                 value={pageRange}
                 onChange={handleInputChange}
                 inputMode="numeric"
+                inputLength={pageRange.length || lastRecordedPage.toString().length}
               />
               <PageSuffix>/{totalPages}p</PageSuffix>
             </InputWrapper>

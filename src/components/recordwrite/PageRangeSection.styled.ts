@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { typography, semanticColors } from '../../styles/global/global';
+import { colors, typography, semanticColors } from '../../styles/global/global';
 
 export const Section = styled.div`
   display: flex;
@@ -41,7 +41,7 @@ export const InputWrapper = styled.div`
   font-family: ${typography.fontFamily.primary};
 `;
 
-export const PageInput = styled.input`
+export const PageInput = styled.input<{ inputLength?: number }>`
   background: none;
   border: none;
   outline: none;
@@ -49,9 +49,10 @@ export const PageInput = styled.input`
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
-  width: 30px;
+  width: ${props => (props.inputLength ? `${Math.max(30, props.inputLength * 8 + 10)}px` : '30px')};
   padding: 0;
   margin: 0;
+  caret-color: ${colors.white};
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
