@@ -36,10 +36,12 @@ export const GroupCard = forwardRef<HTMLDivElement, Props>(
             </Participant>
             {isOngoing === true ? (
               <RecruitingDeadline isRecommend={isRecommend}>
-                {group.deadLine} 마감
+                {group.deadLine} 종료
               </RecruitingDeadline>
             ) : (
-              <OngoingDeadline isRecommend={isRecommend}>{group.deadLine} 종료</OngoingDeadline>
+              <OngoingDeadline isRecommend={isRecommend}>
+                {group.deadLine} 모집 마감
+              </OngoingDeadline>
             )}
           </Bottom>
         </Info>
@@ -149,11 +151,11 @@ const MaximumParticipants = styled.div`
 const RecruitingDeadline = styled.div<{ isRecommend: boolean }>`
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.medium};
-  color: ${colors.red};
+  color: ${colors.white};
 `;
 
 const OngoingDeadline = styled.div<{ isRecommend: boolean }>`
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.medium};
-  color: ${colors.white};
+  color: ${colors.red};
 `;
