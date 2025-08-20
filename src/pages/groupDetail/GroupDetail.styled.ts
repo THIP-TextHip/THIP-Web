@@ -135,8 +135,25 @@ export const Tag = styled.div`
   }
 `;
 
-export const TagGenre = styled.span`
-  color: ${colors.character.orange};
+const getGenreColor = (genre?: string): string => {
+  switch (genre) {
+    case '문학':
+      return colors.character.mint;
+    case '과학·IT':
+      return colors.character.lavender;
+    case '예술':
+      return colors.character.pink;
+    case '사회과학':
+      return colors.character.orange;
+    case '인문학':
+      return colors.character.skyblue;
+    default:
+      return colors.character.orange;
+  }
+};
+
+export const TagGenre = styled.span<{ genre?: string }>`
+  color: ${({ genre }) => getGenreColor(genre)};
 `;
 
 export const BookSection = styled.section`

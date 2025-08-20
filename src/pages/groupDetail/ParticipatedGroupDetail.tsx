@@ -234,7 +234,7 @@ const ParticipatedGroupDetail = () => {
           </MetaInfo>
           <TagRow>
             <Tag>
-              장르 <TagGenre>{data.category}</TagGenre>
+              장르 <TagGenre genre={data.category}>{data.category}</TagGenre>
             </Tag>
           </TagRow>
         </BannerSection>
