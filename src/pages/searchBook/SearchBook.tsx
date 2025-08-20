@@ -38,6 +38,7 @@ import FeedPost from '@/components/feed/FeedPost';
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
+import { usePopupStore } from '@/stores/usePopupStore';
 
 const FILTER = ['최신순', '인기순'] as const;
 const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
@@ -64,6 +65,7 @@ const SearchBook = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const openPopup = usePopupStore(state => state.openPopup);
 
   useEffect(() => {
     const fetchBookDetail = async () => {
@@ -222,6 +224,16 @@ const SearchBook = () => {
       setIsSaving(false);
     }
   };
+
+  useEffect(() => {
+    if (bookDetail && typeof bookDetail.readCount === 'number') {
+      openPopup('counting-bar', {
+        message: `🔥 ${bookDetail.readCount}명이 읽기에 참여중이에요! 🔥`,
+        variant: 'top',
+        onClose: () => usePopupStore.getState().closePopup(),
+      });
+    }
+  }, [bookDetail, openPopup]);
 
   if (isLoading || error || !bookDetail) {
     return (

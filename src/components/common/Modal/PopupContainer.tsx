@@ -4,16 +4,18 @@ import ConfirmModal from './ConfirmModal';
 import MoreMenu from './MoreMenu';
 import Snackbar from './Snackbar';
 import ReplyModal from './ReplyModal';
+import CountingBar from './CountingBar';
 import styled from '@emotion/styled';
 import type {
   ConfirmModalProps,
   MoreMenuProps,
   SnackbarProps,
   ReplyModalProps,
+  CountingBarProps,
 } from '@/stores/usePopupStore';
 
 const PopupContainer = () => {
-  const { popupType, popupProps, isOpen } = usePopupStore();
+  const { popupType, popupProps, isOpen, closePopup } = usePopupStore();
 
   useEffect(() => {
     if (isOpen && popupType !== 'snackbar') {
@@ -25,6 +27,15 @@ const PopupContainer = () => {
       document.body.style.overflow = 'auto';
     };
   }, [isOpen, popupType]);
+
+  useEffect(() => {
+    if (isOpen && popupType === 'snackbar') {
+      const timer = setTimeout(() => {
+        closePopup();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, popupType, closePopup]);
 
   if (!isOpen || !popupType) return null;
 
@@ -47,6 +58,12 @@ const PopupContainer = () => {
         return (
           <SnackbarWrapper>
             <Snackbar {...(popupProps as SnackbarProps)} />
+          </SnackbarWrapper>
+        );
+      case 'counting-bar':
+        return (
+          <SnackbarWrapper>
+            <CountingBar {...(popupProps as CountingBarProps)} />
           </SnackbarWrapper>
         );
       default:
