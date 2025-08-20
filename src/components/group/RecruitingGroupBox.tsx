@@ -88,8 +88,8 @@ const Container = styled.div`
 
 const Title = styled.h2`
   color: #fff;
-  font-size: var(--font-size-large02);
-  font-weight: var(--font-weight-bold);
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.bold};
   margin-bottom: 32px;
   text-align: center;
 `;
@@ -105,8 +105,8 @@ const TabContainer = styled.div`
 const Tab = styled.button<{ selected?: boolean }>`
   white-space: nowrap;
   padding: 8px 12px;
-  font-size: var(--font-size-small03);
-  font-weight: var(--font-weight-regular);
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.regular};
   border: none;
   border-radius: 16px;
   background: ${({ selected }) =>

@@ -12,6 +12,7 @@ interface Props {
   isRecommend?: boolean;
   onClick?: () => void;
   isFirstCard?: boolean;
+  isPublic?: boolean;
 }
 
 export const GroupCard = forwardRef<HTMLDivElement, Props>(
@@ -20,7 +21,7 @@ export const GroupCard = forwardRef<HTMLDivElement, Props>(
       <Card ref={ref} cardType={type} isFirstCard={isFirstCard} onClick={onClick}>
         <CoverWrapper>
           <Cover src={group.coverUrl} alt="cover" cardType={type} isRecommend={isRecommend} />
-          {group.isOnGoing === false && (
+          {group.isPublic === false && (
             <LockedOverlay>
               <img src={lockedBookImg} alt="locked" />
             </LockedOverlay>

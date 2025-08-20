@@ -117,7 +117,7 @@ export const ButtonSection = styled.div`
 
 export const RecruitingGroupButton = styled.button`
   width: 100%;
-  height: 48px;
+  height: 44px;
   border: 1px solid ${colors.grey[200]};
   border-radius: 12px;
   background: transparent;
@@ -140,7 +140,7 @@ export const RightArea = styled.div`
 
 export const WritePostButton = styled.button`
   flex: 1;
-  height: 48px;
+  height: 44px;
   background-color: ${colors.purple.main};
   color: ${colors.white};
   font-size: ${typography.fontSize.base};
@@ -157,8 +157,8 @@ export const WritePostButton = styled.button`
 `;
 
 export const SaveButton = styled.button`
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   background: transparent;
   border: none;
   border-radius: 12px;
@@ -170,7 +170,7 @@ export const SaveButton = styled.button`
 
 export const FeedSection = styled.section`
   display: flex;
-  width: 96%;
+  width: 100%;
   flex-direction: column;
   margin-top: 20px;
 `;
@@ -179,7 +179,7 @@ export const FeedTitle = styled.h2`
   color: ${colors.white};
   font-size: ${typography.fontSize.lg};
   font-weight: ${typography.fontWeight.semibold};
-  padding: 20px;
+  padding: 24px 20px 8px 20px;
 `;
 
 export const FilterContainer = styled.div`
