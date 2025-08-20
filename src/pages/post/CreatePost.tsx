@@ -189,7 +189,7 @@ const CreatePost = () => {
         <PostContentSection 
           content={postContent} 
           onContentChange={setPostContent}
-          readOnly={isFromPin}
+          readOnly={false}
         />
 
         <Section showDivider />

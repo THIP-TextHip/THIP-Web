@@ -7,10 +7,10 @@ export const TextAreaBox = styled.div`
   flex-direction: column;
 `;
 
-export const TextArea = styled.textarea`
+export const TextArea = styled.textarea<{ readOnly?: boolean }>`
   width: 100%;
   min-height: 100px;
-  background-color: ${semanticColors.background.primary};
+  background-color: ${props => props.readOnly ? '#f5f5f5' : semanticColors.background.primary};
   color: ${semanticColors.text.secondary};
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
@@ -19,6 +19,7 @@ export const TextArea = styled.textarea`
   outline: none;
   border: none;
   overflow: hidden;
+  cursor: ${props => props.readOnly ? 'not-allowed' : 'text'};
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
