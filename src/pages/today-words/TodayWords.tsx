@@ -208,6 +208,7 @@ const TodayWords = () => {
       openSnackbar({
         message: '오늘의 한마디는 하루에 다섯번까지 작성할 수 있어요',
         variant: 'top',
+        isError: true,
         onClose: () => {},
       });
       return;
@@ -234,6 +235,7 @@ const TodayWords = () => {
           openSnackbar({
             message: '오늘의 한마디는 하루에 다섯번까지 작성할 수 있어요',
             variant: 'top',
+            isError: true,
             onClose: () => {},
           });
         } else if (todayMyMessageCount === 0) {

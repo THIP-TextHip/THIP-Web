@@ -3,7 +3,7 @@ import { colors, typography } from '@/styles/global/global';
 import type { SnackbarProps } from '@/stores/usePopupStore';
 import { useEffect, useState } from 'react';
 
-const Snackbar = ({ message, actionText, variant, onActionClick, onClose }: SnackbarProps) => {
+const Snackbar = ({ message, actionText, variant, isError, onActionClick, onClose }: SnackbarProps) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const Snackbar = ({ message, actionText, variant, onActionClick, onClose }: Snac
 
   return (
     <Container variant={variant} visible={visible}>
-      <Discription>{message}</Discription>
+      <Discription isError={isError}>{message}</Discription>
       {variant === 'bottom' && actionText && <Button onClick={onActionClick}>{actionText}</Button>}
     </Container>
   );
@@ -55,9 +55,10 @@ const Container = styled.div<{ variant: 'top' | 'bottom'; visible: boolean }>`
   z-index: 1100;
 `;
 
-const Discription = styled.div`
+const Discription = styled.div<{ isError?: boolean }>`
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.medium};
+  color: ${({ isError }) => isError ? colors.red : colors.white};
 `;
 
 const Button = styled.div`

@@ -25,6 +25,7 @@ export interface SnackbarProps {
   message: string;
   actionText?: string;
   variant: 'top' | 'bottom';
+  isError?: boolean;
   onActionClick?: () => void;
   onClose: () => void;
 }
