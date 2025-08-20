@@ -6,10 +6,11 @@ import type { Group } from './MyGroupBox';
 interface MyGroupCardProps {
   group: Group;
   onClick?: () => void;
+  isMine?: boolean;
 }
 
 export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>((props, ref) => {
-  const { group, onClick } = props;
+  const { group, onClick, isMine } = props;
   return (
     <Card ref={ref} onClick={onClick}>
       <Thumbnail src={group.coverUrl} alt="책 표지" />
@@ -23,7 +24,8 @@ export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>((props, 
         </div>
         <div>
           <ProgressText>
-            {group.userName}님의 진행도 <Percent>{group.progress}%</Percent>
+            {isMine ? '내 진행도' : `${group.userName}님의 진행도`}{' '}
+            <Percent>{group.progress}%</Percent>
           </ProgressText>
           <Bar>
             <Fill width={group.progress || 0} />
@@ -96,7 +98,6 @@ const Percent = styled.span`
   font-size: var(--font-size-medium02);
   color: var(--color-purple-main);
   font-weight: var(--font-weight-semibold);
-  margin-left: 4px;
 `;
 
 const Bar = styled.div`

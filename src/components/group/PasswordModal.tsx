@@ -10,7 +10,7 @@ import { usePopupActions } from '@/hooks/usePopupActions';
 interface PasswordModalProps {
   roomId: number;
   onClose: () => void;
-  onJoined?: (roomId: number) => void; // ✅ 추가: 성공 시 부모에서 처리
+  onJoined?: (roomId: number) => void;
 }
 
 const PasswordModal = ({ roomId, onClose, onJoined }: PasswordModalProps) => {

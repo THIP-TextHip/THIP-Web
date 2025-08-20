@@ -8,6 +8,7 @@ export interface RecruitingRoom {
   memberCount: number;
   recruitCount: number;
   deadlineEndDate: string;
+  isPublic: boolean;
 }
 
 // API 응답 데이터 타입
