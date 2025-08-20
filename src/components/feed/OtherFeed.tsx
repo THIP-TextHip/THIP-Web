@@ -1,10 +1,16 @@
 import styled from '@emotion/styled';
+import { useState, useEffect } from 'react';
 import Profile from './Profile';
 import FeedPost from './FeedPost';
 import TotalBar from './TotalBar';
 import { colors, typography } from '../../styles/global/global';
 import type { OtherFeedItem } from '@/api/feeds/getOtherFeed';
 import type { OtherProfileData } from '@/types/profile';
+import { getOtherFeed } from '@/api/feeds/getOtherFeed';
+import { getMyFeeds } from '@/api/feeds/getMyFeed';
+import { getMyProfile } from '@/api/feeds/getMyProfile';
+import type { PostData } from '@/types/post';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 interface OtherFeedProps {
   showHeader?: boolean;
@@ -24,7 +30,43 @@ const OtherFeed = ({
   isMyFeed,
   isMyself,
 }: OtherFeedProps) => {
-  const hasPosts = posts.length > 0;
+  const [feedPosts, setFeedPosts] = useState<OtherFeedItem[] | PostData[]>(posts);
+  const [loading, setLoading] = useState(false);
+  const [totalFeedCount, setTotalFeedCount] = useState(profileData?.totalFeedCount || 0);
+
+  // isMyself 값에 따라 적절한 API 호출
+  useEffect(() => {
+    const loadFeeds = async () => {
+      if (!userId) return;
+
+      try {
+        setLoading(true);
+
+        if (isMyself) {
+          // 자신의 피드인 경우 getMyFeeds와 getMyProfile 병렬 호출
+          const [feedsResponse, profileResponse] = await Promise.all([
+            getMyFeeds(),
+            getMyProfile()
+          ]);
+          setFeedPosts(feedsResponse.data.feedList);
+          // getMyProfile에서 총 피드 수 업데이트
+          setTotalFeedCount(profileResponse.data.totalFeedCount);
+        } else {
+          // 다른 사용자의 피드인 경우 getOtherFeed 호출
+          const response = await getOtherFeed(userId);
+          setFeedPosts(response.data.feedList);
+        }
+      } catch (error) {
+        console.error('피드 로드 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFeeds();
+  }, [userId, isMyself]);
+
+  const hasPosts = feedPosts.length > 0;
 
   if (!profileData) {
     return <></>;
@@ -46,9 +88,11 @@ const OtherFeed = ({
         latestFollowerProfileImageUrls={profileData?.latestFollowerProfileImageUrls || []}
         isMyFeed={isMyFeed}
       />
-      <TotalBar count={profileData.totalFeedCount} />
-      {hasPosts ? (
-        posts.map(post => (
+      <TotalBar count={totalFeedCount} />
+      {loading ? (
+        <LoadingSpinner fullHeight={true} size="medium" />
+      ) : hasPosts && !loading ? (
+        feedPosts.map(post => (
           <FeedPost key={post.feedId} showHeader={false} isMyFeed={isMyFeed} {...post} />
         ))
       ) : (
