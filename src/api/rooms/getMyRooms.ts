@@ -11,6 +11,7 @@ export interface Room {
   memberCount: number;
   endDate: string;
   type: string;
+  isPublic: boolean;
 }
 
 // 내 방 조회 응답 타입
