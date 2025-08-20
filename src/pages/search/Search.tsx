@@ -154,6 +154,7 @@ const Search = () => {
 
     if (isManualSearch) {
       setIsFinalized(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     setIsLoading(true);
