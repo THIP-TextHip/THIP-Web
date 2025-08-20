@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Record } from '../../../types/memory';
 import TextRecord from './TextRecord';
@@ -58,11 +58,6 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   // 전역 댓글 바텀시트
   const { openCommentBottomSheet } = useCommentBottomSheetStore();
 
-  // 길게 누르기 상태 관리
-  const [isPressed, setIsPressed] = useState(false);
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
-  const pressStartPos = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const hasTriggeredLongPress = useRef(false);
 
   // API에서 받은 isWriter 속성으로 내 기록인지 판단
   const isMyRecord = isWriter ?? false;
@@ -270,90 +265,40 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     openCommentBottomSheet(parseInt(id), type === 'poll' ? 'VOTE' : 'RECORD');
   }, [openCommentBottomSheet, id, type]);
 
-  // 길게 누르기 이벤트 핸들러
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      setIsPressed(true);
-      hasTriggeredLongPress.current = false;
-      pressStartPos.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
-      };
-
-      longPressTimer.current = setTimeout(() => {
-        hasTriggeredLongPress.current = true;
-        setIsPressed(false);
-
-        if (isMyRecord) {
-          openMoreMenu({
-            onEdit: handleEdit,
-            onDelete: handleDeleteConfirm,
-            onPin: handlePinConfirm,
-            onClose: closePopup,
-            type: 'post',
-            isWriter: true,
-          });
-        } else {
-          openMoreMenu({
-            onReport: handleReport,
-            onClose: closePopup,
-          });
-        }
-      }, 800);
-    },
-    [
-      isMyRecord,
-      openMoreMenu,
-      handleReport,
-      handleEdit,
-      handleDeleteConfirm,
-      handlePinConfirm,
-      closePopup,
-    ],
-  );
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!longPressTimer.current) return;
-
-    const currentX = e.touches[0].clientX;
-    const currentY = e.touches[0].clientY;
-    const deltaX = Math.abs(currentX - pressStartPos.current.x);
-    const deltaY = Math.abs(currentY - pressStartPos.current.y);
-
-    if (deltaX > 10 || deltaY > 10) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-      setIsPressed(false);
-    }
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-    setIsPressed(false);
-  }, []);
 
   const handleClick = useCallback(() => {
-    if (hasTriggeredLongPress.current) {
-      hasTriggeredLongPress.current = false;
-      return;
+    // 클릭으로 더보기 메뉴 표시
+    if (isMyRecord) {
+      openMoreMenu({
+        onEdit: handleEdit,
+        onDelete: handleDeleteConfirm,
+        onPin: handlePinConfirm,
+        onClose: closePopup,
+        type: 'post',
+        isWriter: true,
+      });
+    } else {
+      openMoreMenu({
+        onReport: handleReport,
+        onClose: closePopup,
+      });
     }
-    // 모든 기록(내 기록 포함)은 이제 길게 누르기로만 더보기 메뉴 표시
-  }, []);
+  }, [
+    isMyRecord,
+    openMoreMenu,
+    handleReport,
+    handleEdit,
+    handleDeleteConfirm,
+    handlePinConfirm,
+    closePopup,
+  ]);
 
   return (
     <Container
       onClick={handleClick}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
       style={{
         filter: shouldBlur ? 'blur(4px)' : 'none',
-        transform: isPressed ? 'scale(0.98)' : 'scale(1)',
-        transition: 'transform 0.1s ease',
-        touchAction: 'manipulation',
+        cursor: 'pointer',
       }}
     >
       <UserSection>
