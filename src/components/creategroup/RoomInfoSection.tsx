@@ -20,7 +20,7 @@ const RoomInfoSection = ({
         <SectionTitle>방 제목</SectionTitle>
         <TextAreaBox>
           <TextArea
-            placeholder="방 제목을 입력합니다."
+            placeholder="방 제목을 입력해주세요."
             value={roomTitle}
             onChange={e => onRoomTitleChange(e.target.value)}
             maxLength={15}
@@ -36,7 +36,7 @@ const RoomInfoSection = ({
         <SectionTitle>한 줄 소개</SectionTitle>
         <TextAreaBox>
           <TextArea
-            placeholder="방에 대한 소개 입력입니다."
+            placeholder="방에 대한 짧은 소개글을 작성해주세요."
             value={roomDescription}
             onChange={e => onRoomDescriptionChange(e.target.value)}
             maxLength={75}

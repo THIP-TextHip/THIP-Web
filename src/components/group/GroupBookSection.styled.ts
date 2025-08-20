@@ -5,9 +5,9 @@ export const GroupBookSection = styled.section`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 90%;
+  width: calc(100% - 40px);
   background: ${colors.darkgrey.dark};
-  margin: 0 20px 0 20px;
+  margin: 0 20px;
   padding: 10px 12px;
   border-radius: 12px;
   cursor: pointer;

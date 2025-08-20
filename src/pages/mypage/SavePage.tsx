@@ -11,6 +11,7 @@ import { colors, typography } from '@/styles/global/global';
 import { getSavedBooksInMy, type SavedBookInMy } from '@/api/books/getSavedBooksInMy';
 import { getSavedFeedsInMy, type SavedFeedInMy } from '@/api/feeds/getSavedFeedsInMy';
 import { postSaveBook } from '@/api/books/postSaveBook';
+
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const tabs = ['피드', '책'];
@@ -38,7 +39,17 @@ const SavePage = () => {
     navigate('/mypage');
   };
 
-  // 저장된 피드 로드
+  // 저장된 책 목록 로드 함수
+  const loadSavedBooks = useCallback(async () => {
+    try {
+      const response = await getSavedBooksInMy();
+      setSavedBooks(response.data.bookList);
+    } catch (error) {
+      console.error('저장된 책 목록 로드 실패:', error);
+    }
+  }, []);
+
+  // 저장된 피드 목록 로드 함수
   const loadSavedFeeds = useCallback(async (cursor: string | null = null) => {
     try {
       setFeedLoading(true);
@@ -61,7 +72,7 @@ const SavePage = () => {
     }
   }, []);
 
-  // 페이지 진입 시 모든 데이터 로드
+  // 페이지 진입 시 모든 데이터 로드 (한 번만 실행)
   useEffect(() => {
     const loadAllData = async () => {
       try {
@@ -88,7 +99,7 @@ const SavePage = () => {
     };
 
     loadAllData();
-  }, []); // 한 번만 실행
+  }, []); // 빈 의존성 배열로 변경
 
   // Intersection Observer 설정 (피드)
   useEffect(() => {
@@ -122,14 +133,32 @@ const SavePage = () => {
       const newSaveState = !currentBook.isSaved;
       await postSaveBook(isbn, newSaveState);
 
-      // 로컬 상태 업데이트
-      setSavedBooks(prev =>
-        prev.map(book => (book.isbn === isbn ? { ...book, isSaved: newSaveState } : book)),
-      );
+      // 저장 취소인 경우 저장된 책 목록을 다시 불러옴
+      if (!newSaveState) {
+        await loadSavedBooks();
+      } else {
+        // 저장인 경우 로컬 상태만 업데이트
+        setSavedBooks(prev =>
+          prev.map(book => (book.isbn === isbn ? { ...book, isSaved: newSaveState } : book)),
+        );
+      }
 
       console.log('저장 토글:', isbn, newSaveState);
     } catch (error) {
       console.error('저장 토글 실패:', error);
+    }
+  };
+
+  // 피드 저장 토글 처리
+  const handleFeedSaveToggle = async (feedId: number, newSaveState: boolean) => {
+    try {
+      if (!newSaveState) {
+        // 저장 취소인 경우 리스트에서 제거
+        setSavedFeeds(prev => prev.filter(feed => feed.feedId !== feedId));
+        console.log('피드 저장 취소 완료:', feedId);
+      }
+    } catch (error) {
+      console.error('피드 저장 상태 변경 실패:', error);
     }
   };
 
@@ -153,6 +182,7 @@ const SavePage = () => {
                   showHeader={true}
                   isMyFeed={false}
                   isLast={index === savedFeeds.length - 1}
+                  onSaveToggle={handleFeedSaveToggle}
                   {...feed}
                 />
               ))}
@@ -258,8 +288,9 @@ const EmptyState = styled.div`
 const BookList = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
   min-width: 320px;
-  max-width: 540px;
+  max-width: 767px;
   padding-top: 32px;
   margin: 0 auto;
   width: 100%;

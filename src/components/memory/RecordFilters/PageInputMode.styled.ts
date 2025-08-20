@@ -38,16 +38,15 @@ export const PageInput = styled.input`
     color: ${semanticColors.text.tertiary};
   }
 
-  /* 숫자 입력 스피너 제거 */
+  /* 숫자 입력 스피너 제거 (inputMode="numeric" 사용으로 불필요하지만 안전장치) */
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
 
-  &[type='number'] {
-    -moz-appearance: textfield;
-  }
+  /* Firefox에서 숫자 타입 기본 스타일 제거 */
+  -moz-appearance: textfield;
 `;
 
 export const Separator = styled.span`

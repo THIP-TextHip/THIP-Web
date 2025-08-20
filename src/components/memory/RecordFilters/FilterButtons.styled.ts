@@ -18,7 +18,8 @@ export const FilterButton = styled.button<{ active: boolean; $disabled?: boolean
     $disabled ? semanticColors.text.tertiary : semanticColors.text.primary};
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
-  cursor: pointer;
+  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
+  pointer-events: ${({ $disabled }) => ($disabled ? 'none' : 'auto')};
   transition: all 0.2s;
   line-height: 24px;
   display: flex;

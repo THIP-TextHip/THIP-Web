@@ -4,18 +4,13 @@ import { RecordListContainer } from './RecordList.styled';
 
 interface RecordListProps {
   records: Record[];
-  readingProgress: number;
 }
 
-const RecordList = ({ records, readingProgress }: RecordListProps) => {
+const RecordList = ({ records }: RecordListProps) => {
   return (
     <RecordListContainer>
       {records.map(record => (
-        <RecordItem
-          key={record.id}
-          record={record}
-          shouldBlur={record.recordType === 'overall' && readingProgress < 80}
-        />
+        <RecordItem key={record.id} record={record} shouldBlur={record.isLocked} />
       ))}
     </RecordListContainer>
   );

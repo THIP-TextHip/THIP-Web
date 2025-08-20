@@ -6,4 +6,5 @@ export interface FollowData {
   aliasColor?: string;
   followerCount?: number;
   isFollowing?: boolean;
+  isMyself?: boolean;
 }

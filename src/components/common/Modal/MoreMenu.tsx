@@ -2,17 +2,9 @@ import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import type { MoreMenuProps } from '@/stores/usePopupStore';
 
-const MoreMenu = ({
-  onEdit,
-  onDelete,
-  onClose,
-  onReport,
-  onPin,
-  isWriter,
-  type,
-}: MoreMenuProps) => {
+const MoreMenu = ({ onEdit, onDelete, onClose, onReport, isWriter, type }: MoreMenuProps) => {
   return (
-    <Overlay onClick={onClose}>
+    <Overlay onClick={() => onClose?.()}>
       {type === 'post' ? (
         // post 타입: 기존 로직 유지
         <>
@@ -25,11 +17,6 @@ const MoreMenu = ({
                 <Button variant="delete" onClick={onDelete}>
                   삭제하기
                 </Button>
-                {onPin && (
-                  <Button variant="pin" onClick={onPin}>
-                    피드에 핀하기
-                  </Button>
-                )}
               </RecordContainer>
             </>
           ) : (
@@ -70,21 +57,16 @@ const Overlay = styled.div`
   bottom: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-width: 320px;
-  max-width: 767px;
-  margin: 0 auto;
+  align-items: flex-end;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(18, 18, 18, 0.1);
   backdrop-filter: blur(2.5px);
   z-index: 1200;
 `;
 
 const ReportContainer = styled.div`
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 320px;
@@ -94,16 +76,11 @@ const ReportContainer = styled.div`
   padding: 20px;
   border-radius: 12px 12px 0px 0px;
   background-color: ${colors.darkgrey.main};
-  z-index: 1201;
 `;
 
 // 3개 버튼을 위한 컨테이너 (핀하기 포함)
 const RecordContainer = styled.div`
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 320px;
@@ -112,7 +89,6 @@ const RecordContainer = styled.div`
   padding: 20px;
   border-radius: 12px 12px 0px 0px;
   background-color: ${colors.darkgrey.main};
-  z-index: 1201;
 `;
 
 const Button = styled.div<{ variant: 'edit' | 'delete' | 'report' | 'pin' }>`
@@ -142,30 +118,30 @@ const Button = styled.div<{ variant: 'edit' | 'delete' | 'report' | 'pin' }>`
     if (variant === 'pin') {
       return `
         &:first-of-type {
-          padding: 8px 12px 16px 12px;
+          padding: 13px 12px 21px 12px;
         }
         
         &:nth-of-type(2) {
-          padding: 8px 12px 16px 12px;
+          padding: 13px 12px 21px 12px;
         }
 
         &:last-of-type {
-          padding: 16px 12px 8px 12px;
+          padding: 21px 12px 13px 12px;
           border-bottom: none;
         }
       `;
     }
     return `
       &:first-of-type {
-        padding: 8px 12px 16px 12px;
+        padding: 13px 12px 21px 12px;
       }
       
       &:nth-of-type(2) {
-        padding: 8px 12px 16px 12px;
+        padding: 13px 12px 21px 12px;
       }
 
       &:last-of-type {
-        padding: 16px 12px 8px 12px;
+        padding: 21px 12px 13px 12px;
         border-bottom: none;
       }
     `;

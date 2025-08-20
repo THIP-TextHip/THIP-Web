@@ -28,7 +28,7 @@ const RecordSection = ({ currentPage, progress, onClick }: RecordSectionProps) =
       <RecordSectionContent>
         <CurrentPage>현재 페이지 {currentPage}</CurrentPage>
         <div style={{ display: 'flex', alignItems: 'baseline' }}>
-          <ProgressText>{progress}</ProgressText>
+          <ProgressText>{Math.floor(progress)}</ProgressText>
           <PercentText>%</PercentText>
         </div>
         <ProgressBar>

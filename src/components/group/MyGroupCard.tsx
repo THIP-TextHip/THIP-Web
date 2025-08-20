@@ -25,7 +25,7 @@ export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>((props, 
         <div>
           <ProgressText>
             {isMine ? '내 진행도' : `${group.userName}님의 진행도`}{' '}
-            <Percent>{group.progress}%</Percent>
+            <Percent>{Math.floor(group.progress || 0)}%</Percent>
           </ProgressText>
           <Bar>
             <Fill width={group.progress || 0} />

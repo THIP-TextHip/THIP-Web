@@ -98,6 +98,7 @@ const PageRangeModal = ({ onClose, onSelect }: PageRangeModalProps) => {
               readOnly
               onClick={() => handleInputFocus('start')}
               active={activeInput === 'start'}
+              inputLength={startPage.length || 1}
             />
             <Separator>~</Separator>
             <PageInput
@@ -106,6 +107,7 @@ const PageRangeModal = ({ onClose, onSelect }: PageRangeModalProps) => {
               readOnly
               onClick={() => handleInputFocus('end')}
               active={activeInput === 'end'}
+              inputLength={endPage.length || 1}
             />
             <PageLabel>p</PageLabel>
             <ResetButton onClick={handleReset}>

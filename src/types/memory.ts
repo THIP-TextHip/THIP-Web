@@ -45,6 +45,8 @@ export interface MemoryPostsData {
   isbn: string;
   nextCursor: string | null;
   isLast: boolean;
+  totalPages?: number; // 전체 페이지 수
+  currentUserPage?: number; // 현재 사용자가 읽은 페이지
 }
 
 // API 응답 타입
@@ -70,6 +72,7 @@ export interface Record {
   pageRange?: string;
   isWriter: boolean;
   isLiked: boolean; // 좋아요 상태 추가
+  isLocked: boolean; // 블러 처리 여부 추가
   pollOptions?: PollOption[];
 }
 
