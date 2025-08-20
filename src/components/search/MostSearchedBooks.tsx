@@ -132,6 +132,7 @@ const Cover = styled.img`
   width: 45px;
   height: 60px;
   object-fit: cover;
+  flex-shrink: 0;
 `;
 
 const BookTitle = styled.span`
@@ -142,6 +143,7 @@ const BookTitle = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   margin-left: 8px;
+  flex-shrink: 1;
 `;
 
 const EmptyMessage = styled.div`
