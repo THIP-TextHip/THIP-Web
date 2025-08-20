@@ -53,10 +53,21 @@ export const PageInput = styled.input<{ inputLength?: number }>`
   padding: 0;
   margin: 0;
   caret-color: ${colors.white};
+  transition: width 0.2s ease;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
   }
+
+  /* 숫자 입력 스피너 제거 */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox에서 기본 스타일 제거 */
+  -moz-appearance: textfield;
 `;
 
 export const PageSuffix = styled.span`

@@ -46,13 +46,13 @@ const RecordFilters = ({
   };
 
   const handleInputChange = (type: 'start' | 'end', value: string) => {
-    // 숫자만 입력 허용
-    const numericValue = value.replace(/[^0-9]/g, '');
-
-    if (type === 'start') {
-      setStartPage(numericValue);
-    } else {
-      setEndPage(numericValue);
+    // 숫자만 입력 허용 (빈 문자열 또는 숫자)
+    if (value === '' || /^\d+$/.test(value)) {
+      if (type === 'start') {
+        setStartPage(value);
+      } else {
+        setEndPage(value);
+      }
     }
   };
 
@@ -65,7 +65,8 @@ const RecordFilters = ({
     const start = parseInt(startPage);
     const end = parseInt(endPage);
 
-    if (start && end && start <= end) {
+    // NaN 체크 포함한 유효성 검사
+    if (!isNaN(start) && !isNaN(end) && start > 0 && end > 0 && start <= end) {
       // 페이지 범위를 상위 컴포넌트에 전달
       if (onPageRangeSet) {
         onPageRangeSet({ start, end });
@@ -99,7 +100,15 @@ const RecordFilters = ({
     setIsDropdownOpen(false);
   };
 
-  const isValid = Boolean(startPage && endPage && parseInt(startPage) <= parseInt(endPage));
+  const isValid = Boolean(
+    startPage && 
+    endPage && 
+    !isNaN(parseInt(startPage)) && 
+    !isNaN(parseInt(endPage)) && 
+    parseInt(startPage) > 0 && 
+    parseInt(endPage) > 0 && 
+    parseInt(startPage) <= parseInt(endPage)
+  );
   const hasAnyInput = startPage.length > 0 || endPage.length > 0;
   const isPageInputMode = showInputMode && activeFilter === 'page' && !selectedPageRange;
 

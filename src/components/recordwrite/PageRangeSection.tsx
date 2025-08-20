@@ -48,14 +48,15 @@ const PageRangeSection = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    // 숫자만 입력 허용
+    // 숫자만 입력 허용 (빈 문자열 또는 양수)
     if (value === '' || /^\d+$/.test(value)) {
       onPageRangeChange(value);
 
       // 전체 페이지 수를 초과하면 에러 상태로 변경
       if (value !== '') {
         const page = parseInt(value);
-        setHasError(page > totalPages);
+        // NaN 체크도 포함하여 안전성 확보
+        setHasError(isNaN(page) || page <= 0 || page > totalPages);
       } else {
         setHasError(false);
       }
