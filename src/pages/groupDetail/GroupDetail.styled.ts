@@ -165,7 +165,7 @@ export const BookInfo = styled.div`
 `;
 
 export const BookCover = styled.img`
-  width: 80px;
+  min-width: 80px;
   height: 107px;
   object-fit: cover;
 `;
@@ -175,14 +175,14 @@ export const BookDetails = styled.div`
   flex-direction: column;
   font-size: ${typography.fontSize['xs']};
   font-weight: ${typography.fontWeight.medium};
-  gap: 20px;
+  gap: 16px;
   color: ${colors.white};
-  margin-top: 8px;
+  margin-top: 2px;
 `;
 
 export const BookIntro = styled.div`
   > p {
-    margin-top: 4px;
+    margin-top: 8px;
     color: ${colors.grey[200]};
     font-size: ${typography.fontSize['2xs']};
     line-height: 20px;

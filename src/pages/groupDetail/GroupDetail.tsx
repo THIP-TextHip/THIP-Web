@@ -43,6 +43,7 @@ import {
 import { postJoinRoom } from '@/api/rooms/postJoinRoom';
 import { postCloseRoom } from '@/api/rooms/postCloseRoom';
 import type { Group } from '@/components/group/MyGroupBox';
+import bookCoverLargeImg from '../../assets/books/bookCoverLarge.svg';
 
 import PasswordModal from '@/components/group/PasswordModal';
 
@@ -130,6 +131,7 @@ const GroupDetail = () => {
     bookTitle,
     authorName,
     bookDescription,
+    publisher,
     bookImageUrl,
     recommendRooms,
   } = roomData;
@@ -245,9 +247,11 @@ const GroupDetail = () => {
           <IconButton src={rightChevron} alt="책 이동 버튼" />
         </BookHeader>
         <BookInfo>
-          <BookCover src={bookImageUrl} alt={bookTitle} />
+          <BookCover src={bookImageUrl ? bookImageUrl : bookCoverLargeImg} alt={bookTitle} />
           <BookDetails>
-            <div>{authorName} 저</div>
+            <div>
+              {authorName} 저 · {publisher}
+            </div>
             <BookIntro>
               도서 소개 <br />
               <p>{bookDescription}</p>
