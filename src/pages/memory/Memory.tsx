@@ -61,9 +61,6 @@ const Memory = () => {
   // 업로드 프로그레스 상태
   const [showUploadProgress, setShowUploadProgress] = useState(false);
 
-  // 개발용 상태 - 기록 유무 전환
-  const [hasRecords, setHasRecords] = useState(true);
-
   // 기록 데이터
   const [myRecords, setMyRecords] = useState<Record[]>([]);
   const [groupRecords, setGroupRecords] = useState<Record[]>([]);
@@ -156,11 +153,8 @@ const Memory = () => {
 
   // 현재 탭에 따른 기록 목록 결정
   const currentRecords = useMemo(() => {
-    if (!hasRecords) {
-      return [];
-    }
     return activeTab === 'group' ? groupRecords : myRecords;
-  }, [activeTab, hasRecords, groupRecords, myRecords]);
+  }, [activeTab, groupRecords, myRecords]);
 
   // 정렬된 기록 목록
   const sortedRecords = useMemo(() => {
@@ -228,10 +222,6 @@ const Memory = () => {
     setActiveFilter('page');
   }, []);
 
-  const handleToggleRecords = useCallback(() => {
-    setHasRecords(!hasRecords);
-  }, [hasRecords]);
-
   const handleUploadComplete = useCallback(() => {
     setShowUploadProgress(false);
   }, []);
@@ -272,7 +262,6 @@ const Memory = () => {
           selectedSort={selectedSort}
           records={filteredRecords}
           selectedPageRange={selectedPageRange}
-          hasRecords={hasRecords}
           showUploadProgress={showUploadProgress}
           currentUserPage={currentUserPage}
           onTabChange={handleTabChange}
@@ -280,7 +269,6 @@ const Memory = () => {
           onSortChange={handleSortChange}
           onPageRangeClear={handlePageRangeClear}
           onPageRangeSet={handlePageRangeSet}
-          onToggleRecords={handleToggleRecords}
           onUploadComplete={handleUploadComplete}
         />
       </ScrollableContent>

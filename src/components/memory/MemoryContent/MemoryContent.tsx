@@ -7,7 +7,7 @@ import RecordInfoMessage from '../RecordInfoMessage';
 import EmptyRecord from '../EmptyRecord';
 import RecordList from './RecordList';
 import UploadProgressBar from '../UploadProgressBar/UploadProgressBar';
-import { Content, FixedSection, ScrollableSection, DevButton } from './MemoryContent.styled';
+import { Content, FixedSection, ScrollableSection } from './MemoryContent.styled';
 
 interface MemoryContentProps {
   activeTab: RecordType;
@@ -16,7 +16,6 @@ interface MemoryContentProps {
   selectedSort: SortType;
   records: Record[];
   selectedPageRange: { start: number; end: number } | null;
-  hasRecords: boolean;
   showUploadProgress: boolean;
   currentUserPage: number;
   onTabChange: (tab: RecordType) => void;
@@ -24,7 +23,6 @@ interface MemoryContentProps {
   onSortChange: (sort: SortType) => void;
   onPageRangeClear: () => void;
   onPageRangeSet: (range: { start: number; end: number }) => void;
-  onToggleRecords: () => void;
   onUploadComplete: () => void;
 }
 
@@ -35,21 +33,16 @@ const MemoryContent = ({
   selectedSort,
   records,
   selectedPageRange,
-  hasRecords,
   showUploadProgress,
   onTabChange,
   onFilterChange,
   onSortChange,
   onPageRangeClear,
   onPageRangeSet,
-  onToggleRecords,
   onUploadComplete,
 }: MemoryContentProps) => {
   return (
     <Content>
-      {/* 개발용 버튼 */}
-      <DevButton onClick={onToggleRecords}>{hasRecords ? '기록 숨기기' : '기록 보이기'}</DevButton>
-
       {/* 고정 영역: 탭과 필터만 */}
       <FixedSection>
         <RecordTabs activeTab={activeTab} onTabChange={onTabChange} />

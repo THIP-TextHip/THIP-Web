@@ -127,7 +127,6 @@ const RecordFilters = ({
             onInputChange={handleInputChange}
             onReset={handleReset}
             onConfirm={handleConfirm}
-            onCancel={handleCancel}
             hasAnyInput={hasAnyInput}
             isValid={isValid}
           />
