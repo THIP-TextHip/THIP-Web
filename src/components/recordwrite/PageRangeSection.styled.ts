@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { typography, semanticColors } from '../../styles/global/global';
+import { colors, typography, semanticColors } from '../../styles/global/global';
 
 export const Section = styled.div`
   display: flex;
@@ -41,7 +41,7 @@ export const InputWrapper = styled.div`
   font-family: ${typography.fontFamily.primary};
 `;
 
-export const PageInput = styled.input`
+export const PageInput = styled.input<{ inputLength?: number }>`
   background: none;
   border: none;
   outline: none;
@@ -49,13 +49,25 @@ export const PageInput = styled.input`
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
-  width: 30px;
+  width: ${props => (props.inputLength ? `${Math.max(30, props.inputLength * 8 + 10)}px` : '30px')};
   padding: 0;
   margin: 0;
+  caret-color: ${colors.white};
+  transition: width 0.2s ease;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
   }
+
+  /* 숫자 입력 스피너 제거 */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox에서 기본 스타일 제거 */
+  -moz-appearance: textfield;
 `;
 
 export const PageSuffix = styled.span`
@@ -124,6 +136,7 @@ export const InfoIcon = styled.div`
   justify-content: center;
   width: 20px;
   height: 20px;
+  cursor: pointer;
 
   img {
     width: 20px;
@@ -163,4 +176,53 @@ export const ToggleSlider = styled.div<{ active: boolean; disabled?: boolean }>`
   left: ${({ active }) => (active ? '24px' : '4px')};
   transition: left 0.3s;
   opacity: ${props => (props.disabled ? 0.7 : 1)};
+`;
+
+export const TooltipContainer = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+export const Tooltip = styled.div<{ variant: 'red' | 'green' }>`
+  position: absolute;
+  top: 33px;
+  right: 0;
+  left: 0;
+  background-color: ${props => (props.variant === 'red' ? '#3d3d3d' : '#3d3d3d')};
+  border-radius: 12px;
+  padding: 21px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+`;
+
+export const TooltipText = styled.span<{ variant: 'red' | 'green' }>`
+  color: ${props => (props.variant === 'red' ? '#FF9496' : semanticColors.text.point.green)};
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.medium};
+  flex: 1;
+`;
+
+export const TooltipCloseButton = styled.button`
+  background: none;
+  border: none;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+export const TooltipArrow = styled.div<{ variant: 'red' | 'green' }>`
+  position: absolute;
+  bottom: 60px;
+  right: 61px;
+  width: 12px;
+  height: 12px;
+  background-color: #3d3d3d;
+  transform: rotate(45deg);
+  z-index: 9;
 `;

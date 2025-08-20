@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { semanticColors, typography } from '../../../styles/global/global';
+import { semanticColors } from '../../../styles/global/global';
 
 export const Content = styled.div`
   display: flex;
@@ -22,23 +22,4 @@ export const FixedSection = styled.div`
 export const ScrollableSection = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-export const DevButton = styled.button`
-  position: fixed;
-  top: 100px;
-  right: 20px;
-  background: ${semanticColors.button.fill.primary};
-  color: ${semanticColors.text.primary};
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: ${typography.fontSize.xs};
-  cursor: pointer;
-  z-index: 100;
-  opacity: 0.8;
-
-  &:hover {
-    opacity: 1;
-  }
 `;

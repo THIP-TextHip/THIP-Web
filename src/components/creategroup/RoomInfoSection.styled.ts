@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { typography, semanticColors } from '../../styles/global/global';
+import { typography, semanticColors, colors } from '../../styles/global/global';
 
 export const TextAreaBox = styled.div`
   position: relative;
@@ -13,7 +13,7 @@ export const TextArea = styled.textarea`
   border: none;
   outline: none;
   color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize.base};
+  font-size: ${typography.fontSize.sm};
   width: 100%;
   resize: none;
   font-family: ${typography.fontFamily.primary};
@@ -22,7 +22,7 @@ export const TextArea = styled.textarea`
   margin: 0;
 
   &::placeholder {
-    color: ${semanticColors.text.primary};
+    color: ${colors.grey[300]};
     font-size: ${typography.fontSize.sm};
   }
 `;

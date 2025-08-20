@@ -34,7 +34,7 @@ interface RecordItemProps {
 const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
-  const { openMoreMenu, openConfirm, openSnackbar } = usePopupActions();
+  const { openMoreMenu, openConfirm, openSnackbar, closePopup } = usePopupActions();
 
   const {
     id,
@@ -53,7 +53,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   // 좋아요 상태 관리 - record 객체에서 isLiked 속성 가져오기
   const [isLiked, setIsLiked] = useState(record.isLiked || false);
   const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
-  
+
   // 전역 댓글 바텀시트
   const { openCommentBottomSheet } = useCommentBottomSheetStore();
 
@@ -129,14 +129,9 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   };
 
   const handleEdit = useCallback(() => {
-    const currentRoomId = roomId || '1';
-
-    if (type === 'poll') {
-      navigate(`/memory/poll/edit/${currentRoomId}/${record.id}`);
-    } else {
-      navigate(`/memory/record/edit/${currentRoomId}/${record.id}`);
-    }
-  }, [roomId, type, record.id, navigate]);
+    // API 개발 전까지 수정 기능 비활성화
+    console.log('수정 기능은 개발 중입니다.');
+  }, []);
 
   const handleDelete = useCallback(async () => {
     const currentRoomId = roomId || '1';
@@ -204,8 +199,11 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
 
     try {
       const response = await pinRecordToFeed(parseInt(currentRoomId), recordId);
-      
+
       if (response.isSuccess) {
+        // 팝업 먼저 닫기
+        closePopup();
+        
         // 피드 작성 페이지로 이동하면서 데이터 전달
         navigate('/feed/write', {
           state: {
@@ -217,12 +215,12 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
               recordContent: content,
               roomId: currentRoomId,
               recordId: record.id,
-            }
-          }
+            },
+          },
         });
       } else {
         let errorMessage = '핀하기에 실패했습니다.';
-        
+
         if (response.code === 130000) {
           errorMessage = '존재하지 않는 기록입니다.';
         } else if (response.code === 130003) {
@@ -233,6 +231,9 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
           errorMessage = '존재하지 않는 책입니다.';
         }
 
+        // 실패한 경우에도 팝업 닫기
+        closePopup();
+        
         openSnackbar({
           message: errorMessage,
           variant: 'top',
@@ -241,22 +242,27 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       }
     } catch (error) {
       console.error('핀하기 API 호출 실패:', error);
+      
+      // 네트워크 오류 시에도 팝업 닫기
+      closePopup();
+      
       openSnackbar({
         message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
         variant: 'top',
         onClose: () => {},
       });
     }
-  }, [roomId, record.id, content, navigate, openSnackbar]);
+  }, [roomId, record.id, content, navigate, openSnackbar, closePopup]);
 
   // 핀하기 확인 팝업 핸들러
   const handlePinConfirm = useCallback(() => {
     openConfirm({
-      title: '기록을 피드에 핀하시겠어요?',
-      disc: '기록의 내용으로 피드 글 작성 페이지가 열립니다.',
+      title: '이 기록을 피드에 핀할까요?',
+      disc: '핀하면 내 피드에 글을 옮길 수 있어요.',
       onConfirm: handlePinRecord,
+      onClose: closePopup, // "아니오" 버튼 클릭 시 팝업 닫기
     });
-  }, [openConfirm, handlePinRecord]);
+  }, [openConfirm, handlePinRecord, closePopup]);
 
   // 댓글 버튼 클릭 핸들러
   const handleCommentClick = useCallback(() => {
@@ -266,8 +272,6 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   // 길게 누르기 이벤트 핸들러
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      if (isMyRecord) return;
-
       setIsPressed(true);
       hasTriggeredLongPress.current = false;
       pressStartPos.current = {
@@ -279,12 +283,32 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
         hasTriggeredLongPress.current = true;
         setIsPressed(false);
 
-        openMoreMenu({
-          onReport: handleReport,
-        });
+        if (isMyRecord) {
+          openMoreMenu({
+            onEdit: handleEdit,
+            onDelete: handleDeleteConfirm,
+            onPin: handlePinConfirm,
+            onClose: closePopup,
+            type: 'post',
+            isWriter: true,
+          });
+        } else {
+          openMoreMenu({
+            onReport: handleReport,
+            onClose: closePopup,
+          });
+        }
       }, 800);
     },
-    [isMyRecord, openMoreMenu, handleReport],
+    [
+      isMyRecord,
+      openMoreMenu,
+      handleReport,
+      handleEdit,
+      handleDeleteConfirm,
+      handlePinConfirm,
+      closePopup,
+    ],
   );
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
@@ -315,17 +339,8 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       hasTriggeredLongPress.current = false;
       return;
     }
-
-    if (isMyRecord) {
-      openMoreMenu({
-        onEdit: handleEdit,
-        onDelete: handleDeleteConfirm,
-        onPin: handlePinConfirm,
-        type: 'post', // 중요: post 타입으로 설정해야 핀하기 버튼이 표시됨
-        isWriter: true, // 내 기록임을 명시
-      });
-    }
-  }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm, handlePinConfirm]);
+    // 모든 기록(내 기록 포함)은 이제 길게 누르기로만 더보기 메뉴 표시
+  }, []);
 
   return (
     <Container
@@ -353,11 +368,12 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
         {type === 'text' ? (
           <TextRecord content={content} />
         ) : (
-          <PollRecord 
-            content={content} 
-            pollOptions={pollOptions || []} 
+          <PollRecord
+            content={content}
+            pollOptions={pollOptions || []}
             postId={parseInt(id)}
-            onVoteUpdate={(updatedOptions) => {
+            shouldBlur={shouldBlur}
+            onVoteUpdate={updatedOptions => {
               // TODO: 부모 컴포넌트로 투표 결과 업데이트 전달
               console.log('투표 결과 업데이트:', updatedOptions);
             }}
@@ -366,35 +382,62 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       </ContentSection>
 
       <ActionSection>
-        <ActionButton onClick={(e) => {
-          e.stopPropagation();
-          handleLikeClick();
-        }}>
+        <ActionButton
+          onClick={
+            shouldBlur
+              ? undefined
+              : e => {
+                  e.stopPropagation();
+                  handleLikeClick();
+                }
+          }
+          style={{
+            cursor: shouldBlur ? 'default' : 'pointer',
+            pointerEvents: shouldBlur ? 'none' : 'auto',
+          }}
+        >
           <img
             src={isLiked ? heartFilledIcon : heartIcon}
             alt={isLiked ? '좋아요 취소' : '좋아요'}
           />
           <span>{currentLikeCount}</span>
         </ActionButton>
-        <ActionButton onClick={(e) => {
-          e.stopPropagation();
-          handleCommentClick();
-        }}>
+        <ActionButton
+          onClick={
+            shouldBlur
+              ? undefined
+              : e => {
+                  e.stopPropagation();
+                  handleCommentClick();
+                }
+          }
+          style={{
+            cursor: shouldBlur ? 'default' : 'pointer',
+            pointerEvents: shouldBlur ? 'none' : 'auto',
+          }}
+        >
           <img src={commentIcon} alt="댓글" />
           <span>{commentCount}</span>
         </ActionButton>
         {isMyRecord && (
-          <ActionButton 
-            onClick={(e) => {
-              e.stopPropagation(); // 이벤트 버블링 방지
-              handlePinConfirm();
+          <ActionButton
+            onClick={
+              shouldBlur
+                ? undefined
+                : e => {
+                    e.stopPropagation(); // 이벤트 버블링 방지
+                    handlePinConfirm();
+                  }
+            }
+            style={{
+              cursor: shouldBlur ? 'default' : 'pointer',
+              pointerEvents: shouldBlur ? 'none' : 'auto',
             }}
           >
             <img src={pinIcon} alt="피드에 핀하기" />
           </ActionButton>
         )}
       </ActionSection>
-
     </Container>
   );
 };

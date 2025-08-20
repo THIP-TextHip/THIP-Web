@@ -4,7 +4,7 @@ import { colors, typography } from '@/styles/global/global';
 export const HotTopicSection = styled.section`
   display: flex;
   flex-direction: column;
-  width: 90%;
+  width: calc(100% - 40px);
   gap: 12px;
   background: ${colors.darkgrey.dark};
   margin: 20px 20px 80px 20px;

@@ -30,18 +30,32 @@ const TodayWords = () => {
   // 하루 5개 제한 관련
   const DAILY_LIMIT = 5;
   
+  // 오늘 날짜를 여러 포맷으로 생성하는 함수
+  const getTodayDateStrings = useCallback(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    
+    return [
+      `${year}.${month}.${day}`,        // 2024.01.15
+      `${year}년 ${month}월 ${day}일`,   // 2024년 01월 15일
+      `${year}-${month}-${day}`,        // 2024-01-15
+      `${month}/${day}/${year}`,        // 01/15/2024
+    ];
+  }, []);
+
   // 오늘 작성한 내 메시지 개수 계산
   const getTodayMyMessageCount = useCallback(() => {
-    const today = new Date().toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).replace(/\. /g, '.').replace(/\.$/, '');
+    const todayFormats = getTodayDateStrings();
     
-    return messages.filter(message => 
-      message.isWriter === true && message.timestamp === today
-    ).length;
-  }, [messages]);
+    return messages.filter(message => {
+      if (!message.isWriter) return false;
+      
+      // 여러 날짜 포맷과 비교
+      return todayFormats.includes(message.timestamp);
+    }).length;
+  }, [messages, getTodayDateStrings]);
 
   const todayMyMessageCount = getTodayMyMessageCount();
 
@@ -52,8 +66,7 @@ const TodayWords = () => {
 
   // API 데이터를 Message 타입으로 변환하는 함수
   const convertToMessage = (item: TodayCommentItem): Message => {
-    // 네트워크 응답에서 postDate가 "1일 전" 형태의 문자열로 오는 것으로 보임
-    // 따라서 postDate를 그대로 timeAgo로 사용
+    // 서버에서 받아오는 postDate를 그대로 사용 (이미 날짜 기반으로 계산된 값)
     const timeAgo = item.postDate || '방금 전';
     
     // createdAt은 현재 시간으로 설정 (정확한 시간이 필요하다면 다른 API 필드 사용)
@@ -99,6 +112,13 @@ const TodayWords = () => {
         setNextCursor(response.data.nextCursor);
         setIsLast(response.data.isLast);
         setHasInitiallyLoaded(true);
+        
+        // 초기 로딩 시 스크롤을 맨 아래로 이동
+        if (isRefresh) {
+          setTimeout(() => {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+          }, 100);
+        }
       } else {
         openSnackbar({
           message: response.message || '오늘의 한마디 목록을 불러오는데 실패했습니다.',
@@ -139,21 +159,21 @@ const TodayWords = () => {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [roomId]);
+  }, [roomId, convertToMessage, openSnackbar]);
 
   // 더 많은 메시지 로드
   const loadMoreMessages = useCallback(() => {
     if (!isLoadingMore && !isLast && nextCursor && roomId) {
       loadMessages(nextCursor);
     }
-  }, [isLoadingMore, isLast, nextCursor, roomId]);
+  }, [isLoadingMore, isLast, nextCursor, roomId, loadMessages]);
 
   // 컴포넌트 마운트 시 초기 데이터 로드
   useEffect(() => {
     if (roomId && !hasInitiallyLoaded) {
       loadMessages(undefined, true);
     }
-  }, [roomId, hasInitiallyLoaded]);
+  }, [roomId, hasInitiallyLoaded, loadMessages]);
 
   // 무한 스크롤 처리
   useEffect(() => {
@@ -188,6 +208,7 @@ const TodayWords = () => {
       openSnackbar({
         message: '오늘의 한마디는 하루에 다섯번까지 작성할 수 있어요',
         variant: 'top',
+        isError: true,
         onClose: () => {},
       });
       return;
@@ -209,14 +230,16 @@ const TodayWords = () => {
         setIsLast(false);
         setHasInitiallyLoaded(false);
 
-        // 5개 도달 시 흰색 토스트, 아니면 일반 성공 메시지
+        // 첫 번째 한마디 작성 시만 성공 메시지, 5개 도달 시 제한 메시지
         if (todayMyMessageCount + 1 >= DAILY_LIMIT) {
           openSnackbar({
             message: '오늘의 한마디는 하루에 다섯번까지 작성할 수 있어요',
             variant: 'top',
+            isError: true,
             onClose: () => {},
           });
-        } else {
+        } else if (todayMyMessageCount === 0) {
+          // 첫 번째 한마디 작성 시만 토스트 메시지 표시
           openSnackbar({
             message: '오늘의 한마디가 작성되었습니다.',
             variant: 'top',

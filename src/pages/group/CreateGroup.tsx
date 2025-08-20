@@ -238,7 +238,7 @@ const CreateGroup = () => {
       <TitleHeader
         leftIcon={<img src={leftarrow} alt="뒤로가기" />}
         title="모임 만들기"
-        rightButton={isSubmitting ? '생성 중...' : '완료'}
+        rightButton="완료"
         onLeftClick={handleBackClick}
         onRightClick={handleCompleteClick}
         isNextActive={isFormValid}

@@ -18,7 +18,7 @@ const GroupBookSection = ({ title, author, onClick }: GroupBookSectionProps) => 
     <StyledGroupBookSection onClick={onClick}>
       <BookTitle>{title}</BookTitle>
       <RightSection>
-        <BookAuthor>{author}</BookAuthor>
+        <BookAuthor>{author} 저</BookAuthor>
         <ChevronIcon src={rightChevron} alt="책 이동 버튼" />
       </RightSection>
     </StyledGroupBookSection>

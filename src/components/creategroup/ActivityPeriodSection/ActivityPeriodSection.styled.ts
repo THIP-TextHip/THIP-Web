@@ -14,12 +14,16 @@ export const DateRangeContainer = styled.div`
   width: 100%;
 `;
 
-export const DateGroup = styled.div`
+export const DateGroup = styled.div<{ alignItems?: 'start' | 'end' | 'center' }>`
   display: flex;
   align-items: center;
   gap: 2px;
   flex: 1;
-  justify-content: center;
+  justify-content: ${({ alignItems = 'center' }) => {
+    if (alignItems === 'start') return 'flex-start';
+    if (alignItems === 'end') return 'flex-end';
+    return 'center';
+  }};
 `;
 
 export const WheelContainer = styled.div`
@@ -89,11 +93,11 @@ export const WheelItem = styled.div<{ isSelected: boolean }>`
   }
 `;
 
-export const DateUnitText = styled.div`
+export const DateUnitText = styled.div<{ isLast?: boolean }>`
   color: ${semanticColors.text.primary};
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.regular};
-  margin-right: 6px;
+  margin-right: ${({ isLast }) => (isLast ? '0px' : '6px')};
 `;
 
 export const SeparatorText = styled.div`

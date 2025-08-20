@@ -36,7 +36,7 @@ const PageInputMode = ({
           value={startPage}
           placeholder=""
           onChange={e => onInputChange('start', e.target.value)}
-          type="number"
+          inputMode="numeric"
           autoFocus
           style={{
             width: startPage.length > 0 ? `${Math.max(36, startPage.length * 12)}px` : '36px',
@@ -49,7 +49,7 @@ const PageInputMode = ({
           value={endPage}
           placeholder=""
           onChange={e => onInputChange('end', e.target.value)}
-          type="number"
+          inputMode="numeric"
           style={{
             width: endPage.length > 0 ? `${Math.max(36, endPage.length * 12)}px` : '36px',
           }}

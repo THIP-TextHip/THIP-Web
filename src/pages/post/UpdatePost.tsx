@@ -64,7 +64,7 @@ const UpdatePost = () => {
           id: 0,
           title: data.bookTitle,
           author: data.bookAuthor,
-          cover: '',
+          cover: data.bookImageUrl,
           isbn: data.isbn,
         });
 
@@ -152,7 +152,7 @@ const UpdatePost = () => {
       <TitleHeader
         leftIcon={<img src={leftarrow} alt="뒤로가기" />}
         title="글 수정"
-        rightButton={updateLoading ? '수정 중...' : '완료'}
+        rightButton="완료"
         onLeftClick={handleBackClick}
         onRightClick={handleCompleteClick}
         isNextActive={isFormValid && !updateLoading}

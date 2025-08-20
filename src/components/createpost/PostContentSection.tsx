@@ -21,10 +21,6 @@ const PostContentSection = ({ content, onContentChange, readOnly = false }: Post
           maxLength={maxLength}
           rows={4}
           readOnly={readOnly}
-          style={{ 
-            backgroundColor: readOnly ? '#f5f5f5' : 'transparent',
-            cursor: readOnly ? 'not-allowed' : 'text'
-          }}
         />
         <CharacterCount>
           {content.length} / {maxLength}
