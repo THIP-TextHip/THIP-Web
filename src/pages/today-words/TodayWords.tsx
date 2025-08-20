@@ -30,18 +30,32 @@ const TodayWords = () => {
   // 하루 5개 제한 관련
   const DAILY_LIMIT = 5;
   
+  // 오늘 날짜를 여러 포맷으로 생성하는 함수
+  const getTodayDateStrings = useCallback(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    
+    return [
+      `${year}.${month}.${day}`,        // 2024.01.15
+      `${year}년 ${month}월 ${day}일`,   // 2024년 01월 15일
+      `${year}-${month}-${day}`,        // 2024-01-15
+      `${month}/${day}/${year}`,        // 01/15/2024
+    ];
+  }, []);
+
   // 오늘 작성한 내 메시지 개수 계산
   const getTodayMyMessageCount = useCallback(() => {
-    const today = new Date().toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).replace(/\. /g, '.').replace(/\.$/, '');
+    const todayFormats = getTodayDateStrings();
     
-    return messages.filter(message => 
-      message.isWriter === true && message.timestamp === today
-    ).length;
-  }, [messages]);
+    return messages.filter(message => {
+      if (!message.isWriter) return false;
+      
+      // 여러 날짜 포맷과 비교
+      return todayFormats.includes(message.timestamp);
+    }).length;
+  }, [messages, getTodayDateStrings]);
 
   const todayMyMessageCount = getTodayMyMessageCount();
 
