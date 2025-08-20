@@ -26,13 +26,13 @@ const BorderBottom = styled.div`
   background: #1c1c1c;
 `;
 
-const FeedPost = ({ showHeader, isLast, isMyFeed, ...postData }: FeedPostProps) => {
+const FeedPost = ({ showHeader, isLast, isMyFeed, onSaveToggle, ...postData }: FeedPostProps) => {
   return (
     <>
       <Container>
         {showHeader && <PostHeader {...postData} />}
         <PostBody {...postData} />
-        <PostFooter isMyFeed={!!isMyFeed} {...postData} />
+        <PostFooter isMyFeed={!!isMyFeed} onSaveToggle={onSaveToggle} {...postData} />
       </Container>
       {!isLast && <BorderBottom />}
     </>

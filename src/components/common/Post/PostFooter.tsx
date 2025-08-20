@@ -52,6 +52,7 @@ interface PostFooterProps {
   isLiked?: boolean;
   isPublic?: boolean;
   isDetail?: boolean;
+  onSaveToggle?: (feedId: number, newSaveState: boolean) => void;
 }
 
 const PostFooter = ({
@@ -63,6 +64,7 @@ const PostFooter = ({
   isLiked = false,
   isPublic = true,
   isDetail = false,
+  onSaveToggle,
 }: PostFooterProps) => {
   const [liked, setLiked] = useState(isLiked);
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
@@ -90,9 +92,15 @@ const PostFooter = ({
       const response = await postSaveFeed(feedId, !saved);
 
       if (response.isSuccess) {
+        const newSaveState = response.data?.isSaved ?? !saved;
         // 성공 시 상태 업데이트
-        setSaved(response.data?.isSaved ?? !saved);
-        console.log('저장 상태 변경 성공:', response.data?.isSaved);
+        setSaved(newSaveState);
+        console.log('저장 상태 변경 성공:', newSaveState);
+        
+        // 부모 컴포넌트에 알림
+        if (onSaveToggle) {
+          onSaveToggle(feedId, newSaveState);
+        }
       } else {
         console.error('저장 상태 변경 실패:', response.message);
       }

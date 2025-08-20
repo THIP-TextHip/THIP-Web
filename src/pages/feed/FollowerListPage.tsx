@@ -135,6 +135,7 @@ const FollowerListPage = () => {
             type={type as UserProfileType}
             isFollowing={user.isFollowing}
             isLast={index === userList.length - 1}
+            isMyself={user.isMyself}
           />
         ))}
       </UserProfileList>
@@ -156,7 +157,9 @@ const Wrapper = styled.div`
 const TotalBar = styled.div`
   position: fixed;
   top: 0;
-  width: 727px;
+  width: 94.8%;
+  max-width: 727px;
+  min-width: 320px;
   padding: 76px 0px 4px 0px;
   border-bottom: 1px solid var(--color-darkgrey-dark);
   background-color: var(--color-black-main);

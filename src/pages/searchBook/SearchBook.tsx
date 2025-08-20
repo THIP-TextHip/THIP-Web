@@ -238,7 +238,7 @@ const SearchBook = () => {
 
   if (isLoading || error || !bookDetail) {
     if (isLoading) {
-      return <LoadingSpinner fullHeight={true} />;
+      return <LoadingSpinner fullHeight={true} size="large" message="책 정보 불러오는 중..." />;
     }
     return (
       <Wrapper>
