@@ -18,6 +18,7 @@ export const TextArea = styled.textarea`
   resize: none;
   outline: none;
   border: none;
+  overflow: hidden;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
