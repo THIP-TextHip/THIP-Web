@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 import { colors, typography } from '@/styles/global/global';
 import MenuButton from '@/components/Mypage/MenuButton';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import { useLogout } from '@/hooks/useLogout';
 import alert from '../../assets/mypage/alert.svg';
@@ -17,14 +18,22 @@ import { useEffect, useState } from 'react';
 
 const Mypage = () => {
   const [profile, setProfile] = useState<GetMyProfileResponse['data'] | null>(null);
+  const [loading, setLoading] = useState(true);
   const { openConfirm, closePopup } = usePopupActions();
   const navigate = useNavigate();
   const { handleLogout: logout } = useLogout();
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const profile = await getMyProfile();
-      setProfile(profile);
+      try {
+        setLoading(true);
+        const profile = await getMyProfile();
+        setProfile(profile);
+      } catch (error) {
+        console.error('프로필 정보 로드 실패:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchProfile();
   }, []);
@@ -33,8 +42,20 @@ const Mypage = () => {
     navigate('/mypage/edit', { state: { profile } });
   };
 
+  if (loading) {
+    return (
+      <Wrapper>
+        <LoadingSpinner message="내 정보를 불러오는 중..." size="large" fullHeight={true} />
+      </Wrapper>
+    );
+  }
+
   if (!profile) {
-    return <div>로딩 중...</div>;
+    return (
+      <Wrapper>
+        <div>프로필 정보를 불러올 수 없습니다.</div>
+      </Wrapper>
+    );
   }
 
   const handleLogout = () => {

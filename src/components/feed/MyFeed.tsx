@@ -7,7 +7,6 @@ import { colors, typography } from '@/styles/global/global';
 import TotalBar from './TotalBar';
 import { getMyProfile } from '@/api/feeds/getMyProfile';
 import type { MyProfileData } from '@/types/profile';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
   const [profileData, setProfileData] = useState<MyProfileData | null>(null);
@@ -34,7 +33,8 @@ const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
 
   if (loading || !profileData) {
     return (
-      <LoadingSpinner message="내 피드 정보를 불러오는 중..." size="large" fullHeight={true} />
+      <></>
+      // <LoadingSpinner message="내 피드 정보를 불러오는 중..." size="large" fullHeight={true} />
     );
   }
 

@@ -93,11 +93,11 @@ const PostBody = ({
       </PostContent>
       <ImageContainer>
         {hasImage && (
-          <div className="imgContainer">
+          <>
             {contentUrls.map((src: string, i: number) => (
               <img key={i} src={src} />
             ))}
-          </div>
+          </>
         )}
       </ImageContainer>
     </Container>
