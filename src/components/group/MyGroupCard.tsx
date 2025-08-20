@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import styled from '@emotion/styled';
 import peopleImg from '../../assets/common/people.svg';
 import type { Group } from './MyGroupBox';
+import { colors, typography } from '@/styles/global/global';
 
 interface MyGroupCardProps {
   group: Group;
@@ -66,8 +67,8 @@ const Info = styled.div`
 `;
 
 const CardTitle = styled.h2`
-  font-size: var(--font-size-large01);
-  font-weight: var(--font-weight-semibold);
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
   color: #000;
   margin: 0;
   white-space: nowrap;
@@ -79,9 +80,9 @@ const Participants = styled.p`
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--font-size-small03);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-grey-300);
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.medium};
+  color: ${colors.grey[300]};
   margin: 8px 0;
   > span {
     line-height: 20px;
@@ -89,21 +90,21 @@ const Participants = styled.p`
 `;
 
 const ProgressText = styled.p`
-  font-size: var(--font-size-medium01);
-  color: var(--color-grey-300);
+  font-size: ${typography.fontSize.sm};
+  color: ${colors.grey[300]};
   margin: 12px 0;
 `;
 
 const Percent = styled.span`
-  font-size: var(--font-size-medium02);
-  color: var(--color-purple-main);
-  font-weight: var(--font-weight-semibold);
+  font-size: ${typography.fontSize.base};
+  color: ${colors.purple.main};
+  font-weight: ${typography.fontWeight.semibold};
 `;
 
 const Bar = styled.div`
   width: 100%;
   height: 6px;
-  background: var(--color-grey-300);
+  background: ${colors.grey[300]};
   border-radius: 4px;
   margin-top: 4px;
 `;
@@ -111,6 +112,6 @@ const Bar = styled.div`
 const Fill = styled.div<{ width: number }>`
   width: ${({ width }) => width}%;
   height: 100%;
-  background-color: var(--color-purple-main);
+  background-color: ${colors.purple.main};
   border-radius: 4px;
 `;

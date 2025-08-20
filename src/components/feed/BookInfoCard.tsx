@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import rightArrow from '../../assets/common/rightArrow.svg';
+import { colors, typography } from '@/styles/global/global';
 
 interface BookInfoCardProps {
   bookTitle: string;
@@ -37,17 +38,17 @@ const BookContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   border-radius: 12px;
-  background: var(--color-darkgrey-main);
+  background: ${colors.darkgrey.main};
   cursor: pointer;
 
   .left {
     overflow: hidden;
     width: 220px;
     white-space: nowrap;
-    color: var(--color-white);
+    color: ${colors.white};
     text-overflow: ellipsis;
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
+    font-size: ${typography.fontSize.base};
+    font-weight: ${typography.fontWeight.semibold};
     line-height: 24px;
   }
 
@@ -56,12 +57,12 @@ const BookContainer = styled.div`
     flex-direction: row;
     gap: 4px;
     overflow: hidden;
-    color: var(--color-grey-100);
+    color: ${colors.grey[100]};
     text-align: right;
     text-overflow: ellipsis;
-    font-size: var(--font-size-xs);
+    font-size: ${typography.fontSize.xs};
     font-style: normal;
-    font-weight: var(--font-weight-regular);
+    font-weight: ${typography.fontWeight.regular};
     line-height: 24px;
 
     .name {
