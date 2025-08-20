@@ -155,16 +155,29 @@ const GroupDetail = () => {
     if (!roomId) return;
 
     if (roomData.isHost) {
-      try {
-        setIsSubmitting(true);
-        await postCloseRoom(Number(roomId));
-        setRoomData(prev => (prev ? { ...prev } : prev));
-        navigate(`/group/detail/joined/${roomId}`);
-      } catch {
-        alert('네트워크 오류 또는 서버 오류');
-      } finally {
-        setIsSubmitting(false);
-      }
+      openPopup('confirm-modal', {
+        title: '모집을 마감하시겠습니까?',
+        disc: `독서메이트 모집을 마감하면 <br> 지금 바로 모임방 활동을 시작할 수 있어요.`,
+        onClose: () => closePopup(),
+        onConfirm: async () => {
+          closePopup();
+          try {
+            setIsSubmitting(true);
+            await postCloseRoom(Number(roomId));
+            setRoomData(prev => (prev ? { ...prev } : prev));
+            openPopup('snackbar', {
+              message: '독서메이트 모집을 성공적으로 마감했어요.',
+              variant: 'top',
+              onClose: () => closePopup(),
+            });
+            navigate(`/group/detail/joined/${roomId}`);
+          } catch {
+            alert('네트워크 오류 또는 서버 오류');
+          } finally {
+            setIsSubmitting(false);
+          }
+        },
+      });
       return;
     }
 

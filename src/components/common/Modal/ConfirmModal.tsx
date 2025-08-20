@@ -6,7 +6,7 @@ const ConfirmModal = ({ title, disc, onConfirm, onClose }: ConfirmModalProps) =>
   return (
     <Container>
       <div className="title">{title}</div>
-      <div className="disc">{disc}</div>
+      <div className="disc" dangerouslySetInnerHTML={{ __html: disc }} />
       <ButtonContainer>
         <Button variant="no" onClick={onClose}>
           아니요
