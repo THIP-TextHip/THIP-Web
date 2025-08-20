@@ -189,7 +189,7 @@ const ActivityPeriodSection = ({
       <DatePickerContainer>
         <DateRangeContainer>
           {/* 시작일 */}
-          <DateGroup>
+          <DateGroup alignItems="end">
             <DateWheel
               values={years}
               selectedValue={startDate.year}
@@ -212,13 +212,13 @@ const ActivityPeriodSection = ({
               onChange={handleStartDayChange}
               width={24}
             />
-            <DateUnitText>일</DateUnitText>
+            <DateUnitText isLast>일</DateUnitText>
           </DateGroup>
 
           <SeparatorText>~</SeparatorText>
 
           {/* 종료일 */}
-          <DateGroup>
+          <DateGroup alignItems="start">
             <DateWheel
               values={years}
               selectedValue={endDate.year}
@@ -241,7 +241,7 @@ const ActivityPeriodSection = ({
               onChange={handleEndDayChange}
               width={24}
             />
-            <DateUnitText>일</DateUnitText>
+            <DateUnitText isLast>일</DateUnitText>
           </DateGroup>
         </DateRangeContainer>
 
