@@ -143,7 +143,9 @@ const BookTitle = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   margin-left: 8px;
-  flex-shrink: 1;
+  flex: 1 1 0%;
+  min-width: 0;
+  max-width: calc(100% - 77px);
 `;
 
 const EmptyMessage = styled.div`
