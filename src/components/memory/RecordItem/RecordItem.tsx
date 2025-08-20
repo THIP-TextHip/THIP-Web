@@ -34,7 +34,7 @@ interface RecordItemProps {
 const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
-  const { openMoreMenu, openConfirm, openSnackbar } = usePopupActions();
+  const { openMoreMenu, openConfirm, openSnackbar, closePopup } = usePopupActions();
 
   const {
     id,
@@ -281,10 +281,11 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
 
         openMoreMenu({
           onReport: handleReport,
+          onClose: closePopup,
         });
       }, 800);
     },
-    [isMyRecord, openMoreMenu, handleReport],
+    [isMyRecord, openMoreMenu, handleReport, closePopup],
   );
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
@@ -321,11 +322,12 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
         onEdit: handleEdit,
         onDelete: handleDeleteConfirm,
         onPin: handlePinConfirm,
+        onClose: closePopup,
         type: 'post', // 중요: post 타입으로 설정해야 핀하기 버튼이 표시됨
         isWriter: true, // 내 기록임을 명시
       });
     }
-  }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm, handlePinConfirm]);
+  }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm, handlePinConfirm, closePopup]);
 
   return (
     <Container

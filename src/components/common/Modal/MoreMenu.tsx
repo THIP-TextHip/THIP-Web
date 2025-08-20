@@ -12,7 +12,7 @@ const MoreMenu = ({
   type,
 }: MoreMenuProps) => {
   return (
-    <Overlay onClick={onClose}>
+    <Overlay onClick={() => onClose?.()}>
       {type === 'post' ? (
         // post 타입: 기존 로직 유지
         <>
@@ -70,21 +70,16 @@ const Overlay = styled.div`
   bottom: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-width: 320px;
-  max-width: 767px;
-  margin: 0 auto;
+  align-items: flex-end;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(18, 18, 18, 0.1);
   backdrop-filter: blur(2.5px);
   z-index: 1200;
 `;
 
 const ReportContainer = styled.div`
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 320px;
@@ -94,16 +89,11 @@ const ReportContainer = styled.div`
   padding: 20px;
   border-radius: 12px 12px 0px 0px;
   background-color: ${colors.darkgrey.main};
-  z-index: 1201;
 `;
 
 // 3개 버튼을 위한 컨테이너 (핀하기 포함)
 const RecordContainer = styled.div`
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 320px;
@@ -112,7 +102,6 @@ const RecordContainer = styled.div`
   padding: 20px;
   border-radius: 12px 12px 0px 0px;
   background-color: ${colors.darkgrey.main};
-  z-index: 1201;
 `;
 
 const Button = styled.div<{ variant: 'edit' | 'delete' | 'report' | 'pin' }>`
