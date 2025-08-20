@@ -39,6 +39,7 @@ import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
 import { usePopupStore } from '@/stores/usePopupStore';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const FILTER = ['최신순', '인기순'] as const;
 const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
@@ -236,6 +237,9 @@ const SearchBook = () => {
   }, [bookDetail, openPopup]);
 
   if (isLoading || error || !bookDetail) {
+    if (isLoading) {
+      return <LoadingSpinner fullHeight={true} />;
+    }
     return (
       <Wrapper>
         <Header>
