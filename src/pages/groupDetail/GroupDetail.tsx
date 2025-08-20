@@ -46,6 +46,7 @@ import type { Group } from '@/components/group/MyGroupBox';
 import bookCoverLargeImg from '../../assets/books/bookCoverLarge.svg';
 
 import PasswordModal from '@/components/group/PasswordModal';
+import { usePopupStore } from '@/stores/usePopupStore';
 
 const GroupDetail = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -59,6 +60,9 @@ const GroupDetail = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  const openPopup = usePopupStore(state => state.openPopup);
+  const closePopup = usePopupStore(state => state.closePopup);
 
   const handleBackButton = () => {
     navigate(-1);
@@ -165,6 +169,34 @@ const GroupDetail = () => {
     }
 
     const nextType: 'join' | 'cancel' = isJoining ? 'cancel' : 'join';
+
+    if (nextType === 'cancel') {
+      openPopup('confirm-modal', {
+        title: '모임방 참여를 취소하시겠어요?',
+        disc: '지금 취소해도, 활동 시작 전에 다시 참여 가능해요.',
+        onClose: () => closePopup(),
+        onConfirm: async () => {
+          closePopup();
+          try {
+            setIsSubmitting(true);
+            await postJoinRoom(Number(roomId), 'cancel');
+            navigate('/group');
+            setTimeout(() => {
+              openPopup('snackbar', {
+                message: '모임방 참여가 취소되었습니다! 다른 방을 찾아보세요.',
+                variant: 'top',
+                onClose: () => closePopup(),
+              });
+            }, 300);
+          } catch {
+            alert('네트워크 오류 또는 서버 오류');
+          } finally {
+            setIsSubmitting(false);
+          }
+        },
+      });
+      return;
+    }
 
     if (nextType === 'join' && !isPublic) {
       setShowPasswordModal(true);
