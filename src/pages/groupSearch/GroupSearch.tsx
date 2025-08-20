@@ -54,6 +54,15 @@ const GroupSearch = () => {
     })();
   }, []);
 
+  const fetchRecentSearches = async () => {
+    try {
+      const response = await getRecentSearch('ROOM');
+      setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
+    } catch {
+      setRecentSearches([]);
+    }
+  };
+
   const searchFirstPage = useCallback(
     async (term: string, sortKey: SortKey, status: 'searching' | 'searched') => {
       if (!term.trim()) return;
@@ -274,16 +283,13 @@ const GroupSearch = () => {
         ) : (
           <RecentSearchTabs
             recentSearches={recentSearches.map(i => i.searchTerm)}
-            handleDelete={(term: string) => {
+            handleDelete={async (term: string) => {
               const x = recentSearches.find(i => i.searchTerm === term);
               if (!x) return;
-              deleteRecentSearch(x.recentSearchId).then(res => {
-                if (res.isSuccess) {
-                  setRecentSearches(prev =>
-                    prev.filter(it => it.recentSearchId !== x.recentSearchId),
-                  );
-                }
-              });
+              const res = await deleteRecentSearch(x.recentSearchId);
+              if (res.isSuccess) {
+                await fetchRecentSearches();
+              }
             }}
             handleRecentSearchClick={handleRecentSearchClick}
           />
