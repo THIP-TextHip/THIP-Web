@@ -17,13 +17,18 @@ const UserProfileItem = ({
   userId,
   isLast,
   type,
+  isMyself,
 }: UserProfileItemProps) => {
   const navigate = useNavigate();
   const [followed, setFollowed] = useState(isFollowing);
   const { openPopup } = usePopupStore();
 
   const handleProfileClick = () => {
-    navigate(`/otherfeed/${userId}`);
+    if (isMyself) {
+      navigate(`/myfeed/${userId}`);
+    } else {
+      navigate(`/otherfeed/${userId}`);
+    }
   };
 
   const toggleFollow = async (e: React.MouseEvent) => {
@@ -62,7 +67,7 @@ const UserProfileItem = ({
             </div>
           </div>
         </div>
-        {type === 'followlist' && (
+        {type === 'followlist' && !isMyself && (
           <div className="followbutton" onClick={toggleFollow}>
             {followed ? '띱 취소' : '띱 하기'}
           </div>

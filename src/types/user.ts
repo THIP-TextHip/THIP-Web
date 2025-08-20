@@ -10,4 +10,5 @@ export interface UserProfileItemProps {
   userId: number;
   isLast?: boolean;
   type?: UserProfileType;
+  isMyself?: boolean;
 }

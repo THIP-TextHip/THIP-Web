@@ -135,6 +135,7 @@ const FollowerListPage = () => {
             type={type as UserProfileType}
             isFollowing={user.isFollowing}
             isLast={index === userList.length - 1}
+            isMyself={user.isMyself}
           />
         ))}
       </UserProfileList>
