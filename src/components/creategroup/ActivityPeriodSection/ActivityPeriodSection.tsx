@@ -16,6 +16,7 @@ interface ActivityPeriodSectionProps {
   endDate: { year: number; month: number; day: number };
   onStartDateChange: (date: { year: number; month: number; day: number }) => void;
   onEndDateChange: (date: { year: number; month: number; day: number }) => void;
+  onValidationChange?: (isValid: boolean) => void;
 }
 
 const ActivityPeriodSection = ({
@@ -23,6 +24,7 @@ const ActivityPeriodSection = ({
   endDate,
   onStartDateChange,
   onEndDateChange,
+  onValidationChange,
 }: ActivityPeriodSectionProps) => {
   // 현재 년도와 다음 년도
   const currentYear = new Date().getFullYear();
@@ -62,6 +64,16 @@ const ActivityPeriodSection = ({
     const endDateObj = new Date(endDate.year, endDate.month - 1, endDate.day);
     return endDateObj < startDateObj;
   }, [startDate, endDate]);
+
+  // 날짜 유효성 검사 결과
+  const isDateValid = !isOverMaxDays && !isEndDateBeforeStart;
+
+  // 유효성 변경 시 부모에게 알림
+  useEffect(() => {
+    if (onValidationChange) {
+      onValidationChange(isDateValid);
+    }
+  }, [isDateValid, onValidationChange]);
 
   // 오늘 날짜로 초기값 설정
   const getInitialDate = () => {
