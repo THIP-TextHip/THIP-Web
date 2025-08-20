@@ -4,7 +4,7 @@ import { colors, semanticColors, typography } from '@/styles/global/global';
 export const RecordSection = styled.section`
   display: flex;
   flex-direction: column;
-  width: 90%;
+  width: calc(100% - 40px);
   gap: 12px;
   background: ${colors.darkgrey.dark};
   margin: 20px 20px 0 20px;
