@@ -353,6 +353,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
             content={content} 
             pollOptions={pollOptions || []} 
             postId={parseInt(id)}
+            shouldBlur={shouldBlur}
             onVoteUpdate={(updatedOptions) => {
               // TODO: 부모 컴포넌트로 투표 결과 업데이트 전달
               console.log('투표 결과 업데이트:', updatedOptions);
@@ -362,28 +363,44 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       </ContentSection>
 
       <ActionSection>
-        <ActionButton onClick={(e) => {
-          e.stopPropagation();
-          handleLikeClick();
-        }}>
+        <ActionButton 
+          onClick={shouldBlur ? undefined : (e) => {
+            e.stopPropagation();
+            handleLikeClick();
+          }}
+          style={{
+            cursor: shouldBlur ? 'default' : 'pointer',
+            pointerEvents: shouldBlur ? 'none' : 'auto'
+          }}
+        >
           <img
             src={isLiked ? heartFilledIcon : heartIcon}
             alt={isLiked ? '좋아요 취소' : '좋아요'}
           />
           <span>{currentLikeCount}</span>
         </ActionButton>
-        <ActionButton onClick={(e) => {
-          e.stopPropagation();
-          handleCommentClick();
-        }}>
+        <ActionButton 
+          onClick={shouldBlur ? undefined : (e) => {
+            e.stopPropagation();
+            handleCommentClick();
+          }}
+          style={{
+            cursor: shouldBlur ? 'default' : 'pointer',
+            pointerEvents: shouldBlur ? 'none' : 'auto'
+          }}
+        >
           <img src={commentIcon} alt="댓글" />
           <span>{commentCount}</span>
         </ActionButton>
         {isMyRecord && (
           <ActionButton 
-            onClick={(e) => {
+            onClick={shouldBlur ? undefined : (e) => {
               e.stopPropagation(); // 이벤트 버블링 방지
               handlePinConfirm();
+            }}
+            style={{
+              cursor: shouldBlur ? 'default' : 'pointer',
+              pointerEvents: shouldBlur ? 'none' : 'auto'
             }}
           >
             <img src={pinIcon} alt="피드에 핀하기" />

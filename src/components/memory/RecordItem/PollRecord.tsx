@@ -20,10 +20,11 @@ interface PollRecordProps {
   content: string;
   pollOptions: PollOption[];
   postId: number; // 투표 API 호출에 필요한 postId
+  shouldBlur?: boolean; // 블라인드 처리 여부
   onVoteUpdate?: (updatedOptions: PollOption[]) => void; // 투표 결과 업데이트 콜백
 }
 
-const PollRecord = ({ content, pollOptions, postId, onVoteUpdate }: PollRecordProps) => {
+const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUpdate }: PollRecordProps) => {
   const [animate, setAnimate] = useState(false);
   const [currentOptions, setCurrentOptions] = useState(pollOptions);
   const [isVoting, setIsVoting] = useState(false);
@@ -67,7 +68,7 @@ const PollRecord = ({ content, pollOptions, postId, onVoteUpdate }: PollRecordPr
 
   // 투표 옵션 클릭 핸들러
   const handleOptionClick = async (option: PollOption) => {
-    if (isVoting || !roomId) return;
+    if (isVoting || !roomId || shouldBlur) return;
 
     setIsVoting(true);
 
@@ -148,10 +149,11 @@ const PollRecord = ({ content, pollOptions, postId, onVoteUpdate }: PollRecordPr
           <PollOptionStyled 
             key={option.id} 
             isHighest={option.isHighest}
-            onClick={() => handleOptionClick(option)}
+            onClick={shouldBlur ? undefined : () => handleOptionClick(option)}
             style={{ 
-              cursor: isVoting ? 'not-allowed' : 'pointer',
-              opacity: isVoting ? 0.7 : 1
+              cursor: shouldBlur ? 'default' : (isVoting ? 'not-allowed' : 'pointer'),
+              opacity: shouldBlur ? 1 : (isVoting ? 0.7 : 1),
+              pointerEvents: shouldBlur ? 'none' : 'auto'
             }}
           >
             <PollBar>
