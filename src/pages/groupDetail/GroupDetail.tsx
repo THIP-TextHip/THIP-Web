@@ -221,6 +221,11 @@ const GroupDetail = () => {
             }
           : prev,
       );
+      openPopup('snackbar', {
+        message: '모임방 참여가 완료되었어요!',
+        variant: 'top',
+        onClose: () => closePopup(),
+      });
     } catch {
       alert('네트워크 오류 또는 서버 오류');
     } finally {
