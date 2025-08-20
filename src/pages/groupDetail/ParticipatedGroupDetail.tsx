@@ -44,7 +44,7 @@ import peopleIcon from '../../assets/common/darkPeople.svg';
 import styled from '@emotion/styled';
 
 const ParticipatedGroupDetail = () => {
-  const { openConfirm } = usePopupActions();
+  const { openConfirm, openSnackbar } = usePopupActions();
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
 
@@ -103,7 +103,12 @@ const ParticipatedGroupDetail = () => {
       disc: '방을 삭제하게 되면\n독서메이트들과의 추억이 사라집니다.',
       onConfirm: () => {
         console.log('방 삭제 확정');
-        navigate('/group');
+        openSnackbar({
+          message: '삭제 기능은 현재 개발 중입니다.',
+          variant: 'top',
+          isError: true,
+          onClose: () => {},
+        });
       },
     });
   };
@@ -114,7 +119,12 @@ const ParticipatedGroupDetail = () => {
       disc: '방을 나가시게 되면\n독서메이트들과의 추억이 사라집니다.',
       onConfirm: () => {
         console.log('방 나가기 확정');
-        navigate('/group');
+        openSnackbar({
+          message: '나가기 기능은 현재 개발 중입니다.',
+          variant: 'top',
+          isError: true,
+          onClose: () => {},
+        });
       },
     });
   };
