@@ -83,6 +83,7 @@ const MyFeedPage = () => {
         isMyFeed={true}
         profileData={profileData}
         showFollowButton={false} // 띱하기 버튼 숨김
+        isMyself={true}
       />
       <NavBar src={writefab} path="/post/create" />
     </Container>
