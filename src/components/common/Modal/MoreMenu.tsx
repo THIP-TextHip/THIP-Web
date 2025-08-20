@@ -2,15 +2,7 @@ import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import type { MoreMenuProps } from '@/stores/usePopupStore';
 
-const MoreMenu = ({
-  onEdit,
-  onDelete,
-  onClose,
-  onReport,
-  onPin,
-  isWriter,
-  type,
-}: MoreMenuProps) => {
+const MoreMenu = ({ onEdit, onDelete, onClose, onReport, isWriter, type }: MoreMenuProps) => {
   return (
     <Overlay onClick={() => onClose?.()}>
       {type === 'post' ? (
@@ -25,11 +17,6 @@ const MoreMenu = ({
                 <Button variant="delete" onClick={onDelete}>
                   삭제하기
                 </Button>
-                {onPin && (
-                  <Button variant="pin" onClick={onPin}>
-                    피드에 핀하기
-                  </Button>
-                )}
               </RecordContainer>
             </>
           ) : (

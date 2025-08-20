@@ -129,14 +129,9 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   };
 
   const handleEdit = useCallback(() => {
-    const currentRoomId = roomId || '1';
-
-    if (type === 'poll') {
-      navigate(`/memory/poll/edit/${currentRoomId}/${record.id}`);
-    } else {
-      navigate(`/memory/record/edit/${currentRoomId}/${record.id}`);
-    }
-  }, [roomId, type, record.id, navigate]);
+    // API 개발 전까지 수정 기능 비활성화
+    console.log('수정 기능은 개발 중입니다.');
+  }, []);
 
   const handleDelete = useCallback(async () => {
     const currentRoomId = roomId || '1';
