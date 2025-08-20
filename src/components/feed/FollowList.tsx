@@ -10,7 +10,7 @@ import { getRecentFollowing, type RecentWriterData } from '@/api/users/getRecent
 const FollowList = () => {
   const navigate = useNavigate();
   const [myFollowings, setMyFollowings] = useState<RecentWriterData[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // API에서 최근 글 작성한 팔로우 리스트 조회
   const fetchRecentFollowing = async () => {
