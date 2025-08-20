@@ -39,6 +39,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   const {
     id,
     user,
+    profileImageUrl,
     content,
     likeCount,
     commentCount,
@@ -356,7 +357,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       }}
     >
       <UserSection>
-        <UserAvatar />
+        <UserAvatar src={profileImageUrl} />
         <UserInfo>
           <UserName>{user}</UserName>
           <PageInfo>{renderPageInfo()}</PageInfo>
