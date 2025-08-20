@@ -66,8 +66,7 @@ const TodayWords = () => {
 
   // API 데이터를 Message 타입으로 변환하는 함수
   const convertToMessage = (item: TodayCommentItem): Message => {
-    // 네트워크 응답에서 postDate가 "1일 전" 형태의 문자열로 오는 것으로 보임
-    // 따라서 postDate를 그대로 timeAgo로 사용
+    // 서버에서 받아오는 postDate를 그대로 사용 (이미 날짜 기반으로 계산된 값)
     const timeAgo = item.postDate || '방금 전';
     
     // createdAt은 현재 시간으로 설정 (정확한 시간이 필요하다면 다른 API 필드 사용)
@@ -113,6 +112,13 @@ const TodayWords = () => {
         setNextCursor(response.data.nextCursor);
         setIsLast(response.data.isLast);
         setHasInitiallyLoaded(true);
+        
+        // 초기 로딩 시 스크롤을 맨 아래로 이동
+        if (isRefresh) {
+          setTimeout(() => {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+          }, 100);
+        }
       } else {
         openSnackbar({
           message: response.message || '오늘의 한마디 목록을 불러오는데 실패했습니다.',
@@ -153,21 +159,21 @@ const TodayWords = () => {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [roomId]);
+  }, [roomId, convertToMessage, openSnackbar]);
 
   // 더 많은 메시지 로드
   const loadMoreMessages = useCallback(() => {
     if (!isLoadingMore && !isLast && nextCursor && roomId) {
       loadMessages(nextCursor);
     }
-  }, [isLoadingMore, isLast, nextCursor, roomId]);
+  }, [isLoadingMore, isLast, nextCursor, roomId, loadMessages]);
 
   // 컴포넌트 마운트 시 초기 데이터 로드
   useEffect(() => {
     if (roomId && !hasInitiallyLoaded) {
       loadMessages(undefined, true);
     }
-  }, [roomId, hasInitiallyLoaded]);
+  }, [roomId, hasInitiallyLoaded, loadMessages]);
 
   // 무한 스크롤 처리
   useEffect(() => {
