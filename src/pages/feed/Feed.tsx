@@ -5,6 +5,7 @@ import TabBar from '../../components/feed/TabBar';
 import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
@@ -42,6 +43,11 @@ const Feed = () => {
   const [myLoading, setMyLoading] = useState(false);
   const [myNextCursor, setMyNextCursor] = useState<string>('');
   const [myIsLast, setMyIsLast] = useState(false);
+
+  // 탭 전환 시 로딩 상태
+  const [tabLoading, setTabLoading] = useState(false);
+  // 초기 로딩 상태 (첫 진입 시)
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const handleSearchButton = () => {
     navigate('/feed/search');
@@ -157,10 +163,17 @@ const Feed = () => {
         return;
       }
 
-      if (activeTab === '피드') {
-        loadTotalFeeds();
-      } else if (activeTab === '내 피드') {
-        loadMyFeeds();
+      setTabLoading(true);
+
+      try {
+        if (activeTab === '피드') {
+          await loadTotalFeeds();
+        } else if (activeTab === '내 피드') {
+          await loadMyFeeds();
+        }
+      } finally {
+        setTabLoading(false);
+        setInitialLoading(false);
       }
     };
 
@@ -171,18 +184,24 @@ const Feed = () => {
     <Container>
       <MainHeader type="home" leftButtonClick={handleSearchButton} />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-      {activeTab === '피드' ? (
-        <>
-          <TotalFeed
-            showHeader={true}
-            posts={totalFeedPosts}
-            isMyFeed={false}
-            isLast={totalIsLast}
-          />
-        </>
+      {initialLoading || tabLoading ? (
+        <LoadingSpinner size="large" fullHeight={true} />
       ) : (
         <>
-          <MyFeed showHeader={false} posts={myFeedPosts} isMyFeed={true} isLast={myIsLast} />
+          {activeTab === '피드' ? (
+            <>
+              <TotalFeed
+                showHeader={true}
+                posts={totalFeedPosts}
+                isMyFeed={false}
+                isLast={totalIsLast}
+              />
+            </>
+          ) : (
+            <>
+              <MyFeed showHeader={false} posts={myFeedPosts} isMyFeed={true} isLast={myIsLast} />
+            </>
+          )}
         </>
       )}
       <NavBar src={writefab} path="/post/create" />
