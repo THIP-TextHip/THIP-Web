@@ -19,12 +19,20 @@ export const BookTitle = styled.h3`
   font-weight: ${typography.fontWeight.semibold};
   margin: 0;
   margin-right: 12px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const BookAuthor = styled.span`
   color: ${semanticColors.text.secondary};
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.regular};
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const ChevronIcon = styled.img`
@@ -37,4 +45,6 @@ export const RightSection = styled.div`
   display: flex;
   align-items: center;
   margin-right: -8px;
+  flex-shrink: 0;
+  gap: 8px;
 `;

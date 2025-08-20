@@ -14,11 +14,14 @@ export const UserSection = styled.div`
   margin-bottom: 8px;
 `;
 
-export const UserAvatar = styled.div`
+export const UserAvatar = styled.div<{ src?: string }>`
   width: 36px;
   height: 36px;
   border-radius: 50%;
   background-color: ${colors.grey[400]};
+  background-image: ${({ src }) => src ? `url(${src})` : 'none'};
+  background-size: cover;
+  background-position: center;
   margin-right: 8px;
 `;
 

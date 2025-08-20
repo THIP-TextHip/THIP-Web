@@ -62,6 +62,7 @@ export interface Record {
   id: string;
   user: string;
   userPoints: number;
+  profileImageUrl: string; // 프로필 이미지 URL 추가
   content: string;
   likeCount: number;
   commentCount: number;

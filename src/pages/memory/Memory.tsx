@@ -19,6 +19,7 @@ const convertPostToRecord = (post: Post): Record => {
     id: post.postId.toString(),
     user: post.nickName,
     userPoints: 132,
+    profileImageUrl: post.profileImageUrl, // 프로필 이미지 URL 추가
     content: post.content,
     likeCount: post.likeCount,
     commentCount: post.commentCount,
