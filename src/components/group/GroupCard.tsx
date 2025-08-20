@@ -77,6 +77,7 @@ const CoverWrapper = styled.div`
 
 const Cover = styled.img<{ cardType: 'main' | 'search' | 'modal'; isRecommend?: boolean }>`
   object-fit: cover;
+  object-position: top;
   flex-shrink: 0;
   width: ${({ cardType, isRecommend }) => (cardType === 'search' || isRecommend ? '60px' : '80px')};
   height: ${({ cardType, isRecommend }) =>
