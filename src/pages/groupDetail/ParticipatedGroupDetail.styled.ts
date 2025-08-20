@@ -6,7 +6,7 @@ export const ParticipatedWrapper = styled.div`
   position: relative;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 320px;
   max-width: 767px;
   min-height: 100vh;

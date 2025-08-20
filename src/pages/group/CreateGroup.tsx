@@ -74,6 +74,7 @@ const CreateGroup = () => {
   const [password, setPassword] = useState('');
   const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDateValid, setIsDateValid] = useState(true);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -105,43 +106,6 @@ const CreateGroup = () => {
         isPublic: !isPrivate, // isPrivate의 반대값
       };
 
-      // 날짜 검증 추가
-      const today = new Date();
-      const startDateObj = new Date(startDate.year, startDate.month - 1, startDate.day);
-      const endDateObj = new Date(endDate.year, endDate.month - 1, endDate.day);
-
-      // 시작 날짜가 오늘 이후인지 확인
-      if (startDateObj <= today) {
-        alert('시작 날짜는 오늘 날짜 이후여야 합니다.');
-        return;
-      }
-
-      // 종료 날짜가 시작 날짜 이후인지 확인
-      if (endDateObj <= startDateObj) {
-        alert('종료 날짜는 시작 날짜 이후여야 합니다.');
-        return;
-      }
-
-      // 요청 데이터 검증
-      const validation = {
-        isbn: roomData.isbn.length > 0,
-        category: roomData.category.length > 0,
-        roomName: roomData.roomName.length > 0,
-        description: roomData.description.length > 0,
-        startDate: roomData.progressStartDate.length >= 8,
-        endDate: roomData.progressEndDate.length >= 8,
-        recruitCount: roomData.recruitCount >= 1 && roomData.recruitCount <= 30,
-        password: !isPrivate || (roomData.password !== null && /^\d{4}$/.test(roomData.password)),
-      };
-
-      const invalidFields = Object.entries(validation)
-        .filter(([, isValid]) => !isValid)
-        .map(([field]) => field);
-
-      if (invalidFields.length > 0) {
-        alert(`다음 필드들을 확인해주세요: ${invalidFields.join(', ')}`);
-        return;
-      }
 
       // 방 생성 API 호출
       const response = await createRoom(roomData);
@@ -230,6 +194,7 @@ const CreateGroup = () => {
     selectedGenre !== '' &&
     roomTitle.trim() !== '' &&
     roomDescription.trim() !== '' &&
+    isDateValid && // 날짜 유효성 검사 추가
     (!isPrivate || (password.trim() !== '' && /^\d{4}$/.test(password.trim()))) && // 비공개방인 경우 4자리 숫자 필수
     !isSubmitting;
 
@@ -264,6 +229,7 @@ const CreateGroup = () => {
           endDate={endDate}
           onStartDateChange={setStartDate}
           onEndDateChange={setEndDate}
+          onValidationChange={setIsDateValid}
         />
 
         <MemberLimitSection memberLimit={memberLimit} onMemberLimitChange={setMemberLimit} />

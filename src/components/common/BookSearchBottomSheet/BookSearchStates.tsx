@@ -44,7 +44,7 @@ const BookSearchStates = ({ isLoading, error, isEmpty, onClose }: BookSearchStat
   if (isEmpty) {
     return (
       <EmptyContainer>
-        <EmptyText>현재 등록된 책이 아닙니다.</EmptyText>
+        <EmptyText>현재 등록된 책이 없습니다.</EmptyText>
         <EmptyText>원하시는 책을 신청해주세요.</EmptyText>
         <ApplyButton onClick={handleApplyBook}>책 신청하기</ApplyButton>
       </EmptyContainer>

@@ -39,6 +39,7 @@ export const InputWrapper = styled.div`
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
+  width: fit-content;
 `;
 
 export const PageInput = styled.input<{ inputLength?: number }>`
@@ -49,11 +50,12 @@ export const PageInput = styled.input<{ inputLength?: number }>`
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
-  width: ${props => (props.inputLength ? `${Math.max(30, props.inputLength * 8 + 10)}px` : '30px')};
+  width: ${props => (props.inputLength ? `${Math.max(27, props.inputLength * 8)}px` : '27px')};
   padding: 0;
   margin: 0;
   caret-color: ${colors.white};
   transition: width 0.2s ease;
+  flex-shrink: 0;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
@@ -77,6 +79,10 @@ export const PageSuffix = styled.span`
   font-family: ${typography.fontFamily.primary};
   margin: 0;
   padding: 0;
+  white-space: nowrap;
+  display: inline-block;
+  flex-shrink: 0;
+  margin-left: 0px;
 `;
 
 export const OverallRangeText = styled.div`

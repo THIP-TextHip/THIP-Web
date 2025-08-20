@@ -2,6 +2,7 @@ import { useState, forwardRef, useImperativeHandle, useEffect } from 'react';
 import moreIcon from '../../../assets/common/more.svg';
 import type { Message } from '../../../types/today';
 import MessageActionBottomSheet from './MessageActionBottomSheet';
+import { usePopupActions } from '../../../hooks/usePopupActions';
 import {
   MessageList as StyledMessageList,
   DateGroup,
@@ -39,6 +40,7 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
   ) => {
     const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
     const [messages, setMessages] = useState(initialMessages);
+    const { openSnackbar } = usePopupActions();
 
     useEffect(() => {
       setMessages(initialMessages);
@@ -102,7 +104,12 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
       if (selectedMessageId) {
         // TODO: 실제 삭제 API 연동 필요
         console.log(`메시지 ID ${selectedMessageId} 삭제 요청 (API 개발 대기중)`);
-        alert('삭제 기능은 현재 개발 중입니다.');
+        openSnackbar({
+          message: '삭제 기능은 현재 개발 중입니다.',
+          variant: 'top',
+          isError: true,
+          onClose: () => {},
+        });
       }
       setSelectedMessageId(null);
     };
