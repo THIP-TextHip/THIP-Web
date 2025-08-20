@@ -19,8 +19,8 @@ export const Overlay = styled.div<{ isOpen: boolean }>`
 
 export const BottomSheet = styled.div<{ isOpen: boolean }>`
   width: 100%;
-  max-width: 540px;
-  min-width: 360px;
+  max-width: 767px;
+  min-width: 320px;
   background: ${colors.darkgrey.main};
   border-radius: 20px 20px 0 0;
   display: flex;
