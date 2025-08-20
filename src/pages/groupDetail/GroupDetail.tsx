@@ -233,6 +233,24 @@ const GroupDetail = () => {
     }
   };
 
+  const handleJoinSuccess = () => {
+    setIsJoining(true);
+    setRoomData(prev =>
+      prev
+        ? {
+            ...prev,
+            isJoining: true,
+            memberCount: Math.min(prev.memberCount + 1, prev.recruitCount),
+          }
+        : prev,
+    );
+    openPopup('snackbar', {
+      message: '모임방 참여가 완료되었어요! 모집 마감 후 활동이 시작돼요.',
+      variant: 'top',
+      onClose: () => closePopup(),
+    });
+  };
+
   return (
     <Wrapper>
       <TopBackground genre={category}>
@@ -321,18 +339,7 @@ const GroupDetail = () => {
         <PasswordModal
           roomId={Number(roomId)}
           onClose={() => setShowPasswordModal(false)}
-          onJoined={() => {
-            setIsJoining(true);
-            setRoomData(prev =>
-              prev
-                ? {
-                    ...prev,
-                    isJoining: true,
-                    memberCount: Math.min(prev.memberCount + 1, prev.recruitCount),
-                  }
-                : prev,
-            );
-          }}
+          onJoined={handleJoinSuccess}
         />
       )}
     </Wrapper>
