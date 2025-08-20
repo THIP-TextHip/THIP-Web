@@ -171,7 +171,7 @@ const CreatePost = () => {
       <TitleHeader
         leftIcon={<img src={leftarrow} alt="뒤로가기" />}
         title="새 글"
-        rightButton={loading ? '작성 중...' : '완료'}
+        rightButton="완료"
         onLeftClick={handleBackClick}
         onRightClick={handleCompleteClick}
         isNextActive={isFormValid && !loading}
