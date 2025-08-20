@@ -229,14 +229,15 @@ const TodayWords = () => {
         setIsLast(false);
         setHasInitiallyLoaded(false);
 
-        // 5개 도달 시 흰색 토스트, 아니면 일반 성공 메시지
+        // 첫 번째 한마디 작성 시만 성공 메시지, 5개 도달 시 제한 메시지
         if (todayMyMessageCount + 1 >= DAILY_LIMIT) {
           openSnackbar({
             message: '오늘의 한마디는 하루에 다섯번까지 작성할 수 있어요',
             variant: 'top',
             onClose: () => {},
           });
-        } else {
+        } else if (todayMyMessageCount === 0) {
+          // 첫 번째 한마디 작성 시만 토스트 메시지 표시
           openSnackbar({
             message: '오늘의 한마디가 작성되었습니다.',
             variant: 'top',
