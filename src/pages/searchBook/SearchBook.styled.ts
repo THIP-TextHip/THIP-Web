@@ -117,7 +117,7 @@ export const ButtonSection = styled.div`
 
 export const RecruitingGroupButton = styled.button`
   width: 100%;
-  height: 48px;
+  height: 44px;
   border: 1px solid ${colors.grey[200]};
   border-radius: 12px;
   background: transparent;
@@ -140,7 +140,7 @@ export const RightArea = styled.div`
 
 export const WritePostButton = styled.button`
   flex: 1;
-  height: 48px;
+  height: 44px;
   background-color: ${colors.purple.main};
   color: ${colors.white};
   font-size: ${typography.fontSize.base};
