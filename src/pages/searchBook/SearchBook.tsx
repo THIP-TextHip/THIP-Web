@@ -246,7 +246,9 @@ const SearchBook = () => {
       <BannerSection>
         <BookInfo>
           <BookTitle>{bookDetail.title}</BookTitle>
-          <Author>{bookDetail.authorName}</Author>
+          <Author>
+            {bookDetail.authorName} 저 · {bookDetail.publisher}
+          </Author>
         </BookInfo>
 
         <Intro onClick={handleIntroClick}>
