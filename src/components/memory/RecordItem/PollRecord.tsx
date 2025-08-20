@@ -141,6 +141,9 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
     }
   };
 
+  // 아무도 투표하지 않았는지 확인 (모든 옵션이 0%인지 확인)
+  const hasVotes = currentOptions.some(option => option.percentage > 0);
+
   return (
     <PollSection ref={pollRef}>
       <PollQuestion>{content}</PollQuestion>
@@ -148,7 +151,7 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
         {currentOptions.map((option, index) => (
           <PollOptionStyled 
             key={option.id} 
-            isHighest={option.isHighest}
+            isHighest={hasVotes && option.isHighest}
             onClick={shouldBlur ? undefined : () => handleOptionClick(option)}
             style={{ 
               cursor: shouldBlur ? 'default' : (isVoting ? 'not-allowed' : 'pointer'),
@@ -158,22 +161,24 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
           >
             <PollBar>
               <PollBarFill
-                percentage={option.percentage}
-                isHighest={option.isHighest}
-                animate={animate}
+                percentage={hasVotes ? option.percentage : 0}
+                isHighest={hasVotes && option.isHighest}
+                animate={hasVotes && animate}
                 delay={index * 200} // 각 옵션마다 200ms 지연
               />
             </PollBar>
             <PollContent>
-              <PollNumber isHighest={option.isHighest}>
+              <PollNumber isHighest={hasVotes && option.isHighest}>
                 {index + 1}
               </PollNumber>
-              <PollText isHighest={option.isHighest}>
+              <PollText isHighest={hasVotes && option.isHighest}>
                 {option.text}
               </PollText>
-              <PollPercentage isHighest={option.isHighest}>
-                {option.percentage}%
-              </PollPercentage>
+              {hasVotes && (
+                <PollPercentage isHighest={hasVotes && option.isHighest}>
+                  {option.percentage}%
+                </PollPercentage>
+              )}
             </PollContent>
           </PollOptionStyled>
         ))}
