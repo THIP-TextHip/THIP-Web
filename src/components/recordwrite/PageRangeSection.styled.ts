@@ -136,6 +136,7 @@ export const InfoIcon = styled.div`
   justify-content: center;
   width: 20px;
   height: 20px;
+  cursor: pointer;
 
   img {
     width: 20px;
@@ -175,4 +176,53 @@ export const ToggleSlider = styled.div<{ active: boolean; disabled?: boolean }>`
   left: ${({ active }) => (active ? '24px' : '4px')};
   transition: left 0.3s;
   opacity: ${props => (props.disabled ? 0.7 : 1)};
+`;
+
+export const TooltipContainer = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+export const Tooltip = styled.div<{ variant: 'red' | 'green' }>`
+  position: absolute;
+  top: 33px;
+  right: 0;
+  left: 0;
+  background-color: ${props => (props.variant === 'red' ? '#3d3d3d' : '#3d3d3d')};
+  border-radius: 12px;
+  padding: 21px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+`;
+
+export const TooltipText = styled.span<{ variant: 'red' | 'green' }>`
+  color: ${props => (props.variant === 'red' ? '#FF9496' : semanticColors.text.point.green)};
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.medium};
+  flex: 1;
+`;
+
+export const TooltipCloseButton = styled.button`
+  background: none;
+  border: none;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+export const TooltipArrow = styled.div<{ variant: 'red' | 'green' }>`
+  position: absolute;
+  bottom: 60px;
+  right: 61px;
+  width: 12px;
+  height: 12px;
+  background-color: #3d3d3d;
+  transform: rotate(45deg);
+  z-index: 9;
 `;

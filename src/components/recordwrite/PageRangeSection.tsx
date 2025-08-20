@@ -16,9 +16,15 @@ import {
   ToggleLabel,
   ToggleSwitch,
   ToggleSlider,
+  TooltipContainer,
+  Tooltip,
+  TooltipText,
+  TooltipCloseButton,
+  TooltipArrow,
 } from './PageRangeSection.styled';
 import closeIcon from '../../assets/common/delete.svg';
 import infoIcon from '../../assets/common/infoIcon.svg';
+import recordcloseIcon from '../../assets/memory/record-x.svg';
 
 interface PageRangeSectionProps {
   pageRange: string;
@@ -41,6 +47,8 @@ const PageRangeSection = ({
   readingProgress,
 }: PageRangeSectionProps) => {
   const [hasError, setHasError] = useState(false);
+  const [showRedTooltip, setShowRedTooltip] = useState(false);
+  const [showGreenTooltip, setShowGreenTooltip] = useState(false);
 
   // 80% 이상일 때만 총평 활성화
   const canUseOverall = readingProgress >= 80;
@@ -71,8 +79,22 @@ const PageRangeSection = ({
   const handleToggleClick = () => {
     if (canUseOverall) {
       onOverallToggle();
+    } else {
+      // 80% 미만이면 빨간 툴팁 표시
+      setShowRedTooltip(true);
+      setShowGreenTooltip(false);
     }
-    // 80% 미만이면 아무것도 하지 않음
+  };
+
+  const handleInfoClick = () => {
+    // i 아이콘 클릭 시 초록 툴팁 표시
+    setShowGreenTooltip(true);
+    setShowRedTooltip(false);
+  };
+
+  const handleCloseTooltip = () => {
+    setShowRedTooltip(false);
+    setShowGreenTooltip(false);
   };
 
   return (
@@ -103,21 +125,45 @@ const PageRangeSection = ({
       </PageRangeContainer>
       {!isOverallEnabled && hasError && <ErrorMessage>전체페이지를 초과할 수 없어요.</ErrorMessage>}
 
-      <ToggleContainer>
-        <LeftSection>
-          <InfoIcon>
-            <img src={infoIcon} alt="정보" />
-          </InfoIcon>
-          <ToggleLabel disabled={!canUseOverall}>총평</ToggleLabel>
-        </LeftSection>
-        <ToggleSwitch
-          active={isOverallEnabled}
-          onClick={handleToggleClick}
-          disabled={!canUseOverall}
-        >
-          <ToggleSlider active={isOverallEnabled} disabled={!canUseOverall} />
-        </ToggleSwitch>
-      </ToggleContainer>
+      <TooltipContainer>
+        {showRedTooltip && (
+          <Tooltip variant="red">
+            <TooltipText variant="red">
+              독서 진행도 80%를 달성해야 총평을 작성할 수 있어요.
+            </TooltipText>
+            <TooltipCloseButton onClick={handleCloseTooltip}>
+              <img src={recordcloseIcon} alt="닫기" />
+            </TooltipCloseButton>
+            <TooltipArrow variant="red" />
+          </Tooltip>
+        )}
+        {showGreenTooltip && (
+          <Tooltip variant="green">
+            <TooltipText variant="green">
+              독서 진행도 80%를 달성해야 총평을 작성할 수 있어요.
+            </TooltipText>
+            <TooltipCloseButton onClick={handleCloseTooltip}>
+              <img src={recordcloseIcon} alt="닫기" />
+            </TooltipCloseButton>
+            <TooltipArrow variant="green" />
+          </Tooltip>
+        )}
+        <ToggleContainer>
+          <LeftSection>
+            <InfoIcon onClick={handleInfoClick}>
+              <img src={infoIcon} alt="정보" />
+            </InfoIcon>
+            <ToggleLabel disabled={!canUseOverall}>총평</ToggleLabel>
+          </LeftSection>
+          <ToggleSwitch
+            active={isOverallEnabled}
+            onClick={handleToggleClick}
+            disabled={!canUseOverall}
+          >
+            <ToggleSlider active={isOverallEnabled} disabled={!canUseOverall} />
+          </ToggleSwitch>
+        </ToggleContainer>
+      </TooltipContainer>
     </Section>
   );
 };
