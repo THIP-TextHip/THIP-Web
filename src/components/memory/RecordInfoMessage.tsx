@@ -7,7 +7,7 @@ const RecordInfoMessage = () => {
       <InfoIcon>
         <img src={infoIcon} alt="정보" />
       </InfoIcon>
-      <InfoText>내 진행도에 따라 일부 댓글은 블러처리됩니다.</InfoText>
+      <InfoText>내 진행도에 따라 일부 기록은 블러처리됩니다.</InfoText>
     </Container>
   );
 };
