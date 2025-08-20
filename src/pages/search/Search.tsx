@@ -214,6 +214,7 @@ const Search = () => {
 
       if (response.isSuccess) {
         setRecentSearches(prev => prev.filter(item => item.recentSearchId !== recentSearchId));
+        await fetchRecentSearches();
       } else {
         console.error('최근 검색어 삭제 실패:', response.message);
       }
