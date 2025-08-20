@@ -42,11 +42,12 @@ const Container = styled.div<{ variant: 'top' | 'bottom'; visible: boolean }>`
   min-width: 280px;
   max-width: 500px;
   width: calc(100% - 40px);
-  padding: 12px 20px;
+  padding: 12px;
   margin: 0 auto;
   background: ${colors.darkgrey.main};
   color: ${colors.white};
-  border-radius: 8px;
+  border: 1px solid ${colors.grey[200]};
+  border-radius: 12px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
