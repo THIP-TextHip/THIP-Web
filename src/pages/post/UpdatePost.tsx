@@ -64,7 +64,7 @@ const UpdatePost = () => {
           id: 0,
           title: data.bookTitle,
           author: data.bookAuthor,
-          cover: '',
+          cover: data.bookImageUrl,
           isbn: data.isbn,
         });
 
