@@ -261,8 +261,6 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   // 길게 누르기 이벤트 핸들러
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      if (isMyRecord) return;
-
       setIsPressed(true);
       hasTriggeredLongPress.current = false;
       pressStartPos.current = {
@@ -274,13 +272,24 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
         hasTriggeredLongPress.current = true;
         setIsPressed(false);
 
-        openMoreMenu({
-          onReport: handleReport,
-          onClose: closePopup,
-        });
+        if (isMyRecord) {
+          openMoreMenu({
+            onEdit: handleEdit,
+            onDelete: handleDeleteConfirm,
+            onPin: handlePinConfirm,
+            onClose: closePopup,
+            type: 'post',
+            isWriter: true,
+          });
+        } else {
+          openMoreMenu({
+            onReport: handleReport,
+            onClose: closePopup,
+          });
+        }
       }, 800);
     },
-    [isMyRecord, openMoreMenu, handleReport, closePopup],
+    [isMyRecord, openMoreMenu, handleReport, handleEdit, handleDeleteConfirm, handlePinConfirm, closePopup],
   );
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
@@ -311,18 +320,8 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       hasTriggeredLongPress.current = false;
       return;
     }
-
-    if (isMyRecord) {
-      openMoreMenu({
-        onEdit: handleEdit,
-        onDelete: handleDeleteConfirm,
-        onPin: handlePinConfirm,
-        onClose: closePopup,
-        type: 'post', // 중요: post 타입으로 설정해야 핀하기 버튼이 표시됨
-        isWriter: true, // 내 기록임을 명시
-      });
-    }
-  }, [isMyRecord, openMoreMenu, handleEdit, handleDeleteConfirm, handlePinConfirm, closePopup]);
+    // 모든 기록(내 기록 포함)은 이제 길게 누르기로만 더보기 메뉴 표시
+  }, []);
 
   return (
     <Container
