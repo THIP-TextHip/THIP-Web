@@ -24,6 +24,10 @@ const LoadingSpinner = ({
 const Container = styled.div<{ fullHeight: boolean }>`
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 767px;
+  min-width: 320px;
+  margin: 0 auto;
   justify-content: center;
   align-items: center;
   ${({ fullHeight }) =>
