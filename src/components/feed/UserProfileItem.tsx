@@ -67,7 +67,7 @@ const UserProfileItem = ({
             </div>
           </div>
         </div>
-        {type === 'followlist' && !isMyself && (
+        {type === 'followlist' && (
           <div className="followbutton" onClick={toggleFollow}>
             {followed ? '띱 취소' : '띱 하기'}
           </div>

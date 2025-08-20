@@ -13,6 +13,7 @@ interface OtherFeedProps {
   profileData?: OtherProfileData | null;
   userId?: number;
   showFollowButton?: boolean; // showFollowButton prop 추가
+  isMyself?: boolean;
 }
 
 const OtherFeed = ({
@@ -21,6 +22,7 @@ const OtherFeed = ({
   userId,
   showFollowButton,
   isMyFeed,
+  isMyself,
 }: OtherFeedProps) => {
   const hasPosts = posts.length > 0;
 
@@ -32,7 +34,9 @@ const OtherFeed = ({
     <Container>
       <Profile
         userId={userId}
-        showFollowButton={showFollowButton !== undefined ? showFollowButton : !profileData.isWriter}
+        showFollowButton={
+          showFollowButton !== undefined ? showFollowButton : !profileData.isWriter && !isMyself
+        }
         isFollowing={profileData.isFollowing}
         profileImageUrl={profileData.profileImageUrl}
         nickname={profileData.nickname}
