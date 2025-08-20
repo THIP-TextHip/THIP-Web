@@ -17,7 +17,6 @@ interface MemoryContentProps {
   records: Record[];
   selectedPageRange: { start: number; end: number } | null;
   showUploadProgress: boolean;
-  currentUserPage: number;
   onTabChange: (tab: RecordType) => void;
   onFilterChange: (filter: FilterType) => void;
   onSortChange: (sort: SortType) => void;
@@ -74,7 +73,7 @@ const MemoryContent = ({
         {records.length === 0 && <EmptyRecord type={activeTab} />}
 
         {/* 기록 목록 */}
-        {records.length > 0 && <RecordList records={records} readingProgress={readingProgress} />}
+        {records.length > 0 && <RecordList records={records} />}
       </ScrollableSection>
     </Content>
   );

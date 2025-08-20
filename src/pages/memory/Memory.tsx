@@ -29,6 +29,7 @@ const convertPostToRecord = (post: Post): Record => {
     pageRange: post.isOverview ? undefined : post.page.toString(),
     isWriter: post.isWriter,
     isLiked: post.isLiked,
+    isLocked: post.isLocked, // 블러 처리 여부 추가
     pollOptions: post.voteItems.map((item, index) => ({
       id: item.voteItemId.toString(),
       text: item.itemName,
@@ -64,6 +65,10 @@ const Memory = () => {
   // 기록 데이터
   const [myRecords, setMyRecords] = useState<Record[]>([]);
   const [groupRecords, setGroupRecords] = useState<Record[]>([]);
+  
+  // API에서 받은 페이지 정보
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [currentUserPage, setCurrentUserPage] = useState<number>(0);
 
   // API 데이터 로드 함수
   const loadMemoryPosts = useCallback(async () => {
@@ -111,6 +116,14 @@ const Memory = () => {
         }
 
         setIsOverviewEnabled(response.data.isOverviewEnabled);
+        
+        // 페이지 정보 설정 (API에서 제공되면)
+        if (response.data.totalPages !== undefined) {
+          setTotalPages(response.data.totalPages);
+        }
+        if (response.data.currentUserPage !== undefined) {
+          setCurrentUserPage(response.data.currentUserPage);
+        }
       } else {
         setError(response.message);
       }
@@ -226,9 +239,12 @@ const Memory = () => {
     setShowUploadProgress(false);
   }, []);
 
-  // 독서 진행률 계산
-  const readingProgress = isOverviewEnabled ? 85 : 70;
-  const currentUserPage = 350; // 임시로 350으로 설정 (나중에 API에서 가져올 것)
+  // 독서 진행률 계산 (전체 페이지 대비 현재 페이지 퍼센트)
+  const readingProgress = totalPages > 0 ? Math.round((currentUserPage / totalPages) * 100) : 0;
+  
+  // 총평 활성화 상태를 읽기 진행률에 따라 표시용으로 활용
+  const overviewStatus = isOverviewEnabled ? '총평 활성화' : '총평 비활성화';
+  console.log('📊 현재 상태:', overviewStatus, `진행률: ${readingProgress}%`);
 
   // 에러 상태 렌더링
   if (error) {
@@ -263,7 +279,6 @@ const Memory = () => {
           records={filteredRecords}
           selectedPageRange={selectedPageRange}
           showUploadProgress={showUploadProgress}
-          currentUserPage={currentUserPage}
           onTabChange={handleTabChange}
           onFilterChange={handleFilterChange}
           onSortChange={handleSortChange}
