@@ -39,6 +39,7 @@ const BarContainer = styled.div`
   display: flex;
   justify-content: center;
   z-index: 101;
+  pointer-events: none;
 `;
 
 const Bar = styled.div`
@@ -51,6 +52,7 @@ const Bar = styled.div`
   line-height: 20px;
   transform: none;
   transition: none;
+  pointer-events: none;
 
   &[data-leaving='true'] {
     transform: translateY(-32px) scale(0.98);
