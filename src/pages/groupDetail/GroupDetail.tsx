@@ -247,7 +247,7 @@ const GroupDetail = () => {
         <BookInfo>
           <BookCover src={bookImageUrl} alt={bookTitle} />
           <BookDetails>
-            <div>{authorName}</div>
+            <div>{authorName} 저</div>
             <BookIntro>
               도서 소개 <br />
               <p>{bookDescription}</p>

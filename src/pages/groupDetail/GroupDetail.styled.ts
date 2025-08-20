@@ -185,7 +185,7 @@ export const BookIntro = styled.div`
     margin-top: 4px;
     color: ${colors.grey[200]};
     font-size: ${typography.fontSize['2xs']};
-
+    line-height: 20px;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
