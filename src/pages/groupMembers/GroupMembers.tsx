@@ -65,8 +65,14 @@ const GroupMembers = () => {
   };
 
   const handleMemberClick = (memberId: string) => {
-    // 특정 사용자 페이지로 이동
-    navigate(`/otherfeed/${memberId}`);
+    // MemberList 컴포넌트에서 isMyself에 따른 네비게이션 처리를 담당하므로
+    // 여기서는 기본 동작을 유지
+    const member = members.find(m => m.id === memberId);
+    if (member?.isMyself) {
+      navigate(`/myfeed/${memberId}`);
+    } else {
+      navigate(`/otherfeed/${memberId}`);
+    }
   };
 
   // 로딩 상태
