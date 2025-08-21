@@ -65,8 +65,14 @@ export const getRoomPlaying = async (roomId: number): Promise<RoomPlayingRespons
   try {
     const response = await apiClient.get<RoomPlayingResponse>(`/rooms/${roomId}/playing`);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('진행중인 방 상세 정보 조회 API 오류:', error);
+    
+    // 방 접근 권한이 없는 경우
+    if (error.response?.data?.code === 140011) {
+      throw new Error('방 접근 권한이 없습니다.');
+    }
+    
     throw error;
   }
 };
