@@ -12,4 +12,5 @@ export const Container = styled.div`
   padding: 96px 20px 100px 20px;
   box-sizing: border-box;
   gap: 32px;
+
 `;

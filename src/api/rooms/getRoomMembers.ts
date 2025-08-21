@@ -7,6 +7,7 @@ export interface RoomMember {
   imageUrl: string;
   aliasName: string;
   followerCount: number;
+  isMyself: boolean;
 }
 
 // 독서메이트 조회 응답 타입
@@ -26,6 +27,7 @@ export interface Member {
   role: string;
   followersCount?: number;
   profileImageUrl?: string;
+  isMyself?: boolean;
 }
 
 export const convertRoomMembersToMembers = (roomMembers: RoomMember[]): Member[] => {
@@ -36,6 +38,7 @@ export const convertRoomMembersToMembers = (roomMembers: RoomMember[]): Member[]
       role: member.aliasName || '독서메이트',
       followersCount: member.followerCount || 0,
       profileImageUrl: member.imageUrl || undefined,
+      isMyself: member.isMyself,
     };
 
     return convertedMember;
