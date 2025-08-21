@@ -26,9 +26,11 @@ const Guide = () => {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // SignupGenre에서 전달받은 닉네임
+  // SignupGenre에서 전달받은 모든 정보
   const nickname = location.state?.nickname || '사용자';
   const aliasName = location.state?.aliasName || '독서가';
+  const aliasColor = location.state?.aliasColor;
+  const aliasIconUrl = location.state?.aliasIconUrl;
   // 터치 시작
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
@@ -138,11 +140,13 @@ const Guide = () => {
     if (currentStep < guideSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // 마지막 단계에서 완료 처리 - SignupDone으로 닉네임 전달
+      // 마지막 단계에서 완료 처리 - SignupDone으로 모든 정보 전달
       navigate('/signup/done', {
         state: {
           nickName: nickname,
           aliasName: aliasName,
+          aliasColor: aliasColor,
+          aliasIconUrl: aliasIconUrl,
         },
       });
     }
@@ -153,6 +157,8 @@ const Guide = () => {
       state: {
         nickName: nickname,
         aliasName: aliasName,
+        aliasColor: aliasColor,
+        aliasIconUrl: aliasIconUrl,
       },
     });
   };
