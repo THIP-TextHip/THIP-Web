@@ -12,6 +12,7 @@ const GenreSelectionSection = ({ selectedGenre, onGenreSelect }: GenreSelectionS
 
   return (
     <Section>
+      <Section showDivider />
       <SectionTitle>책 장르</SectionTitle>
       <GenreButtonGroup>
         {genres.map(genre => (
