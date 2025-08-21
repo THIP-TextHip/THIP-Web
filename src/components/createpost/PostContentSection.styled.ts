@@ -18,10 +18,32 @@ export const TextArea = styled.textarea<{ readOnly?: boolean }>`
   resize: none;
   outline: none;
   border: none;
-  overflow: hidden;
+  overflow-y: auto;
   cursor: ${props => (props.readOnly ? 'not-allowed' : 'text')};
   padding: 0;
   caret-color: ${colors.neongreen};
+
+  /* 얇은 스크롤바 스타일 */
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: ${semanticColors.text.ghost};
+    border-radius: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: ${semanticColors.text.tertiary};
+  }
+
+  /* Firefox 스크롤바 스타일 */
+  scrollbar-width: thin;
+  scrollbar-color: ${semanticColors.text.ghost} transparent;
 
   &::placeholder {
     color: ${semanticColors.text.ghost};
