@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { typography, semanticColors } from '../../styles/global/global';
+import { typography, semanticColors, colors } from '../../styles/global/global';
 
 export const TextAreaBox = styled.div`
   position: relative;
@@ -21,6 +21,7 @@ export const TextArea = styled.textarea<{ readOnly?: boolean }>`
   overflow: hidden;
   cursor: ${props => (props.readOnly ? 'not-allowed' : 'text')};
   padding: 0;
+  caret-color: ${colors.neongreen};
 
   &::placeholder {
     color: ${semanticColors.text.ghost};

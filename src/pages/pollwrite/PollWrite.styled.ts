@@ -13,8 +13,4 @@ export const Container = styled.div`
   box-sizing: border-box;
   gap: 32px;
 
-  /* 투표작성 페이지에서는 기본 커서 색상 사용 */
-  input, textarea {
-    caret-color: auto;
-  }
 `;
