@@ -20,8 +20,8 @@ interface RecordSectionProps {
 
 const RecordSection = ({ currentPage, progress, onClick }: RecordSectionProps) => {
   return (
-    <StyledRecordSection>
-      <RecordSectionHeader onClick={onClick}>
+    <StyledRecordSection onClick={onClick}>
+      <RecordSectionHeader>
         <RecordSectionTitle>기록장</RecordSectionTitle>
         <RecordSectionChevron src={rightChevron} alt="기록장 이동 버튼" />
       </RecordSectionHeader>

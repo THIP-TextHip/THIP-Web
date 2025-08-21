@@ -17,6 +17,7 @@ const MemberLimitSection = ({ memberLimit, onMemberLimitChange }: MemberLimitSec
 
   return (
     <Section>
+      <Section showDivider />
       <SectionTitle>인원 제한</SectionTitle>
       <MemberLimitContainer>
         <MemberWheelContainer>

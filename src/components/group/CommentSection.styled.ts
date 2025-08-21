@@ -10,13 +10,18 @@ export const CommentSection = styled.section`
   margin: 20px 20px 0 20px;
   padding: 16px 12px;
   border-radius: 12px;
+  cursor: pointer;
+  
+  &:focus-visible {
+    outline: 2px solid ${colors.purple.main};
+    outline-offset: 2px;
+  }
 `;
 
 export const CommentSectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: pointer;
 `;
 
 export const CommentSectionTitle = styled.h3`

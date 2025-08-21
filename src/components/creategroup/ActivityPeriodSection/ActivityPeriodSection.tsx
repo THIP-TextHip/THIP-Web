@@ -87,7 +87,7 @@ const ActivityPeriodSection = ({
 
   const getInitialEndDate = () => {
     const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setDate(tomorrow.getDate() + 2);
     return {
       year: tomorrow.getFullYear(),
       month: tomorrow.getMonth() + 1,
