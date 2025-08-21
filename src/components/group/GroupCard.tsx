@@ -110,6 +110,7 @@ const Info = styled.div`
   flex-direction: column;
   justify-content: space-between;
   flex: 1;
+  min-width: 0; /* flex 아이템이 부모 너비를 넘지 않도록 */
 `;
 
 const Title = styled.h3<{ isRecommend: boolean }>`
@@ -123,6 +124,7 @@ const Title = styled.h3<{ isRecommend: boolean }>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  width: 100%; /* 부모 컨테이너의 전체 너비 사용 */
 `;
 
 const Bottom = styled.div`
