@@ -30,8 +30,6 @@ const NavContainer = styled.div`
   padding: 16px 32px;
 
   border-top: 1px solid var(--color-grey-300);
-  border-left: 1px solid var(--color-grey-300);
-  border-right: 1px solid var(--color-grey-300);
   border-radius: 12px 12px 0px 0px;
   background-color: var(--color-black-main);
 `;
