@@ -23,6 +23,8 @@ const PostContent = styled.div<{ hasImage: boolean }>`
     font-size: var(--string-size-medium01, 14px);
     font-weight: var(--string-weight-regular, 400);
     line-height: var(--string-lineheight-feedcontent_height20, 20px);
+    white-space: pre-wrap; // 개행문자 유지
+    word-wrap: break-word; // 긴 텍스트 줄바꿈
   }
 
   .imgContainer {

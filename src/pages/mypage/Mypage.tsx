@@ -204,7 +204,7 @@ const UserProfile = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
 
     img {
       width: 54px;

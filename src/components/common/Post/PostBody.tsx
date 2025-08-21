@@ -26,10 +26,12 @@ const PostContent = styled.div<{ hasImage: boolean }>`
     font-weight: var(--string-weight-regular, 400);
     line-height: var(--string-lineheight-feedcontent_height20, 20px);
     cursor: pointer;
+    white-space: pre-wrap; // 개행문자 유지
+    /* word-wrap: break-word; // 긴 텍스트 줄바꿈 */
 
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: ${({ hasImage }) => (hasImage ? 3 : 8)};
+    -webkit-line-clamp: ${({ hasImage }) => (hasImage ? 4 : 8)};
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -84,7 +86,7 @@ const PostBody = ({
 
   return (
     <Container onClick={() => handlePostClick(feedId)}>
-      <div onClick={(e) => e.stopPropagation()}>
+      <div onClick={e => e.stopPropagation()}>
         <BookInfoCard bookTitle={bookTitle} bookAuthor={bookAuthor} isbn={isbn} />
       </div>
       <PostContent hasImage={hasImage}>

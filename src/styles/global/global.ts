@@ -207,6 +207,11 @@ export const globalStyles = css`
     box-sizing: border-box;
   }
 
+  /* Input 요소 전역 스타일 */
+  input {
+    caret-color: ${colors.neongreen};
+  }
+
   ${coreDesignTokens}
 `;
 
