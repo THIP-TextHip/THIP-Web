@@ -1,4 +1,5 @@
 import { apiClient } from '../index';
+import { AxiosError } from 'axios';
 
 // 투표 아이템 타입
 export interface VoteItem {
@@ -65,11 +66,11 @@ export const getRoomPlaying = async (roomId: number): Promise<RoomPlayingRespons
   try {
     const response = await apiClient.get<RoomPlayingResponse>(`/rooms/${roomId}/playing`);
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('진행중인 방 상세 정보 조회 API 오류:', error);
     
     // 방 접근 권한이 없는 경우
-    if (error.response?.data?.code === 140011) {
+    if (error instanceof AxiosError && error.response?.data?.code === 140011) {
       throw new Error('방 접근 권한이 없습니다.');
     }
     

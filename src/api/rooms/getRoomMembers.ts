@@ -1,4 +1,5 @@
 import { apiClient } from '../index';
+import { AxiosError } from 'axios';
 
 export interface RoomMember {
   userId: number;
@@ -47,11 +48,11 @@ export const getRoomMembers = async (roomId: number): Promise<RoomMembersRespons
   try {
     const response = await apiClient.get<RoomMembersResponse>(`/rooms/${roomId}/users`);
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('독서메이트 조회 API 오류:', error);
     
     // 방 접근 권한이 없는 경우
-    if (error.response?.data?.code === 140011) {
+    if (error instanceof AxiosError && error.response?.data?.code === 140011) {
       throw new Error('방 접근 권한이 없습니다.');
     }
     

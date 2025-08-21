@@ -97,17 +97,17 @@ const GroupDetail = () => {
         } else {
           setError(response.message);
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('방 상세 정보 조회 실패:', error);
         
         // 모집기간이 만료된 방인 경우 - 진행중인 방으로 리다이렉트
-        if (error.message === '모집기간이 만료된 방입니다.') {
+        if (error instanceof Error && error.message === '모집기간이 만료된 방입니다.') {
           navigate(`/group/detail/joined/${roomId}`, { replace: true });
           return;
         }
         
         // 방 접근 권한이 없는 경우 - 모임 홈으로 리다이렉트
-        if (error.message === '방 접근 권한이 없습니다.') {
+        if (error instanceof Error && error.message === '방 접근 권한이 없습니다.') {
           navigate('/group', { replace: true });
           return;
         }

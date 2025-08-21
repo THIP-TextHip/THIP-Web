@@ -74,11 +74,11 @@ const ParticipatedGroupDetail = () => {
         } else {
           setError(response.message);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('방 상세 정보 조회 오류:', err);
         
         // 방 접근 권한이 없는 경우 - 모임 홈으로 리다이렉트
-        if (err.message === '방 접근 권한이 없습니다.') {
+        if (err instanceof Error && err.message === '방 접근 권한이 없습니다.') {
           navigate('/group', { replace: true });
           return;
         }
