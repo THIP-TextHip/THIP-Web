@@ -72,8 +72,8 @@ const SignupGenre = () => {
           state: {
             nickname: nickname,
             aliasName: selectedAlias.subTitle,
-            aliasColor: genres.find(g => g.id === selectedAlias.id)?.color,
-            aliasIconUrl: genres.find(g => g.id === selectedAlias.id)?.iconUrl,
+            aliasColor: genres.find(g => g.subTitle === selectedAlias.subTitle)?.color,
+            aliasIconUrl: genres.find(g => g.subTitle === selectedAlias.subTitle)?.iconUrl,
           },
         });
       } else {
