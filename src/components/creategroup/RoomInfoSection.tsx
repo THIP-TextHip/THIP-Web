@@ -16,6 +16,7 @@ const RoomInfoSection = ({
 }: RoomInfoSectionProps) => {
   return (
     <>
+      <Section showDivider />
       <Section>
         <SectionTitle>방 제목</SectionTitle>
         <TextAreaBox>
@@ -45,6 +46,8 @@ const RoomInfoSection = ({
           <CharacterCount>{roomDescription.length} / 75</CharacterCount>
         </TextAreaBox>
       </Section>
+
+      <Section showDivider />
     </>
   );
 };

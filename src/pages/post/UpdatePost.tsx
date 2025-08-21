@@ -108,7 +108,7 @@ const UpdatePost = () => {
       contentBody: postContent.trim(),
       isPublic: !isPrivate,
       ...(selectedTags.length ? { tagList: selectedTags } : {}),
-      ...(remainImageUrls.length ? { remainImageUrls } : {}),
+      remainImageUrls, // 이미지가 없어도 빈 배열로 전송하여 삭제 처리
     };
 
     const result = await updateExistingFeed(Number(feedId), body);

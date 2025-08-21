@@ -10,13 +10,13 @@ export const RecordSection = styled.section`
   margin: 20px 20px 0 20px;
   padding: 16px 12px;
   border-radius: 12px;
+  cursor: pointer;
 `;
 
 export const RecordSectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: pointer;
 `;
 
 export const RecordSectionTitle = styled.h3`

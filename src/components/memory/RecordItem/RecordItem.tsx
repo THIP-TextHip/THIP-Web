@@ -269,14 +269,20 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   const handleClick = useCallback(() => {
     // 클릭으로 더보기 메뉴 표시
     if (isMyRecord) {
-      openMoreMenu({
+      const menuOptions: any = {
         onEdit: handleEdit,
         onDelete: handleDeleteConfirm,
-        onPin: handlePinConfirm,
         onClose: closePopup,
         type: 'post',
         isWriter: true,
-      });
+      };
+      
+      // 기록(text)일 때만 핀하기 기능 추가
+      if (type === 'text') {
+        menuOptions.onPin = handlePinConfirm;
+      }
+      
+      openMoreMenu(menuOptions);
     } else {
       openMoreMenu({
         onReport: handleReport,
@@ -285,6 +291,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     }
   }, [
     isMyRecord,
+    type,
     openMoreMenu,
     handleReport,
     handleEdit,
@@ -365,7 +372,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
           <img src={commentIcon} alt="댓글" />
           <span>{commentCount}</span>
         </ActionButton>
-        {isMyRecord && (
+        {isMyRecord && type === 'text' && (
           <ActionButton
             onClick={
               shouldBlur

@@ -24,6 +24,7 @@ const PrivacySettingSection = ({
 }: PrivacySettingSectionProps) => {
   return (
     <Section>
+      <Section showDivider />
       <SectionTitle>공개 설정</SectionTitle>
       <PrivacyToggleContainer>
         <PrivacyLabel>비공개로 설정하기</PrivacyLabel>

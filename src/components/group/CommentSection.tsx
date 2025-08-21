@@ -15,8 +15,8 @@ interface CommentSectionProps {
 
 const CommentSection = ({ message, onClick }: CommentSectionProps) => {
   return (
-    <StyledCommentSection>
-      <CommentSectionHeader onClick={onClick}>
+    <StyledCommentSection onClick={onClick}>
+      <CommentSectionHeader>
         <CommentSectionTitle>오늘의 한마디</CommentSectionTitle>
         <CommentSectionChevron src={rightChevron} alt="한마디 이동 버튼" />
       </CommentSectionHeader>
