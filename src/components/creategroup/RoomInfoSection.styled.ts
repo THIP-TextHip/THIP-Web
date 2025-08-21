@@ -20,6 +20,7 @@ export const TextArea = styled.textarea`
   font-weight: ${typography.fontWeight.regular};
   padding: 0;
   margin: 0;
+  caret-color: ${colors.neongreen};
 
   &::placeholder {
     color: ${colors.grey[300]};

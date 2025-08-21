@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { Section, SectionTitle } from '../../pages/group/CommonSection.styled';
 import {
   PhotoContainer,
@@ -49,9 +49,17 @@ const PhotoSection = ({
     e.target.value = '';
   };
 
-  const createImageUrl = (file: File) => {
-    return URL.createObjectURL(file);
-  };
+  // 사진 파일들을 blob URL로 변환 (메모리 누수 방지)
+  const photoUrls = useMemo(() => {
+    return photos.map(file => URL.createObjectURL(file));
+  }, [photos]);
+
+  // 컴포넌트 언마운트 또는 photos 변경 시 기존 blob URL 해제
+  useEffect(() => {
+    return () => {
+      photoUrls.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [photoUrls]);
 
   const totalImageCount = existingImageUrls.length + photos.length;
   const isDisabled = totalImageCount >= 3 || readOnly || isEditMode;
@@ -81,12 +89,12 @@ const PhotoSection = ({
             </div>
           ))}
 
-          {photos.map((photo, index) => (
+          {photos.map((_, index) => (
             <div
               key={`new-${index}`}
               style={{ position: 'relative', width: '80px', height: '80px' }}
             >
-              <PhotoImage src={createImageUrl(photo)} alt={`새 이미지 ${index + 1}`} />
+              <PhotoImage src={photoUrls[index]} alt={`새 이미지 ${index + 1}`} />
               {!readOnly && (
                 <RemoveButton onClick={() => onPhotoRemove(index)}>
                   <img src={closeIcon} alt="삭제" />

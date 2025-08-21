@@ -249,7 +249,7 @@ export const EmptyContainer = styled.div`
 `;
 
 export const EmptyText = styled.p`
-  color: #e0e0e0;};
+  color: #e0e0e0;
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   margin: 0;

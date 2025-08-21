@@ -23,12 +23,16 @@ interface MemberListProps {
 const MemberList = ({ members, onMemberClick }: MemberListProps) => {
   const navigate = useNavigate();
 
-  const handleMemberClick = (memberId: string) => {
+  const handleMemberClick = (member: Member) => {
     if (onMemberClick) {
-      onMemberClick(memberId);
+      onMemberClick(member.id);
     } else {
-      // 기본 동작: 개별 유저 페이지로 이동
-      navigate(`/otherfeed/${memberId}`);
+      // isMyself가 true면 본인 프로필 페이지로, 아니면 다른 유저 페이지로 이동
+      if (member.isMyself) {
+        navigate(`/myfeed/${member.id}`);
+      } else {
+        navigate(`/otherfeed/${member.id}`);
+      }
     }
   };
 
@@ -39,11 +43,11 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
           key={member.id}
           role="button"
           tabIndex={0}
-          onClick={() => handleMemberClick(member.id)}
+          onClick={() => handleMemberClick(member)}
           onKeyDown={(e: KeyboardEvent) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
-              handleMemberClick(member.id);
+              handleMemberClick(member);
             }
           }}
         >
