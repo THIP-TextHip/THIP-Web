@@ -33,10 +33,22 @@ const FeedDetailPage = () => {
     try {
       const commentsResponse = await getComments(Number(feedId), { postType: 'FEED' });
       setCommentList(commentsResponse.data.commentList);
+
+      // 피드 데이터의 댓글 수를 실제 댓글 목록 길이로 업데이트
+      if (feedData) {
+        setFeedData(prev =>
+          prev
+            ? {
+                ...prev,
+                commentCount: commentsResponse.data.commentList.length,
+              }
+            : null,
+        );
+      }
     } catch (err) {
       console.error('댓글 목록 다시 로드 실패:', err);
     }
-  }, [feedId]);
+  }, [feedId, feedData]);
 
   // 페이지를 떠날 때 답글 상태 초기화
   useEffect(() => {
