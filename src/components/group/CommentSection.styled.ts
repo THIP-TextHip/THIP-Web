@@ -11,6 +11,11 @@ export const CommentSection = styled.section`
   padding: 16px 12px;
   border-radius: 12px;
   cursor: pointer;
+  
+  &:focus-visible {
+    outline: 2px solid ${colors.purple.main};
+    outline-offset: 2px;
+  }
 `;
 
 export const CommentSectionHeader = styled.div`
