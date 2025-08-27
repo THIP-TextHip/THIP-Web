@@ -54,6 +54,13 @@ const GroupSearch = () => {
     })();
   }, []);
 
+  // searchStatus가 'idle'로 변경될 때 최근 검색어 새로고침
+  useEffect(() => {
+    if (searchStatus === 'idle') {
+      fetchRecentSearches();
+    }
+  }, [searchStatus]);
+
   const fetchRecentSearches = async () => {
     try {
       const response = await getRecentSearch('ROOM');

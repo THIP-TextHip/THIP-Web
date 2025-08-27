@@ -52,7 +52,7 @@ const SearchBarWrapper = styled.div`
   background-color: var(--color-darkgrey-main);
   border-radius: 12px;
   width: calc(100% - 40px);
-  margin: 76px 20px 16px 20px;
+  margin: 16px 20px;
   padding: 8px 12px;
   box-sizing: border-box;
 

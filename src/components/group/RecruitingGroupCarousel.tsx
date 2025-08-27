@@ -112,5 +112,5 @@ const Item = styled.div`
   max-width: 640px;
   scroll-snap-align: center;
   transition: transform 0.2s;
-  height: 800px;
+  /* height: 800px; */
 `;

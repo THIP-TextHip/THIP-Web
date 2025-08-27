@@ -68,6 +68,7 @@ export function RecruitingGroupBox({ groups, title }: Props) {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  height: 100%;
   min-width: 260px;
   max-width: 704px;
   width: 100%;
@@ -133,6 +134,7 @@ const EmptyContent = styled.div`
   justify-content: center;
   align-items: center;
   gap: 8px;
+  height: 133px;
   padding: 60px 20px;
   grid-column: 1 / -1;
 `;

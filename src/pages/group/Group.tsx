@@ -104,10 +104,11 @@ const Wrapper = styled.div`
   position: relative;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 320px;
   max-width: 767px;
-  height: 100%;
+  min-height: 100vh;
   margin: 0 auto;
+  padding-top: 56px;
   background-color: #121212;
 `;
