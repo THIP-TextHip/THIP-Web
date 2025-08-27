@@ -236,7 +236,7 @@ const Header = styled.div<{ active: boolean }>`
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  max-width: 766px;
+  max-width: 767px;
   margin: 0 auto;
   padding: 16px 20px;
   background-color: ${colors.black.main};
