@@ -78,7 +78,7 @@ export default function MostSearchedBooks() {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 36px 20px 0 20px;
+  padding: 32px 20px 0 20px;
   background-color: var(--color-black-main);
   margin-bottom: 72px;
 `;

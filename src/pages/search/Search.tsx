@@ -335,6 +335,7 @@ const Header = styled.div`
   top: 0;
   left: 0;
   right: 0;
+  height: 56px;
   max-width: 767px;
   margin: 0 auto;
   color: ${colors.white};
@@ -347,7 +348,7 @@ const Header = styled.div`
 
 const SearchBarContainer = styled.div`
   position: fixed;
-  top: 0;
+  top: 56px;
   left: 0;
   right: 0;
   max-width: 767px;

@@ -44,8 +44,10 @@ const UserSearch = () => {
   };
 
   useEffect(() => {
-    fetchRecentSearches();
-  }, []);
+    if (!isSearched) {
+      fetchRecentSearches();
+    }
+  }, [isSearched]);
 
   const handleChange = (value: string) => {
     setSearchTerm(value);
@@ -64,7 +66,8 @@ const UserSearch = () => {
       const response = await deleteRecentSearch(recentSearchId);
 
       if (response.isSuccess) {
-        setRecentSearches(prev => prev.filter(item => item.recentSearchId !== recentSearchId));
+        // 삭제 성공 후 최근 검색어 리스트를 다시 호출
+        await fetchRecentSearches();
       } else {
         console.error('최근 검색어 삭제 실패:', response.message);
       }
@@ -164,7 +167,7 @@ const Wrapper = styled.div`
 
 const SearchBarContainer = styled.div`
   position: fixed;
-  top: 0;
+  top: 56px;
   left: 0;
   right: 0;
   max-width: 767px;

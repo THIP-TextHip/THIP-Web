@@ -12,7 +12,8 @@ export const Overlay = styled.div<{ $whiteBg?: boolean }>`
   width: 100%;
   max-width: 767px;
   min-width: 320px;
-  height: 100vh;
+  padding-top: 56px;
+  min-height: 100vh;
   background: ${({ $whiteBg }) => ($whiteBg ? 'white' : colors.black.main)};
   z-index: 110;
 `;
