@@ -297,9 +297,15 @@ const BookList = styled.div`
 `;
 
 const BookItem = styled.div`
+  width: 94.8%;
+  margin: 0 auto;
   display: flex;
   border-bottom: 1px solid ${colors.darkgrey.dark};
   padding: 12px 20px;
+
+  &:last-child {
+    border-bottom: none;
+  }
   justify-content: space-between;
 `;
 
