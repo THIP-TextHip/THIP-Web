@@ -258,7 +258,7 @@ const GroupSearch = () => {
         />
 
         <SearchBar
-          placeholder="방제목 혹은 책제목을 검색해보세요."
+          placeholder="방 제목 혹은 책 제목을 검색해보세요."
           value={searchTerm}
           onChange={handleChange}
           onSearch={handleSearch}
