@@ -54,21 +54,21 @@ const Container = styled.div`
 `;
 
 interface MyFollowerProps {
-  userId?: number;
+  creatorId?: number;
   followerCount: number;
   latestFollowerProfileImageUrls?: string[];
 }
 
 const MyFollower = ({
-  userId,
+  creatorId,
   followerCount = 0,
   latestFollowerProfileImageUrls = [],
 }: MyFollowerProps) => {
   const navigate = useNavigate();
 
   const handleMoreClick = () => {
-    if (userId) {
-      navigate(`/follow/followerlist/${userId}`);
+    if (creatorId) {
+      navigate(`/follow/followerlist/${creatorId}`);
     }
   };
 
