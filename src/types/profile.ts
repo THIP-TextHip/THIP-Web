@@ -1,8 +1,8 @@
 // 내 프로필 정보 타입
 export interface MyProfileData {
-  creatorId: number;
-  userId: number;
+  creatorId?: number;
   profileImageUrl: string;
+  userId?: number;
   nickname: string;
   aliasName: string;
   aliasColor: string;
