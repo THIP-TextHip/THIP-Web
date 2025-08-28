@@ -208,8 +208,10 @@ export const globalStyles = css`
   }
 
   /* Input 요소 전역 스타일 */
-  input {
+  input,
+  textarea {
     caret-color: ${colors.neongreen};
+    font-size: ${typography.fontSize.base};
   }
 
   ${coreDesignTokens}

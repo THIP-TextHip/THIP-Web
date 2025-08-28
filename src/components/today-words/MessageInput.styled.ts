@@ -65,7 +65,6 @@ export const MessageInput = styled.textarea`
   border: none;
   padding: 10px 58px 10px 12px;
   color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
   line-height: 1.4;
