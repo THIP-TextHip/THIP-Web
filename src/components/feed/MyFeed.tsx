@@ -41,7 +41,7 @@ const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
   return (
     <Container>
       <Profile
-        userId={profileData.userId}
+        userId={profileData.creatorId}
         showFollowButton={false}
         profileImageUrl={profileData.profileImageUrl}
         nickname={profileData.nickname}
