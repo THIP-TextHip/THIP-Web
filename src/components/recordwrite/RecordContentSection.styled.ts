@@ -26,7 +26,6 @@ export const TextArea = styled.textarea`
   max-height: 200px;
   background-color: ${semanticColors.background.primary};
   color: ${semanticColors.text.secondary};
-  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
   line-height: 1.5;

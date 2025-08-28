@@ -275,7 +275,7 @@ const Search = () => {
       )}
       <SearchBarContainer>
         <SearchBar
-          placeholder="책 제목, 작가명을 검색해보세요."
+          placeholder="책 제목 혹은 작가명을 검색해보세요."
           value={searchTerm}
           onChange={handleChange}
           onSearch={() => handleSearch(searchTerm.trim(), true)}

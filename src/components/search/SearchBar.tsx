@@ -72,7 +72,6 @@ const Input = styled.input`
   border: none;
   background: transparent;
   color: #ffffff;
-  font-size: 14px;
   padding: 8px 0;
   box-sizing: border-box;
   caret-color: var(--color-neongreen);

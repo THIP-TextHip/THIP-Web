@@ -12,7 +12,6 @@ export const TextArea = styled.textarea<{ readOnly?: boolean }>`
   min-height: 100px;
   background-color: ${props => (props.readOnly ? '#f5f5f5' : semanticColors.background.primary)};
   color: ${semanticColors.text.secondary};
-  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
   resize: none;
