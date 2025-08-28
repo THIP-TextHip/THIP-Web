@@ -63,7 +63,7 @@ export const MessageInput = styled.textarea`
   flex: 1;
   background: none;
   border: none;
-  padding: 10px 58px 10px 12px;
+  padding: 9px 58px 9px 12px;
   color: ${semanticColors.text.primary};
   font-weight: ${typography.fontWeight.regular};
   font-family: ${typography.fontFamily.primary};
@@ -91,7 +91,7 @@ export const MessageInput = styled.textarea`
 export const SendButton = styled.button<{ active: boolean }>`
   position: absolute;
   right: 4px;
-  bottom: 6px;
+  bottom: 7px;
   width: 42px;
   height: 28px;
   border-radius: 20px;
