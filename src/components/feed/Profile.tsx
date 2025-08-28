@@ -13,6 +13,7 @@ export interface ProfileProps {
   aliasColor: string;
   followerCount: number;
   latestFollowerProfileImageUrls?: string[];
+  creatorId?: number;
   userId?: number;
   isMyFeed?: boolean;
 }
@@ -26,6 +27,7 @@ const Profile = ({
   aliasColor,
   followerCount,
   latestFollowerProfileImageUrls = [],
+  creatorId,
   userId,
   isMyFeed,
 }: ProfileProps) => {
@@ -92,7 +94,7 @@ const Profile = ({
       <MyFollower
         followerCount={followerCount}
         latestFollowerProfileImageUrls={latestFollowerProfileImageUrls}
-        userId={userId}
+        creatorId={creatorId}
       />
     </Container>
   );
