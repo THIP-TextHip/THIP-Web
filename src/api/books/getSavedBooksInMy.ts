@@ -14,6 +14,8 @@ export interface SavedBookInMy {
 // API 응답 데이터 타입
 export interface SavedBooksInMyData {
   bookList: SavedBookInMy[];
+  nextCursor: string;
+  isLast: boolean;
 }
 
 // API 응답 타입
@@ -24,10 +26,17 @@ export interface SavedBooksInMyResponse {
   data: SavedBooksInMyData;
 }
 
-// 개인적으로 저장한 책 목록 조회 API 함수
-export const getSavedBooksInMy = async () => {
+// 개인적으로 저장한 책 목록 조회 API 함수 (무한스크롤)
+export const getSavedBooksInMy = async (cursor: string | null = null) => {
   try {
-    const response = await apiClient.get<SavedBooksInMyResponse>('/books/saved');
+    const params: { cursor?: string | null } = {};
+    if (cursor !== null) {
+      params.cursor = cursor;
+    }
+
+    const response = await apiClient.get<SavedBooksInMyResponse>('/books/saved', {
+      params,
+    });
     return response.data;
   } catch (error) {
     console.error('개인 저장 책 조회 API 오류:', error);

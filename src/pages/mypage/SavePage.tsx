@@ -28,24 +28,41 @@ const SavePage = () => {
 
   // 책 관련 상태
   const [savedBooks, setSavedBooks] = useState<SavedBookInMy[]>([]);
+  const [bookNextCursor, setBookNextCursor] = useState<string | null>(null);
+  const [bookIsLast, setBookIsLast] = useState(false);
+  const [bookLoading, setBookLoading] = useState(false);
 
   // 초기 로딩 상태
   const [initialLoading, setInitialLoading] = useState(true);
 
   // Intersection Observer ref
   const feedObserverRef = useRef<HTMLDivElement>(null);
+  const bookObserverRef = useRef<HTMLDivElement>(null);
 
   const handleBack = () => {
     navigate('/mypage');
   };
 
-  // 저장된 책 목록 로드 함수
-  const loadSavedBooks = useCallback(async () => {
+  // 저장된 책 목록 로드 함수 (무한스크롤)
+  const loadSavedBooks = useCallback(async (cursor: string | null = null) => {
     try {
-      const response = await getSavedBooksInMy();
-      setSavedBooks(response.data.bookList);
+      setBookLoading(true);
+      const response = await getSavedBooksInMy(cursor);
+
+      if (cursor === null) {
+        // 첫 로드
+        setSavedBooks(response.data.bookList);
+      } else {
+        // 추가 로드
+        setSavedBooks(prev => [...prev, ...response.data.bookList]);
+      }
+
+      setBookNextCursor(response.data.nextCursor);
+      setBookIsLast(response.data.isLast);
     } catch (error) {
       console.error('저장된 책 목록 로드 실패:', error);
+    } finally {
+      setBookLoading(false);
     }
   }, []);
 
@@ -72,6 +89,35 @@ const SavePage = () => {
     }
   }, []);
 
+  // 저장된 책 목록 로드 함수
+  const loadMoreBooks = useCallback(async () => {
+    if (!bookNextCursor || bookIsLast || bookLoading) return;
+
+    try {
+      await loadSavedBooks(bookNextCursor);
+    } catch (error) {
+      console.error('책 추가 로드 실패:', error);
+    }
+  }, [bookNextCursor, bookIsLast, bookLoading, loadSavedBooks]);
+
+  // 책 Intersection Observer 콜백
+  const lastBookElementCallback = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (bookLoading || bookIsLast) return;
+
+      if (node) {
+        const observer = new IntersectionObserver(entries => {
+          if (entries[0].isIntersecting && !bookLoading && !bookIsLast) {
+            loadMoreBooks();
+          }
+        });
+
+        observer.observe(node);
+      }
+    },
+    [bookLoading, bookIsLast, loadMoreBooks],
+  );
+
   // 페이지 진입 시 모든 데이터 로드 (한 번만 실행)
   useEffect(() => {
     const loadAllData = async () => {
@@ -91,6 +137,8 @@ const SavePage = () => {
 
         // 책 데이터 설정
         setSavedBooks(booksResponse.data.bookList);
+        setBookNextCursor(booksResponse.data.nextCursor);
+        setBookIsLast(booksResponse.data.isLast);
       } catch (error) {
         console.error('초기 데이터 로드 실패:', error);
       } finally {
@@ -203,8 +251,11 @@ const SavePage = () => {
       ) : savedBooks.length > 0 ? (
         <>
           <BookList>
-            {savedBooks.map(book => (
-              <BookItem key={book.bookId}>
+            {savedBooks.map((book, index) => (
+              <BookItem
+                key={book.bookId}
+                ref={index === savedBooks.length - 1 ? lastBookElementCallback : null}
+              >
                 <LeftSection>
                   <Cover src={book.bookImageUrl} alt={`${book.bookTitle} 커버`} />
                   <BookInfo>
@@ -222,6 +273,12 @@ const SavePage = () => {
                 </SaveIcon>
               </BookItem>
             ))}
+            {/* 무한스크롤을 위한 observer 요소 */}
+            {!bookIsLast && (
+              <div ref={bookObserverRef} style={{ height: '20px' }}>
+                {bookLoading && <LoadingSpinner fullHeight={false} size="small" />}
+              </div>
+            )}
           </BookList>
         </>
       ) : (
