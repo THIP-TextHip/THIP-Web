@@ -12,26 +12,47 @@
       }
     </style>
     <script>
-      // 좌우 스와이프 네비게이션 방지
+      // 좌우 스와이프 네비게이션 완전 차단
       let startX = null;
+      let startY = null;
       
       document.addEventListener('touchstart', function(e) {
         startX = e.touches[0].clientX;
-      }, { passive: true });
+        startY = e.touches[0].clientY;
+      }, { passive: false });
       
       document.addEventListener('touchmove', function(e) {
-        if (!startX) return;
+        if (!startX || !startY) return;
         
         let currentX = e.touches[0].clientX;
+        let currentY = e.touches[0].clientY;
         let diffX = Math.abs(currentX - startX);
-        let diffY = Math.abs(e.touches[0].clientY - (e.touches[0].clientY || 0));
+        let diffY = Math.abs(currentY - startY);
         
-        // 수평 스와이프가 수직보다 크면 preventDefault
-        if (diffX > diffY && diffX > 10) {
-          if ((currentX > startX && startX < 50) || (currentX < startX && startX > window.innerWidth - 50)) {
-            e.preventDefault();
-          }
+        // 수평 스와이프 감지시 무조건 차단
+        if (diffX > 5 && diffX > diffY) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
         }
+      }, { passive: false, capture: true });
+      
+      document.addEventListener('touchend', function(e) {
+        startX = null;
+        startY = null;
+      }, { passive: false });
+      
+      // 추가적인 제스처 차단
+      document.addEventListener('gesturestart', function(e) {
+        e.preventDefault();
+      }, { passive: false });
+      
+      document.addEventListener('gesturechange', function(e) {
+        e.preventDefault();
+      }, { passive: false });
+      
+      document.addEventListener('gestureend', function(e) {
+        e.preventDefault();
       }, { passive: false });
     </script>
     <script>
