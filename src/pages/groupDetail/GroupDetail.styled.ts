@@ -246,8 +246,17 @@ export const RecommendText = styled.h2`
 export const GroupCardBox = styled.div`
   display: flex;
   overflow-x: auto;
+  overflow-y: hidden;
   padding: 0 20px;
   gap: 20px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+  }
 `;
 
 export const BottomButton = styled.button`
