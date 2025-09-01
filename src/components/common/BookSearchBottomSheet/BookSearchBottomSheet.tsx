@@ -28,11 +28,15 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     showTabs,
     hasNextPage,
     isLoadingMore,
+    currentTabHasNext,
+    currentTabIsLoadingMore,
     setSearchQuery,
     handleTabChange,
     loadInitialData,
     performSearch,
     loadMoreSearchResults,
+    loadMoreSavedBooks,
+    loadMoreGroupBooks,
   } = useBookSearch();
 
   // 컴포넌트가 열릴 때 초기 데이터 로드
@@ -78,6 +82,19 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
   };
 
   const showBookList = !isLoading && !error && !showEmptyState;
+  const isSearchMode = searchQuery.trim() !== '';
+  
+  // 현재 탭에 맞는 무한 스크롤 핸들러 결정
+  const getLoadMoreHandler = () => {
+    if (isSearchMode) {
+      return loadMoreSearchResults;
+    }
+    return activeTab === 'saved' ? loadMoreSavedBooks : loadMoreGroupBooks;
+  };
+  
+  // 현재 상태에 맞는 무한 스크롤 정보
+  const currentHasNextPage = isSearchMode ? hasNextPage : currentTabHasNext;
+  const currentIsLoadingMore = isSearchMode ? isLoadingMore : currentTabIsLoadingMore;
 
   return (
     <Overlay isVisible={isOpen} onClick={handleOverlayClick}>
@@ -108,10 +125,10 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
               <BookList 
                 books={filteredBooks} 
                 onBookSelect={handleBookSelect}
-                onLoadMore={loadMoreSearchResults}
-                hasNextPage={hasNextPage}
-                isLoadingMore={isLoadingMore}
-                isSearchMode={searchQuery.trim() !== ''}
+                onLoadMore={getLoadMoreHandler()}
+                hasNextPage={currentHasNextPage}
+                isLoadingMore={currentIsLoadingMore}
+                isSearchMode={isSearchMode}
               />
             )}
           </BookListContainer>

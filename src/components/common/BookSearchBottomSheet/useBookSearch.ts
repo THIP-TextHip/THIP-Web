@@ -17,6 +17,14 @@ export const useBookSearch = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  
+  // 저장한 책/모임 책 무한 스크롤 관련 상태
+  const [savedBooksCursor, setSavedBooksCursor] = useState<string | null>(null);
+  const [groupBooksCursor, setGroupBooksCursor] = useState<string | null>(null);
+  const [hasSavedBooksNext, setHasSavedBooksNext] = useState(false);
+  const [hasGroupBooksNext, setHasGroupBooksNext] = useState(false);
+  const [isLoadingMoreSavedBooks, setIsLoadingMoreSavedBooks] = useState(false);
+  const [isLoadingMoreGroupBooks, setIsLoadingMoreGroupBooks] = useState(false);
 
   // API에서 받은 데이터를 Book 타입으로 변환하는 함수
   const convertSavedBookToBook = (savedBook: SavedBook): Book => ({
@@ -36,16 +44,28 @@ export const useBookSearch = () => {
     isbn: searchedBook.isbn,
   });
 
-  // 저장한 책 데이터 가져오기
-  const fetchSavedBooks = async () => {
+  // 저장한 책 데이터 가져오기 (무한 스크롤)
+  const fetchSavedBooks = async (isLoadMore: boolean = false) => {
     try {
-      setIsLoading(true);
+      if (isLoadMore) {
+        setIsLoadingMoreSavedBooks(true);
+      } else {
+        setIsLoading(true);
+        setSavedBooksCursor(null);
+      }
       setError(null);
 
-      const response = await getSavedBooks('saved');
+      const cursor = isLoadMore ? savedBooksCursor : null;
+      const response = await getSavedBooks('saved', cursor);
 
       if (response.isSuccess && response.data) {
-        setSavedBooks(response.data.bookList);
+        if (isLoadMore) {
+          setSavedBooks(prev => [...prev, ...response.data.bookList]);
+        } else {
+          setSavedBooks(response.data.bookList);
+        }
+        setSavedBooksCursor(response.data.nextCursor);
+        setHasSavedBooksNext(!response.data.isLast);
       } else {
         setError(response.message || '저장한 책을 불러오는데 실패했습니다.');
       }
@@ -53,20 +73,36 @@ export const useBookSearch = () => {
       console.error('저장한 책 조회 오류:', err);
       setError('저장한 책을 불러오는데 실패했습니다.');
     } finally {
-      setIsLoading(false);
+      if (isLoadMore) {
+        setIsLoadingMoreSavedBooks(false);
+      } else {
+        setIsLoading(false);
+      }
     }
   };
 
-  // 모임 책 데이터 가져오기
-  const fetchGroupBooks = async () => {
+  // 모임 책 데이터 가져오기 (무한 스크롤)
+  const fetchGroupBooks = async (isLoadMore: boolean = false) => {
     try {
-      setIsLoading(true);
+      if (isLoadMore) {
+        setIsLoadingMoreGroupBooks(true);
+      } else {
+        setIsLoading(true);
+        setGroupBooksCursor(null);
+      }
       setError(null);
 
-      const response = await getSavedBooks('joining');
+      const cursor = isLoadMore ? groupBooksCursor : null;
+      const response = await getSavedBooks('joining', cursor);
 
       if (response.isSuccess && response.data) {
-        setGroupBooks(response.data.bookList);
+        if (isLoadMore) {
+          setGroupBooks(prev => [...prev, ...response.data.bookList]);
+        } else {
+          setGroupBooks(response.data.bookList);
+        }
+        setGroupBooksCursor(response.data.nextCursor);
+        setHasGroupBooksNext(!response.data.isLast);
       } else {
         setError(response.message || '모임 책을 불러오는데 실패했습니다.');
       }
@@ -74,7 +110,11 @@ export const useBookSearch = () => {
       console.error('모임 책 조회 오류:', err);
       setError('모임 책을 불러오는데 실패했습니다.');
     } finally {
-      setIsLoading(false);
+      if (isLoadMore) {
+        setIsLoadingMoreGroupBooks(false);
+      } else {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -138,6 +178,24 @@ export const useBookSearch = () => {
     }
     
     await performSearch(searchQuery.trim(), currentPage + 1, false);
+  };
+
+  // 더 많은 저장한 책 로드
+  const loadMoreSavedBooks = async () => {
+    if (isLoadingMoreSavedBooks || !hasSavedBooksNext) {
+      return;
+    }
+    
+    await fetchSavedBooks(true);
+  };
+
+  // 더 많은 모임 책 로드
+  const loadMoreGroupBooks = async () => {
+    if (isLoadingMoreGroupBooks || !hasGroupBooksNext) {
+      return;
+    }
+    
+    await fetchGroupBooks(true);
   };
 
   // 검색어 변경 핸들러 (디바운싱 적용)
@@ -204,6 +262,10 @@ export const useBookSearch = () => {
   const hasBooks = isSearchMode ? searchResults.length > 0 : currentTabBooks.length > 0;
   const showEmptyState = !isLoading && !error && !hasBooks;
   const showTabs = !isSearchMode; // 검색 모드가 아닐 때는 항상 탭 표시
+  
+  // 현재 탭의 무한 스크롤 상태
+  const currentTabHasNext = activeTab === 'saved' ? hasSavedBooksNext : hasGroupBooksNext;
+  const currentTabIsLoadingMore = activeTab === 'saved' ? isLoadingMoreSavedBooks : isLoadingMoreGroupBooks;
 
   // 컴포넌트 언마운트 시 타이머 정리
   useEffect(() => {
@@ -226,6 +288,8 @@ export const useBookSearch = () => {
     showTabs,
     hasNextPage,
     isLoadingMore,
+    currentTabHasNext,
+    currentTabIsLoadingMore,
 
     // Actions
     setSearchQuery: handleSearchQueryChange,
@@ -233,5 +297,7 @@ export const useBookSearch = () => {
     loadInitialData,
     performSearch,
     loadMoreSearchResults,
+    loadMoreSavedBooks,
+    loadMoreGroupBooks,
   };
 };
