@@ -1,6 +1,39 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <style>
+      body {
+        overscroll-behavior: none;
+        touch-action: pan-y pinch-zoom;
+      }
+      
+      * {
+        overscroll-behavior-x: none;
+      }
+    </style>
+    <script>
+      // 좌우 스와이프 네비게이션 방지
+      let startX = null;
+      
+      document.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+      }, { passive: true });
+      
+      document.addEventListener('touchmove', function(e) {
+        if (!startX) return;
+        
+        let currentX = e.touches[0].clientX;
+        let diffX = Math.abs(currentX - startX);
+        let diffY = Math.abs(e.touches[0].clientY - (e.touches[0].clientY || 0));
+        
+        // 수평 스와이프가 수직보다 크면 preventDefault
+        if (diffX > diffY && diffX > 10) {
+          if ((currentX > startX && startX < 50) || (currentX < startX && startX > window.innerWidth - 50)) {
+            e.preventDefault();
+          }
+        }
+      }, { passive: false });
+    </script>
     <script>
       (function (m, a, z, e) {
         var s, t;

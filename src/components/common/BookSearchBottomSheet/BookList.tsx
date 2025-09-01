@@ -48,7 +48,7 @@ const BookList = ({
     if (observerRef.current) observerRef.current.disconnect();
     
     observerRef.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasNextPage && onLoadMore && isSearchMode) {
+      if (entries[0].isIntersecting && hasNextPage && onLoadMore) {
         onLoadMore();
       }
     });
@@ -81,8 +81,8 @@ const BookList = ({
         </BookItem>
       ))}
       
-      {/* 검색 모드에서 더 많은 데이터가 있고 로딩 중일 때 로딩 표시 */}
-      {isSearchMode && isLoadingMore && (
+      {/* 더 많은 데이터가 있고 로딩 중일 때 로딩 표시 */}
+      {isLoadingMore && (
         <LoadingContainer ref={loadingRef}>
           <LoadingText>더 많은 책을 불러오는 중...</LoadingText>
         </LoadingContainer>

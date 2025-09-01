@@ -55,6 +55,7 @@ const ImageContainer = styled.div`
     width: 100px;
     height: 100px;
     flex-shrink: 0; //고정사이즈
+    object-fit: cover;
   }
 `;
 
