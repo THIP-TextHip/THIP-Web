@@ -249,6 +249,7 @@ const Search = () => {
     setHasMore(true);
     setPage(1);
     setSearchParams({}, { replace: true });
+    fetchRecentSearches();
   };
 
   useEffect(() => {
