@@ -51,7 +51,7 @@ export const Header = styled.div`
     var(--color-view-viewfield_background_black, #121212) 100%
   );
   backdrop-filter: blur(0px);
-  z-index: 10;
+  z-index: 100;
 `;
 
 export const BannerSection = styled.section`
