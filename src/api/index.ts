@@ -24,8 +24,8 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${authToken}`;
     } else {
       console.log('❌ localStorage에 토큰이 없습니다.');
-      config.headers.Authorization =
-        'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.BSGuoMWlrzc0oKgSJXHEycxdzzY9-e7gD4xh-wSDemc';
+      // config.headers.Authorization =
+      //   'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.BSGuoMWlrzc0oKgSJXHEycxdzzY9-e7gD4xh-wSDemc';
     }
 
     return config;
