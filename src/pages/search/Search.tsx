@@ -31,15 +31,13 @@ const Search = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
-  // 무한스크롤 관련 상태
   const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1); // 1부터 시작
+  const [page, setPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
-  // Intersection Observer를 위한 ref
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastBookElementRef = useRef<HTMLDivElement | null>(null);
 
@@ -59,7 +57,6 @@ const Search = () => {
     }
   };
 
-  // 추가 데이터 로드 함수
   const loadMore = useCallback(async () => {
     if (!searchTerm.trim() || isLoadingMore || !hasMore) return;
 
@@ -75,7 +72,6 @@ const Search = () => {
         if (newResults.length > 0) {
           setSearchResults(prev => [...prev, ...newResults]);
           setPage(nextPage);
-          // API 응답의 last 필드를 사용하여 hasMore 설정
           setHasMore(!response.data.last);
         } else {
           setHasMore(false);
@@ -92,7 +88,6 @@ const Search = () => {
     }
   }, [searchTerm, isLoadingMore, hasMore, page, isFinalized]);
 
-  // 무한스크롤을 위한 Intersection Observer 설정
   const lastBookElementCallback = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoadingMore || !hasMore) return;
@@ -118,8 +113,8 @@ const Search = () => {
     setSearchTerm(value);
     setIsFinalized(false);
     setIsSearching(value.trim() !== '');
-    setHasMore(true); // 새로운 검색 시 hasMore 초기화
-    setPage(1); // 페이지를 1로 초기화
+    setHasMore(true);
+    setPage(1);
 
     if (value.trim()) {
       setSearchParams({ q: value.trim() }, { replace: true });
@@ -158,16 +153,15 @@ const Search = () => {
     }
 
     setIsLoading(true);
-    setPage(1); // 검색 시 페이지를 1로 초기화
-    setHasMore(true); // 검색 시 hasMore 초기화
+    setPage(1);
+    setHasMore(true);
 
     try {
-      const response = await getSearchBooks(term, 1, isManualSearch); // 첫 페이지는 1
+      const response = await getSearchBooks(term, 1, isManualSearch);
 
       if (response.isSuccess) {
         const convertedResults = convertToSearchedBooks(response.data.searchResult);
         setSearchResults(convertedResults);
-        // API 응답의 last 필드를 사용하여 hasMore 설정
         setHasMore(!response.data.last);
         setTotalElements(response.data.totalElements);
       } else {
