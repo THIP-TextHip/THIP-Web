@@ -22,7 +22,7 @@
       }, { passive: false });
       
       document.addEventListener('touchmove', function(e) {
-        if (!startX || !startY) return;
+        if (startX === null || startY === null) return;
         
         let currentX = e.touches[0].clientX;
         let currentY = e.touches[0].clientY;
@@ -38,6 +38,11 @@
       }, { passive: false, capture: true });
       
       document.addEventListener('touchend', function(e) {
+        startX = null;
+        startY = null;
+      }, { passive: false });
+      
+      document.addEventListener('touchcancel', function(e) {
         startX = null;
         startY = null;
       }, { passive: false });
