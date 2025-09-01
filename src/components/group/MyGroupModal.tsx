@@ -305,6 +305,7 @@ const ErrorMessage = styled.div`
 `;
 
 const EmptyState = styled.div`
+  grid-column: 1 / -1; /* 그리드 2열일 때도 전체 너비 차지 */
   flex: 1;
   min-height: 78vh;
   display: flex;

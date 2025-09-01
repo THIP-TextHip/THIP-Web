@@ -69,6 +69,7 @@ const Card = styled.div<{ cardType: 'main' | 'search' | 'modal'; isFirstCard?: b
   gap: 12px;
   padding: 12px;
   min-width: 232px;
+  cursor: pointer;
 `;
 
 const CoverWrapper = styled.div`
