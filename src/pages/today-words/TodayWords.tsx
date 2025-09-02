@@ -296,8 +296,11 @@ const TodayWords = () => {
     }
   }, [inputValue, roomId, isSubmitting, openSnackbar, todayMyMessageCount, DAILY_LIMIT]);
 
-
-
+  // 메시지 삭제 핸들러
+  const handleMessageDelete = useCallback((messageId: string) => {
+    // 삭제된 메시지를 로컬 상태에서 제거 (MessageList 컴포넌트에서 이미 처리하지만 동기화를 위해)
+    setMessages(prev => prev.filter(msg => msg.id !== messageId));
+  }, []);
 
   return (
     <>
@@ -319,6 +322,8 @@ const TodayWords = () => {
               <MessageList
                 ref={messageListRef}
                 messages={messages}
+                roomId={roomId ? parseInt(roomId) : undefined}
+                onMessageDelete={handleMessageDelete}
               />
               {isLoadingMore && (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
