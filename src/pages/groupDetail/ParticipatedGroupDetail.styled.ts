@@ -20,10 +20,6 @@ export const ClickableMeta = styled.div`
   flex-direction: column;
   width: 100%;
   cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
 `;
 
 export const MetaChevron = styled.img`

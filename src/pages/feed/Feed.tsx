@@ -162,7 +162,7 @@ const Feed = () => {
       if (!authToken) {
         // localStorage.setItem(
         //   'authToken',
-        //   'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.BSGuoMWlrzc0oKgSJXHEycxdzzY9-e7gD4xh-wSDemc',
+        //   'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjksImlhdCI6MTc1Njc4MjEyNywiZXhwIjoxNzU5Mzc0MTI3fQ.iRU7rN90Vs9Wykxvw-gkyAkbyB-HQENm_WifYHb2UR8',
         // );
         console.log('🔑 하드코딩된 토큰으로 설정했습니다.');
         return;

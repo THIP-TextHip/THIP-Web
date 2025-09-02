@@ -25,7 +25,7 @@ apiClient.interceptors.request.use(
     } else {
       console.log('❌ localStorage에 토큰이 없습니다.');
       // config.headers.Authorization =
-      //   'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.BSGuoMWlrzc0oKgSJXHEycxdzzY9-e7gD4xh-wSDemc';
+      //   'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjksImlhdCI6MTc1Njc4MjEyNywiZXhwIjoxNzU5Mzc0MTI3fQ.iRU7rN90Vs9Wykxvw-gkyAkbyB-HQENm_WifYHb2UR8eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjksImlhdCI6MTc1Njc4NTY5NSwiZXhwIjoxNzU5Mzc3Njk1fQ.jnYVdrvtHivfyteXPHAZmAM1mkwW2U66EPn7BylzHu0';
     }
 
     return config;
