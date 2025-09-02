@@ -59,7 +59,7 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
             )}
             <MemberInfo>
               <MemberName>{member.nickname}</MemberName>
-              <MemberRole>{member.role}</MemberRole>
+              <MemberRole roleType={member.role}>{member.role}</MemberRole>
             </MemberInfo>
           </ProfileSection>
           <MemberStatus>

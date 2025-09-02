@@ -160,10 +160,10 @@ const Feed = () => {
       const authToken = localStorage.getItem('authToken');
       // 토큰이 없으면 하드코딩된 토큰으로 설정
       if (!authToken) {
-        // localStorage.setItem(
-        //   'authToken',
-        //   'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.BSGuoMWlrzc0oKgSJXHEycxdzzY9-e7gD4xh-wSDemc',
-        // );
+        localStorage.setItem(
+          'authToken',
+          'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjksImlhdCI6MTc1Njc4NTY5NSwiZXhwIjoxNzU5Mzc3Njk1fQ.jnYVdrvtHivfyteXPHAZmAM1mkwW2U66EPn7BylzHu0',
+        );
         console.log('🔑 하드코딩된 토큰으로 설정했습니다.');
         return;
       }
