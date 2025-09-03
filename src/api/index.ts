@@ -10,7 +10,6 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // 쿠키 자동 전송 설정
 });
 // Request 인터셉터: localStorage의 토큰을 헤더에 자동 추가
 apiClient.interceptors.request.use(
@@ -19,13 +18,9 @@ apiClient.interceptors.request.use(
     const authToken = localStorage.getItem('authToken');
 
     if (authToken) {
-      // 토큰이 있으면 Authorization 헤더에 추가
-      console.log('🔑 Authorization 헤더에 토큰 추가');
       config.headers.Authorization = `Bearer ${authToken}`;
     } else {
       console.log('❌ localStorage에 토큰이 없습니다.');
-      // config.headers.Authorization =
-      //   'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NDM4MjY1MiwiZXhwIjoxNzU2OTc0NjUyfQ.BSGuoMWlrzc0oKgSJXHEycxdzzY9-e7gD4xh-wSDemc';
     }
 
     return config;
