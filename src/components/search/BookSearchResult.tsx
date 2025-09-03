@@ -104,6 +104,7 @@ const ResultHeader = styled.div`
 const Cover = styled.img`
   width: 80px;
   height: 107px;
+  flex-shrink: 0;
   object-fit: cover;
 `;
 
@@ -111,12 +112,20 @@ const BookInfo = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 12px;
+  min-width: 0;
 `;
 
 const Title = styled.h3`
   font-size: ${typography.fontSize.base};
   font-weight: ${typography.fontWeight.semibold};
   color: ${colors.white};
+  line-height: 20px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
 `;
 
 const Subtitle = styled.span`
@@ -124,6 +133,7 @@ const Subtitle = styled.span`
   font-weight: ${typography.fontWeight.medium};
   color: ${colors.grey[200]};
   margin-top: 8px;
+  line-height: 20px;
 `;
 
 const EmptyWrapper = styled.div`
