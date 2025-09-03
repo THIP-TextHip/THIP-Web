@@ -1,7 +1,7 @@
 export type UserProfileType = 'followlist' | 'followerlist';
 
 export interface UserProfileItemProps {
-  profileImgUrl: string;
+  profileImageUrl: string;
   nickname: string;
   aliasName: string;
   aliasColor?: string;

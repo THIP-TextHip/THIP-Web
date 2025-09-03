@@ -8,7 +8,7 @@ import { postFollow } from '@/api/users/postFollow';
 import { usePopupStore } from '@/stores/usePopupStore';
 
 const UserProfileItem = ({
-  profileImgUrl,
+  profileImageUrl,
   nickname,
   aliasName,
   aliasColor,
@@ -59,7 +59,7 @@ const UserProfileItem = ({
     <Wrapper onClick={handleProfileClick} isLast={isLast}>
       <UserProfile>
         <div className="userInfo">
-          <img src={profileImgUrl} />
+          <img src={profileImageUrl} />
           <div className="user">
             <div className="username">{nickname}</div>
             <div className="usertitle" style={{ color: aliasColor }}>
