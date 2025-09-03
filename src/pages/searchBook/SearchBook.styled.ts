@@ -175,6 +175,10 @@ export const FeedSection = styled.section`
   margin-top: 20px;
 `;
 
+export const FeedPostContainer = styled.div`
+  min-height: 50vh;
+`;
+
 export const FeedTitle = styled.h2`
   color: ${colors.white};
   font-size: ${typography.fontSize.lg};
