@@ -20,6 +20,7 @@ import {
   EmptyState,
   EmptyTitle,
   EmptySubText,
+  FeedPostContainer,
 } from './SearchBook.styled';
 import { useNavigate, useParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -298,11 +299,10 @@ const SearchBook = () => {
             setSelectedFilter={filter => setSelectedFilter(filter as (typeof FILTER)[number])}
           />
         </FilterContainer>
-
         {isLoadingFeeds && feeds.length === 0 ? (
           <LoadingBox>불러오는 중...</LoadingBox>
         ) : feeds.length > 0 ? (
-          <>
+          <FeedPostContainer>
             {feeds.map((post, idx) => (
               <div
                 key={post.feedId}
@@ -328,7 +328,7 @@ const SearchBook = () => {
                 />
               </div>
             ))}
-          </>
+          </FeedPostContainer>
         ) : (
           <EmptyState>
             <EmptyTitle>이 책으로 작성된 피드가 없어요.</EmptyTitle>
