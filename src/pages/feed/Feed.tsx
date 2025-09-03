@@ -155,6 +155,7 @@ const Feed = () => {
     const loadFeedsWithToken = async () => {
       // 토큰 발급 완료 대기
       await waitForToken();
+
       setTabLoading(true);
 
       try {
