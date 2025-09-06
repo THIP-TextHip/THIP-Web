@@ -266,7 +266,13 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   }, [openCommentBottomSheet, id, type]);
 
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    // 블라인드된 상태에서는 클릭 이벤트 무시
+    if (shouldBlur) {
+      e.stopPropagation();
+      return;
+    }
+    
     // 클릭으로 더보기 메뉴 표시
     if (isMyRecord) {
       const menuOptions: any = {
@@ -303,11 +309,28 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   return (
     <Container
       onClick={handleClick}
+      shouldBlur={shouldBlur}
       style={{
-        filter: shouldBlur ? 'blur(4px)' : 'none',
         cursor: 'pointer',
+        position: 'relative',
       }}
     >
+      {shouldBlur && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 10,
+            cursor: 'default',
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        />
+      )}
       <UserSection>
         <UserAvatar src={profileImageUrl} />
         <UserInfo>
