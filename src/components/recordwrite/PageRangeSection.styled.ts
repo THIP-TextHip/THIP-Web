@@ -52,7 +52,7 @@ export const PageInput = styled.input<{ inputLength?: number }>`
   font-family: ${typography.fontFamily.primary};
   width: ${props => {
     if (!props.inputLength) return '12px';
-    return `${Math.max(9, props.inputLength * 8)}px`;
+    return `${Math.max(9, props.inputLength * 9)}px`;
   }};
   padding: 0;
   margin: 0;
