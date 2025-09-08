@@ -3,6 +3,7 @@ import moreIcon from '../../../assets/common/more.svg';
 import type { Message } from '../../../types/today';
 import MessageActionBottomSheet from './MessageActionBottomSheet';
 import { usePopupActions } from '../../../hooks/usePopupActions';
+import { deleteDailyGreeting } from '../../../api/rooms/deleteDailyGreeting';
 import {
   MessageList as StyledMessageList,
   DateGroup,
@@ -24,6 +25,7 @@ interface MessageListProps {
   currentUserId?: string;
   onMessageDelete?: (messageId: string) => void;
   isRealTimeMode?: boolean;
+  roomId?: number;
 }
 
 export interface MessageListRef {
@@ -35,6 +37,8 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
     {
       messages: initialMessages,
       currentUserId = 'user.01',
+      onMessageDelete,
+      roomId,
     },
     ref,
   ) => {
@@ -100,12 +104,51 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
       setSelectedMessageId(null);
     };
 
-    const handleDelete = () => {
-      if (selectedMessageId) {
-        // TODO: 실제 삭제 API 연동 필요
-        console.log(`메시지 ID ${selectedMessageId} 삭제 요청 (API 개발 대기중)`);
+    const handleDelete = async () => {
+      if (selectedMessageId && roomId) {
+        try {
+          // API에서는 attendanceCheckId가 필요하므로 selectedMessageId를 사용
+          const attendanceCheckId = parseInt(selectedMessageId);
+          
+          const result = await deleteDailyGreeting(roomId, attendanceCheckId);
+          
+          if (result.isSuccess) {
+            // 로컬 상태에서 메시지 제거
+            setMessages(prevMessages => 
+              prevMessages.filter(msg => msg.id !== selectedMessageId)
+            );
+            
+            // 부모 컴포넌트에 삭제 알림
+            if (onMessageDelete) {
+              onMessageDelete(selectedMessageId);
+            }
+            
+            openSnackbar({
+              message: '오늘의 한마디가 삭제되었습니다.',
+              variant: 'top',
+              isError: false,
+              onClose: () => {},
+            });
+          } else {
+            openSnackbar({
+              message: result.message || '삭제에 실패했습니다.',
+              variant: 'top',
+              isError: true,
+              onClose: () => {},
+            });
+          }
+        } catch (error) {
+          console.error('삭제 오류:', error);
+          openSnackbar({
+            message: '삭제 중 오류가 발생했습니다.',
+            variant: 'top',
+            isError: true,
+            onClose: () => {},
+          });
+        }
+      } else if (!roomId) {
         openSnackbar({
-          message: '삭제 기능은 현재 개발 중입니다.',
+          message: '방 정보가 없습니다.',
           variant: 'top',
           isError: true,
           onClose: () => {},
