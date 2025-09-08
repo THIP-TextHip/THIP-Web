@@ -67,7 +67,8 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
   }, [pollOptions]);
 
   // 투표 옵션 클릭 핸들러
-  const handleOptionClick = async (option: PollOption) => {
+  const handleOptionClick = async (e: React.MouseEvent, option: PollOption) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
     if (isVoting || !roomId || shouldBlur) return;
 
     setIsVoting(true);
@@ -152,7 +153,7 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
           <PollOptionStyled 
             key={option.id} 
             isHighest={hasVotes && option.isHighest}
-            onClick={shouldBlur ? undefined : () => handleOptionClick(option)}
+            onClick={shouldBlur ? undefined : (e) => handleOptionClick(e, option)}
             style={{ 
               cursor: shouldBlur ? 'default' : (isVoting ? 'not-allowed' : 'pointer'),
               opacity: shouldBlur ? 1 : (isVoting ? 0.7 : 1),
