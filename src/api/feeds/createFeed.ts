@@ -6,6 +6,7 @@ export interface CreateFeedBody {
   contentBody: string;
   isPublic: boolean;
   tagList?: string[];
+  imageUrls?: string[];
 }
 
 /** 성공 응답 */
@@ -29,27 +30,12 @@ export type CreateFeedResponse = CreateFeedSuccess | CreateFeedFail;
 
 /**
  * 피드 작성 API
- * - multipart/form-data
- *   - request: application/json (Blob로 감싸 전송)
- *   - images: File[] (선택값, 없으면 미첨부)
+ * - application/json (presigned URL 방식)
+ * - imageUrls: 미리 S3에 업로드한 이미지의 CloudFront URL 목록
  */
 export const createFeed = async (
   body: CreateFeedBody,
-  images?: File[],
 ): Promise<CreateFeedResponse> => {
-  const form = new FormData();
-
-  // request 파트(JSON) - 필수
-  form.append('request', new Blob([JSON.stringify(body)], { type: 'application/json' }));
-
-  // images 파트들 - 선택
-  if (images && images.length > 0) {
-    images.forEach(file => form.append('images', file));
-  }
-
-  const { data } = await apiClient.post<CreateFeedResponse>('/feeds', form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-
+  const { data } = await apiClient.post<CreateFeedResponse>('/feeds', body);
   return data;
 };

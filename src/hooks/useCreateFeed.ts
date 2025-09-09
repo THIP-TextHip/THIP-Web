@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { createFeed, type CreateFeedBody, type CreateFeedResponse } from '@/api/feeds/createFeed';
+import { getPresignedUrl, type PresignedUrlRequest } from '@/api/feeds/getPresignedUrl';
+import { uploadFileToS3 } from '@/api/feeds/uploadToS3';
 import { usePopupActions } from './usePopupActions';
 
 interface UseCreateFeedProps {
@@ -38,6 +40,8 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
         }
       }
 
+      let uploadedImageUrls: string[] = [];
+
       if (images && images.length > 0) {
         // 최대 3장
         if (images.length > 3) {
@@ -67,10 +71,65 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
           });
           return { success: false as const };
         }
+
+        // Presigned URL 발급 요청
+        const presignedRequests: PresignedUrlRequest[] = images.map(file => ({
+          extension: file.name.split('.').pop()?.toLowerCase() || 'jpg',
+          size: file.size,
+        }));
+
+        try {
+          const presignedResponse = await getPresignedUrl(presignedRequests);
+          
+          if (!presignedResponse.isSuccess || !presignedResponse.data) {
+            openSnackbar({
+              message: presignedResponse.message || 'Presigned URL 발급에 실패했습니다.',
+              variant: 'top',
+              onClose: closePopup,
+            });
+            return { success: false as const };
+          }
+
+          // S3에 이미지 업로드
+          const uploadPromises = presignedResponse.data.presignedUrls.map(
+            async (urlData, index) => {
+              const success = await uploadFileToS3(urlData.presignedUrl, images[index]);
+              return success ? urlData.fileUrl : null;
+            }
+          );
+
+          const uploadResults = await Promise.all(uploadPromises);
+          
+          // 업로드 실패한 파일이 있는지 확인
+          if (uploadResults.some(result => result === null)) {
+            openSnackbar({
+              message: '이미지 업로드 중 오류가 발생했습니다.',
+              variant: 'top',
+              onClose: closePopup,
+            });
+            return { success: false as const };
+          }
+
+          uploadedImageUrls = uploadResults.filter((url): url is string => url !== null);
+        } catch (error) {
+          console.error('이미지 업로드 실패:', error);
+          openSnackbar({
+            message: '이미지 업로드 중 오류가 발생했습니다.',
+            variant: 'top',
+            onClose: closePopup,
+          });
+          return { success: false as const };
+        }
       }
       // ===== 선검증 끝 =====
 
-      const res: CreateFeedResponse = await createFeed(body, images);
+      // 피드 생성 요청에 업로드된 이미지 URL 포함
+      const feedBody: CreateFeedBody = {
+        ...body,
+        ...(uploadedImageUrls.length > 0 && { imageUrls: uploadedImageUrls }),
+      };
+
+      const res: CreateFeedResponse = await createFeed(feedBody);
 
       if (res.isSuccess) {
         openSnackbar({

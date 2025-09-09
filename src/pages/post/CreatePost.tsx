@@ -101,7 +101,7 @@ const CreatePost = () => {
 
     const candidates = makeIsbnCandidates(selectedBook!.isbn);
 
-    // images: 선택값 (없으면 undefined 전달 → FormData에 미첨부)
+    // images: 선택값 (없으면 undefined 전달)
     const filesOrUndefined = selectedPhotos.length ? selectedPhotos : undefined;
 
     // 최대 2회까지(총 3회) 재시도: 13 → (10) → (정규화원본)
