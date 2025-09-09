@@ -35,6 +35,8 @@ interface PageRangeSectionProps {
   onOverallToggle: () => void;
   readingProgress: number;
   isOverviewPossible: boolean;
+  isDisabled?: boolean;
+  hideToggle?: boolean; // 총평 토글 버튼 숨김 여부
 }
 
 const PageRangeSection = ({
@@ -45,6 +47,8 @@ const PageRangeSection = ({
   isOverallEnabled,
   onOverallToggle,
   readingProgress,
+  isDisabled = false,
+  hideToggle = false,
 }: PageRangeSectionProps) => {
   const [hasError, setHasError] = useState(false);
   const [showRedTooltip, setShowRedTooltip] = useState(false);
@@ -112,12 +116,13 @@ const PageRangeSection = ({
                 onChange={handleInputChange}
                 inputMode="numeric"
                 inputLength={pageRange.length || lastRecordedPage.toString().length}
+                disabled={isDisabled}
               />
               <PageSuffix>/{totalPages}p</PageSuffix>
             </InputWrapper>
           )}
         </PageInputContainer>
-        {!isOverallEnabled && pageRange && (
+        {!isOverallEnabled && pageRange && !isDisabled && (
           <CloseButton onClick={handleClear}>
             <img src={closeIcon} alt="지우기" />
           </CloseButton>
@@ -148,21 +153,23 @@ const PageRangeSection = ({
             <TooltipArrow variant="green" />
           </Tooltip>
         )}
-        <ToggleContainer>
-          <LeftSection>
-            <InfoIcon onClick={handleInfoClick}>
-              <img src={infoIcon} alt="정보" />
-            </InfoIcon>
-            <ToggleLabel disabled={!canUseOverall}>총평</ToggleLabel>
-          </LeftSection>
-          <ToggleSwitch
-            active={isOverallEnabled}
-            onClick={handleToggleClick}
-            disabled={!canUseOverall}
-          >
-            <ToggleSlider active={isOverallEnabled} disabled={!canUseOverall} />
-          </ToggleSwitch>
-        </ToggleContainer>
+        {!hideToggle && (
+          <ToggleContainer>
+            <LeftSection>
+              <InfoIcon onClick={handleInfoClick}>
+                <img src={infoIcon} alt="정보" />
+              </InfoIcon>
+              <ToggleLabel disabled={!canUseOverall}>총평</ToggleLabel>
+            </LeftSection>
+            <ToggleSwitch
+              active={isOverallEnabled}
+              onClick={handleToggleClick}
+              disabled={!canUseOverall || isDisabled}
+            >
+              <ToggleSlider active={isOverallEnabled} disabled={!canUseOverall} />
+            </ToggleSwitch>
+          </ToggleContainer>
+        )}
       </TooltipContainer>
     </Section>
   );

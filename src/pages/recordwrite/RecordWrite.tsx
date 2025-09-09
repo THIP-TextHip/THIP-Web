@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import PageRangeSection from '../../components/recordwrite/PageRangeSection';
 import RecordContentSection from '../../components/recordwrite/RecordContentSection';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { Container } from './RecordWrite.styled';
 import { createRecord } from '../../api/record/createRecord';
-import type { CreateRecordRequest } from '../../types/record';
+import { updateRecord } from '../../api/record/updateRecord';
+import type { CreateRecordRequest, UpdateRecordRequest } from '../../types/record';
 import { getBookPage } from '../../api/rooms/getBookPage';
 import { usePopupActions } from '../../hooks/usePopupActions';
 
 const RecordWrite = () => {
   const navigate = useNavigate();
-  const { roomId } = useParams<{ roomId: string }>();
+  const { roomId, recordId } = useParams<{ roomId: string; recordId: string }>();
+  const [searchParams] = useSearchParams();
+
+  // 수정 모드인지 판단
+  const isEditMode = Boolean(recordId);
   const { openSnackbar } = usePopupActions();
 
   const [pageRange, setPageRange] = useState('');
@@ -26,9 +31,9 @@ const RecordWrite = () => {
   const [isOverviewPossible, setIsOverviewPossible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 컴포넌트 마운트 시 책 페이지 정보 조회
+  // 컴포넌트 마운트 시 책 페이지 정보 조회 (생성 모드) 또는 기록 내용 로드 (수정 모드)
   useEffect(() => {
-    const fetchBookPageInfo = async () => {
+    const initializeData = async () => {
       if (!roomId) {
         openSnackbar({
           message: '방 정보를 찾을 수 없습니다.',
@@ -41,6 +46,36 @@ const RecordWrite = () => {
 
       try {
         setIsLoading(true);
+
+        if (isEditMode) {
+          // 수정 모드: 쿼리 파라미터에서 기존 내용과 페이지 정보 로드
+          const existingContent = searchParams.get('content');
+          const existingPageRange = searchParams.get('pageRange');
+          const existingRecordType = searchParams.get('recordType');
+
+          if (existingContent) {
+            setContent(decodeURIComponent(existingContent));
+          }
+
+          if (existingPageRange) {
+            setPageRange(existingPageRange);
+          }
+
+          if (existingRecordType === 'overall') {
+            setIsOverallEnabled(true);
+          }
+
+          // 수정 모드에서도 전체 페이지 수는 필요하므로 책 정보 조회
+          const response = await getBookPage(parseInt(roomId));
+          if (response.isSuccess) {
+            setTotalPages(response.data.totalBookPage);
+          }
+
+          setIsLoading(false);
+          return;
+        }
+
+        // 생성 모드: 책 페이지 정보 조회
         const response = await getBookPage(parseInt(roomId));
 
         if (response.isSuccess) {
@@ -55,9 +90,7 @@ const RecordWrite = () => {
           });
         }
       } catch (error) {
-        console.error('책 페이지 정보 조회 오류:', error);
-
-        let errorMessage = '책 정보를 불러오는 중 오류가 발생했습니다.';
+        let errorMessage = '데이터를 불러오는 중 오류가 발생했습니다.';
 
         if (error && typeof error === 'object' && 'response' in error) {
           const axiosError = error as {
@@ -90,8 +123,8 @@ const RecordWrite = () => {
       }
     };
 
-    fetchBookPageInfo();
-  }, [roomId]);
+    initializeData();
+  }, [roomId, isEditMode]);
 
   // 총평 모드가 변경될 때 isOverviewPossible 체크
   useEffect(() => {
@@ -115,67 +148,100 @@ const RecordWrite = () => {
     setIsSubmitting(true);
 
     try {
-      // 페이지 범위 결정
-      let finalPage: number;
+      if (isEditMode) {
+        // 수정 모드: 내용만 수정
+        if (!recordId) {
+          openSnackbar({
+            message: '기록 정보를 찾을 수 없습니다.',
+            variant: 'top',
+            onClose: () => {},
+          });
+          setIsSubmitting(false);
+          return;
+        }
 
-      if (isOverallEnabled) {
-        // 총평인 경우: 책의 마지막 페이지 또는 전체 페이지 수 사용
-        finalPage = totalPages;
-      } else {
-        // 일반 기록인 경우
-        if (pageRange.trim() !== '') {
-          finalPage = parseInt(pageRange.trim());
+        const updateData: UpdateRecordRequest = {
+          content: content.trim(),
+        };
+
+        const response = await updateRecord(parseInt(roomId), parseInt(recordId), updateData);
+
+        if (response.isSuccess) {
+          openSnackbar({
+            message: '기록 수정을 완료했어요.',
+            variant: 'top',
+            onClose: () => {},
+          });
+
+          // 성공 시 기록장으로 이동
+          navigate(`/rooms/${roomId}/memory`, {
+            replace: true,
+          });
         } else {
-          finalPage = lastRecordedPage;
+          openSnackbar({
+            message: response.message || '기록 수정에 실패했습니다.',
+            variant: 'top',
+            onClose: () => {},
+          });
+          setIsSubmitting(false);
+        }
+      } else {
+        // 생성 모드: 기존 로직 유지
+        // 페이지 범위 결정
+        let finalPage: number;
+
+        if (isOverallEnabled) {
+          // 총평인 경우: 책의 마지막 페이지 또는 전체 페이지 수 사용
+          finalPage = totalPages;
+        } else {
+          // 일반 기록인 경우
+          if (pageRange.trim() !== '') {
+            finalPage = parseInt(pageRange.trim());
+          } else {
+            finalPage = lastRecordedPage;
+          }
+        }
+
+        // 페이지 유효성 검사
+        if (finalPage <= 0 || finalPage > totalPages) {
+          openSnackbar({
+            message: `유효하지 않은 페이지입니다. (1-${totalPages} 사이의 값을 입력해주세요)`,
+            variant: 'top',
+            onClose: () => {},
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
+        // API 요청 데이터 생성
+        const recordData: CreateRecordRequest = {
+          page: finalPage,
+          isOverview: isOverallEnabled,
+          content: content.trim(),
+        };
+
+        // API 호출
+        const response = await createRecord(parseInt(roomId), recordData);
+
+        if (response.isSuccess) {
+          // 성공 시 기록장으로 이동
+          navigate(`/rooms/${roomId}/memory`, {
+            replace: true,
+          });
+        } else {
+          openSnackbar({
+            message: response.message || '기록 작성에 실패했습니다.',
+            variant: 'top',
+            onClose: () => {},
+          });
+          setIsSubmitting(false);
         }
       }
-
-      // 페이지 유효성 검사
-      if (finalPage <= 0 || finalPage > totalPages) {
-        openSnackbar({
-          message: `유효하지 않은 페이지입니다. (1-${totalPages} 사이의 값을 입력해주세요)`,
-          variant: 'top',
-          onClose: () => {},
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      // API 요청 데이터 생성
-      const recordData: CreateRecordRequest = {
-        page: finalPage,
-        isOverview: isOverallEnabled,
-        content: content.trim(),
-      };
-
-      console.log('기록 생성 API 호출:', recordData);
-      console.log('roomId:', roomId);
-
-      // API 호출
-      const response = await createRecord(parseInt(roomId), recordData);
-
-      if (response.isSuccess) {
-        console.log('기록 생성 성공:', response.data);
-
-        // 성공 시 기록장으로 이동
-        navigate(`/rooms/${roomId}/memory`, {
-          replace: true,
-        });
-      } else {
-        // API 에러 응답 처리
-        console.error('기록 생성 실패:', response.message);
-        openSnackbar({
-          message: response.message || '기록 작성에 실패했습니다.',
-          variant: 'top',
-          onClose: () => {},
-        });
-        setIsSubmitting(false);
-      }
     } catch (error) {
-      console.error('기록 저장 실패:', error);
-
       // 에러 타입에 따른 메시지 처리
-      let errorMessage = '기록 저장 중 오류가 발생했습니다.';
+      let errorMessage = isEditMode
+        ? '기록 수정 중 오류가 발생했습니다.'
+        : '기록 저장 중 오류가 발생했습니다.';
 
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as {
@@ -192,9 +258,9 @@ const RecordWrite = () => {
         } else if (axiosError.response?.data?.code === 400) {
           errorMessage = '입력값을 확인해 주세요.';
         } else if (axiosError.response?.data?.code === 403) {
-          errorMessage = '방 접근 권한이 없습니다.';
+          errorMessage = '접근 권한이 없습니다.';
         } else if (axiosError.response?.data?.code === 404) {
-          errorMessage = '존재하지 않는 방입니다.';
+          errorMessage = '존재하지 않는 데이터입니다.';
         }
       }
 
@@ -213,7 +279,7 @@ const RecordWrite = () => {
       <>
         <TitleHeader
           leftIcon={<img src={leftArrow} alt="뒤로가기" />}
-          title="기록 작성"
+          title={isEditMode ? '기록 수정' : '기록 작성'}
           onLeftClick={handleBackClick}
         />
         <Container>
@@ -237,7 +303,7 @@ const RecordWrite = () => {
     <>
       <TitleHeader
         leftIcon={<img src={leftArrow} alt="뒤로가기" />}
-        title="기록 작성"
+        title={isEditMode ? '기록 수정' : '기록 작성'}
         rightButton={<div className="complete">완료</div>}
         onLeftClick={handleBackClick}
         onRightClick={handleCompleteClick}
@@ -253,8 +319,14 @@ const RecordWrite = () => {
           onOverallToggle={() => setIsOverallEnabled(prev => !prev)}
           readingProgress={isOverviewPossible ? 80 : 70} // 총평 가능하면 80% 이상으로 표시
           isOverviewPossible={isOverviewPossible}
+          isDisabled={isEditMode} // 수정 모드일 때 비활성화
+          hideToggle={isEditMode} // 수정 모드일 때 총평 토글 숨김
         />
-        <RecordContentSection content={content} onContentChange={setContent} />
+        <RecordContentSection
+          content={content}
+          onContentChange={setContent}
+          autoFocus={isEditMode}
+        />
       </Container>
     </>
   );

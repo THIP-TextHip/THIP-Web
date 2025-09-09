@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import PageRangeSection from '../../components/recordwrite/PageRangeSection';
 import PollCreationSection from '../../components/pollwrite/PollCreationSection';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { Container } from './PollWrite.styled';
 import { createVote } from '../../api/record/createVote';
-import type { CreateVoteRequest } from '../../types/record';
+import { updateVote } from '../../api/record/updateVote';
+import type { CreateVoteRequest, UpdateVoteRequest } from '../../types/record';
 import { getBookPage } from '../../api/rooms/getBookPage';
 import { usePopupActions } from '../../hooks/usePopupActions';
 
 const PollWrite = () => {
   const navigate = useNavigate();
-  const { roomId } = useParams<{ roomId: string }>();
+  const { roomId, voteId } = useParams<{ roomId: string; voteId: string }>();
+  const [searchParams] = useSearchParams();
+  
+  // 수정 모드인지 판단
+  const isEditMode = Boolean(voteId);
   const { openSnackbar } = usePopupActions();
 
   const [pageRange, setPageRange] = useState('');
@@ -27,9 +32,9 @@ const PollWrite = () => {
   const [isOverviewPossible, setIsOverviewPossible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 컴포넌트 마운트 시 책 페이지 정보 조회
+  // 컴포넌트 마운트 시 책 페이지 정보 조회 (생성 모드) 또는 투표 내용 로드 (수정 모드)
   useEffect(() => {
-    const fetchBookPageInfo = async () => {
+    const initializeData = async () => {
       if (!roomId) {
         openSnackbar({
           message: '방 정보를 찾을 수 없습니다.',
@@ -42,6 +47,46 @@ const PollWrite = () => {
 
       try {
         setIsLoading(true);
+        
+        if (isEditMode) {
+          // 수정 모드: 쿼리 파라미터에서 기존 내용과 페이지 정보, 투표 옵션 로드
+          const existingContent = searchParams.get('content');
+          const existingPageRange = searchParams.get('pageRange');
+          const existingRecordType = searchParams.get('recordType');
+          const existingOptions = searchParams.get('options');
+          
+          if (existingContent) {
+            setPollContent(decodeURIComponent(existingContent));
+          }
+          
+          if (existingPageRange) {
+            setPageRange(existingPageRange);
+          }
+          
+          if (existingRecordType === 'overall') {
+            setIsOverallEnabled(true);
+          }
+          
+          if (existingOptions) {
+            try {
+              const options = JSON.parse(decodeURIComponent(existingOptions));
+              setPollOptions(options);
+            } catch (e) {
+              console.error('투표 옵션 파싱 오류:', e);
+            }
+          }
+          
+          // 수정 모드에서도 전체 페이지 수는 필요하므로 책 정보 조회
+          const response = await getBookPage(parseInt(roomId));
+          if (response.isSuccess) {
+            setTotalPages(response.data.totalBookPage);
+          }
+          
+          setIsLoading(false);
+          return;
+        }
+        
+        // 생성 모드: 책 페이지 정보 조회
         const response = await getBookPage(parseInt(roomId));
 
         if (response.isSuccess) {
@@ -56,9 +101,9 @@ const PollWrite = () => {
           });
         }
       } catch (error) {
-        console.error('책 페이지 정보 조회 오류:', error);
+        console.error('데이터 로드 오류:', error);
 
-        let errorMessage = '책 정보를 불러오는 중 오류가 발생했습니다.';
+        let errorMessage = '데이터를 불러오는 중 오류가 발생했습니다.';
 
         if (error && typeof error === 'object' && 'response' in error) {
           const axiosError = error as {
@@ -91,8 +136,8 @@ const PollWrite = () => {
       }
     };
 
-    fetchBookPageInfo();
-  }, [roomId]);
+    initializeData();
+  }, [roomId, isEditMode]);
 
   // 총평 모드가 변경될 때 isOverviewPossible 체크
   useEffect(() => {
@@ -116,47 +161,92 @@ const PollWrite = () => {
     setIsSubmitting(true);
 
     try {
-      // 투표 옵션 필터링 (빈 옵션 제거)
-      const validOptions = pollOptions.filter(option => option.trim() !== '');
-
-      if (validOptions.length < 2) {
-        openSnackbar({
-          message: '투표 옵션은 최소 2개 이상이어야 합니다.',
-          variant: 'top',
-          onClose: () => {},
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      // 페이지 범위 결정
-      let finalPage: number;
-
-      if (isOverallEnabled) {
-        // 총평인 경우: 책의 마지막 페이지 또는 전체 페이지 수 사용
-        finalPage = totalPages;
-      } else {
-        // 일반 투표인 경우
-        if (pageRange.trim() !== '') {
-          finalPage = parseInt(pageRange.trim());
-        } else {
-          finalPage = lastRecordedPage;
+      if (isEditMode) {
+        // 수정 모드: 내용만 수정
+        if (!voteId) {
+          openSnackbar({
+            message: '투표 정보를 찾을 수 없습니다.',
+            variant: 'top',
+            onClose: () => {},
+          });
+          setIsSubmitting(false);
+          return;
         }
-      }
 
-      // 페이지 유효성 검사
-      if (finalPage <= 0 || finalPage > totalPages) {
-        openSnackbar({
-          message: `유효하지 않은 페이지입니다. (1-${totalPages} 사이의 값을 입력해주세요)`,
-          variant: 'top',
-          onClose: () => {},
-        });
-        setIsSubmitting(false);
-        return;
-      }
+        const updateData: UpdateVoteRequest = {
+          content: pollContent.trim(),
+        };
 
-      // API 요청 데이터 생성
-      const voteData: CreateVoteRequest = {
+        console.log('투표 수정 API 호출:', updateData);
+        console.log('roomId:', roomId, 'voteId:', voteId);
+
+        const response = await updateVote(parseInt(roomId), parseInt(voteId), updateData);
+
+        if (response.isSuccess) {
+          console.log('투표 수정 성공:', response.data);
+          
+          openSnackbar({
+            message: '투표 수정을 완료했어요.',
+            variant: 'top',
+            onClose: () => {},
+          });
+
+          // 성공 시 기록장으로 이동
+          navigate(`/rooms/${roomId}/memory`, {
+            replace: true,
+          });
+        } else {
+          console.error('투표 수정 실패:', response.message);
+          openSnackbar({
+            message: response.message || '투표 수정에 실패했습니다.',
+            variant: 'top',
+            onClose: () => {},
+          });
+          setIsSubmitting(false);
+        }
+      } else {
+        // 생성 모드: 기존 로직 유지
+        // 투표 옵션 필터링 (빈 옵션 제거)
+        const validOptions = pollOptions.filter(option => option.trim() !== '');
+
+        if (validOptions.length < 2) {
+          openSnackbar({
+            message: '투표 옵션은 최소 2개 이상이어야 합니다.',
+            variant: 'top',
+            onClose: () => {},
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
+        // 페이지 범위 결정
+        let finalPage: number;
+
+        if (isOverallEnabled) {
+          // 총평인 경우: 책의 마지막 페이지 또는 전체 페이지 수 사용
+          finalPage = totalPages;
+        } else {
+          // 일반 투표인 경우
+          if (pageRange.trim() !== '') {
+            finalPage = parseInt(pageRange.trim());
+          } else {
+            finalPage = lastRecordedPage;
+          }
+        }
+
+        // 페이지 유효성 검사
+        if (finalPage <= 0 || finalPage > totalPages) {
+          openSnackbar({
+            message: `유효하지 않은 페이지입니다. (1-${totalPages} 사이의 값을 입력해주세요)`,
+            variant: 'top',
+            onClose: () => {},
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
+        // API 요청 데이터 생성
+        const voteData: CreateVoteRequest = {
         page: finalPage,
         isOverview: isOverallEnabled,
         content: pollContent.trim(),
@@ -186,11 +276,12 @@ const PollWrite = () => {
         });
         setIsSubmitting(false);
       }
+      }
     } catch (error) {
       console.error('투표 저장 실패:', error);
 
       // 에러 타입에 따른 메시지 처리
-      let errorMessage = '투표 저장 중 오류가 발생했습니다.';
+      let errorMessage = isEditMode ? '투표 수정 중 오류가 발생했습니다.' : '투표 저장 중 오류가 발생했습니다.';
 
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as {
@@ -228,7 +319,7 @@ const PollWrite = () => {
       <>
         <TitleHeader
           leftIcon={<img src={leftArrow} alt="뒤로가기" />}
-          title="투표 작성"
+          title={isEditMode ? "투표 수정" : "투표 작성"}
           onLeftClick={handleBackClick}
         />
         <Container>
@@ -252,7 +343,7 @@ const PollWrite = () => {
     <>
       <TitleHeader
         leftIcon={<img src={leftArrow} alt="뒤로가기" />}
-        title="투표 작성"
+        title={isEditMode ? "투표 수정" : "투표 작성"}
         rightButton={<div className="complete">완료</div>}
         onLeftClick={handleBackClick}
         onRightClick={handleCompleteClick}
@@ -268,12 +359,16 @@ const PollWrite = () => {
           onOverallToggle={() => setIsOverallEnabled(prev => !prev)}
           readingProgress={isOverviewPossible ? 80 : 70} // 총평 가능하면 80% 이상으로 표시
           isOverviewPossible={isOverviewPossible}
+          isDisabled={isEditMode} // 수정 모드일 때 비활성화
+          hideToggle={isEditMode} // 수정 모드일 때 총평 토글 숨김
         />
         <PollCreationSection
           content={pollContent}
           onContentChange={setPollContent}
           options={pollOptions}
           onOptionsChange={setPollOptions}
+          isEditMode={isEditMode}
+          autoFocus={isEditMode}
         />
       </Container>
     </>
