@@ -15,7 +15,7 @@ const RecordWrite = () => {
   const navigate = useNavigate();
   const { roomId, recordId } = useParams<{ roomId: string; recordId: string }>();
   const [searchParams] = useSearchParams();
-  
+
   // 수정 모드인지 판단
   const isEditMode = Boolean(recordId);
   const { openSnackbar } = usePopupActions();
@@ -24,7 +24,6 @@ const RecordWrite = () => {
   const [content, setContent] = useState('');
   const [isOverallEnabled, setIsOverallEnabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
 
   // API에서 받아올 데이터
   const [totalPages, setTotalPages] = useState(0);
@@ -47,35 +46,35 @@ const RecordWrite = () => {
 
       try {
         setIsLoading(true);
-        
+
         if (isEditMode) {
           // 수정 모드: 쿼리 파라미터에서 기존 내용과 페이지 정보 로드
           const existingContent = searchParams.get('content');
           const existingPageRange = searchParams.get('pageRange');
           const existingRecordType = searchParams.get('recordType');
-          
+
           if (existingContent) {
             setContent(decodeURIComponent(existingContent));
           }
-          
+
           if (existingPageRange) {
             setPageRange(existingPageRange);
           }
-          
+
           if (existingRecordType === 'overall') {
             setIsOverallEnabled(true);
           }
-          
+
           // 수정 모드에서도 전체 페이지 수는 필요하므로 책 정보 조회
           const response = await getBookPage(parseInt(roomId));
           if (response.isSuccess) {
             setTotalPages(response.data.totalBookPage);
           }
-          
+
           setIsLoading(false);
           return;
         }
-        
+
         // 생성 모드: 책 페이지 정보 조회
         const response = await getBookPage(parseInt(roomId));
 
@@ -91,8 +90,6 @@ const RecordWrite = () => {
           });
         }
       } catch (error) {
-        console.error('데이터 로드 오류:', error);
-
         let errorMessage = '데이터를 불러오는 중 오류가 발생했습니다.';
 
         if (error && typeof error === 'object' && 'response' in error) {
@@ -167,14 +164,9 @@ const RecordWrite = () => {
           content: content.trim(),
         };
 
-        console.log('기록 수정 API 호출:', updateData);
-        console.log('roomId:', roomId, 'recordId:', recordId);
-
         const response = await updateRecord(parseInt(roomId), parseInt(recordId), updateData);
 
         if (response.isSuccess) {
-          console.log('기록 수정 성공:', response.data);
-          
           openSnackbar({
             message: '기록 수정을 완료했어요.',
             variant: 'top',
@@ -186,7 +178,6 @@ const RecordWrite = () => {
             replace: true,
           });
         } else {
-          console.error('기록 수정 실패:', response.message);
           openSnackbar({
             message: response.message || '기록 수정에 실패했습니다.',
             variant: 'top',
@@ -229,22 +220,15 @@ const RecordWrite = () => {
           content: content.trim(),
         };
 
-        console.log('기록 생성 API 호출:', recordData);
-        console.log('roomId:', roomId);
-
         // API 호출
         const response = await createRecord(parseInt(roomId), recordData);
 
         if (response.isSuccess) {
-          console.log('기록 생성 성공:', response.data);
-
           // 성공 시 기록장으로 이동
           navigate(`/rooms/${roomId}/memory`, {
             replace: true,
           });
         } else {
-          // API 에러 응답 처리
-          console.error('기록 생성 실패:', response.message);
           openSnackbar({
             message: response.message || '기록 작성에 실패했습니다.',
             variant: 'top',
@@ -254,10 +238,10 @@ const RecordWrite = () => {
         }
       }
     } catch (error) {
-      console.error('기록 저장 실패:', error);
-
       // 에러 타입에 따른 메시지 처리
-      let errorMessage = isEditMode ? '기록 수정 중 오류가 발생했습니다.' : '기록 저장 중 오류가 발생했습니다.';
+      let errorMessage = isEditMode
+        ? '기록 수정 중 오류가 발생했습니다.'
+        : '기록 저장 중 오류가 발생했습니다.';
 
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as {
@@ -295,7 +279,7 @@ const RecordWrite = () => {
       <>
         <TitleHeader
           leftIcon={<img src={leftArrow} alt="뒤로가기" />}
-          title={isEditMode ? "기록 수정" : "기록 작성"}
+          title={isEditMode ? '기록 수정' : '기록 작성'}
           onLeftClick={handleBackClick}
         />
         <Container>
@@ -319,7 +303,7 @@ const RecordWrite = () => {
     <>
       <TitleHeader
         leftIcon={<img src={leftArrow} alt="뒤로가기" />}
-        title={isEditMode ? "기록 수정" : "기록 작성"}
+        title={isEditMode ? '기록 수정' : '기록 작성'}
         rightButton={<div className="complete">완료</div>}
         onLeftClick={handleBackClick}
         onRightClick={handleCompleteClick}
@@ -338,9 +322,9 @@ const RecordWrite = () => {
           isDisabled={isEditMode} // 수정 모드일 때 비활성화
           hideToggle={isEditMode} // 수정 모드일 때 총평 토글 숨김
         />
-        <RecordContentSection 
-          content={content} 
-          onContentChange={setContent} 
+        <RecordContentSection
+          content={content}
+          onContentChange={setContent}
           autoFocus={isEditMode}
         />
       </Container>
