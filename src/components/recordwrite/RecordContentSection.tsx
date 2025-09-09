@@ -10,9 +10,14 @@ import {
 interface RecordContentSectionProps {
   content: string;
   onContentChange: (value: string) => void;
+  autoFocus?: boolean; // 자동 포커스 및 커서 위치 설정 여부
 }
 
-const RecordContentSection = ({ content, onContentChange }: RecordContentSectionProps) => {
+const RecordContentSection = ({
+  content,
+  onContentChange,
+  autoFocus = false,
+}: RecordContentSectionProps) => {
   const maxLength = 500;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -31,10 +36,19 @@ const RecordContentSection = ({ content, onContentChange }: RecordContentSection
     adjustHeight();
   }, [content]);
 
-  // 컴포넌트 마운트 시 초기 높이 설정
+  // 컴포넌트 마운트 시 초기 높이 설정 및 autoFocus 처리
   useEffect(() => {
     adjustHeight();
-  }, []);
+    
+    // autoFocus가 true이고 textarea가 있으면 포커스 및 커서를 끝으로 이동
+    if (autoFocus && textareaRef.current) {
+      const textarea = textareaRef.current;
+      textarea.focus();
+      // 커서를 텍스트 끝으로 이동
+      const length = textarea.value.length;
+      textarea.setSelectionRange(length, length);
+    }
+  }, [autoFocus]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onContentChange(e.target.value);

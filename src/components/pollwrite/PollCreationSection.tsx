@@ -17,6 +17,8 @@ interface PollCreationSectionProps {
   onContentChange: (value: string) => void;
   options: string[];
   onOptionsChange: (options: string[]) => void;
+  isEditMode?: boolean; // 수정 모드 여부
+  autoFocus?: boolean; // 자동 포커스 및 커서 위치 설정 여부
 }
 
 const PollCreationSection = ({
@@ -24,11 +26,14 @@ const PollCreationSection = ({
   onContentChange,
   options,
   onOptionsChange,
+  isEditMode = false,
+  autoFocus = false,
 }: PollCreationSectionProps) => {
   const maxContentLength = 20;
   const maxOptions = 5;
   const [focusStates, setFocusStates] = useState<boolean[]>(options.map(() => false));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const contentInputRef = useRef<HTMLInputElement>(null);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -87,10 +92,22 @@ const PollCreationSection = ({
     }
   }, [options.length, focusStates.length]);
 
+  // autoFocus 처리
+  useEffect(() => {
+    if (autoFocus && contentInputRef.current) {
+      const input = contentInputRef.current;
+      input.focus();
+      // 커서를 텍스트 끝으로 이동
+      const length = input.value.length;
+      input.setSelectionRange(length, length);
+    }
+  }, [autoFocus]);
+
   return (
     <Section>
       <PollContentContainer>
         <PollInput
+          ref={contentInputRef}
           placeholder="투표 내용을 20자 이내로 입력하세요."
           value={content}
           onChange={handleContentChange}
@@ -111,23 +128,30 @@ const PollCreationSection = ({
               onFocus={() => handleOptionFocus(index)}
               onBlur={() => handleOptionBlur(index)}
               maxLength={20}
+              disabled={isEditMode}
+              readOnly={isEditMode}
             />
-            {/* 텍스트가 있을 때는 X 아이콘으로 텍스트 삭제 */}
-            {option.trim() !== '' && (
-              <DeleteButton onClick={() => handleClearOption(index)}>
-                <img src={closeIcon} alt="텍스트 삭제" />
-              </DeleteButton>
-            )}
-            {/* 텍스트가 없고 3번째 항목(index >= 2)부터만 쓰레기통 아이콘으로 항목 삭제 */}
-            {option.trim() === '' && index >= 2 && (
-              <DeleteButton onClick={() => handleRemoveOption(index)}>
-                <img src={trashIcon} alt="항목 삭제" />
-              </DeleteButton>
+            {/* 수정 모드가 아니어야만 삭제 버튼 표시 */}
+            {!isEditMode && (
+              <>
+                {/* 텍스트가 있을 때는 X 아이콘으로 텍스트 삭제 */}
+                {option.trim() !== '' && (
+                  <DeleteButton onClick={() => handleClearOption(index)}>
+                    <img src={closeIcon} alt="텍스트 삭제" />
+                  </DeleteButton>
+                )}
+                {/* 텍스트가 없고 3번째 항목(index >= 2)부터만 쓰레기통 아이콘으로 항목 삭제 */}
+                {option.trim() === '' && index >= 2 && (
+                  <DeleteButton onClick={() => handleRemoveOption(index)}>
+                    <img src={trashIcon} alt="항목 삭제" />
+                  </DeleteButton>
+                )}
+              </>
             )}
           </OptionInputContainer>
         ))}
 
-        {options.length < maxOptions && (
+        {!isEditMode && options.length < maxOptions && (
           <AddOptionButton onClick={handleAddOption}>항목 추가</AddOptionButton>
         )}
       </PollOptionsContainer>

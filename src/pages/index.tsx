@@ -64,6 +64,7 @@ const Router = () => {
         <Route path="memory/record/write/:roomId" element={<RecordWrite />} />
         <Route path="memory/record/edit/:roomId/:recordId" element={<RecordWrite />} />
         <Route path="memory/poll/write/:roomId" element={<PollWrite />} />
+        <Route path="memory/poll/edit/:roomId/:voteId" element={<PollWrite />} />
         <Route path="feed" element={<Feed />} />
         <Route path="feed/search" element={<UserSearch />} />
         <Route path="feed/:feedId" element={<FeedDetailPage />} />

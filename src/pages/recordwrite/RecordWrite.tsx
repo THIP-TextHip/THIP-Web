@@ -338,7 +338,11 @@ const RecordWrite = () => {
           isDisabled={isEditMode} // 수정 모드일 때 비활성화
           hideToggle={isEditMode} // 수정 모드일 때 총평 토글 숨김
         />
-        <RecordContentSection content={content} onContentChange={setContent} />
+        <RecordContentSection 
+          content={content} 
+          onContentChange={setContent} 
+          autoFocus={isEditMode}
+        />
       </Container>
     </>
   );
