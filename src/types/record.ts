@@ -51,6 +51,16 @@ export interface VoteData {
   voteItems: VoteItemResult[]; // 투표 결과 리스트
 }
 
+// 기록 수정 요청 데이터 타입
+export interface UpdateRecordRequest {
+  content: string; // 수정할 기록 내용
+}
+
+// 기록 수정 응답 데이터 타입
+export interface UpdateRecordData {
+  roomId: number; // 방 ID
+}
+
 // 공통 API 응답 타입
 export interface ApiResponse<T> {
   isSuccess: boolean;
