@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "dev:lan": "vite --host 0.0.0.0 --port 5173"
   },
   "dependencies": {
     "@emotion/css": "^11.13.5",

@@ -6,7 +6,7 @@
         overscroll-behavior: none;
         touch-action: pan-y pinch-zoom;
       }
-      
+
       * {
         overscroll-behavior-x: none;
       }
@@ -15,50 +15,78 @@
       // 좌우 스와이프 네비게이션 완전 차단
       let startX = null;
       let startY = null;
-      
-      document.addEventListener('touchstart', function(e) {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-      }, { passive: false });
-      
-      document.addEventListener('touchmove', function(e) {
-        if (startX === null || startY === null) return;
-        
-        let currentX = e.touches[0].clientX;
-        let currentY = e.touches[0].clientY;
-        let diffX = Math.abs(currentX - startX);
-        let diffY = Math.abs(currentY - startY);
-        
-        // 수평 스와이프 감지시 무조건 차단
-        if (diffX > 5 && diffX > diffY) {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-      }, { passive: false, capture: true });
-      
-      document.addEventListener('touchend', function(e) {
-        startX = null;
-        startY = null;
-      }, { passive: false });
-      
-      document.addEventListener('touchcancel', function(e) {
-        startX = null;
-        startY = null;
-      }, { passive: false });
-      
+
+      document.addEventListener(
+        'touchstart',
+        function (e) {
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+        },
+        { passive: false },
+      );
+
+      document.addEventListener(
+        'touchmove',
+        function (e) {
+          if (startX === null || startY === null) return;
+
+          let currentX = e.touches[0].clientX;
+          let currentY = e.touches[0].clientY;
+          let diffX = Math.abs(currentX - startX);
+          let diffY = Math.abs(currentY - startY);
+
+          // 수평 스와이프 감지시 무조건 차단
+          if (diffX > 5 && diffX > diffY) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+        },
+        { passive: false, capture: true },
+      );
+
+      document.addEventListener(
+        'touchend',
+        function (e) {
+          startX = null;
+          startY = null;
+        },
+        { passive: false },
+      );
+
+      document.addEventListener(
+        'touchcancel',
+        function (e) {
+          startX = null;
+          startY = null;
+        },
+        { passive: false },
+      );
+
       // 추가적인 제스처 차단
-      document.addEventListener('gesturestart', function(e) {
-        e.preventDefault();
-      }, { passive: false });
-      
-      document.addEventListener('gesturechange', function(e) {
-        e.preventDefault();
-      }, { passive: false });
-      
-      document.addEventListener('gestureend', function(e) {
-        e.preventDefault();
-      }, { passive: false });
+      document.addEventListener(
+        'gesturestart',
+        function (e) {
+          e.preventDefault();
+        },
+        { passive: false },
+      );
+
+      document.addEventListener(
+        'gesturechange',
+        function (e) {
+          e.preventDefault();
+        },
+        { passive: false },
+      );
+
+      document.addEventListener(
+        'gestureend',
+        function (e) {
+          e.preventDefault();
+        },
+        { passive: false },
+      );
     </script>
     <script>
       (function (m, a, z, e) {
@@ -86,6 +114,15 @@
         '77efe927-4d36-4c1a-9e5f-b47c9b90fff9',
       );
     </script>
+    <script>
+      function applyVv() {
+        const vv = window.visualViewport;
+        const h = vv ? vv.height : window.innerHeight;
+        document.documentElement.style.setProperty('--vvh', `${h}px`);
+      }
+      applyVv();
+      (window.visualViewport || window).addEventListener('resize', applyVv);
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/assets/custom_favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -94,6 +131,7 @@
     <meta property="og:description" content="커뮤니티형 독서 기록 플랫폼. 띱. THIP." />
     <meta property="og:image" content="https://thip.co.kr/assets/thumbnail.jpeg" />
     <meta property="og:url" content="https://thip.co.kr" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   </head>
   <body>
     <div id="root"></div>

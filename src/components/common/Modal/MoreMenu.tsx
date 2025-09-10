@@ -51,15 +51,23 @@ const MoreMenu = ({ onEdit, onDelete, onClose, onReport, isWriter, type }: MoreM
 
 const Overlay = styled.div`
   position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
+  inset: 0;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  width: 100vw;
+
+  /* ⬇︎ 핵심: 실제 보이는 높이로 맞추기 (dvh 폴백 포함) */
   height: 100vh;
+  @supports (height: 100dvh) {
+    height: 100dvh;
+  }
+  /* JS 폴백 변수 */
+  height: var(--vvh, 100dvh);
+
+  /* ⬇︎ 하단 안전영역만큼 띄워서 탭바/홈바를 피함 */
+  padding-bottom: env(safe-area-inset-bottom, 0);
+
+  width: 100vw;
   background-color: rgba(18, 18, 18, 0.1);
   backdrop-filter: blur(2.5px);
   z-index: 1200;
@@ -75,6 +83,7 @@ const ReportContainer = styled.div`
   height: 90px;
   padding: 20px;
   border-radius: 12px 12px 0px 0px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
   background-color: ${colors.darkgrey.main};
 `;
 
