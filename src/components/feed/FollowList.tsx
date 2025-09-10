@@ -164,7 +164,7 @@ const EmptyFollowerContainer = styled.div`
   margin: 12px 0;
   justify-content: space-between;
   align-items: center;
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: var(--color-darkgrey-dark);
 
   color: var(--color-grey-100);

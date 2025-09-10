@@ -2,7 +2,7 @@ import type { UserProfileItemProps } from '@/types/user';
 
 export const mockUserList: UserProfileItemProps[] = [
   {
-    profileImgUrl: 'https://placehold.co/36x36',
+    profileImageUrl: 'https://placehold.co/36x36',
     nickname: 'ThipOther',
     aliasName: '칭호칭호',
     aliasColor: '#FF8BAC',
@@ -11,7 +11,7 @@ export const mockUserList: UserProfileItemProps[] = [
     isFollowing: false,
   },
   {
-    profileImgUrl: 'https://placehold.co/36x36',
+    profileImageUrl: 'https://placehold.co/36x36',
     nickname: '하위',
     aliasName: '칭호칭호',
     aliasColor: '#FF8BAC',
@@ -20,7 +20,7 @@ export const mockUserList: UserProfileItemProps[] = [
     isFollowing: true,
   },
   {
-    profileImgUrl: 'https://placehold.co/36x36',
+    profileImageUrl: 'https://placehold.co/36x36',
     nickname: '책읽으러왔음',
     aliasName: '공식 인플루언서',
     aliasColor: '#A0F8E8',
@@ -29,7 +29,7 @@ export const mockUserList: UserProfileItemProps[] = [
     isFollowing: false,
   },
   {
-    profileImgUrl: 'https://placehold.co/36x36',
+    profileImageUrl: 'https://placehold.co/36x36',
     nickname: 'thip01',
     aliasName: '작가',
     aliasColor: '#A0F8E8',
