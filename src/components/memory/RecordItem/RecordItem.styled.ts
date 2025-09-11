@@ -5,7 +5,7 @@ export const Container = styled.div<{ shouldBlur?: boolean }>`
   background-color: none;
   filter: ${({ shouldBlur }) => (shouldBlur ? 'blur(2px)' : 'none')};
   transition: filter 0.3s ease;
-  pointer-events: ${({ shouldBlur }) => (shouldBlur ? 'none' : 'auto')};
+  position: relative;
 `;
 
 export const UserSection = styled.div`
@@ -19,10 +19,11 @@ export const UserAvatar = styled.div<{ src?: string }>`
   height: 36px;
   border-radius: 50%;
   background-color: ${colors.grey[400]};
-  background-image: ${({ src }) => src ? `url(${src})` : 'none'};
+  background-image: ${({ src }) => (src ? `url(${src})` : 'none')};
   background-size: cover;
   background-position: center;
   margin-right: 8px;
+  border: 0.5px solid ${colors.grey[300]};
 `;
 
 export const UserInfo = styled.div`

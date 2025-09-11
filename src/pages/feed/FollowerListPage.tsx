@@ -126,7 +126,7 @@ const FollowerListPage = () => {
         {userList.map((user, index) => (
           <UserProfileItem
             key={user.userId}
-            profileImgUrl={user.profileImageUrl}
+            profileImageUrl={user.profileImageUrl}
             nickname={user.nickname}
             aliasName={user.aliasName}
             aliasColor={user.aliasColor}

@@ -125,9 +125,32 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   };
 
   const handleEdit = useCallback(() => {
-    // API 개발 전까지 수정 기능 비활성화
-    console.log('수정 기능은 개발 중입니다.');
-  }, []);
+    if (!roomId) return;
+    
+    // 바텀시트 닫기
+    closePopup();
+    
+    if (type === 'poll') {
+      // 투표 수정 페이지로 이동 (투표 정보를 쿼리 파라미터로 전달)
+      const params = new URLSearchParams({
+        content: content,
+        pageRange: pageRange || '',
+        recordType: recordType || 'normal',
+        options: JSON.stringify(pollOptions?.map(option => option.text) || [])
+      });
+      
+      navigate(`/memory/poll/edit/${roomId}/${record.id}?${params.toString()}`);
+    } else {
+      // 기록 수정 페이지로 이동 (기록 정보를 쿼리 파라미터로 전달)
+      const params = new URLSearchParams({
+        content: content,
+        pageRange: pageRange || '',
+        recordType: recordType || 'normal'
+      });
+      
+      navigate(`/memory/record/edit/${roomId}/${record.id}?${params.toString()}`);
+    }
+  }, [roomId, record.id, content, pageRange, recordType, type, pollOptions, navigate, closePopup]);
 
   const handleDelete = useCallback(async () => {
     const currentRoomId = roomId || '1';
@@ -266,7 +289,13 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   }, [openCommentBottomSheet, id, type]);
 
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    // 블라인드된 상태에서는 클릭 이벤트 무시
+    if (shouldBlur) {
+      e.stopPropagation();
+      return;
+    }
+    
     // 클릭으로 더보기 메뉴 표시
     if (isMyRecord) {
       const menuOptions: any = {
@@ -303,11 +332,28 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   return (
     <Container
       onClick={handleClick}
+      shouldBlur={shouldBlur}
       style={{
-        filter: shouldBlur ? 'blur(4px)' : 'none',
         cursor: 'pointer',
+        position: 'relative',
       }}
     >
+      {shouldBlur && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 10,
+            cursor: 'default',
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        />
+      )}
       <UserSection>
         <UserAvatar src={profileImageUrl} />
         <UserInfo>

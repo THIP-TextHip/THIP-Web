@@ -34,6 +34,7 @@ import {
   convertVotesToPolls,
   type Poll,
 } from '@/api/rooms/getRoomPlaying';
+import { leaveRoom } from '@/api/rooms/leaveRoom';
 import rightChevron from '../../assets/group/right-chevron.svg';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
@@ -124,14 +125,50 @@ const ParticipatedGroupDetail = () => {
     openConfirm({
       title: '모임방을 나가시겠어요?',
       disc: '방을 나가시게 되면\n독서메이트들과의 추억이 사라집니다.',
-      onConfirm: () => {
-        console.log('방 나가기 확정');
-        openSnackbar({
-          message: '나가기 기능은 현재 개발 중입니다.',
-          variant: 'top',
-          isError: true,
-          onClose: () => {},
-        });
+      onConfirm: async () => {
+        if (!roomId) return;
+
+        try {
+          const response = await leaveRoom(parseInt(roomId));
+          
+          if (response.isSuccess) {
+            openSnackbar({
+              message: '모임 나가기를 완료했어요.',
+              variant: 'top',
+              isError: false,
+              onClose: () => {},
+            });
+            // 모임 홈으로 이동
+            navigate('/group', { replace: true });
+          } else {
+            // API에서 반환한 에러 메시지 사용
+            openSnackbar({
+              message: response.message,
+              variant: 'top',
+              isError: true,
+              onClose: () => {},
+            });
+          }
+        } catch (error: unknown) {
+          console.error('방 나가기 오류:', error);
+          
+          // 서버 응답이 있는 경우 메시지 사용, 없으면 기본 메시지
+          let errorMessage = '방 나가기 중 오류가 발생했습니다.';
+          
+          if (error && typeof error === 'object' && 'response' in error) {
+            const axiosError = error as { response?: { data?: { message?: string } } };
+            if (axiosError.response?.data?.message) {
+              errorMessage = axiosError.response.data.message;
+            }
+          }
+          
+          openSnackbar({
+            message: errorMessage,
+            variant: 'top',
+            isError: true,
+            onClose: () => {},
+          });
+        }
       },
     });
   };

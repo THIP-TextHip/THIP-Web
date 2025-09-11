@@ -13,12 +13,7 @@ export const MemberItem = styled.div`
   justify-content: space-between;
   padding: 20px;
   cursor: pointer;
-  transition: background-color 0.2s;
   position: relative;
-
-  &:hover {
-    background-color: ${colors.darkgrey['50']};
-  }
 
   &:focus-visible {
     outline: 2px solid ${semanticColors.text.point.green};
@@ -67,8 +62,30 @@ export const MemberName = styled.div`
   font-weight: ${typography.fontWeight.medium};
 `;
 
-export const MemberRole = styled.div`
-  color: ${semanticColors.text.point.green};
+export const MemberRole = styled.div<{ roleType?: string }>`
+  color: ${({ roleType }) => {
+    if (!roleType) return semanticColors.text.point.green;
+    
+    const role = roleType.toLowerCase();
+    
+    if (role.includes('예술') || role.includes('art')) {
+      return semanticColors.text.character.pink;
+    }
+    if (role.includes('문학') || role.includes('literature')) {
+      return semanticColors.text.character.mint;
+    }
+    if (role.includes('사회') || role.includes('sociology')) {
+      return semanticColors.text.character.orange;
+    }
+    if (role.includes('인문') || role.includes('humanities')) {
+      return semanticColors.text.character.skyblue;
+    }
+    if (role.includes('과학') || role.includes('science')) {
+      return semanticColors.text.character.lavender;
+    }
+    
+    return semanticColors.text.point.green;
+  }};
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.regular};
 `;

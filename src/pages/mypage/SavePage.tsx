@@ -358,7 +358,7 @@ const BookItem = styled.div`
   margin: 0 auto;
   display: flex;
   border-bottom: 1px solid ${colors.darkgrey.dark};
-  padding: 12px 20px;
+  padding: 12px;
 
   &:last-child {
     border-bottom: none;

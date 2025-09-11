@@ -3,7 +3,7 @@ import { apiClient } from '../index';
 export interface UserData {
   userId: number;
   nickname: string;
-  profileImgUrl: string;
+  profileImageUrl: string;
   aliasName: string;
   aliasColor: string;
   followerCount: number;
