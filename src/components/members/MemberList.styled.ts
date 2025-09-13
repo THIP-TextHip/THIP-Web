@@ -65,13 +65,13 @@ export const MemberName = styled.div`
 export const MemberRole = styled.div<{ roleType?: string }>`
   color: ${({ roleType }) => {
     if (!roleType) return semanticColors.text.point.green;
-    
+
     const role = roleType.toLowerCase();
-    
+
     if (role.includes('예술') || role.includes('art')) {
       return semanticColors.text.character.pink;
     }
-    if (role.includes('문학') || role.includes('literature')) {
+    if (role.includes('인문') || role.includes('humanities') || role.includes('철학')) {
       return semanticColors.text.character.mint;
     }
     if (role.includes('사회') || role.includes('sociology')) {
@@ -83,7 +83,7 @@ export const MemberRole = styled.div<{ roleType?: string }>`
     if (role.includes('과학') || role.includes('science')) {
       return semanticColors.text.character.lavender;
     }
-    
+
     return semanticColors.text.point.green;
   }};
   font-size: ${typography.fontSize.xs};
