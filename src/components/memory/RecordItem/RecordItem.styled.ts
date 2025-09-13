@@ -3,7 +3,7 @@ import { colors, typography, semanticColors } from '../../../styles/global/globa
 
 export const Container = styled.div<{ shouldBlur?: boolean }>`
   background-color: none;
-  filter: ${({ shouldBlur }) => (shouldBlur ? 'blur(2px)' : 'none')};
+  filter: ${({ shouldBlur }) => (shouldBlur ? 'blur(3px)' : 'none')};
   transition: filter 0.3s ease;
   position: relative;
 `;
