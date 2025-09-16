@@ -47,6 +47,7 @@ export const ProfileImage = styled.div`
   height: 36px;
   border-radius: 50%;
   background-color: ${colors.grey['400']};
+  border: 1px solid #888;
   flex-shrink: 0;
 `;
 
