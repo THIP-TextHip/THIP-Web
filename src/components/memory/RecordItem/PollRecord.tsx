@@ -91,8 +91,9 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
             return {
               ...opt,
               percentage: updatedItem.percentage,
+              count: updatedItem.count,
               isVoted: updatedItem.isVoted,
-              isHighest: updatedItem.percentage === Math.max(...response.data.voteItems.map(item => item.percentage))
+              isHighest: updatedItem.count === Math.max(...response.data.voteItems.map(item => item.count))
             };
           }
           return opt;
@@ -142,8 +143,17 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
     }
   };
 
-  // 아무도 투표하지 않았는지 확인 (모든 옵션이 0%인지 확인)
-  const hasVotes = currentOptions.some(option => option.percentage > 0);
+  // 아무도 투표하지 않았는지 확인 (모든 옵션이 0표인지 확인)
+  const hasVotes = currentOptions.some(option => option.count > 0);
+
+  // 전체 투표수 계산
+  const totalVotes = currentOptions.reduce((sum, option) => sum + option.count, 0);
+
+  // 각 옵션의 퍼센트 계산 (애니메이션용)
+  const getPercentage = (count: number) => {
+    if (totalVotes === 0) return 0;
+    return (count / totalVotes) * 100;
+  };
 
   return (
     <PollSection ref={pollRef}>
@@ -162,7 +172,7 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
           >
             <PollBar>
               <PollBarFill
-                percentage={hasVotes ? option.percentage : 0}
+                percentage={hasVotes ? getPercentage(option.count) : 0}
                 isHighest={hasVotes && option.isHighest}
                 animate={hasVotes && animate}
                 delay={index * 200} // 각 옵션마다 200ms 지연
@@ -177,7 +187,7 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
               </PollText>
               {hasVotes && (
                 <PollPercentage isHighest={hasVotes && option.isHighest}>
-                  {option.percentage}%
+                  {option.count}표
                 </PollPercentage>
               )}
             </PollContent>

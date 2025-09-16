@@ -31,14 +31,18 @@ const convertPostToRecord = (post: Post): Record => {
     isWriter: post.isWriter,
     isLiked: post.isLiked,
     isLocked: post.isLocked, // 블러 처리 여부 추가
-    pollOptions: post.voteItems.map((item, index) => ({
-      id: item.voteItemId.toString(),
-      text: item.itemName,
-      percentage: item.percentage,
-      isHighest: index === 0,
-      voteItemId: item.voteItemId,
-      isVoted: item.isVoted,
-    })),
+    pollOptions: post.voteItems.map((item) => {
+      const maxCount = Math.max(...post.voteItems.map(v => v.count || 0));
+      return {
+        id: item.voteItemId.toString(),
+        text: item.itemName,
+        percentage: item.percentage,
+        count: item.count || 0,
+        isHighest: (item.count || 0) === maxCount && maxCount > 0,
+        voteItemId: item.voteItemId,
+        isVoted: item.isVoted,
+      };
+    }),
   };
 };
 

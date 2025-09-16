@@ -35,6 +35,7 @@ export interface VoteItemResult {
   voteItemId: number; // 투표 아이템 ID
   itemName: string; // 투표 옵션 이름
   percentage: number; // 득표율
+  count: number; // 득표수
   isVoted: boolean; // 현재 사용자가 투표했는지 여부
 }
 

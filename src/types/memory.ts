@@ -3,6 +3,7 @@ export interface VoteItem {
   voteItemId: number;
   itemName: string;
   percentage: number;
+  count: number;
   isVoted: boolean;
 }
 
@@ -82,6 +83,7 @@ export interface PollOption {
   id: string;
   text: string;
   percentage: number;
+  count: number;
   isHighest: boolean;
   voteItemId: number; // 투표 API에 필요한 ID
   isVoted: boolean; // 현재 사용자가 투표했는지 여부
