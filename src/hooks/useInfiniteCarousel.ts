@@ -68,12 +68,19 @@ export function useInfiniteCarousel(groups: Group[], options?: { scaleAmount?: n
       handleScroll();
     };
 
-    const timer = setTimeout(initializeScroll, 0);
+    const timer = setTimeout(initializeScroll, 100);
+
+    const handleResize = () => {
+      setTimeout(initializeScroll, 50);
+    };
+
     container.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize);
 
     return () => {
       clearTimeout(timer);
       container.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
     };
   }, [infiniteGroups.length, handleScroll, middleIndex]);
 

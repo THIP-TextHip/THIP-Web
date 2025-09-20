@@ -105,11 +105,21 @@ const ScrollWrapper = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+
+  @media (max-width: 480px) {
+    padding: 15px 10px;
+  }
 `;
 
 const Item = styled.div`
   flex: 0 0 90%;
   max-width: 640px;
+  min-width: 280px;
   scroll-snap-align: center;
   transition: transform 0.2s;
+
+  @media (max-width: 480px) {
+    flex: 0 0 85%;
+    min-width: 260px;
+  }
 `;
