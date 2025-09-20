@@ -103,7 +103,7 @@ const Text = styled.p`
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   color: ${colors.white};
-  margin: 96px 20px 20px 20px;
+  margin: 20px;
 `;
 
 const Content = styled.div<{ isEmpty?: boolean }>`

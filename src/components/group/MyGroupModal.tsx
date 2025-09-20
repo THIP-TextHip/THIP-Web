@@ -255,7 +255,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
 const TabContainer = styled.div`
   display: flex;
   gap: 8px;
-  margin: 76px 20px 20px 20px;
+  margin: 20px;
 `;
 
 const Tab = styled.button<{ selected: boolean }>`
