@@ -20,7 +20,7 @@ export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>((props, 
           <CardTitle>{group.title}</CardTitle>
           <Participants>
             <img src={peopleImg} alt="" />
-            <span>{group.participants}명 참여</span>
+            <span>{group.participants}명</span>
           </Participants>
         </div>
         <div>
@@ -80,7 +80,7 @@ const Participants = styled.p`
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: ${typography.fontSize.xs};
+  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.medium};
   color: ${colors.grey[300]};
   margin: 8px 0;
