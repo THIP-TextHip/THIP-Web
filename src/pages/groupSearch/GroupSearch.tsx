@@ -2,6 +2,7 @@ import TitleHeader from '@/components/common/TitleHeader';
 import { Modal, Overlay } from '@/components/group/Modal.styles';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import SearchBar from '@/components/search/SearchBar';
+import rightChevron from '../../assets/common/right-Chevron.svg';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import GroupSearchResult from '@/components/search/GroupSearchResult';
@@ -53,6 +54,13 @@ const GroupSearch = () => {
       }
     })();
   }, []);
+
+  // 검색 완료 시 전체 탭 선택
+  useEffect(() => {
+    if (showTabs && searchStatus === 'searched') {
+      setCategory('');
+    }
+  }, [showTabs, searchStatus]);
 
   // searchStatus가 'idle'로 변경될 때 최근 검색어 새로고침
   useEffect(() => {
@@ -241,6 +249,8 @@ const GroupSearch = () => {
     }
   };
 
+  const handleAllRoomsClick = () => {};
+
   useEffect(() => {
     return () => {
       if (searchTimeoutId) clearTimeout(searchTimeoutId);
@@ -288,18 +298,24 @@ const GroupSearch = () => {
             )}
           </>
         ) : (
-          <RecentSearchTabs
-            recentSearches={recentSearches.map(i => i.searchTerm)}
-            handleDelete={async (term: string) => {
-              const x = recentSearches.find(i => i.searchTerm === term);
-              if (!x) return;
-              const res = await deleteRecentSearch(x.recentSearchId);
-              if (res.isSuccess) {
-                await fetchRecentSearches();
-              }
-            }}
-            handleRecentSearchClick={handleRecentSearchClick}
-          />
+          <>
+            <RecentSearchTabs
+              recentSearches={recentSearches.map(i => i.searchTerm)}
+              handleDelete={async (term: string) => {
+                const x = recentSearches.find(i => i.searchTerm === term);
+                if (!x) return;
+                const res = await deleteRecentSearch(x.recentSearchId);
+                if (res.isSuccess) {
+                  await fetchRecentSearches();
+                }
+              }}
+              handleRecentSearchClick={handleRecentSearchClick}
+            />
+            <AllRoomsButton onClick={handleAllRoomsClick}>
+              <p>전체 모임방 둘러보기</p>
+              <img src={rightChevron} alt="전체 모임방 버튼" />
+            </AllRoomsButton>
+          </>
         )}
       </Modal>
     </Overlay>
@@ -315,4 +331,15 @@ const LoadingMessage = styled.div`
   padding: 40px 20px;
   color: ${colors.white};
   font-size: ${typography.fontSize.base};
+`;
+
+const AllRoomsButton = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 30px 20px;
+  background-color: transparent;
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
+  cursor: pointer;
 `;
