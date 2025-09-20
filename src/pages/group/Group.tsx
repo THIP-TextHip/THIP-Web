@@ -18,7 +18,7 @@ import { colors, typography } from '@/styles/global/global';
 const convertRoomItemToGroup = (
   room: RoomItem,
   category: string,
-  listType: 'deadline' | 'popular',
+  listType: 'deadline' | 'popular' | 'recent',
 ): GroupType => ({
   id: `${room.roomId}-${category}-${listType}`,
   title: room.roomName,
@@ -34,6 +34,7 @@ const Group = () => {
   const [isMyGroupModalOpen, setIsMyGroupModalOpen] = useState(false);
   const [isCompletedGroupModalOpen, setIsCompletedGroupModalOpen] = useState(false);
   const [sections, setSections] = useState<Section[]>([
+    { title: '최근 생성된 독서 모임방', groups: [] },
     { title: '마감 임박한 독서 모임방', groups: [] },
     { title: '인기 있는 독서 모임방', groups: [] },
   ]);
@@ -43,6 +44,7 @@ const Group = () => {
       const categories = ['문학', '인문학', '사회과학', '과학·IT', '예술'];
       const deadlineRoomsData: GroupType[] = [];
       const popularRoomsData: GroupType[] = [];
+      const recentRoomsData: GroupType[] = [];
 
       for (const category of categories) {
         const response = await getRoomsByCategory(category);
@@ -53,18 +55,24 @@ const Group = () => {
           const popularGroups = response.data.popularRoomList.map(room =>
             convertRoomItemToGroup(room, category, 'popular'),
           );
+          const recentGroups = response.data.recentRoomList.map(room =>
+            convertRoomItemToGroup(room, category, 'recent'),
+          );
           deadlineRoomsData.push(...deadlineGroups);
           popularRoomsData.push(...popularGroups);
+          recentRoomsData.push(...recentGroups);
         }
       }
 
       setSections([
+        { title: '최근 생성된 독서 모임방', groups: recentRoomsData },
         { title: '마감 임박한 독서 모임방', groups: deadlineRoomsData },
         { title: '인기 있는 독서 모임방', groups: popularRoomsData },
       ]);
     } catch (error) {
       console.error('방 목록 조회 오류:', error);
       setSections([
+        { title: '최근 생성된 독서 모임방', groups: [] },
         { title: '마감 임박한 독서 모임방', groups: [] },
         { title: '인기 있는 독서 모임방', groups: [] },
       ]);
