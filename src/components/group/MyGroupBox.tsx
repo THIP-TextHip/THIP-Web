@@ -28,6 +28,7 @@ const convertJoinedRoomToGroup = (room: JoinedRoomItem): Group => ({
   participants: room.memberCount,
   coverUrl: room.bookImageUrl,
   progress: room.userPercentage,
+  deadLine: room.deadlineDate || undefined,
 });
 
 interface MyGroupProps {

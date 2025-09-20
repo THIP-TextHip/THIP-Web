@@ -12,6 +12,8 @@ interface MyGroupCardProps {
 
 export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>((props, ref) => {
   const { group, onClick, isMine } = props;
+  const hasDeadline = group.deadLine != null;
+
   return (
     <Card ref={ref} onClick={onClick}>
       <Thumbnail src={group.coverUrl} alt="책 표지" />
@@ -24,13 +26,21 @@ export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>((props, 
           </Participants>
         </div>
         <div>
-          <ProgressText>
-            {isMine ? '내 진행도' : `${group.userName}님의 진행도`}{' '}
-            <Percent>{Math.floor(group.progress || 0)}%</Percent>
-          </ProgressText>
-          <Bar>
-            <Fill width={group.progress || 0} />
-          </Bar>
+          {hasDeadline ? (
+            <DeadlineText>
+              시작까지 <DeadlineValue>{group.deadLine}</DeadlineValue>
+            </DeadlineText>
+          ) : (
+            <>
+              <ProgressText>
+                {isMine ? '내 진행도' : `${group.userName}님의 진행도`}{' '}
+                <Percent>{Math.floor(group.progress || 0)}%</Percent>
+              </ProgressText>
+              <Bar>
+                <Fill width={group.progress || 0} />
+              </Bar>
+            </>
+          )}
         </div>
       </Info>
     </Card>
@@ -99,6 +109,19 @@ const Percent = styled.span`
   font-size: ${typography.fontSize.base};
   color: ${colors.purple.main};
   font-weight: ${typography.fontWeight.semibold};
+`;
+
+const DeadlineText = styled.p`
+  font-size: ${typography.fontSize.sm};
+  color: ${colors.grey[300]};
+  margin: 12px 0;
+`;
+
+const DeadlineValue = styled.span`
+  font-size: ${typography.fontSize.base};
+  color: ${colors.purple.main};
+  font-weight: ${typography.fontWeight.semibold};
+  margin-left: 4px;
 `;
 
 const Bar = styled.div`
