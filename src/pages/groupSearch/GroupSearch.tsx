@@ -11,13 +11,14 @@ import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
 import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms';
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 type SortKey = 'deadline' | 'memberCount';
 type SearchStatus = 'idle' | 'searching' | 'searched';
 
 const GroupSearch = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchStatus, setSearchStatus] = useState<SearchStatus>('idle');
@@ -56,12 +57,6 @@ const GroupSearch = () => {
   }, []);
 
   useEffect(() => {
-    if (showTabs && searchStatus === 'searched') {
-      setCategory('');
-    }
-  }, [showTabs, searchStatus]);
-
-  useEffect(() => {
     if (searchStatus === 'idle') {
       fetchRecentSearches();
     }
@@ -81,6 +76,7 @@ const GroupSearch = () => {
       term: string,
       sortKey: SortKey,
       status: 'searching' | 'searched',
+      categoryParam: string,
       isAllCategory: boolean = false,
     ) => {
       setIsLoading(true);
@@ -96,7 +92,7 @@ const GroupSearch = () => {
           sortKey,
           undefined,
           isFinalized,
-          category,
+          categoryParam,
           isAllCategory,
         );
         if (res.isSuccess) {
@@ -114,8 +110,18 @@ const GroupSearch = () => {
         setIsLoading(false);
       }
     },
-    [category],
+    [],
   );
+
+  useEffect(() => {
+    if (location.state?.allRooms) {
+      setSearchTerm('');
+      setSearchStatus('searched');
+      setShowTabs(true);
+      setCategory('');
+      searchFirstPage('', toSortKey(selectedFilter), 'searched', '', true);
+    }
+  }, [location.state?.allRooms, searchFirstPage, selectedFilter, toSortKey]);
 
   const handleChange = (value: string) => {
     setSearchTerm(value);
@@ -136,7 +142,7 @@ const GroupSearch = () => {
     setSearchStatus('searching');
     setShowTabs(false);
     const id = setTimeout(() => {
-      searchFirstPage(trimmed, toSortKey(selectedFilter), 'searching');
+      searchFirstPage(trimmed, toSortKey(selectedFilter), 'searching', category);
     }, 300);
     setSearchTimeoutId(id);
   };
@@ -151,7 +157,7 @@ const GroupSearch = () => {
 
     setSearchStatus('searched');
     setShowTabs(true);
-    searchFirstPage(term, toSortKey(selectedFilter), 'searched');
+    searchFirstPage(term, toSortKey(selectedFilter), 'searched', category);
   };
 
   const handleRecentSearchClick = (recent: string) => {
@@ -162,7 +168,7 @@ const GroupSearch = () => {
     setSearchTerm(recent);
     setSearchStatus('searched');
     setShowTabs(true);
-    searchFirstPage(recent.trim(), toSortKey(selectedFilter), 'searched');
+    searchFirstPage(recent.trim(), toSortKey(selectedFilter), 'searched', category);
   };
 
   const handleAllRoomsClick = () => {
@@ -174,32 +180,30 @@ const GroupSearch = () => {
     setSearchStatus('searched');
     setShowTabs(true);
     setCategory('');
-    searchFirstPage('', toSortKey(selectedFilter), 'searched', true);
+    searchFirstPage('', toSortKey(selectedFilter), 'searched', '', true);
   };
+
+  const searchStatusRef = useRef(searchStatus);
+  const categoryRef = useRef(category);
+  const selectedFilterRef = useRef(selectedFilter);
+  const searchTermRef = useRef(searchTerm);
+
+  useEffect(() => {
+    searchStatusRef.current = searchStatus;
+    categoryRef.current = category;
+    selectedFilterRef.current = selectedFilter;
+    searchTermRef.current = searchTerm;
+  });
 
   useEffect(() => {
     if (searchStatus !== 'searched') return;
 
-    const term = searchTerm.trim();
+    const term = searchTermRef.current.trim();
     const isAllCategory = !term && category === '';
 
-    if (searchTimeoutId) {
-      clearTimeout(searchTimeoutId);
-      setSearchTimeoutId(null);
-    }
+    searchFirstPage(term, toSortKey(selectedFilter), 'searched', category, isAllCategory);
+  }, [selectedFilter, category, searchFirstPage, searchStatus, toSortKey]);
 
-    searchFirstPage(term, toSortKey(selectedFilter), 'searched', isAllCategory);
-  }, [
-    selectedFilter,
-    category,
-    searchFirstPage,
-    toSortKey,
-    searchStatus,
-    searchTerm,
-    searchTimeoutId,
-  ]);
-
-  // 입력 중일 때만 디바운싱 처리
   useEffect(() => {
     const term = searchTerm.trim();
     if (!term || searchStatus !== 'searching') return;
@@ -210,10 +214,11 @@ const GroupSearch = () => {
     }
 
     const id = setTimeout(() => {
-      searchFirstPage(term, toSortKey(selectedFilter), 'searching');
+      const currentCategory = categoryRef.current;
+      searchFirstPage(term, toSortKey(selectedFilter), 'searching', currentCategory);
     }, 300);
     setSearchTimeoutId(id);
-  }, [searchTerm, searchFirstPage, toSortKey, selectedFilter, searchStatus, searchTimeoutId]);
+  }, [searchTerm, searchStatus, searchFirstPage, searchTimeoutId, selectedFilter, toSortKey]);
 
   const loadMore = useCallback(async () => {
     if (!searchTerm.trim() || !nextCursor || isLast || isLoadingMore) return;

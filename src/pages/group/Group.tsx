@@ -11,7 +11,9 @@ import { MyGroupModal } from '@/components/group/MyGroupModal';
 import CompletedGroupModal from '@/components/group/CompletedGroupModal';
 import { useNavigate } from 'react-router-dom';
 import makegroupfab from '../../assets/common/makegroupfab.svg';
+import searchChar from '../../assets/common/searchChar.svg';
 import { getRoomsByCategory, type RoomItem } from '@/api/rooms/getRoomsByCategory';
+import { colors, typography } from '@/styles/global/global';
 
 const convertRoomItemToGroup = (
   room: RoomItem,
@@ -83,6 +85,14 @@ const Group = () => {
     navigate('/group/search');
   };
 
+  const handleAllRoomsClick = () => {
+    navigate('/group/search', {
+      state: {
+        allRooms: true,
+      },
+    });
+  };
+
   return (
     <Wrapper>
       {isMyGroupModalOpen && <MyGroupModal onClose={closeMyGroupModal} />}
@@ -91,6 +101,10 @@ const Group = () => {
       <SearchBar placeholder="모임방 참여할 사람!" onClick={handleSearchBarClick} />
       <MyGroupBox onMyGroupsClick={openMyGroupModal}></MyGroupBox>
       <Blank height={'10px'} margin={'32px 0'}></Blank>
+      <AllRoomsButton onClick={handleAllRoomsClick}>
+        전체 모임방을 한 눈에 들러보세요!
+        <img src={searchChar} alt="검색 캐릭터 이미지" />
+      </AllRoomsButton>
       <RecruitingGroupCarousel sections={sections} />
       <NavBar src={makegroupfab} path="/group/create" />
     </Wrapper>
@@ -110,5 +124,24 @@ const Wrapper = styled.div`
   min-height: 100vh;
   margin: 0 auto;
   padding-top: 56px;
-  background-color: #121212;
+  background-color: ${colors.black.main};
+`;
+
+const AllRoomsButton = styled.div`
+  display: flex;
+  position: relative;
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.medium};
+  width: 83%;
+  border-radius: 12px;
+  padding: 14px 12px;
+  margin-bottom: 12px;
+  color: ${colors.white};
+  background-color: ${colors.darkgrey.main};
+  cursor: pointer;
+  > img {
+    position: absolute;
+    right: 5%;
+    top: -2px;
+  }
 `;
