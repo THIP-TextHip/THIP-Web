@@ -55,14 +55,12 @@ const GroupSearch = () => {
     })();
   }, []);
 
-  // 검색 완료 시 전체 탭 선택
   useEffect(() => {
     if (showTabs && searchStatus === 'searched') {
       setCategory('');
     }
   }, [showTabs, searchStatus]);
 
-  // searchStatus가 'idle'로 변경될 때 최근 검색어 새로고침
   useEffect(() => {
     if (searchStatus === 'idle') {
       fetchRecentSearches();
@@ -79,9 +77,12 @@ const GroupSearch = () => {
   };
 
   const searchFirstPage = useCallback(
-    async (term: string, sortKey: SortKey, status: 'searching' | 'searched') => {
-      if (!term.trim()) return;
-
+    async (
+      term: string,
+      sortKey: SortKey,
+      status: 'searching' | 'searched',
+      isAllCategory: boolean = false,
+    ) => {
       setIsLoading(true);
       setError(null);
       setRooms([]);
@@ -90,7 +91,14 @@ const GroupSearch = () => {
 
       try {
         const isFinalized = status === 'searched';
-        const res = await getSearchRooms(term.trim(), sortKey, undefined, isFinalized, category);
+        const res = await getSearchRooms(
+          term.trim(),
+          sortKey,
+          undefined,
+          isFinalized,
+          category,
+          isAllCategory,
+        );
         if (res.isSuccess) {
           const { roomList, nextCursor: nc, isLast: last } = res.data;
 
@@ -157,29 +165,69 @@ const GroupSearch = () => {
     searchFirstPage(recent.trim(), toSortKey(selectedFilter), 'searched');
   };
 
+  const handleAllRoomsClick = () => {
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+      setSearchTimeoutId(null);
+    }
+    setSearchTerm('');
+    setSearchStatus('searched');
+    setShowTabs(true);
+    setCategory('');
+    searchFirstPage('', toSortKey(selectedFilter), 'searched', true);
+  };
+
   useEffect(() => {
+    if (searchStatus !== 'searched') return;
+
     const term = searchTerm.trim();
-    if (!term) return;
+    const isAllCategory = !term && category === '';
 
     if (searchTimeoutId) {
       clearTimeout(searchTimeoutId);
       setSearchTimeoutId(null);
     }
-    setSearchStatus('searching');
-    searchFirstPage(term, toSortKey(selectedFilter), 'searching');
-  }, [selectedFilter, category, searchTerm, searchFirstPage, toSortKey, searchTimeoutId]);
+
+    searchFirstPage(term, toSortKey(selectedFilter), 'searched', isAllCategory);
+  }, [
+    selectedFilter,
+    category,
+    searchFirstPage,
+    toSortKey,
+    searchStatus,
+    searchTerm,
+    searchTimeoutId,
+  ]);
+
+  // 입력 중일 때만 디바운싱 처리
+  useEffect(() => {
+    const term = searchTerm.trim();
+    if (!term || searchStatus !== 'searching') return;
+
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+      setSearchTimeoutId(null);
+    }
+
+    const id = setTimeout(() => {
+      searchFirstPage(term, toSortKey(selectedFilter), 'searching');
+    }, 300);
+    setSearchTimeoutId(id);
+  }, [searchTerm, searchFirstPage, toSortKey, selectedFilter, searchStatus, searchTimeoutId]);
 
   const loadMore = useCallback(async () => {
     if (!searchTerm.trim() || !nextCursor || isLast || isLoadingMore) return;
     try {
       setIsLoadingMore(true);
       const isFinalized = searchStatus === 'searched';
+      const isAllCategory = !searchTerm.trim() && category === '';
       const res = await getSearchRooms(
         searchTerm.trim(),
         toSortKey(selectedFilter),
         nextCursor,
         isFinalized,
         category,
+        isAllCategory,
       );
       if (res.isSuccess) {
         const { roomList, nextCursor: nc, isLast: last } = res.data;
@@ -248,8 +296,6 @@ const GroupSearch = () => {
       navigate('/group');
     }
   };
-
-  const handleAllRoomsClick = () => {};
 
   useEffect(() => {
     return () => {

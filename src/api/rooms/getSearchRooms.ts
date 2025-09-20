@@ -29,14 +29,18 @@ export const getSearchRooms = async (
   cursor?: string,
   isFinalized: boolean = false,
   category: string = '',
+  isAllCategory: boolean = false,
 ): Promise<SearchRoomsResponse> => {
   try {
     const params = new URLSearchParams();
-    params.append('keyword', keyword);
+    if (!isAllCategory && keyword) {
+      params.append('keyword', keyword);
+    }
     params.append('sort', sort);
     params.append('isFinalized', String(isFinalized));
     if (cursor) params.append('cursor', cursor);
     if (category) params.append('category', category);
+    if (isAllCategory) params.append('isAllCategory', 'true');
 
     const url = `/rooms/search?${params.toString()}`;
     const response = await apiClient.get<SearchRoomsResponse>(url);
