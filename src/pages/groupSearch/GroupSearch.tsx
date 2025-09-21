@@ -202,7 +202,8 @@ const GroupSearch = () => {
     const isAllCategory = !term && category === '';
 
     searchFirstPage(term, toSortKey(selectedFilter), 'searched', category, isAllCategory);
-  }, [selectedFilter, category, searchFirstPage, searchStatus, toSortKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFilter, category, searchStatus]);
 
   useEffect(() => {
     const term = searchTerm.trim();
@@ -218,7 +219,8 @@ const GroupSearch = () => {
       searchFirstPage(term, toSortKey(selectedFilter), 'searching', currentCategory);
     }, 300);
     setSearchTimeoutId(id);
-  }, [searchTerm, searchStatus, searchFirstPage, searchTimeoutId, selectedFilter, toSortKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, searchStatus, selectedFilter]);
 
   const loadMore = useCallback(async () => {
     if (!searchTerm.trim() || !nextCursor || isLast || isLoadingMore) return;
@@ -248,16 +250,8 @@ const GroupSearch = () => {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [
-    searchTerm,
-    nextCursor,
-    isLast,
-    isLoadingMore,
-    selectedFilter,
-    toSortKey,
-    searchStatus,
-    category,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, nextCursor, isLast, isLoadingMore, selectedFilter, searchStatus, category]);
 
   const lastRoomElementCallback = useCallback(
     (node: HTMLDivElement | null) => {
