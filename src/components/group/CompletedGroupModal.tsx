@@ -8,12 +8,14 @@ import { Modal, Overlay } from './Modal.styles';
 import { getMyRooms, type Room } from '@/api/rooms/getMyRooms';
 import { getMyProfile } from '@/api/users/getMyProfile';
 import { colors, typography } from '@/styles/global/global';
+import { useNavigate } from 'react-router-dom';
 
 interface CompletedGroupModalProps {
   onClose: () => void;
 }
 
 const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
+  const navigate = useNavigate();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +32,10 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
       deadLine: '',
       isOnGoing: false,
     };
+  };
+
+  const handleGroupCardClick = (group: Group) => {
+    navigate(`/group/detail/joined/${group.id}`);
   };
 
   useEffect(() => {
@@ -84,7 +90,14 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
           ) : error ? (
             <ErrorMessage>{error}</ErrorMessage>
           ) : convertedGroups.length > 0 ? (
-            convertedGroups.map(group => <GroupCard key={group.id} group={group} type={'modal'} />)
+            convertedGroups.map(group => (
+              <GroupCard
+                key={group.id}
+                group={group}
+                type={'modal'}
+                onClick={() => handleGroupCardClick(group)}
+              />
+            ))
           ) : (
             <EmptyState data-empty="true">
               <EmptyTitle>완료된 모임방이 없어요</EmptyTitle>
