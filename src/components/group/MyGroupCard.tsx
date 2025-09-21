@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import peopleImg from '../../assets/common/people.svg';
 import type { Group } from './MyGroupBox';
 import { colors, typography } from '@/styles/global/global';
+import { useNavigate } from 'react-router-dom';
 
 interface MyGroupCardProps {
   group: Group;
@@ -12,10 +13,19 @@ interface MyGroupCardProps {
 
 export const MyGroupCard = forwardRef<HTMLDivElement, MyGroupCardProps>((props, ref) => {
   const { group, onClick, isMine } = props;
+  const navigate = useNavigate();
   const hasDeadline = group.deadLine != null;
 
+  const handleClick = () => {
+    if (hasDeadline) {
+      navigate(`/group/detail/${group.id}`);
+    } else {
+      onClick?.();
+    }
+  };
+
   return (
-    <Card ref={ref} onClick={onClick}>
+    <Card ref={ref} onClick={handleClick}>
       <Thumbnail src={group.coverUrl} alt="책 표지" />
       <Info>
         <div>
