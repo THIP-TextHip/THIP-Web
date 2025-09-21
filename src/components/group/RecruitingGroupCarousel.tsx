@@ -2,6 +2,8 @@ import styled from '@emotion/styled';
 import type { Group } from './MyGroupBox';
 import { RecruitingGroupBox } from './RecruitingGroupBox';
 import { useInfiniteCarousel } from '@/hooks/useInfiniteCarousel';
+import backIcon from '@/assets/common/back.svg';
+import nextIcon from '@/assets/common/next.svg';
 
 export interface Section {
   title: string;
@@ -61,8 +63,30 @@ export function RecruitingGroupCarousel({ sections }: Props) {
     isDragging = false;
   };
 
+  const handlePrevClick = () => {
+    if (scrollRef.current) {
+      const container = scrollRef.current;
+      const cardWidth = cardRefs.current[0]?.offsetWidth || 0;
+      container.scrollLeft -= cardWidth + 20;
+    }
+  };
+
+  const handleNextClick = () => {
+    if (scrollRef.current) {
+      const container = scrollRef.current;
+      const cardWidth = cardRefs.current[0]?.offsetWidth || 0;
+      container.scrollLeft += cardWidth + 20;
+    }
+  };
+
   return (
     <CarouselContainer>
+      <NavButton className="nav-button prev" onClick={handlePrevClick}>
+        <img src={backIcon} alt="이전" />
+      </NavButton>
+      <NavButton className="nav-button next" onClick={handleNextClick}>
+        <img src={nextIcon} alt="다음" />
+      </NavButton>
       <ScrollWrapper
         ref={scrollRef}
         onMouseDown={handleMouseDown}
@@ -92,6 +116,41 @@ const CarouselContainer = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
+  position: relative;
+
+  &:hover .nav-button {
+    opacity: 1;
+    visibility: visible;
+  }
+`;
+
+const NavButton = styled.button`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  visibility: hidden;
+  transition: all 0.1s ease;
+
+  &.prev {
+    left: 3%;
+  }
+
+  &.next {
+    right: 3%;
+  }
+
+  img {
+    filter: invert(1);
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const ScrollWrapper = styled.div`
