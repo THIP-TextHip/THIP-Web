@@ -1,14 +1,19 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { colors, typography } from '@/styles/global/global';
-import { mockNotifications } from '@/mocks/notification.mock';
+import { getNotifications, type NotificationItem } from '@/api/notifications/getNotifications';
 
 const Notice = () => {
   const [selected, setSelected] = useState<string>('');
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [isLast, setIsLast] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const isLoadingRef = useRef<boolean>(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
   const handleBackButton = () => {
@@ -19,14 +24,67 @@ const Notice = () => {
     setSelected(prev => (prev === tab ? '' : tab));
   };
 
-  const handleReadNotification = (index: number) => {
-    setNotifications(prev =>
-      prev.map((item, idx) => (idx === index ? { ...item, read: true } : item)),
-    );
-  };
+  const loadNotifications = useCallback(
+    async (cursor?: string | null) => {
+      try {
+        if (isLoadingRef.current) return;
+        isLoadingRef.current = true;
+        setIsLoading(true);
+        const params: { cursor?: string | null; type?: 'feed' | 'room' } = { cursor };
+        if (selected === '피드') params.type = 'feed';
+        if (selected === '모임') params.type = 'room';
 
-  const filteredNotifications =
-    selected === '' ? notifications : notifications.filter(notif => notif.category === selected);
+        const res = await getNotifications(params);
+        if (res.isSuccess) {
+          setNotifications(prev =>
+            cursor ? [...prev, ...res.data.notifications] : res.data.notifications,
+          );
+          setNextCursor(res.data.nextCursor || null);
+          setIsLast(res.data.isLast);
+        }
+      } finally {
+        setIsLoading(false);
+        isLoadingRef.current = false;
+      }
+    },
+    [selected],
+  );
+
+  useEffect(() => {
+    // 탭 변경 시 첫 페이지부터 다시 로드
+    setNotifications([]);
+    setNextCursor(null);
+    setIsLast(false);
+    void loadNotifications(null);
+  }, [selected, loadNotifications]);
+
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+    const el = sentinelRef.current;
+    const observer = new IntersectionObserver(
+      entries => {
+        const entry = entries[0];
+        if (entry.isIntersecting && !isLoading && !isLast && nextCursor !== null) {
+          void loadNotifications(nextCursor);
+        }
+      },
+      { root: null, rootMargin: '0px', threshold: 0.1 },
+    );
+
+    observer.observe(el);
+    return () => {
+      observer.unobserve(el);
+      observer.disconnect();
+    };
+  }, [isLoading, isLast, nextCursor, loadNotifications]);
+
+  // const handleReadNotification = (index: number) => {
+  //   setNotifications(prev =>
+  //     prev.map((item, idx) => (idx === index ? { ...item, isChecked: true } : item)),
+  //   );
+  // };
+
+  const filteredNotifications = notifications;
 
   const tabs = ['피드', '모임'];
 
@@ -52,21 +110,24 @@ const Notice = () => {
         ) : (
           filteredNotifications.map((notif, idx) => (
             <NotificationCard
-              key={idx}
-              read={notif.read}
-              onClick={() => handleReadNotification(idx)}
+              key={notif.notificationId ?? idx}
+              read={notif.isChecked}
+              // onClick={() => handleReadNotification(idx)}
             >
-              {!notif.read && <UnreadDot />}
+              {!notif.isChecked && <UnreadDot />}
               <TitleRow>
-                <Badge>{notif.category}</Badge>
+                <Badge>{notif.notificationType}</Badge>
                 <Title>{notif.title}</Title>
-                <Time>{notif.time}</Time>
+                <Time>{notif.postDate}</Time>
               </TitleRow>
-              <Description>{notif.description}</Description>
+              <Description>{notif.content}</Description>
             </NotificationCard>
           ))
         )}
       </NotificationList>
+
+      {/* 무한 스크롤 감지용 센티넬 */}
+      <Sentinel ref={sentinelRef} />
     </Wrapper>
   );
 };
@@ -120,7 +181,7 @@ const NotificationCard = styled.div<{ read: boolean }>`
   padding: 16px;
   color: ${colors.grey[300]};
   position: relative;
-  width: ${({ read }) => (read ? '100%' : '90%')};
+  width: 100%;
   opacity: ${({ read }) => (read ? '0.5' : '1')};
   cursor: pointer;
 `;
@@ -173,12 +234,13 @@ const Description = styled.div`
 `;
 
 const EmptyState = styled.div`
-  margin-top: 50%;
-  font-size: ${typography.fontSize.sm};
+  margin-top: 300px;
+  font-size: ${typography.fontSize.lg};
   font-weight: ${typography.fontWeight.semibold};
-  padding: 40px;
+  line-height: 24px;
+  padding: 40px 0px;
   text-align: center;
-  color: #e0e0e0;
+  color: ${colors.white};
 `;
 
 const UnreadDot = styled.div`
@@ -189,4 +251,9 @@ const UnreadDot = styled.div`
   height: 6px;
   background-color: #ff9496;
   border-radius: 50%;
+`;
+
+const Sentinel = styled.div`
+  width: 100%;
+  height: 1px;
 `;

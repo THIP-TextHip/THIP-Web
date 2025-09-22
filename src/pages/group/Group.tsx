@@ -93,6 +93,9 @@ const Group = () => {
     navigate('/group/search');
   };
 
+  const handleNoticeButton = () => {
+    navigate('/notice');
+      
   const handleAllRoomsClick = () => {
     navigate('/group/search', {
       state: {
@@ -105,7 +108,11 @@ const Group = () => {
     <Wrapper>
       {isMyGroupModalOpen && <MyGroupModal onClose={closeMyGroupModal} />}
       {isCompletedGroupModalOpen && <CompletedGroupModal onClose={closeCompletedGroupModal} />}
-      <MainHeader type="group" leftButtonClick={openCompletedGroupModal} />
+      <MainHeader
+        type="group"
+        leftButtonClick={openCompletedGroupModal}
+        rightButtonClick={handleNoticeButton}
+      />
       <SearchBar placeholder="모임방 참여할 사람!" onClick={handleSearchBarClick} />
       <MyGroupBox onMyGroupsClick={openMyGroupModal}></MyGroupBox>
       <Blank height={'10px'} margin={'32px 0'}></Blank>

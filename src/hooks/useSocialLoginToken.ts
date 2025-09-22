@@ -23,16 +23,23 @@ export const useSocialLoginToken = () => {
         console.log('🔑 소셜 로그인 토큰 발급 요청');
         console.log('📋 loginTokenKey:', loginTokenKey);
 
-        // /auth/token API 호출하여 토큰 발급 (임시 토큰 또는 access 토큰)
+        // /auth/token API 호출하여 토큰 발급 (임시 토큰)
         const response = await getToken({ loginTokenKey });
 
         if (response.isSuccess) {
-          const { token } = response.data;
+          const { token, isNewUser } = response.data;
 
-          // 토큰을 localStorage에 저장 (request header에 사용)
-          localStorage.setItem('authToken', token);
-
-          console.log('✅ Access 토큰 발급 성공 (바로 홈 화면)');
+          if (isNewUser) {
+            // 회원가입 진행용 임시 토큰 저장
+            localStorage.setItem('preAuthToken', token);
+            localStorage.removeItem('authToken');
+            console.log('✅ 신규 사용자: 임시 토큰 저장 (회원가입 진행)');
+          } else {
+            // 기존 사용자: 액세스 토큰 저장
+            localStorage.setItem('authToken', token);
+            localStorage.removeItem('preAuthToken');
+            console.log('✅ 기존 사용자: 액세스 토큰 저장');
+          }
 
           // URL에서 loginTokenKey 파라미터 제거
           const newUrl = window.location.pathname;
@@ -53,7 +60,7 @@ export const useSocialLoginToken = () => {
       // 토큰 발급 Promise를 저장
       tokenPromise.current = handleSocialLoginToken();
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   // 토큰 발급 완료를 기다리는 함수 반환
   const waitForToken = useCallback(async (): Promise<void> => {

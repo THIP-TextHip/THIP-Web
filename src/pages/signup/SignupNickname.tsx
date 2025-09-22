@@ -31,15 +31,15 @@ const SignupNickname = () => {
       // 토큰 발급 완료 대기
       await waitForToken();
 
-      // localStorage에 토큰이 있는지 확인
-      const authToken = localStorage.getItem('authToken');
-      if (!authToken) {
-        console.log('❌ 토큰이 없어서 닉네임 검증을 할 수 없습니다.');
+      // 임시 토큰 존재 여부 확인 (회원가입 진행 중)
+      const preAuthToken = localStorage.getItem('preAuthToken');
+      if (!preAuthToken) {
+        console.log('❌ 임시 토큰이 없어 닉네임 검증을 할 수 없습니다.');
         setError('인증 토큰이 없습니다. 다시 시도해주세요.');
         return;
       }
 
-      console.log('✅ 토큰 확인 완료, 닉네임 검증 API 호출');
+      console.log('✅ 임시 토큰 확인 완료, 닉네임 검증 API 호출');
       const result = await postNickname(nickname);
 
       if (result.data.isVerified) {

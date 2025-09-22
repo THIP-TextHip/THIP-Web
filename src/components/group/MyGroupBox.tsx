@@ -22,6 +22,7 @@ export interface Group {
   genre?: string;
   isOnGoing?: boolean;
   isPublic?: boolean;
+  type?: string;
 }
 
 const convertJoinedRoomToGroup = (room: JoinedRoomItem): Group => ({
