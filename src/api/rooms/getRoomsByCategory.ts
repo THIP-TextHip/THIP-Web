@@ -17,6 +17,7 @@ export interface RoomsResponse {
   data: {
     deadlineRoomList: RoomItem[];
     popularRoomList: RoomItem[];
+    recentRoomList: RoomItem[];
   };
 }
 

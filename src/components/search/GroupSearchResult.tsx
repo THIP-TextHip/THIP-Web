@@ -6,7 +6,7 @@ import { Filter } from '../common/Filter';
 import type { SearchRoomItem } from '@/api/rooms/getSearchRooms';
 
 const FILTER = ['마감임박순', '인기순'];
-const CATEGORIES = ['문학', '과학·IT', '사회과학', '인문학', '예술'] as const;
+const CATEGORIES = ['전체', '문학', '과학·IT', '사회과학', '인문학', '예술'] as const;
 
 type ResultType = 'searching' | 'searched';
 
@@ -60,12 +60,12 @@ const GroupSearchResult = ({
       {showTabs && (
         <TabContainer>
           {CATEGORIES.map(tab => {
-            const selected = tab === currentCategory;
+            const selected = tab === currentCategory || (tab === '전체' && currentCategory === '');
             return (
               <Tab
                 key={tab}
                 selected={selected}
-                onClick={() => onChangeCategory(selected ? '' : tab)}
+                onClick={() => onChangeCategory(tab === '전체' ? '' : tab)}
                 aria-pressed={selected}
               >
                 {tab}

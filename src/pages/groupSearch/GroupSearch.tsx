@@ -2,6 +2,7 @@ import TitleHeader from '@/components/common/TitleHeader';
 import { Modal, Overlay } from '@/components/group/Modal.styles';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import SearchBar from '@/components/search/SearchBar';
+import rightChevron from '../../assets/common/right-Chevron.svg';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import GroupSearchResult from '@/components/search/GroupSearchResult';
@@ -10,13 +11,14 @@ import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
 import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms';
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 type SortKey = 'deadline' | 'memberCount';
 type SearchStatus = 'idle' | 'searching' | 'searched';
 
 const GroupSearch = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchStatus, setSearchStatus] = useState<SearchStatus>('idle');
@@ -54,7 +56,6 @@ const GroupSearch = () => {
     })();
   }, []);
 
-  // searchStatus가 'idle'로 변경될 때 최근 검색어 새로고침
   useEffect(() => {
     if (searchStatus === 'idle') {
       fetchRecentSearches();
@@ -71,9 +72,13 @@ const GroupSearch = () => {
   };
 
   const searchFirstPage = useCallback(
-    async (term: string, sortKey: SortKey, status: 'searching' | 'searched') => {
-      if (!term.trim()) return;
-
+    async (
+      term: string,
+      sortKey: SortKey,
+      status: 'searching' | 'searched',
+      categoryParam: string,
+      isAllCategory: boolean = false,
+    ) => {
       setIsLoading(true);
       setError(null);
       setRooms([]);
@@ -82,7 +87,14 @@ const GroupSearch = () => {
 
       try {
         const isFinalized = status === 'searched';
-        const res = await getSearchRooms(term.trim(), sortKey, undefined, isFinalized, category);
+        const res = await getSearchRooms(
+          term.trim(),
+          sortKey,
+          undefined,
+          isFinalized,
+          categoryParam,
+          isAllCategory,
+        );
         if (res.isSuccess) {
           const { roomList, nextCursor: nc, isLast: last } = res.data;
 
@@ -98,8 +110,19 @@ const GroupSearch = () => {
         setIsLoading(false);
       }
     },
-    [category],
+    [],
   );
+
+  useEffect(() => {
+    if (location.state?.allRooms) {
+      navigate(location.pathname, { replace: true });
+
+      setSearchTerm('');
+      setSearchStatus('searched');
+      setShowTabs(true);
+      setCategory('');
+    }
+  }, [location.state?.allRooms, navigate, location.pathname]);
 
   const handleChange = (value: string) => {
     setSearchTerm(value);
@@ -120,7 +143,7 @@ const GroupSearch = () => {
     setSearchStatus('searching');
     setShowTabs(false);
     const id = setTimeout(() => {
-      searchFirstPage(trimmed, toSortKey(selectedFilter), 'searching');
+      searchFirstPage(trimmed, toSortKey(selectedFilter), 'searching', category);
     }, 300);
     setSearchTimeoutId(id);
   };
@@ -135,7 +158,6 @@ const GroupSearch = () => {
 
     setSearchStatus('searched');
     setShowTabs(true);
-    searchFirstPage(term, toSortKey(selectedFilter), 'searched');
   };
 
   const handleRecentSearchClick = (recent: string) => {
@@ -146,32 +168,71 @@ const GroupSearch = () => {
     setSearchTerm(recent);
     setSearchStatus('searched');
     setShowTabs(true);
-    searchFirstPage(recent.trim(), toSortKey(selectedFilter), 'searched');
   };
+
+  const handleAllRoomsClick = () => {
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId);
+      setSearchTimeoutId(null);
+    }
+    setSearchTerm('');
+    setSearchStatus('searched');
+    setShowTabs(true);
+    setCategory('');
+  };
+
+  const searchStatusRef = useRef(searchStatus);
+  const categoryRef = useRef(category);
+  const selectedFilterRef = useRef(selectedFilter);
+  const searchTermRef = useRef(searchTerm);
+
+  useEffect(() => {
+    searchStatusRef.current = searchStatus;
+    categoryRef.current = category;
+    selectedFilterRef.current = selectedFilter;
+    searchTermRef.current = searchTerm;
+  });
+
+  useEffect(() => {
+    if (searchStatus !== 'searched') return;
+
+    const term = searchTerm.trim();
+    const isAllCategory = !term && category === '';
+
+    searchFirstPage(term, toSortKey(selectedFilter), 'searched', category, isAllCategory);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFilter, category, searchStatus, searchTerm]);
 
   useEffect(() => {
     const term = searchTerm.trim();
-    if (!term) return;
+    if (!term || searchStatus !== 'searching') return;
 
     if (searchTimeoutId) {
       clearTimeout(searchTimeoutId);
       setSearchTimeoutId(null);
     }
-    setSearchStatus('searching');
-    searchFirstPage(term, toSortKey(selectedFilter), 'searching');
-  }, [selectedFilter, category, searchTerm, searchFirstPage, toSortKey, searchTimeoutId]);
+
+    const id = setTimeout(() => {
+      const currentCategory = categoryRef.current;
+      searchFirstPage(term, toSortKey(selectedFilter), 'searching', currentCategory);
+    }, 300);
+    setSearchTimeoutId(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, searchStatus, selectedFilter]);
 
   const loadMore = useCallback(async () => {
     if (!searchTerm.trim() || !nextCursor || isLast || isLoadingMore) return;
     try {
       setIsLoadingMore(true);
       const isFinalized = searchStatus === 'searched';
+      const isAllCategory = !searchTerm.trim() && category === '';
       const res = await getSearchRooms(
         searchTerm.trim(),
         toSortKey(selectedFilter),
         nextCursor,
         isFinalized,
         category,
+        isAllCategory,
       );
       if (res.isSuccess) {
         const { roomList, nextCursor: nc, isLast: last } = res.data;
@@ -187,16 +248,8 @@ const GroupSearch = () => {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [
-    searchTerm,
-    nextCursor,
-    isLast,
-    isLoadingMore,
-    selectedFilter,
-    toSortKey,
-    searchStatus,
-    category,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, nextCursor, isLast, isLoadingMore, selectedFilter, searchStatus, category]);
 
   const lastRoomElementCallback = useCallback(
     (node: HTMLDivElement | null) => {
@@ -288,18 +341,24 @@ const GroupSearch = () => {
             )}
           </>
         ) : (
-          <RecentSearchTabs
-            recentSearches={recentSearches.map(i => i.searchTerm)}
-            handleDelete={async (term: string) => {
-              const x = recentSearches.find(i => i.searchTerm === term);
-              if (!x) return;
-              const res = await deleteRecentSearch(x.recentSearchId);
-              if (res.isSuccess) {
-                await fetchRecentSearches();
-              }
-            }}
-            handleRecentSearchClick={handleRecentSearchClick}
-          />
+          <>
+            <RecentSearchTabs
+              recentSearches={recentSearches.map(i => i.searchTerm)}
+              handleDelete={async (term: string) => {
+                const x = recentSearches.find(i => i.searchTerm === term);
+                if (!x) return;
+                const res = await deleteRecentSearch(x.recentSearchId);
+                if (res.isSuccess) {
+                  await fetchRecentSearches();
+                }
+              }}
+              handleRecentSearchClick={handleRecentSearchClick}
+            />
+            <AllRoomsButton onClick={handleAllRoomsClick}>
+              <p>전체 모임방 둘러보기</p>
+              <img src={rightChevron} alt="전체 모임방 버튼" />
+            </AllRoomsButton>
+          </>
         )}
       </Modal>
     </Overlay>
@@ -315,4 +374,15 @@ const LoadingMessage = styled.div`
   padding: 40px 20px;
   color: ${colors.white};
   font-size: ${typography.fontSize.base};
+`;
+
+const AllRoomsButton = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 30px 20px;
+  background-color: transparent;
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
+  cursor: pointer;
 `;

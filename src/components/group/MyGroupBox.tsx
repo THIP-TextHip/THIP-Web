@@ -2,6 +2,8 @@ import { MyGroupCard } from './MyGroupCard';
 import { useInfiniteCarousel } from '../../hooks/useInfiniteCarousel';
 import styled from '@emotion/styled';
 import rightChevron from '../../assets/common/right-Chevron.svg';
+import backIcon from '@/assets/common/back.svg';
+import nextIcon from '@/assets/common/next.svg';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getJoinedRooms, type JoinedRoomItem } from '@/api/rooms/getJoinedRooms';
@@ -29,6 +31,7 @@ const convertJoinedRoomToGroup = (room: JoinedRoomItem): Group => ({
   participants: room.memberCount,
   coverUrl: room.bookImageUrl,
   progress: room.userPercentage,
+  deadLine: room.deadlineDate || undefined,
 });
 
 interface MyGroupProps {
@@ -109,6 +112,22 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
     isDragging = false;
   };
 
+  const handlePrevClick = () => {
+    if (scrollRef.current) {
+      const container = scrollRef.current;
+      const cardWidth = cardRefs.current[0]?.offsetWidth || 0;
+      container.scrollLeft -= cardWidth + 12;
+    }
+  };
+
+  const handleNextClick = () => {
+    if (scrollRef.current) {
+      const container = scrollRef.current;
+      const cardWidth = cardRefs.current[0]?.offsetWidth || 0;
+      container.scrollLeft += cardWidth + 12;
+    }
+  };
+
   return (
     <Container>
       <Header>
@@ -126,7 +145,17 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
           <ErrorText>{error}</ErrorText>
         </ErrorContainer>
       ) : groups.length > 0 ? (
-        <>
+        <CarouselContainer>
+          {!isSingle && (
+            <>
+              <NavButton className="nav-button prev" onClick={handlePrevClick}>
+                <img src={backIcon} alt="이전" />
+              </NavButton>
+              <NavButton className="nav-button next" onClick={handleNextClick}>
+                <img src={nextIcon} alt="다음" />
+              </NavButton>
+            </>
+          )}
           {isSingle ? (
             <Carousel>
               <MyGroupCard
@@ -159,7 +188,7 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
               ))}
             </Carousel>
           )}
-        </>
+        </CarouselContainer>
       ) : (
         <EmptyContainer>
           <EmptyCard role="status" aria-live="polite">
@@ -206,6 +235,45 @@ const MoreButton = styled.button`
   > img {
     width: 24px;
     height: 24px;
+  }
+`;
+
+const CarouselContainer = styled.div`
+  position: relative;
+  width: 100%;
+
+  &:hover .nav-button {
+    opacity: 1;
+    visibility: visible;
+  }
+`;
+
+const NavButton = styled.button`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  visibility: hidden;
+  transition: all 0.1s ease;
+
+  &.prev {
+    left: 4%;
+  }
+
+  &.next {
+    right: 4%;
+  }
+
+  img {
+    filter: invert(1);
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
