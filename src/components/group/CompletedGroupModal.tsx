@@ -31,6 +31,7 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
       coverUrl: room.bookImageUrl,
       deadLine: '',
       isOnGoing: false,
+      type: room.type,
     };
   };
 
@@ -116,7 +117,7 @@ const Text = styled.p`
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   color: ${colors.white};
-  margin: 96px 20px 20px 20px;
+  margin: 20px;
 `;
 
 const Content = styled.div<{ isEmpty?: boolean }>`
@@ -128,6 +129,11 @@ const Content = styled.div<{ isEmpty?: boolean }>`
 
   @media (min-width: 584px) {
     grid-template-columns: 1fr 1fr;
+  }
+
+  //항목이 하나일 때는 전체 열을 사용하여 2열 그리드처럼 보이지 않도록 처리
+  & > *:only-child {
+    grid-column: 1 / -1;
   }
 `;
 
