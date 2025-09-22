@@ -9,7 +9,8 @@ export interface GetTokenResponse {
   code: number;
   message: string;
   data: {
-    token: string; // 토큰
+    token: string; // 토큰 (임시 또는 액세스)
+    isNewUser: boolean; // true면 회원가입 필요 (임시 토큰), false면 액세스 토큰
   };
 }
 

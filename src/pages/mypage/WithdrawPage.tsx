@@ -7,10 +7,11 @@ import { colors, typography } from '@/styles/global/global';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import withdraw from '@/assets/mypage/withdraw.svg';
 import check from '@/assets/mypage/check.svg';
+import { deleteUsers } from '@/api/users/deleteUsers';
 
 const WithdrawPage = () => {
   const navigate = useNavigate();
-  const { openConfirm, closePopup } = usePopupActions();
+  const { openConfirm, closePopup, openSnackbar } = usePopupActions();
   const [isChecked, setIsChecked] = useState(false);
 
   const handleBack = () => {
@@ -27,10 +28,35 @@ const WithdrawPage = () => {
         title: '정말 탈퇴하시겠어요?',
         disc: "'예'를 누르면 Thip에서의 모든 기록이 사라져요",
         onConfirm: () => {
-          // 회원탈퇴 API 호출 부분 (비워둠)
-          console.log('회원탈퇴 API 호출');
-          closePopup();
-          navigate('/mypage/withdraw/done');
+          void (async () => {
+            try {
+              const response = await deleteUsers();
+              if (response.isSuccess) {
+                closePopup();
+                navigate('/mypage/withdraw/done');
+                localStorage.removeItem('authToken');
+              } else {
+                closePopup();
+                openSnackbar({
+                  message: response.message,
+                  variant: 'top',
+                  onClose: () => {},
+                });
+              }
+            } catch (error) {
+              let serverMessage = '요청 처리 중 오류가 발생했어요.';
+              if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                serverMessage = axiosError.response?.data?.message || serverMessage;
+              }
+              closePopup();
+              openSnackbar({
+                message: serverMessage,
+                variant: 'top',
+                onClose: () => {},
+              });
+            }
+          })();
         },
         onClose: () => {
           closePopup();
@@ -50,11 +76,11 @@ const WithdrawPage = () => {
         <Content>
           <ContentTitle>회원탈퇴 주의사항</ContentTitle>
           <ContentText>
-            회원탈퇴 시 계정정보는 복구 불가능하며 90일 이후 재가입이 가능합니다.
+            회원탈퇴 시 계정 및 활동 데이터는 <span className="danger">즉시 삭제</span>되며,
+            <span className="danger"> 복구가 불가능</span>합니다.
           </ContentText>
-          <ContentText>등록된 기록 및 게시물은 삭제되지 않습니다.</ContentText>
-          <ContentText>등록된 기록 및 게시물은 삭제되지 않습니다.</ContentText>
-          <ContentText>등록된 기록 및 게시물은 삭제되지 않습니다.</ContentText>
+          <ContentText>백업 및 로그 역시 보안 저장 후 최대 90일 내 자동 삭제됩니다.</ContentText>
+          <ContentText>법령상 보존 의무가 있는 정보는 해당 기간 동안 보관됩니다.</ContentText>
         </Content>
         <CheckSection>
           <CheckboxContainer onClick={handleCheckboxChange}>
@@ -91,7 +117,7 @@ const Container = styled.div`
   min-width: 320px;
   max-width: 540px;
   gap: 30px;
-  padding: 40px 0px 105px 0px;
+  padding: 40px 20px 105px 20px;
 `;
 
 const Content = styled.div`
@@ -115,6 +141,10 @@ const ContentText = styled.div`
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   line-height: 20px;
+
+  .danger {
+    color: #ff9496;
+  }
 `;
 
 const CheckSection = styled.div`
@@ -146,7 +176,7 @@ const Checkbox = styled.div<{ checked: boolean }>`
 
 const CheckLabel = styled.div`
   color: ${colors.white};
-  font-size: ${typography.fontSize.base};
+  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.regular};
   line-height: 24px;
 `;

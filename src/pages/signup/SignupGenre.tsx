@@ -66,6 +66,8 @@ const SignupGenre = () => {
         if (result.data.accessToken) {
           localStorage.setItem('authToken', result.data.accessToken);
           console.log('✅ 새로운 access 토큰이 localStorage에 저장되었습니다.');
+          // 임시 토큰 제거
+          localStorage.removeItem('preAuthToken');
         }
 
         navigate('/signup/guide', {
