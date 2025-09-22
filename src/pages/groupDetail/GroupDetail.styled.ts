@@ -276,4 +276,9 @@ export const BottomButton = styled.button`
   border: none;
   z-index: 10;
   cursor: pointer;
+
+  &:disabled {
+    background-color: ${colors.grey[300]};
+    cursor: not-allowed;
+  }
 `;
