@@ -42,11 +42,11 @@ const PopupContainer = () => {
       case 'confirm-modal':
         return (
           <Wrapper>
-            <ConfirmModal {...(popupProps as ConfirmModalProps)} />
+            <ConfirmModal {...(popupProps as ConfirmModalProps)} onClose={closePopup} />
           </Wrapper>
         );
       case 'moremenu':
-        return <MoreMenu {...(popupProps as MoreMenuProps)} />;
+        return <MoreMenu {...(popupProps as MoreMenuProps)} onClose={closePopup} />;
       case 'reply-modal':
         return <ReplyModal {...(popupProps as ReplyModalProps)} />;
       case 'snackbar':
