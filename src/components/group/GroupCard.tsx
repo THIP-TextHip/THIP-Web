@@ -35,15 +35,16 @@ export const GroupCard = forwardRef<HTMLDivElement, Props>(
               <p>{group.participants}</p>
               <MaximumParticipants>/ {group.maximumParticipants}명</MaximumParticipants>
             </Participant>
-            {isOngoing === true ? (
-              <RecruitingDeadline isRecommend={isRecommend}>
-                {group.deadLine} 종료
-              </RecruitingDeadline>
-            ) : (
-              <OngoingDeadline isRecommend={isRecommend}>
-                {group.deadLine} 모집 마감
-              </OngoingDeadline>
-            )}
+            {(type !== 'modal' || group.type !== 'expired') &&
+              (isOngoing === true ? (
+                <RecruitingDeadline isRecommend={isRecommend}>
+                  {group.deadLine} 종료
+                </RecruitingDeadline>
+              ) : (
+                <OngoingDeadline isRecommend={isRecommend}>
+                  {group.deadLine} 모집 마감
+                </OngoingDeadline>
+              ))}
           </Bottom>
         </Info>
       </Card>
