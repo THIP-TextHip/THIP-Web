@@ -53,6 +53,10 @@ const Feed = () => {
     navigate('/feed/search');
   };
 
+  const handleNoticeButton = () => {
+    navigate('/notice');
+  };
+
   // 전체 피드 로드 함수
   const loadTotalFeeds = useCallback(async (_cursor?: string) => {
     try {
@@ -175,7 +179,11 @@ const Feed = () => {
 
   return (
     <Container>
-      <MainHeader type="home" leftButtonClick={handleSearchButton} />
+      <MainHeader
+        type="home"
+        leftButtonClick={handleSearchButton}
+        rightButtonClick={handleNoticeButton}
+      />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {initialLoading || tabLoading ? (
         <LoadingSpinner size="large" fullHeight={true} />
