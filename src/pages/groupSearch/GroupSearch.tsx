@@ -115,13 +115,14 @@ const GroupSearch = () => {
 
   useEffect(() => {
     if (location.state?.allRooms) {
+      navigate(location.pathname, { replace: true });
+
       setSearchTerm('');
       setSearchStatus('searched');
       setShowTabs(true);
       setCategory('');
-      searchFirstPage('', toSortKey(selectedFilter), 'searched', '', true);
     }
-  }, [location.state?.allRooms, searchFirstPage, selectedFilter, toSortKey]);
+  }, [location.state?.allRooms, navigate, location.pathname]);
 
   const handleChange = (value: string) => {
     setSearchTerm(value);
@@ -157,7 +158,6 @@ const GroupSearch = () => {
 
     setSearchStatus('searched');
     setShowTabs(true);
-    searchFirstPage(term, toSortKey(selectedFilter), 'searched', category);
   };
 
   const handleRecentSearchClick = (recent: string) => {
@@ -168,7 +168,6 @@ const GroupSearch = () => {
     setSearchTerm(recent);
     setSearchStatus('searched');
     setShowTabs(true);
-    searchFirstPage(recent.trim(), toSortKey(selectedFilter), 'searched', category);
   };
 
   const handleAllRoomsClick = () => {
@@ -180,7 +179,6 @@ const GroupSearch = () => {
     setSearchStatus('searched');
     setShowTabs(true);
     setCategory('');
-    searchFirstPage('', toSortKey(selectedFilter), 'searched', '', true);
   };
 
   const searchStatusRef = useRef(searchStatus);
@@ -198,12 +196,12 @@ const GroupSearch = () => {
   useEffect(() => {
     if (searchStatus !== 'searched') return;
 
-    const term = searchTermRef.current.trim();
+    const term = searchTerm.trim();
     const isAllCategory = !term && category === '';
 
     searchFirstPage(term, toSortKey(selectedFilter), 'searched', category, isAllCategory);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFilter, category, searchStatus]);
+  }, [selectedFilter, category, searchStatus, searchTerm]);
 
   useEffect(() => {
     const term = searchTerm.trim();
