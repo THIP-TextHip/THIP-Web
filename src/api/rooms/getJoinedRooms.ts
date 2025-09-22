@@ -1,12 +1,12 @@
 import { apiClient } from '../index';
 
-// 가입한 방 목록 응답 데이터 타입
 export interface JoinedRoomItem {
   roomId: number;
   bookImageUrl: string;
   roomTitle: string;
   memberCount: number;
   userPercentage: number;
+  deadlineDate?: string | null;
 }
 
 export interface JoinedRoomsResponse {

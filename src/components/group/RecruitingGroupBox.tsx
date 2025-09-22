@@ -98,9 +98,15 @@ const Title = styled.h2`
 const TabContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 8px;
   justify-content: center;
   margin-bottom: 24px;
+
+  @media (max-width: 373px) {
+    max-width: 240px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 `;
 
 const Tab = styled.button<{ selected?: boolean }>`

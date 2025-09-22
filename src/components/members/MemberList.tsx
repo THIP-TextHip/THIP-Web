@@ -78,6 +78,7 @@ const ProfileImageWithSrc = styled.img`
   height: 36px;
   border-radius: 50%;
   background-color: var(--color-grey-400);
+  border: 1px solid #888;
   flex-shrink: 0;
   object-fit: cover;
 `;
