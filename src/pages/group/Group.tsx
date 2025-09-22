@@ -95,7 +95,8 @@ const Group = () => {
 
   const handleNoticeButton = () => {
     navigate('/notice');
-      
+  };
+
   const handleAllRoomsClick = () => {
     navigate('/group/search', {
       state: {
