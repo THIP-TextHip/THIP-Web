@@ -126,6 +126,11 @@ const Grid = styled.div`
   @media (min-width: 584px) {
     grid-template-columns: 1fr 1fr;
   }
+
+  /* 항목이 하나일 때는 전체 열 사용 (2열로 쪼개지지 않도록 처리) */
+  & > *:only-child {
+    grid-column: 1 / -1;
+  }
 `;
 
 const EmptyContent = styled.div`
