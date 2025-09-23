@@ -10,19 +10,6 @@
 export const isRoomCompleted = (progressEndDate: string): boolean => {
   if (!progressEndDate) return false;
 
-  // 🧪 테스트용: 특정 roomId들을 완료된 상태로 시뮬레이션
-  if (typeof window !== 'undefined') {
-    const currentPath = window.location.pathname;
-    const testRoomIds = ['999', '998', '997']; // 테스트용 완료된 모임방 ID들
-
-    for (const testId of testRoomIds) {
-      if (currentPath.includes(`/${testId}`) || currentPath.includes(`rooms/${testId}`)) {
-        console.log(`🧪 테스트 모드: 모임방 ${testId}는 완료된 상태로 시뮬레이션됩니다.`);
-        return true;
-      }
-    }
-  }
-
   // 날짜 형식 정규화 (YYYY.MM.DD -> YYYY-MM-DD)
   const normalizedDate = progressEndDate.replace(/\./g, '-');
 
