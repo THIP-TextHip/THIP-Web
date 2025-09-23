@@ -141,9 +141,14 @@ const Content = styled.div`
   flex-direction: column;
   gap: 12px;
   overflow-y: auto;
-  padding: 0 20px 24px;
-`;
+  padding: 0 20px 60px;
 
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+`;
 const GroupCardHeader = styled.div`
   display: flex;
   justify-content: space-between;
