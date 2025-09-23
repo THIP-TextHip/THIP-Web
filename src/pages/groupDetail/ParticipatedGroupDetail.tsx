@@ -43,6 +43,7 @@ import lockIcon from '../../assets/group/lock.svg';
 import calendarIcon from '../../assets/group/calendar.svg';
 import peopleIcon from '../../assets/common/darkPeople.svg';
 import styled from '@emotion/styled';
+import { isRoomCompleted } from '@/utils/roomStatus';
 
 const ParticipatedGroupDetail = () => {
   const { openConfirm, openSnackbar } = usePopupActions();
@@ -243,12 +244,15 @@ const ParticipatedGroupDetail = () => {
     message: '모임방 멤버들과 간단한 인사를 나눠보세요!',
   };
 
+  // 모임방 완료 여부 확인
+  const isCompleted = roomData ? isRoomCompleted(roomData.data.progressEndDate) : false;
+
   return (
     <ParticipatedWrapper>
       <TopBackground genre={getGenreForBackground()}>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
-          <IconButton src={moreIcon} onClick={handleMoreButton} />
+          {!isCompleted && <IconButton src={moreIcon} onClick={handleMoreButton} />}
         </Header>
         <BannerSection>
           <GroupTitle>

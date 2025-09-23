@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import MessageInput from '@/components/today-words/MessageInput';
 import ReplyList from '@/components/common/Post/ReplyList';
 import { getComments, type CommentData } from '@/api/comments/getComments';
@@ -7,6 +8,8 @@ import { useReplyActions } from '@/hooks/useReplyActions';
 import { useReplyStore } from '@/stores/useReplyStore';
 import { useCommentBottomSheetStore } from '@/stores/useCommentBottomSheetStore';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import { getRoomPlaying } from '@/api/rooms/getRoomPlaying';
+import { isRoomCompleted } from '@/utils/roomStatus';
 import {
   Overlay,
   BottomSheet,
@@ -18,12 +21,14 @@ import {
 } from './GlobalCommentBottomSheet.styled';
 
 const GlobalCommentBottomSheet = () => {
+  const { roomId } = useParams<{ roomId: string }>();
   const { isOpen, postId, postType, closeCommentBottomSheet } = useCommentBottomSheetStore();
-  
+
   const [commentList, setCommentList] = useState<CommentData[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [roomCompleted, setRoomCompleted] = useState(false);
   
   const { nickname, isReplying, cancelReply } = useReplyActions();
   const { parentId } = useReplyStore();
@@ -102,6 +107,27 @@ const GlobalCommentBottomSheet = () => {
     }
   };
 
+  // 모임방 상태 확인
+  useEffect(() => {
+    const checkRoomStatus = async () => {
+      if (!roomId) return;
+
+      try {
+        const response = await getRoomPlaying(parseInt(roomId));
+        if (response.isSuccess) {
+          const completed = isRoomCompleted(response.data.progressEndDate);
+          setRoomCompleted(completed);
+        }
+      } catch (error) {
+        console.error('모임방 상태 확인 오류:', error);
+      }
+    };
+
+    if (isOpen) {
+      checkRoomStatus();
+    }
+  }, [isOpen, roomId]);
+
   // 바텀시트가 열릴 때 댓글 로드
   useEffect(() => {
     if (isOpen) {
@@ -138,20 +164,22 @@ const GlobalCommentBottomSheet = () => {
           )}
         </Content>
 
-        <InputSection>
-          <MessageInput
-            placeholder={
-              isReplying ? `@${nickname}님에게 답글을 남겨보세요` : '댓글을 남겨보세요'
-            }
-            value={inputValue}
-            onChange={setInputValue}
-            onSend={handleSendComment}
-            isReplying={isReplying}
-            onCancelReply={handleCancelReply}
-            nickname={nickname}
-            disabled={isSending}
-          />
-        </InputSection>
+        {!roomCompleted && (
+          <InputSection>
+            <MessageInput
+              placeholder={
+                isReplying ? `@${nickname}님에게 답글을 남겨보세요` : '댓글을 남겨보세요'
+              }
+              value={inputValue}
+              onChange={setInputValue}
+              onSend={handleSendComment}
+              isReplying={isReplying}
+              onCancelReply={handleCancelReply}
+              nickname={nickname}
+              disabled={isSending}
+            />
+          </InputSection>
+        )}
       </BottomSheet>
     </Overlay>
   );

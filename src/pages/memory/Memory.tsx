@@ -8,6 +8,8 @@ import Snackbar from '../../components/common/Modal/Snackbar';
 import GlobalCommentBottomSheet from '../../components/common/CommentBottomSheet/GlobalCommentBottomSheet';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
+import { getRoomPlaying } from '../../api/rooms/getRoomPlaying';
+import { isRoomCompleted } from '../../utils/roomStatus';
 import type { GetMemoryPostsParams, Post, Record } from '../../types/memory';
 
 export type RecordType = 'group' | 'my';
@@ -66,6 +68,9 @@ const Memory = () => {
 
   // 업로드 프로그레스 상태
   const [showUploadProgress, setShowUploadProgress] = useState(false);
+
+  // 모임방 완료 상태
+  const [roomCompleted, setRoomCompleted] = useState(false);
 
   // 기록 데이터
   const [myRecords, setMyRecords] = useState<Record[]>([]);
@@ -145,6 +150,25 @@ const Memory = () => {
       setError('기록을 불러오는 중 오류가 발생했습니다.');
     }
   }, [roomId, activeTab, selectedSort, activeFilter, selectedPageRange]);
+
+  // 모임방 상태 확인
+  useEffect(() => {
+    const checkRoomStatus = async () => {
+      if (!roomId) return;
+
+      try {
+        const response = await getRoomPlaying(parseInt(roomId));
+        if (response.isSuccess) {
+          const completed = isRoomCompleted(response.data.progressEndDate);
+          setRoomCompleted(completed);
+        }
+      } catch (error) {
+        console.error('모임방 상태 확인 오류:', error);
+      }
+    };
+
+    checkRoomStatus();
+  }, [roomId]);
 
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
@@ -292,9 +316,11 @@ const Memory = () => {
         />
       </ScrollableContent>
 
-      <FloatingElements>
-        <MemoryAddButton />
-      </FloatingElements>
+      {!roomCompleted && (
+        <FloatingElements>
+          <MemoryAddButton />
+        </FloatingElements>
+      )}
 
       {showSnackbar && (
         <Snackbar
