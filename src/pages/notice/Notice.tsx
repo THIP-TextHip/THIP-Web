@@ -171,6 +171,12 @@ const NotificationList = styled.div`
   padding: 0 20px 20px 20px;
   width: 100%;
   overflow-y: auto;
+  /* Hide scrollbar but keep scroll */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 `;
 
 const NotificationCard = styled.div<{ read: boolean }>`
