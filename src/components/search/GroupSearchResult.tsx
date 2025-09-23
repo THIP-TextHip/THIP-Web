@@ -100,7 +100,7 @@ const GroupSearchResult = ({
               key={group.id}
               group={group}
               type={'search'}
-              isOngoing={group.isOnGoing}
+              isOngoing={false}
               isFirstCard={type === 'searching' && idx === 0}
               onClick={() => onClickRoom(Number(group.id))}
               ref={idx === mapped.length - 1 ? lastRoomElementCallback : undefined}
@@ -139,7 +139,6 @@ const Tab = styled.button<{ selected?: boolean }>`
 const Content = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
   overflow-y: auto;
   padding: 0 20px 60px;
 
