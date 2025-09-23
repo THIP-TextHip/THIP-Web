@@ -66,9 +66,8 @@ const Card = styled.div<{ cardType: 'main' | 'search' | 'modal'; isFirstCard?: b
   border: ${({ cardType }) => (cardType === 'main' ? `1px solid ${colors.grey[300]}` : '')};
   border-radius: ${({ cardType }) => (cardType === 'search' ? `none` : '12px')};
   box-sizing: border-box;
-  padding: ${({ cardType }) => (cardType === 'search' ? '24px 12px 12px 12px' : '12px')};
+  padding: ${({ cardType }) => (cardType === 'search' ? '24px 12px' : '12px')};
   gap: 12px;
-  padding: 12px;
   min-width: 232px;
   cursor: pointer;
 `;
@@ -112,7 +111,7 @@ const Info = styled.div`
   flex-direction: column;
   justify-content: space-between;
   flex: 1;
-  min-width: 0; /* flex 아이템이 부모 너비를 넘지 않도록 */
+  min-width: 0;
 `;
 
 const Title = styled.h3<{ isRecommend: boolean }>`
@@ -126,7 +125,7 @@ const Title = styled.h3<{ isRecommend: boolean }>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 100%; /* 부모 컨테이너의 전체 너비 사용 */
+  width: 100%;
 `;
 
 const Bottom = styled.div`
