@@ -81,25 +81,8 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       } else {
         console.error('좋아요 상태 변경 실패:', response.message);
 
-        // 에러 메시지에 따른 사용자 알림
-        let errorMessage = '좋아요 처리 중 오류가 발생했습니다.';
-
-        if (response.code === 140011) {
-          errorMessage = '방 접근 권한이 없습니다.';
-        } else if (response.code === 185001) {
-          errorMessage = '이미 좋아요한 게시물입니다.';
-        } else if (response.code === 185002) {
-          errorMessage = '좋아요하지 않은 게시물은 취소할 수 없습니다.';
-        } else if (response.code === 100009) {
-          errorMessage = '잘못된 게시물 타입입니다.';
-        } else if (response.code === 110009) {
-          errorMessage = '존재하지 않는 게시물입니다.';
-        } else if (response.code === 40500) {
-          errorMessage = '허용되지 않는 HTTP 메소드입니다.';
-        }
-
         openSnackbar({
-          message: errorMessage,
+          message: response.message || '좋아요 처리 중 오류가 발생했습니다.',
           variant: 'top',
           onClose: () => {},
         });
@@ -252,7 +235,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
 
         // 실패한 경우에도 팝업 닫기
         closePopup();
-        
+
         openSnackbar({
           message: errorMessage,
           variant: 'top',
@@ -298,20 +281,26 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     
     // 클릭으로 더보기 메뉴 표시
     if (isMyRecord) {
-      const menuOptions: any = {
-        onEdit: handleEdit,
-        onDelete: handleDeleteConfirm,
-        onClose: closePopup,
-        type: 'post',
-        isWriter: true,
-      };
-      
-      // 기록(text)일 때만 핀하기 기능 추가
       if (type === 'text') {
-        menuOptions.onPin = handlePinConfirm;
+        // 기록(text)일 때는 핀하기 기능 포함
+        openMoreMenu({
+          onEdit: handleEdit,
+          onDelete: handleDeleteConfirm,
+          onClose: closePopup,
+          onPin: handlePinConfirm,
+          type: 'post' as const,
+          isWriter: true,
+        });
+      } else {
+        // 투표일 때는 핀하기 기능 제외
+        openMoreMenu({
+          onEdit: handleEdit,
+          onDelete: handleDeleteConfirm,
+          onClose: closePopup,
+          type: 'post' as const,
+          isWriter: true,
+        });
       }
-      
-      openMoreMenu(menuOptions);
     } else {
       openMoreMenu({
         onReport: handleReport,

@@ -7,6 +7,19 @@ export const postRoomPostLike = async (
   requestData: RoomPostLikeRequest,
 ): Promise<RoomPostLikeResponse> => {
   try {
+    // 🧪 테스트용: roomId 999는 완료된 모임방으로 시뮬레이션
+    if (window.location.pathname.includes('/999')) {
+      return {
+        isSuccess: false,
+        code: 50001,
+        message: '완료된 모임방에서는 좋아요를 누를 수 없습니다.',
+        data: {
+          postId: postId,
+          isLiked: false
+        }
+      };
+    }
+
     const response = await apiClient.post<RoomPostLikeResponse>(
       `/room-posts/${postId}/likes`,
       requestData,

@@ -6,6 +6,7 @@ import { postReply } from '@/api/comments/postReply';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { useReplyStore } from '@/stores/useReplyStore';
 import { useCommentBottomSheetStore } from '@/stores/useCommentBottomSheetStore';
+import { usePopupActions } from '@/hooks/usePopupActions';
 import {
   Overlay,
   BottomSheet,
@@ -26,6 +27,7 @@ const GlobalCommentBottomSheet = () => {
   
   const { nickname, isReplying, cancelReply } = useReplyActions();
   const { parentId } = useReplyStore();
+  const { openSnackbar } = usePopupActions();
 
   // 댓글 목록 로드
   const loadComments = useCallback(async () => {
@@ -62,15 +64,27 @@ const GlobalCommentBottomSheet = () => {
       };
 
       const response = await postReply(postId, requestData);
-      
+
       if (response.isSuccess) {
         setInputValue('');
         cancelReply(); // 답글 상태 초기화
         // 댓글 목록 새로고침
         await loadComments();
+      } else {
+        // 서버에서 받은 에러 메시지 표시
+        openSnackbar({
+          message: response.message || '댓글 작성 중 오류가 발생했습니다.',
+          variant: 'top',
+          onClose: () => {},
+        });
       }
     } catch (error) {
       console.error('댓글 전송 실패:', error);
+      openSnackbar({
+        message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
+        variant: 'top',
+        onClose: () => {},
+      });
     } finally {
       setIsSending(false);
     }

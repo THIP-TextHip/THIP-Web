@@ -24,7 +24,13 @@ interface PollRecordProps {
   onVoteUpdate?: (updatedOptions: PollOption[]) => void; // 투표 결과 업데이트 콜백
 }
 
-const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUpdate }: PollRecordProps) => {
+const PollRecord = ({
+  content,
+  pollOptions,
+  postId,
+  shouldBlur = false,
+  onVoteUpdate,
+}: PollRecordProps) => {
   const [animate, setAnimate] = useState(false);
   const [currentOptions, setCurrentOptions] = useState(pollOptions);
   const [isVoting, setIsVoting] = useState(false);
@@ -85,7 +91,7 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
         // API 응답으로 받은 투표 결과를 현재 옵션 형태로 변환
         const updatedOptions = currentOptions.map(opt => {
           const updatedItem = response.data.voteItems.find(
-            item => item.voteItemId === opt.voteItemId
+            item => item.voteItemId === opt.voteItemId,
           );
           if (updatedItem) {
             return {
@@ -93,7 +99,8 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
               percentage: updatedItem.percentage,
               count: updatedItem.count,
               isVoted: updatedItem.isVoted,
-              isHighest: updatedItem.count === Math.max(...response.data.voteItems.map(item => item.count))
+              isHighest:
+                updatedItem.count === Math.max(...response.data.voteItems.map(item => item.count)),
             };
           }
           return opt;
@@ -112,7 +119,7 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
       } else {
         // 에러 처리
         let errorMessage = '투표 처리 중 오류가 발생했습니다.';
-        
+
         if (response.code === 120001) {
           errorMessage = '이미 투표한 투표항목입니다.';
         } else if (response.code === 120002) {
@@ -121,8 +128,6 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
           errorMessage = '방 접근 권한이 없습니다.';
         } else if (response.code === 120000) {
           errorMessage = '투표는 존재하지만 투표항목이 비어있습니다.';
-        } else if (response.code === 140011) {
-          errorMessage = '방 접근 권한이 없습니다.';
         }
 
         openSnackbar({
@@ -160,14 +165,14 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
       <PollQuestion>{content}</PollQuestion>
       <PollOptions>
         {currentOptions.map((option, index) => (
-          <PollOptionStyled 
-            key={option.id} 
+          <PollOptionStyled
+            key={option.id}
             isHighest={hasVotes && option.isHighest}
-            onClick={shouldBlur ? undefined : (e) => handleOptionClick(e, option)}
-            style={{ 
-              cursor: shouldBlur ? 'default' : (isVoting ? 'not-allowed' : 'pointer'),
-              opacity: shouldBlur ? 1 : (isVoting ? 0.7 : 1),
-              pointerEvents: shouldBlur ? 'none' : 'auto'
+            onClick={shouldBlur ? undefined : e => handleOptionClick(e, option)}
+            style={{
+              cursor: shouldBlur ? 'default' : isVoting ? 'not-allowed' : 'pointer',
+              opacity: shouldBlur ? 1 : isVoting ? 0.7 : 1,
+              pointerEvents: shouldBlur ? 'none' : 'auto',
             }}
           >
             <PollBar>
@@ -179,12 +184,8 @@ const PollRecord = ({ content, pollOptions, postId, shouldBlur = false, onVoteUp
               />
             </PollBar>
             <PollContent>
-              <PollNumber isHighest={hasVotes && option.isHighest}>
-                {index + 1}
-              </PollNumber>
-              <PollText isHighest={hasVotes && option.isHighest}>
-                {option.text}
-              </PollText>
+              <PollNumber isHighest={hasVotes && option.isHighest}>{index + 1}</PollNumber>
+              <PollText isHighest={hasVotes && option.isHighest}>{option.text}</PollText>
               {hasVotes && (
                 <PollPercentage isHighest={hasVotes && option.isHighest}>
                   {option.count}표
