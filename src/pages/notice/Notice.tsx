@@ -136,16 +136,20 @@ const Notice = () => {
         }
 
         // 모임방 -> 기록장 -> 해당 기록 필터링 화면으로 이동
-        case 'ROOM_POST_DETAIL':
-        case 'ROOM_RECORD_DETAIL':
-        case 'ROOM_VOTE_DETAIL': {
+        case 'ROOM_POST_DETAIL': {
           const roomId = (params?.roomId as number) ?? undefined;
           const postId = (params?.postId as number) ?? undefined;
           const page = (params?.page as number) ?? undefined;
           const postType = params?.postType as 'RECORD' | 'VOTE';
+          const shouldOpenComments = (params as { openComments?: boolean })?.openComments === true;
           if (roomId !== undefined) {
             navigate(`/rooms/${roomId}/memory`, {
-              state: { focusPostId: postId, postType, page },
+              state: {
+                focusPostId: postId,
+                postType,
+                page,
+                ...(shouldOpenComments ? { openComments: true } : {}),
+              },
             });
           }
           break;
