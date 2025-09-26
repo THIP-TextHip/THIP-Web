@@ -21,6 +21,13 @@ const CompletedGroupModal = ({ onClose }: CompletedGroupModalProps) => {
   const [error, setError] = useState<string | null>(null);
   const [nickname, setNickname] = useState<string>('');
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   const convertRoomToGroup = (room: Room): Group => {
     return {
       id: room.roomId.toString(),
@@ -126,15 +133,20 @@ const Content = styled.div<{ isEmpty?: boolean }>`
   overflow-y: ${({ isEmpty }) => (isEmpty ? 'visible' : 'auto')};
   padding: 0 20px;
   grid-template-columns: 1fr;
+  margin-bottom: 70px;
 
   @media (min-width: 584px) {
     grid-template-columns: 1fr 1fr;
   }
 
-  //항목이 하나일 때는 전체 열을 사용하여 2열 그리드처럼 보이지 않도록 처리
   & > *:only-child {
     grid-column: 1 / -1;
   }
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 `;
 
 const LoadingMessage = styled.div`
