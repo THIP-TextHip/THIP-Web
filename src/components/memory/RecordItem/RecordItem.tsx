@@ -316,6 +316,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     handleDeleteConfirm,
     handlePinConfirm,
     closePopup,
+    shouldBlur,
   ]);
 
   return (

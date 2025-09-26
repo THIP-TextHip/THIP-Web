@@ -56,13 +56,14 @@ const PollRecord = ({
       },
     );
 
-    if (pollRef.current) {
-      observer.observe(pollRef.current);
+    const currentPollRef = pollRef.current;
+    if (currentPollRef) {
+      observer.observe(currentPollRef);
     }
 
     return () => {
-      if (pollRef.current) {
-        observer.unobserve(pollRef.current);
+      if (currentPollRef) {
+        observer.unobserve(currentPollRef);
       }
     };
   }, [animate]);
@@ -91,7 +92,7 @@ const PollRecord = ({
         // API 응답으로 받은 투표 결과를 현재 옵션 형태로 변환
         const updatedOptions = currentOptions.map(opt => {
           const updatedItem = response.data.voteItems.find(
-            item => item.voteItemId === opt.voteItemId,
+            (item: PollOption) => item.voteItemId === opt.voteItemId,
           );
           if (updatedItem) {
             return {
@@ -100,7 +101,8 @@ const PollRecord = ({
               count: updatedItem.count,
               isVoted: updatedItem.isVoted,
               isHighest:
-                updatedItem.count === Math.max(...response.data.voteItems.map(item => item.count)),
+                updatedItem.count ===
+                Math.max(...response.data.voteItems.map((item: PollOption) => item.count)),
             };
           }
           return opt;
@@ -128,6 +130,8 @@ const PollRecord = ({
           errorMessage = '방 접근 권한이 없습니다.';
         } else if (response.code === 120000) {
           errorMessage = '투표는 존재하지만 투표항목이 비어있습니다.';
+        } else if (response.message) {
+          errorMessage = response.message; // 서버에서 보낸 메시지 사용
         }
 
         openSnackbar({

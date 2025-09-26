@@ -12,8 +12,12 @@ export const postRoomPostLike = async (
       requestData,
     );
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('방 게시물 좋아요 API 오류:', error);
+    // 서버에서 에러 응답을 보낸 경우 해당 응답을 반환
+    if (error.response?.data) {
+      return error.response.data;
+    }
     throw error;
   }
 };
