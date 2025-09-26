@@ -52,8 +52,9 @@ export function trackEvent(eventName: string, params?: EventParams) {
   >;
   const rest = Object.fromEntries(entries) as Record<string, string | number | boolean | undefined>;
 
+  const payload = { category, ...rest };
   if (GA_DEBUG) {
-    console.info('[GA4] event:', eventName, { category, ...rest });
+    console.info('[GA4] event:', eventName, payload);
   }
-  ReactGA.event({ category, action: eventName, ...rest });
+  ReactGA.event(eventName, payload);
 }
