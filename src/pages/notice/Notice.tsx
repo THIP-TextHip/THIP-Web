@@ -5,6 +5,7 @@ import TitleHeader from '@/components/common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { colors, typography } from '@/styles/global/global';
 import { getNotifications, type NotificationItem } from '@/api/notifications/getNotifications';
+import { postNotificationsCheck } from '@/api/notifications/postNotificationsCheck';
 
 const Notice = () => {
   const [selected, setSelected] = useState<string>('');
@@ -78,15 +79,90 @@ const Notice = () => {
     };
   }, [isLoading, isLast, nextCursor, loadNotifications]);
 
-  // const handleReadNotification = (index: number) => {
-  //   setNotifications(prev =>
-  //     prev.map((item, idx) => (idx === index ? { ...item, isChecked: true } : item)),
-  //   );
-  // };
-
   const filteredNotifications = notifications;
 
   const tabs = ['피드', '모임'];
+
+  const handleNotificationClick = async (notif: NotificationItem) => {
+    try {
+      const res = await postNotificationsCheck(notif.notificationId);
+      if (!res.isSuccess) return;
+
+      // UI 즉시 반영: 읽음 처리
+      // setNotifications(prev =>
+      //   prev.map(item =>
+      //     item.notificationId === notif.notificationId ? { ...item, isChecked: true } : item,
+      //   ),
+      // );
+
+      const { route, params } = res.data as { route: string; params?: Record<string, unknown> };
+
+      // 서버 라우팅 키 → 실제 앱 경로 매핑
+      switch (route) {
+        // 이동 없음
+        case 'NONE':
+          break;
+
+        // 피드 1번 (해당유저 피드로 이동)
+        case 'FEED_USER': {
+          const userId = (params?.userId as number) ?? undefined;
+          if (userId !== undefined) {
+            navigate(`/otherfeed/${userId}`);
+          }
+          break;
+        }
+
+        // 피드 2~6번 (피드상세페이지로 이동)
+        case 'FEED_DETAIL': {
+          const feedId = (params?.feedId as number) ?? undefined;
+          if (feedId !== undefined) {
+            navigate(`/feed/${feedId}`);
+          }
+          break;
+        }
+
+        // 모임 (모집조기마감 or 모임시작)
+        case 'ROOM_MAIN': {
+          const roomId = (params?.roomId as number) ?? undefined;
+          if (roomId !== undefined) navigate(`/group/detail/joined/${roomId}`);
+          break;
+        }
+
+        // host일때, 누군가 모임 참여를 눌렀을 때
+        case 'ROOM_DETAIL': {
+          const roomId = (params?.roomId as number) ?? undefined;
+          if (roomId !== undefined) navigate(`/group/detail/${roomId}`);
+          break;
+        }
+
+        // 모임방 -> 기록장 -> 해당 기록 필터링 화면으로 이동
+        case 'ROOM_POST_DETAIL': {
+          const roomId = (params?.roomId as number) ?? undefined;
+          const postId = (params?.postId as number) ?? undefined;
+          const page = (params?.page as number) ?? undefined;
+          const postType = params?.postType as 'RECORD' | 'VOTE';
+          const shouldOpenComments = (params as { openComments?: boolean })?.openComments === true;
+          if (roomId !== undefined) {
+            navigate(`/rooms/${roomId}/memory`, {
+              state: {
+                focusPostId: postId,
+                postType,
+                page,
+                ...(shouldOpenComments ? { openComments: true } : {}),
+              },
+            });
+          }
+          break;
+        }
+
+        default:
+          break;
+      }
+    } catch (e) {
+      // noop: 실패 시 네비게이션 없이 무시
+      console.error('알림 확인 처리 실패:', e);
+    }
+  };
 
   return (
     <Wrapper>
@@ -112,7 +188,7 @@ const Notice = () => {
             <NotificationCard
               key={notif.notificationId ?? idx}
               read={notif.isChecked}
-              // onClick={() => handleReadNotification(idx)}
+              onClick={() => handleNotificationClick(notif)}
             >
               {!notif.isChecked && <UnreadDot />}
               <TitleRow>
@@ -171,6 +247,12 @@ const NotificationList = styled.div`
   padding: 0 20px 20px 20px;
   width: 100%;
   overflow-y: auto;
+  /* Hide scrollbar but keep scroll */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 `;
 
 const NotificationCard = styled.div<{ read: boolean }>`
