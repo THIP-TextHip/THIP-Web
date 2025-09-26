@@ -6,6 +6,7 @@ import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
 import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddButton';
 import Snackbar from '../../components/common/Modal/Snackbar';
 import GlobalCommentBottomSheet from '../../components/common/CommentBottomSheet/GlobalCommentBottomSheet';
+import { useCommentBottomSheetStore } from '@/stores/useCommentBottomSheetStore';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
 import type { GetMemoryPostsParams, Post, Record } from '../../types/memory';
@@ -31,7 +32,7 @@ const convertPostToRecord = (post: Post): Record => {
     isWriter: post.isWriter,
     isLiked: post.isLiked,
     isLocked: post.isLocked, // 블러 처리 여부 추가
-    pollOptions: post.voteItems.map((item) => {
+    pollOptions: post.voteItems.map(item => {
       const maxCount = Math.max(...post.voteItems.map(v => v.count || 0));
       return {
         id: item.voteItemId.toString(),
@@ -50,6 +51,7 @@ const Memory = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { roomId } = useParams<{ roomId: string }>();
+  const { openCommentBottomSheet } = useCommentBottomSheetStore();
 
   // 상태 관리
   const [activeTab, setActiveTab] = useState<RecordType>('group');
@@ -150,6 +152,30 @@ const Memory = () => {
   useEffect(() => {
     loadMemoryPosts();
   }, [loadMemoryPosts]);
+
+  // Notice에서 넘어온 state(page, focusPostId 등)로 초기 필터 적용
+  useEffect(() => {
+    type MemoryLocationState = {
+      page?: number;
+      focusPostId?: number;
+      postType?: 'RECORD' | 'VOTE';
+      openComments?: boolean;
+    } | null;
+    const state = (location.state as MemoryLocationState) || null;
+    const initialPage = state?.page;
+    if (initialPage && !selectedPageRange) {
+      setSelectedPageRange({ start: initialPage, end: initialPage });
+      setActiveFilter('page');
+    }
+
+    // 댓글 모달 자동 오픈 처리
+    if (state?.openComments && state.focusPostId && state.postType) {
+      openCommentBottomSheet(state.focusPostId, state.postType);
+      // 동일 경로 재진입 시 중복 오픈 방지를 위해 state 제거
+      navigate(location.pathname, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state, roomId]);
 
   // 새로운 기록이 추가되었을 때 처리 (작성 완료 후 돌아왔을 때)
   useEffect(() => {
