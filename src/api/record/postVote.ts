@@ -6,8 +6,17 @@ export type VoteResponse = ApiResponse<VoteData>;
 
 // 투표하기 API 함수
 export const postVote = async (roomId: number, voteId: number, voteData: VoteRequest) => {
-  const response = await apiClient.post<VoteResponse>(`/rooms/${roomId}/vote/${voteId}`, voteData);
-  return response.data;
+  try {
+    const response = await apiClient.post<VoteResponse>(`/rooms/${roomId}/vote/${voteId}`, voteData);
+    return response.data;
+  } catch (error: any) {
+    console.error('투표 API 오류:', error);
+    // 서버에서 에러 응답을 보낸 경우 해당 응답을 반환
+    if (error.response?.data) {
+      return error.response.data;
+    }
+    throw error;
+  }
 };
 
 /*

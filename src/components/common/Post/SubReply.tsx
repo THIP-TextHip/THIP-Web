@@ -46,11 +46,20 @@ const SubReply = ({
   const handleLike = async () => {
     try {
       const response = await postLike(commentId, !liked);
-      console.log('좋아요 상태 변경 성공:', response);
 
-      // 서버 응답으로 상태 업데이트
-      setLiked(response.data.isLiked);
-      setCurrentLikeCount(prev => (response.data.isLiked ? prev + 1 : prev - 1));
+      if (response.isSuccess) {
+        console.log('좋아요 상태 변경 성공:', response);
+        // 서버 응답으로 상태 업데이트
+        setLiked(response.data.isLiked);
+        setCurrentLikeCount(prev => (response.data.isLiked ? prev + 1 : prev - 1));
+      } else {
+        console.error('좋아요 상태 변경 실패:', response.message);
+        openSnackbar({
+          message: response.message || '좋아요 처리 중 오류가 발생했습니다.',
+          variant: 'top',
+          onClose: () => {},
+        });
+      }
     } catch (error) {
       console.error('좋아요 상태 변경 실패:', error);
     }
