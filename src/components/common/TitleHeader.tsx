@@ -78,7 +78,7 @@ const TitleHeader = ({
           {rightIcon}
         </div>
       ) : rightButton ? (
-        <NextButton onClick={onRightClick} active={isNextActive}>
+        <NextButton onClick={isNextActive ? onRightClick : undefined} active={isNextActive}>
           {rightButton}
         </NextButton>
       ) : (
