@@ -278,6 +278,7 @@ const Content = styled.div`
   grid-template-columns: 1fr;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  margin-bottom: 60px;
   &::-webkit-scrollbar {
     display: none;
   }
