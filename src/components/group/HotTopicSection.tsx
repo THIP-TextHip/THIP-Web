@@ -32,11 +32,11 @@ export interface Poll {
 interface HotTopicSectionProps {
   polls: Poll[];
   hasPolls: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   onPollClick: (pageNumber: number) => void;
 }
 
-const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSectionProps) => {
+const HotTopicSection = ({ polls, hasPolls, onPollClick }: HotTopicSectionProps) => {
   const [currentPollIndex, setCurrentPollIndex] = useState(0);
   const slideRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -46,15 +46,30 @@ const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSect
   const dragStateRef = useRef({
     startX: 0,
     startTranslateX: 0,
+    hasMoved: false,
   });
 
   const containerWidth = 100; // 각 슬라이드의 width %
 
   // 투표 옵션 클릭 시 해당 페이지로 이동
-  const handleVoteClick = (poll: Poll) => {
-    if (!isDragging) {
+  const handleVoteClick = (e: React.MouseEvent | React.TouchEvent, poll: Poll) => {
+    e.stopPropagation();
+    if (!isDragging || !dragStateRef.current.hasMoved) {
       onPollClick(poll.pageNumber);
     }
+  };
+
+  // 터치 이벤트 핸들러
+  const handleVoteTouchEnd = (e: React.TouchEvent, poll: Poll) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragging || !dragStateRef.current.hasMoved) {
+      onPollClick(poll.pageNumber);
+    }
+  };
+
+  const handleVoteTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
   };
 
   // 슬라이드 위치 계산
@@ -81,6 +96,7 @@ const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSect
       setIsDragging(true);
       dragStateRef.current.startX = clientX;
       dragStateRef.current.startTranslateX = translateX;
+      dragStateRef.current.hasMoved = false;
     },
     [translateX],
   );
@@ -91,6 +107,11 @@ const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSect
       if (!isDragging) return;
 
       const deltaX = clientX - dragStateRef.current.startX;
+
+      if (Math.abs(deltaX) > 5) {
+        dragStateRef.current.hasMoved = true;
+      }
+
       const newTranslateX =
         dragStateRef.current.startTranslateX + (deltaX / window.innerWidth) * 100;
 
@@ -166,7 +187,9 @@ const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSect
     return poll.options.map((option, index) => (
       <StyledVoteOption
         key={option.id}
-        onClick={() => handleVoteClick(poll)}
+        onClick={e => handleVoteClick(e, poll)}
+        onTouchStart={handleVoteTouchStart}
+        onTouchEnd={e => handleVoteTouchEnd(e, poll)}
         style={{ cursor: isDragging ? 'grabbing' : 'pointer' }}
       >
         <VoteOptionNumber>{index + 1}.</VoteOptionNumber>
@@ -228,7 +251,7 @@ const HotTopicSection = ({ polls, hasPolls, onClick, onPollClick }: HotTopicSect
 
   return (
     <StyledHotTopicSection>
-      <HotTopicSectionHeader onClick={onClick}>
+      <HotTopicSectionHeader>
         <HotTopicSectionTitle>모임방의 뜨거운 감자</HotTopicSectionTitle>
       </HotTopicSectionHeader>
       {renderPollContent()}
