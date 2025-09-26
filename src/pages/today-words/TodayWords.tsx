@@ -11,6 +11,8 @@ import { Container, ContentArea } from './TodayWords.styled';
 import type { Message, TodayCommentItem } from '../../types/today';
 import { createDailyGreeting } from '../../api/rooms/createDailyGreeting';
 import { getDailyGreeting } from '../../api/rooms/getDailyGreeting';
+import { getRoomPlaying } from '../../api/rooms/getRoomPlaying';
+import { isRoomCompleted } from '../../utils/roomStatus';
 import { usePopupActions } from '../../hooks/usePopupActions';
 
 const TodayWords = () => {
@@ -25,6 +27,7 @@ const TodayWords = () => {
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [isLast, setIsLast] = useState(false);
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
+  const [roomCompleted, setRoomCompleted] = useState(false);
   const { openSnackbar } = usePopupActions();
 
   // 하루 5개 제한 관련
@@ -167,6 +170,25 @@ const TodayWords = () => {
       loadMessages(nextCursor);
     }
   }, [isLoadingMore, isLast, nextCursor, roomId, loadMessages]);
+
+  // 모임방 상태 확인
+  useEffect(() => {
+    const checkRoomStatus = async () => {
+      if (!roomId) return;
+
+      try {
+        const response = await getRoomPlaying(parseInt(roomId));
+        if (response.isSuccess) {
+          const completed = isRoomCompleted(response.data.progressEndDate);
+          setRoomCompleted(completed);
+        }
+      } catch (error) {
+        console.error('모임방 상태 확인 오류:', error);
+      }
+    };
+
+    checkRoomStatus();
+  }, [roomId]);
 
   // 컴포넌트 마운트 시 초기 데이터 로드
   useEffect(() => {
@@ -334,13 +356,15 @@ const TodayWords = () => {
           )}
         </ContentArea>
 
-        <MessageInput
-          value={inputValue}
-          onChange={setInputValue}
-          onSend={handleSendMessage}
-          placeholder="메이트들과 간단한 인사를 나눠 보세요!"
-          disabled={isSubmitting}
-        />
+        {!roomCompleted && (
+          <MessageInput
+            value={inputValue}
+            onChange={setInputValue}
+            onSend={handleSendMessage}
+            placeholder="메이트들과 간단한 인사를 나눠 보세요!"
+            disabled={isSubmitting}
+          />
+        )}
       </Container>
     </>
   );

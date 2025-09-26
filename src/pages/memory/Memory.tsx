@@ -9,6 +9,8 @@ import GlobalCommentBottomSheet from '../../components/common/CommentBottomSheet
 import { useCommentBottomSheetStore } from '@/stores/useCommentBottomSheetStore';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
+import { getRoomPlaying } from '../../api/rooms/getRoomPlaying';
+import { isRoomCompleted } from '../../utils/roomStatus';
 import type { GetMemoryPostsParams, Post, Record } from '../../types/memory';
 
 export type RecordType = 'group' | 'my';
@@ -20,7 +22,7 @@ const convertPostToRecord = (post: Post): Record => {
     id: post.postId.toString(),
     user: post.nickName,
     userPoints: 132,
-    profileImageUrl: post.profileImageUrl, // 프로필 이미지 URL 추가
+    profileImageUrl: post.profileImageUrl,
     content: post.content,
     likeCount: post.likeCount,
     commentCount: post.commentCount,
@@ -31,7 +33,7 @@ const convertPostToRecord = (post: Post): Record => {
     pageRange: post.isOverview ? undefined : post.page.toString(),
     isWriter: post.isWriter,
     isLiked: post.isLiked,
-    isLocked: post.isLocked, // 블러 처리 여부 추가
+    isLocked: post.isLocked,
     pollOptions: post.voteItems.map(item => {
       const maxCount = Math.max(...post.voteItems.map(v => v.count || 0));
       return {
@@ -62,12 +64,33 @@ const Memory = () => {
     null,
   );
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const pageParam = searchParams.get('page');
+    const filterParam = searchParams.get('filter');
+
+    if (pageParam && filterParam === 'poll') {
+      const page = parseInt(pageParam);
+      if (!isNaN(page)) {
+        console.log('✅ 페이지 필터 적용:', { page });
+        setSelectedPageRange({ start: page, end: page });
+        setActiveFilter('page');
+        setActiveTab('group');
+
+        navigate(location.pathname, { replace: true });
+      }
+    }
+  }, [location.search]);
+
   // API 관련 상태
   const [error, setError] = useState<string | null>(null);
   const [isOverviewEnabled, setIsOverviewEnabled] = useState(false);
 
   // 업로드 프로그레스 상태
   const [showUploadProgress, setShowUploadProgress] = useState(false);
+
+  // 모임방 완료 상태
+  const [roomCompleted, setRoomCompleted] = useState(false);
 
   // 기록 데이터
   const [myRecords, setMyRecords] = useState<Record[]>([]);
@@ -99,19 +122,13 @@ const Memory = () => {
       // 필터 적용
       if (activeFilter === 'overall') {
         params.isOverview = true;
-        console.log('🎯 총평 필터 적용 - 독서 진행률 80% 이상 필요');
       } else if (selectedPageRange) {
         params.pageStart = selectedPageRange.start;
         params.pageEnd = selectedPageRange.end;
         params.isPageFilter = true;
-        console.log('📖 페이지 필터 적용:', selectedPageRange);
       }
 
-      console.log('📤 API 요청 파라미터:', params);
-
       const response = await getMemoryPosts(params);
-      console.log('📨 API 응답 성공:', response);
-
       if (response.isSuccess) {
         const convertedRecords = response.data.postList.map(convertPostToRecord);
 
@@ -123,7 +140,6 @@ const Memory = () => {
 
         setIsOverviewEnabled(response.data.isOverviewEnabled);
 
-        // 페이지 정보 설정 (API에서 제공되면)
         if (response.data.totalPages !== undefined) {
           setTotalPages(response.data.totalPages);
         }
@@ -147,6 +163,25 @@ const Memory = () => {
       setError('기록을 불러오는 중 오류가 발생했습니다.');
     }
   }, [roomId, activeTab, selectedSort, activeFilter, selectedPageRange]);
+
+  // 모임방 상태 확인
+  useEffect(() => {
+    const checkRoomStatus = async () => {
+      if (!roomId) return;
+
+      try {
+        const response = await getRoomPlaying(parseInt(roomId));
+        if (response.isSuccess) {
+          const completed = isRoomCompleted(response.data.progressEndDate);
+          setRoomCompleted(completed);
+        }
+      } catch (error) {
+        console.error('모임방 상태 확인 오류:', error);
+      }
+    };
+
+    checkRoomStatus();
+  }, [roomId]);
 
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
@@ -318,9 +353,11 @@ const Memory = () => {
         />
       </ScrollableContent>
 
-      <FloatingElements>
-        <MemoryAddButton />
-      </FloatingElements>
+      {!roomCompleted && (
+        <FloatingElements>
+          <MemoryAddButton />
+        </FloatingElements>
+      )}
 
       {showSnackbar && (
         <Snackbar
