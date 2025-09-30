@@ -143,7 +143,7 @@ const Mypage = () => {
               onClick={handleTerms}
             />
             <MenuButton src={guide} name="가이드" isButton onClick={handleGuide} />
-            <MenuButton src={ver} name="버젼 1.0.0" isButton onClick={handleVersion} />
+            <MenuButton src={ver} name="버젼 1.3.0" isButton onClick={handleVersion} />
           </MenuGrid>
         </Section>
         <BottomMenu>
