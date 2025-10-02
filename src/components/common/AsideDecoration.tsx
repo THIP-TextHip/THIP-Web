@@ -1,9 +1,10 @@
 import styled from '@emotion/styled';
+import asideSvg from '@/assets/common/aside.svg';
 
 const AsideDecoration = () => {
   return (
     <Wrapper aria-hidden="true">
-      <img src="/src/assets/common/aside.svg" alt="QR플로팅 이미지" />
+      <img src={asideSvg} alt="QR플로팅 이미지" />
     </Wrapper>
   );
 };
