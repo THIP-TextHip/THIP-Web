@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import ScrollToTop from './ScrollToTop';
+import AsideDecoration from './AsideDecoration';
 import { sendPageView } from '@/lib/ga';
 
 const Layout = () => {
@@ -38,6 +39,7 @@ const Layout = () => {
   return (
     <>
       <ScrollToTop />
+      <AsideDecoration />
       <Outlet />
     </>
   );
