@@ -149,6 +149,7 @@ const Wrapper = styled.div`
   align-items: center;
   min-width: 320px;
   max-width: 767px;
+  min-height: 100vh;
   padding: 0 20px;
   margin: 0 auto;
   background-color: var(--color-black-main);
