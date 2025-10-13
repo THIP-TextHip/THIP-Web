@@ -1,12 +1,14 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getToken } from '@/api/auth';
+import { useAuthReadyStore } from '@/stores/useAuthReadyStore';
 
 export const useSocialLoginToken = () => {
   const location = useLocation();
 
   // 토큰 발급 완료를 기다리는 Promise
   const tokenPromise = useRef<Promise<void> | null>(null);
+  const setReady = useAuthReadyStore(s => s.setReady);
 
   useEffect(() => {
     const handleSocialLoginToken = async (): Promise<void> => {
@@ -50,6 +52,8 @@ export const useSocialLoginToken = () => {
       } catch (error) {
         console.error('💥 토큰 발급 중 오류 발생:', error);
       }
+      // 토큰 발급 시도 완료 시점에 ready true
+      setReady(true);
     };
 
     // 소셜 로그인 후 리다이렉트된 경우에만 실행
@@ -57,10 +61,12 @@ export const useSocialLoginToken = () => {
     const isSocialLoginComplete = urlParams.get('loginTokenKey');
 
     if (isSocialLoginComplete) {
-      // 토큰 발급 Promise를 저장
       tokenPromise.current = handleSocialLoginToken();
+    } else {
+      // 로그인 리다이렉트 경로가 아니어도 이미 토큰이 있을 수 있음 → 바로 ready
+      setReady(true);
     }
-  }, [location.pathname, location.search]);
+  }, [location.pathname, location.search, setReady]);
 
   // 토큰 발급 완료를 기다리는 함수 반환
   const waitForToken = useCallback(async (): Promise<void> => {

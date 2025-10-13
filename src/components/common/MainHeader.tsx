@@ -1,9 +1,13 @@
+import { useEffect, useState } from 'react';
 import headerLogo from '../../assets/header/header-logo.svg';
 import groupDoneLogo from '../../assets/header/group-done.svg';
 import findUserLogo from '../../assets/header/findUser.svg';
 import bellLogo from '../../assets/header/bell.svg';
+import bellExistLogo from '../../assets/header/exist-bell.svg';
 import styled from '@emotion/styled';
 import { IconButton } from './IconButton';
+import { getNotificationExist } from '@/api/notifications/getNotificationExist';
+import { useAuthReadyStore } from '@/stores/useAuthReadyStore';
 
 interface MainHeaderProps {
   type: 'home' | 'group';
@@ -12,6 +16,26 @@ interface MainHeaderProps {
 }
 
 const MainHeader = ({ type, leftButtonClick, rightButtonClick }: MainHeaderProps) => {
+  const [hasUnchecked, setHasUnchecked] = useState(false);
+  const isAuthReady = useAuthReadyStore(s => s.isReady);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      if (!localStorage.getItem('authToken')) return;
+      try {
+        const res = await getNotificationExist();
+        if (mounted && res.isSuccess) setHasUnchecked(res.data.exists);
+      } catch {
+        // ignore
+      }
+    };
+    if (isAuthReady) void fetchData();
+    return () => {
+      mounted = false;
+    };
+  }, [isAuthReady]);
+
   return (
     <HeaderWrapper>
       <LogoImg src={headerLogo} alt="headerLogo" />
@@ -21,7 +45,11 @@ const MainHeader = ({ type, leftButtonClick, rightButtonClick }: MainHeaderProps
           src={type === 'group' ? groupDoneLogo : findUserLogo}
           alt={type === 'group' ? '모임 완료 아이콘' : '사용자 찾기 아이콘'}
         />
-        <IconButton onClick={rightButtonClick} src={bellLogo} alt="알림 아이콘" />
+        <IconButton
+          onClick={rightButtonClick}
+          src={hasUnchecked ? bellExistLogo : bellLogo}
+          alt="알림 아이콘"
+        />
       </Actions>
     </HeaderWrapper>
   );
