@@ -114,7 +114,7 @@ const FollowerListPage = () => {
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
 
-      if (scrollTop + windowHeight >= documentHeight - 200) {
+      if (scrollTop + windowHeight >= documentHeight - 100) {
         loadUserList(nextCursor);
       }
     };
@@ -127,6 +127,15 @@ const FollowerListPage = () => {
   useEffect(() => {
     loadUserList();
   }, [loadUserList]);
+
+  // 첫 페이지 높이가 뷰포트보다 작아 스크롤 이벤트가 발생하지 않는 경우 자동으로 다음 페이지를 프리페치
+  useEffect(() => {
+    const doc = document.documentElement;
+    const needsMore = doc.scrollHeight <= window.innerHeight + 100;
+    if (!loading && !isLast && !!nextCursor && needsMore) {
+      loadUserList(nextCursor);
+    }
+  }, [userList, loading, isLast, nextCursor, loadUserList]);
 
   return (
     <Wrapper>
@@ -192,9 +201,9 @@ const TotalBar = styled.div`
 
 const UserProfileList = styled.div`
   width: 100%;
-  height: 100vh;
-  /* min-width: 320px;
-  max-width: 540px; */
+  /* 고정 헤더(TopBar) 영역을 제외한 최소 높이를 보장하여 하단 여백에도 배경이 비지 않도록 함 */
+  min-height: 100vh;
+  background-color: var(--color-black-main);
   padding-top: 105px;
   padding-bottom: 20px;
 `;
