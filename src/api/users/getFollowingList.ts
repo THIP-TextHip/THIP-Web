@@ -9,6 +9,7 @@ export interface FollowingListResponse {
     followings: FollowData[];
     nextCursor: string;
     isLast: boolean;
+    totalFollowingCount?: number;
   };
 }
 

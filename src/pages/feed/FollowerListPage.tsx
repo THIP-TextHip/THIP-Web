@@ -8,6 +8,7 @@ import type { UserProfileType } from '@/types/user';
 import { getFollowerList } from '@/api/users/getFollowerList';
 import { getFollowingList } from '@/api/users/getFollowingList';
 import type { FollowData } from '@/types/follow';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const FollowerListPage = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const FollowerListPage = () => {
 
   // 상태 관리
   const [userList, setUserList] = useState<FollowData[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
@@ -77,6 +79,14 @@ const FollowerListPage = () => {
 
         setNextCursor(response.data.nextCursor);
         setIsLast(response.data.isLast);
+        // 총합 카운트 설정 (API별 키 분기)
+        if (type === 'followerlist') {
+          const total = (response.data as { totalFollowerCount?: number }).totalFollowerCount;
+          if (typeof total === 'number') setTotalCount(total);
+        } else {
+          const total = (response.data as { totalFollowingCount?: number }).totalFollowingCount;
+          if (typeof total === 'number') setTotalCount(total);
+        }
         // setTotalCount(prev => prev + userData.length);
         setRetryCount(0);
       } catch (error) {
@@ -121,24 +131,33 @@ const FollowerListPage = () => {
   return (
     <Wrapper>
       <TitleHeader leftIcon={<img src={leftArrow} />} onLeftClick={handleBackClick} title={title} />
-      <TotalBar>전체 {userList.length}</TotalBar>
-      <UserProfileList>
-        {userList.map((user, index) => (
-          <UserProfileItem
-            key={user.userId}
-            profileImageUrl={user.profileImageUrl}
-            nickname={user.nickname}
-            aliasName={user.aliasName}
-            aliasColor={user.aliasColor}
-            followerCount={user.followerCount}
-            userId={user.userId}
-            type={type as UserProfileType}
-            isFollowing={user.isFollowing}
-            isLast={index === userList.length - 1}
-            isMyself={user.isMyself}
-          />
-        ))}
-      </UserProfileList>
+      <TotalBar>전체 {totalCount}</TotalBar>
+      {loading && userList.length === 0 ? (
+        <LoadingSpinner size="medium" fullHeight={true} />
+      ) : (
+        <UserProfileList>
+          {userList.map((user, index) => (
+            <UserProfileItem
+              key={user.userId}
+              profileImageUrl={user.profileImageUrl}
+              nickname={user.nickname}
+              aliasName={user.aliasName}
+              aliasColor={user.aliasColor}
+              followerCount={user.followerCount}
+              userId={user.userId}
+              type={type as UserProfileType}
+              isFollowing={user.isFollowing}
+              isLast={index === userList.length - 1}
+              isMyself={user.isMyself}
+            />
+          ))}
+          {loading && userList.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
+              <LoadingSpinner size="small" />
+            </div>
+          )}
+        </UserProfileList>
+      )}
     </Wrapper>
   );
 };
