@@ -221,13 +221,14 @@ const GroupSearch = () => {
   }, [searchTerm, searchStatus, selectedFilter]);
 
   const loadMore = useCallback(async () => {
-    if (!searchTerm.trim() || !nextCursor || isLast || isLoadingMore) return;
+    const trimmedTerm = searchTerm.trim();
+    const isAllCategory = !trimmedTerm && category === '';
+    if ((!isAllCategory && !trimmedTerm) || !nextCursor || isLast || isLoadingMore) return;
     try {
       setIsLoadingMore(true);
       const isFinalized = searchStatus === 'searched';
-      const isAllCategory = !searchTerm.trim() && category === '';
       const res = await getSearchRooms(
-        searchTerm.trim(),
+        trimmedTerm,
         toSortKey(selectedFilter),
         nextCursor,
         isFinalized,
