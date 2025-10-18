@@ -95,23 +95,6 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
     document.body.style.userSelect = '';
   };
 
-  let touchStartX = 0;
-  let touchScrollLeft = 0;
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    isDragging = true;
-    touchStartX = e.touches[0].pageX - (scrollRef.current?.offsetLeft ?? 0);
-    touchScrollLeft = scrollRef.current?.scrollLeft ?? 0;
-  };
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!isDragging || !scrollRef.current) return;
-    const x = e.touches[0].pageX - scrollRef.current.offsetLeft;
-    const walk = x - touchStartX;
-    scrollRef.current.scrollLeft = touchScrollLeft - walk;
-  };
-  const handleTouchEnd = () => {
-    isDragging = false;
-  };
-
   const handlePrevClick = () => {
     if (scrollRef.current) {
       const container = scrollRef.current;
@@ -171,9 +154,6 @@ export function MyGroupBox({ onMyGroupsClick }: MyGroupProps) {
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
             >
               {infiniteGroups.map((g, i) => (
                 <MyGroupCard
