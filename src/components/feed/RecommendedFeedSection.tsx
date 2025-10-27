@@ -105,24 +105,6 @@ const mockRecommendedFeeds: PostData[] = [
   },
 ];
 
-const RecommendedFeedSection = () => {
-  return (
-    <SectionContainer>
-      <SectionHeader>
-        <HeaderText>지금 뜨는 추천 글</HeaderText>
-      </SectionHeader>
-      <CarouselContainer>
-        <CardList>
-          {mockRecommendedFeeds.map(feed => (
-            <RecommendedFeedCard key={feed.feedId} {...feed} />
-          ))}
-        </CardList>
-      </CarouselContainer>
-      <BorderBottom />
-    </SectionContainer>
-  );
-};
-
 const SectionContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -131,14 +113,24 @@ const SectionContainer = styled.div`
 `;
 
 const SectionHeader = styled.div`
-  padding: 28px 20px 16px;
+  padding: 40px 20px 20px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const HeaderText = styled.h2`
   color: ${colors.white};
-  font-size: ${typography.fontSize.lg};
+  font-size: ${typography.fontSize.xl};
   font-weight: ${typography.fontWeight.bold};
   line-height: normal;
+  margin-bottom: 8px;
+`;
+
+const SubText = styled.p`
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.medium};
+  line-height: 20px;
   margin: 0;
 `;
 
@@ -169,5 +161,26 @@ const BorderBottom = styled.div`
   height: 6px;
   background: #1c1c1c;
 `;
+
+// Component
+const RecommendedFeedSection = () => {
+  return (
+    <SectionContainer>
+      <SectionHeader>
+        <HeaderText>지금 뜨는 추천 글</HeaderText>
+        <SubText>비슷한 취향의 인플루언서, 작가가</SubText>
+        <SubText>추천하는 도서를 만나보세요.</SubText>
+      </SectionHeader>
+      <CarouselContainer>
+        <CardList>
+          {mockRecommendedFeeds.map(feed => (
+            <RecommendedFeedCard key={feed.feedId} {...feed} />
+          ))}
+        </CardList>
+      </CarouselContainer>
+      <BorderBottom />
+    </SectionContainer>
+  );
+};
 
 export default RecommendedFeedSection;
