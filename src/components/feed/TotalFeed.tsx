@@ -19,11 +19,11 @@ const TotalFeed = ({ showHeader, posts = [], isTotalFeed }: FeedListProps) => {
                 key={`${post.feedId}-${index}`}
                 showHeader={showHeader}
                 isMyFeed={isTotalFeed}
-                isLast={false} // 추천 섹션이 있으므로 마지막 구분선 유지
+                isLast={false}
                 {...post}
               />
-              {/* 10번째 피드 이후에 추천 섹션 한 번만 표시 */}
-              {index === 9 && <RecommendedFeedSection />}
+              {/* 10개마다 추천 섹션 반복 표시 */}
+              {(index + 1) % 10 === 0 && <RecommendedFeedSection />}
             </>
           ))}
         </>
