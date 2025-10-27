@@ -23,7 +23,7 @@ const mockRecommendedFeeds: MockPostData[] = [
     bookTitle: '책이름을입력해주세요...',
     bookAuthor: '한강',
     contentBody:
-      '세줄까지만 입력 가능합니다.ㄴ ㅇㄹㄴㄴ ㅇㅎㄴ녀;ㅇㄹ만; ↑ㅇㅎㅇ ↓ ↑ㅇ앙; ↓ ↑ㅇ악; ↓ ↑ ㅁ보름ㅇㄹ과; ㅁ먼엄안ㅇ만;ㅇㄹ라; ㅁ ㅁ엄만; 입력...',
+      '세줄까지만 입력 가능합니다.ㄴ ㅇㄹㄴㄴ ㅇㅎㄴ녀;ㅇㄹ만; ↑ㅇㅎㅇ ↓ ↑ㅇ앙; ↓ ↑ㅇ악; ↓ ↑ ㅁ보름ㅇㄹ과; ㅁ먼엄안ㅇ만;ㅇㄹ라; ㅁ ㅁ엄만; 입력..ㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㅇㅁㅇㅁㄴㅇㅁㅇㅁㅇs.',
     contentUrls: [],
     likeCount: 123,
     commentCount: 123,

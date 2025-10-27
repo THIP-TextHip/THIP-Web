@@ -4,6 +4,7 @@ import PostFooter from '../common/Post/PostFooter';
 import PostHeader from '../common/Post/PostHeader';
 import type { PostData } from '../../types/post';
 import { colors } from '@/styles/global/global';
+import lookmoreInfluencer from '@/assets/feed/lookmore-influencer.svg';
 
 interface RecommendedFeedCardProps extends PostData {
   aliasColor?: string;
@@ -45,6 +46,11 @@ const PostBodyWrapper = styled.div`
   .content {
     -webkit-line-clamp: 3 !important;
     min-height: 60px;
+  }
+
+  && img.lookmore-icon,
+  && .lookmore-icon {
+    content: url("${lookmoreInfluencer}") !important;
   }
 `;
 
