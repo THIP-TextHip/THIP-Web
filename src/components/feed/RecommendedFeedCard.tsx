@@ -11,8 +11,12 @@ interface RecommendedFeedCardProps extends PostData {
 }
 
 const RecommendedFeedCard = (postData: RecommendedFeedCardProps) => {
+  const handleCardClick = () => {
+    window.open(`/feed/${postData.feedId}`, '_blank');
+  };
+
   return (
-    <CardContainer>
+    <CardContainer onClick={handleCardClick}>
       <PostHeader {...postData} aliasName={postData.alias} aliasColor={postData.aliasColor} />
       <PostBodyWrapper>
         <PostBody {...postData} />
@@ -26,7 +30,7 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 20px;
+  padding: 12px;
   background-color: ${colors.darkgrey.dark};
   border-radius: 12px;
   width: 100%;
@@ -48,9 +52,15 @@ const PostBodyWrapper = styled.div`
     min-height: 60px;
   }
 
+  /* prettier-ignore */
   && img.lookmore-icon,
   && .lookmore-icon {
     content: url("${lookmoreInfluencer}") !important;
+  }
+
+  /* 책 카드 클릭 무효화 - 카드 전체 클릭만 작동하도록 */
+  > div > div:first-of-type {
+    pointer-events: none;
   }
 `;
 
