@@ -22,9 +22,8 @@ const CardContainer = styled.div`
   padding: 20px;
   background-color: ${colors.darkgrey.dark};
   border-radius: 12px;
-  min-width: 280px;
-  width: 280px;
-  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
 `;
 
 export default RecommendedFeedCard;

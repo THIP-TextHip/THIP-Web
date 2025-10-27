@@ -2,6 +2,8 @@ import styled from '@emotion/styled';
 import RecommendedFeedCard from './RecommendedFeedCard';
 import { colors, typography } from '@/styles/global/global';
 import type { PostData } from '@/types/post';
+import useEmblaCarousel from 'embla-carousel-react';
+import type { EmblaOptionsType } from 'embla-carousel';
 
 // 목업 데이터
 const mockRecommendedFeeds: PostData[] = [
@@ -134,28 +136,26 @@ const SubText = styled.p`
   margin: 0;
 `;
 
-const CarouselContainer = styled.div`
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  /* 스크롤바 숨기기 */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+const EmblaViewport = styled.div`
+  overflow: hidden;
 `;
 
-const CardList = styled.div`
+const EmblaContainer = styled.div`
   display: flex;
-  gap: 10px;
-  padding: 0 20px 28px;
-  width: fit-content;
+  touch-action: pan-y pinch-zoom;
+  gap: 12px;
+  padding: 0 20px;
+`;
+
+const EmblaSlide = styled.div`
+  transform: translate3d(0, 0, 0);
+  flex: 0 0 calc(100% - 10px); /* 좌우 패딩 제외한 전체 너비 */
+  min-width: 0;
+  padding-bottom: 28px;
 `;
 
 const BorderBottom = styled.div`
-  width: 94.8%;
+  width: 100%;
   margin: 0 auto;
   padding: 0 20px;
   height: 6px;
@@ -164,6 +164,14 @@ const BorderBottom = styled.div`
 
 // Component
 const RecommendedFeedSection = () => {
+  const options: EmblaOptionsType = {
+    align: 'center',
+    slidesToScroll: 1,
+    containScroll: 'trimSnaps',
+  };
+
+  const [emblaRef] = useEmblaCarousel(options);
+
   return (
     <SectionContainer>
       <SectionHeader>
@@ -171,13 +179,15 @@ const RecommendedFeedSection = () => {
         <SubText>비슷한 취향의 인플루언서, 작가가</SubText>
         <SubText>추천하는 도서를 만나보세요.</SubText>
       </SectionHeader>
-      <CarouselContainer>
-        <CardList>
+      <EmblaViewport ref={emblaRef}>
+        <EmblaContainer>
           {mockRecommendedFeeds.map(feed => (
-            <RecommendedFeedCard key={feed.feedId} {...feed} />
+            <EmblaSlide key={feed.feedId}>
+              <RecommendedFeedCard {...feed} />
+            </EmblaSlide>
           ))}
-        </CardList>
-      </CarouselContainer>
+        </EmblaContainer>
+      </EmblaViewport>
       <BorderBottom />
     </SectionContainer>
   );
