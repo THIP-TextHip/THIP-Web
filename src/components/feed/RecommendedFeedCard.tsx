@@ -13,7 +13,9 @@ const RecommendedFeedCard = (postData: RecommendedFeedCardProps) => {
   return (
     <CardContainer>
       <PostHeader {...postData} aliasName={postData.alias} aliasColor={postData.aliasColor} />
-      <PostBody {...postData} />
+      <PostBodyWrapper>
+        <PostBody {...postData} />
+      </PostBodyWrapper>
       <PostFooter isMyFeed={false} {...postData} />
     </CardContainer>
   );
@@ -28,6 +30,17 @@ const CardContainer = styled.div`
   border-radius: 12px;
   width: 100%;
   height: 100%;
+
+  > *:last-child {
+    margin-top: auto;
+  }
+`;
+
+const PostBodyWrapper = styled.div`
+  .content {
+    -webkit-line-clamp: 3 !important;
+    min-height: 60px;
+  }
 `;
 
 export default RecommendedFeedCard;
