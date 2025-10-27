@@ -15,8 +15,8 @@ const RecommendedFeedCard = (postData: RecommendedFeedCardProps) => {
       <PostHeader {...postData} aliasName={postData.alias} aliasColor={postData.aliasColor} />
       <PostBodyWrapper>
         <PostBody {...postData} />
+        <PostFooter isMyFeed={false} {...postData} />
       </PostBodyWrapper>
-      <PostFooter isMyFeed={false} {...postData} />
     </CardContainer>
   );
 };
@@ -33,6 +33,11 @@ const CardContainer = styled.div`
 
   > *:last-child {
     margin-top: auto;
+  }
+
+  /* 북마크 아이콘 숨기기 */
+  .right {
+    display: none;
   }
 `;
 

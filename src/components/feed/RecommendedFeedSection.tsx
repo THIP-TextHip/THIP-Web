@@ -147,18 +147,18 @@ const SubText = styled.p`
 
 const EmblaViewport = styled.div`
   overflow: hidden;
+  padding: 0 20px;
 `;
 
 const EmblaContainer = styled.div`
   display: flex;
   touch-action: pan-y pinch-zoom;
   gap: 12px;
-  padding: 0 20px;
 `;
 
 const EmblaSlide = styled.div`
   transform: translate3d(0, 0, 0);
-  flex: 0 0 calc(100% - 10px); /* 좌우 패딩 제외한 전체 너비 */
+  flex: 0 0 calc(100% - 10px);
   min-width: 0;
   padding-bottom: 40px;
 `;
