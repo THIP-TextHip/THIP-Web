@@ -5,14 +5,19 @@ import type { PostData } from '@/types/post';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { EmblaOptionsType } from 'embla-carousel';
 
-// 목업 데이터
-const mockRecommendedFeeds: PostData[] = [
+// 목업 데이터 (aliasColor 추가 필요)
+interface MockPostData extends PostData {
+  aliasColor?: string;
+}
+
+const mockRecommendedFeeds: MockPostData[] = [
   {
     feedId: 101,
     creatorId: 1,
     creatorNickname: 'user.01',
     creatorProfileImageUrl: 'https://via.placeholder.com/36',
     alias: '공식 인플루언서',
+    aliasColor: colors.neongreen,
     postDate: '12시간 전',
     isbn: '9788936434267',
     bookTitle: '책이름을입력해주세요...',
@@ -33,6 +38,7 @@ const mockRecommendedFeeds: PostData[] = [
     creatorNickname: 'user.01',
     creatorProfileImageUrl: 'https://via.placeholder.com/36',
     alias: '공식 인플루언서',
+    aliasColor: colors.neongreen,
     postDate: '12시간 전',
     isbn: '9788936434267',
     bookTitle: '책이름을입력해주세요...',
@@ -52,6 +58,7 @@ const mockRecommendedFeeds: PostData[] = [
     creatorNickname: 'user.01',
     creatorProfileImageUrl: 'https://via.placeholder.com/36',
     alias: '공식 인플루언서',
+    aliasColor: colors.neongreen,
     postDate: '12시간 전',
     isbn: '9788936434267',
     bookTitle: '책이름을입력해주세요...',
@@ -71,6 +78,7 @@ const mockRecommendedFeeds: PostData[] = [
     creatorNickname: 'user.01',
     creatorProfileImageUrl: 'https://via.placeholder.com/36',
     alias: '공식 인플루언서',
+    aliasColor: colors.neongreen,
     postDate: '12시간 전',
     isbn: '9788936434267',
     bookTitle: '책이름을입력해주세요...',
@@ -91,6 +99,7 @@ const mockRecommendedFeeds: PostData[] = [
     creatorNickname: 'user.01',
     creatorProfileImageUrl: 'https://via.placeholder.com/36',
     alias: '공식 인플루언서',
+    aliasColor: colors.neongreen,
     postDate: '12시간 전',
     isbn: '9788936434267',
     bookTitle: '책이름을입력해주세요...',
@@ -151,7 +160,7 @@ const EmblaSlide = styled.div`
   transform: translate3d(0, 0, 0);
   flex: 0 0 calc(100% - 10px); /* 좌우 패딩 제외한 전체 너비 */
   min-width: 0;
-  padding-bottom: 28px;
+  padding-bottom: 40px;
 `;
 
 const BorderBottom = styled.div`

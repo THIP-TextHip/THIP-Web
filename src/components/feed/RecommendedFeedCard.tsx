@@ -5,10 +5,14 @@ import PostHeader from '../common/Post/PostHeader';
 import type { PostData } from '../../types/post';
 import { colors } from '@/styles/global/global';
 
-const RecommendedFeedCard = (postData: PostData) => {
+interface RecommendedFeedCardProps extends PostData {
+  aliasColor?: string;
+}
+
+const RecommendedFeedCard = (postData: RecommendedFeedCardProps) => {
   return (
     <CardContainer>
-      <PostHeader {...postData} />
+      <PostHeader {...postData} aliasName={postData.alias} aliasColor={postData.aliasColor} />
       <PostBody {...postData} />
       <PostFooter isMyFeed={false} {...postData} />
     </CardContainer>
