@@ -23,7 +23,9 @@ const TotalFeed = ({ showHeader, posts = [], isTotalFeed }: FeedListProps) => {
                 {...post}
               />
               {/* 10개마다 추천 섹션 반복 표시 */}
-              {(index + 1) % 10 === 0 && <RecommendedFeedSection />}
+              {(index + 1) % 10 === 0 && (
+                <RecommendedFeedSection sectionIndex={Math.floor((index + 1) / 10) - 1} />
+              )}
             </>
           ))}
         </>
