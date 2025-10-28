@@ -40,7 +40,6 @@ const CardContainer = styled.div`
     margin-top: auto;
   }
 
-  /* 북마크 아이콘 숨기기 */
   .right {
     display: none;
   }
@@ -58,7 +57,6 @@ const PostBodyWrapper = styled.div`
     content: url("${lookmoreInfluencer}") !important;
   }
 
-  /* 책 카드 클릭 무효화 - 카드 전체 클릭만 작동하도록 */
   > div > div:first-of-type {
     pointer-events: none;
   }
