@@ -10,7 +10,7 @@ import { AddButton, DropdownContainer, DropdownItem } from './MemoryAddButton.st
 const MemoryAddButton = () => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>(); // useParams 추가
-  const { openConfirm } = usePopupActions();
+  const { openConfirm, closePopup } = usePopupActions();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -63,8 +63,10 @@ const MemoryAddButton = () => {
       confirmText: '확인',
       cancelText: '취소',
       onConfirm: () => {
-        console.log('AI 독서 감상문 생성 시작');
-        // TODO: AI 생성 API 호출
+        closePopup();
+        const currentRoomId = roomId || '1';
+        navigate(`/aiwrite/${currentRoomId}`);
+        console.log('AI 독서 감상문 생성 시작 - roomId:', currentRoomId);
       },
     });
   };
