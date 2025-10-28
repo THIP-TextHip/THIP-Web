@@ -60,6 +60,8 @@ const MemoryAddButton = () => {
     openConfirm({
       title: 'AI 독서감상문 생성 (Beta)',
       disc: '기록장에서 작성한 기록을 기반으로<br/>독서감상문을 생성하시겠어요?<br/>(서비스 내 잔여 이용횟수 : n/5)',
+      confirmText: '확인',
+      cancelText: '취소',
       onConfirm: () => {
         console.log('AI 독서 감상문 생성 시작');
         // TODO: AI 생성 API 호출

@@ -2,7 +2,14 @@ import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import type { ConfirmModalProps } from '@/stores/usePopupStore';
 
-const ConfirmModal = ({ title, disc, onConfirm, onClose }: ConfirmModalProps) => {
+const ConfirmModal = ({
+  title,
+  disc,
+  onConfirm,
+  onClose,
+  confirmText = '예',
+  cancelText = '아니요',
+}: ConfirmModalProps) => {
   const handleContainerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -13,10 +20,10 @@ const ConfirmModal = ({ title, disc, onConfirm, onClose }: ConfirmModalProps) =>
       <div className="disc" dangerouslySetInnerHTML={{ __html: disc }} />
       <ButtonContainer>
         <Button variant="no" onClick={onClose}>
-          아니요
+          {cancelText}
         </Button>
         <Button variant="yes" onClick={onConfirm}>
-          예
+          {confirmText}
         </Button>
       </ButtonContainer>
     </Container>
