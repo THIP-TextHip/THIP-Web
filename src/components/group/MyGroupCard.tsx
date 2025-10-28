@@ -67,6 +67,7 @@ const Card = styled.div`
   box-sizing: border-box;
   transition: transform 0.35s ease-out;
   will-change: transform;
+  transform: translateZ(0);
 `;
 
 const Thumbnail = styled.img`

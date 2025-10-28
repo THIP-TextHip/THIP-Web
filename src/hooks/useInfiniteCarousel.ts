@@ -57,30 +57,49 @@ export function useInfiniteCarousel(groups: Group[], options?: { scaleAmount?: n
     const container = scrollRef.current;
     if (!container || infiniteGroups.length === 0) return;
 
+    let rafId: number | null = null;
     const initializeScroll = () => {
-      const card = cardRefs.current[middleIndex];
-      if (!card) return;
-      const center = container.offsetWidth / 2;
-      const left = card.offsetLeft + card.offsetWidth / 2 - center;
-      container.style.scrollBehavior = 'auto';
-      container.scrollLeft = left;
-      container.style.scrollBehavior = '';
-      handleScroll();
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      rafId = requestAnimationFrame(() => {
+        const card = cardRefs.current[middleIndex];
+        if (!card) return;
+        const center = container.offsetWidth / 2;
+        const left = card.offsetLeft + card.offsetWidth / 2 - center;
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = left;
+        container.style.scrollBehavior = '';
+        handleScroll();
+        rafId = null;
+      });
     };
 
-    const timer = setTimeout(initializeScroll, 100);
+    const timer = window.setTimeout(initializeScroll, 100);
 
+    let resizeTimer: number | null = null;
     const handleResize = () => {
-      setTimeout(initializeScroll, 50);
+      if (resizeTimer !== null) {
+        window.clearTimeout(resizeTimer);
+      }
+      resizeTimer = window.setTimeout(() => {
+        initializeScroll();
+      }, 150);
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleResize);
 
     return () => {
-      clearTimeout(timer);
+      window.clearTimeout(timer);
       container.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
+      if (resizeTimer !== null) {
+        window.clearTimeout(resizeTimer);
+      }
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, [infiniteGroups.length, handleScroll, middleIndex]);
 
