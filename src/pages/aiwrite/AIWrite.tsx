@@ -8,7 +8,7 @@ import leftArrow from '@/assets/common/leftArrow.svg';
 import infoIcon from '@/assets/common/infoIcon_white.svg';
 import { MOCK_AI_WRITING } from '@/mocks/aiwrite.mock';
 
-const AIWriteLoading = () => {
+const AIWrite = () => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
   const [isLoading, setIsLoading] = useState(true);
@@ -153,4 +153,4 @@ const CopyButton = styled.button`
   line-height: 50px;
 `;
 
-export default AIWriteLoading;
+export default AIWrite;
