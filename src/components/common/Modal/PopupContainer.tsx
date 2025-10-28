@@ -41,7 +41,7 @@ const PopupContainer = () => {
     switch (popupType) {
       case 'confirm-modal':
         return (
-          <Wrapper>
+          <Wrapper onClick={closePopup}>
             <ConfirmModal {...(popupProps as ConfirmModalProps)} onClose={closePopup} />
           </Wrapper>
         );

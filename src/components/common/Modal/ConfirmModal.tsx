@@ -3,8 +3,12 @@ import { colors, typography } from '@/styles/global/global';
 import type { ConfirmModalProps } from '@/stores/usePopupStore';
 
 const ConfirmModal = ({ title, disc, onConfirm, onClose }: ConfirmModalProps) => {
+  const handleContainerClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
-    <Container>
+    <Container onClick={handleContainerClick}>
       <div className="title">{title}</div>
       <div className="disc" dangerouslySetInnerHTML={{ __html: disc }} />
       <ButtonContainer>
