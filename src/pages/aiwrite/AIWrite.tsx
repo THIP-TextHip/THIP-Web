@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import TitleHeader from '@/components/common/TitleHeader';
+import { usePopupActions } from '@/hooks/usePopupActions';
 import leftArrow from '@/assets/common/leftArrow.svg';
 import infoIcon from '@/assets/common/infoIcon_white.svg';
 import { MOCK_AI_WRITING } from '@/mocks/aiwrite.mock';
@@ -11,6 +12,7 @@ import { MOCK_AI_WRITING } from '@/mocks/aiwrite.mock';
 const AIWrite = () => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
+  const { openSnackbar } = usePopupActions();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -25,9 +27,23 @@ const AIWrite = () => {
     navigate(`/rooms/${roomId}/memory`);
   };
 
-  const handleCopyToClipboard = () => {
-    // TODO: 클립보드 복사 기능 구현
-    console.log('클립보드에 복사');
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(MOCK_AI_WRITING);
+      openSnackbar({
+        message: '클립보드에 복사가 완료되었어요',
+        variant: 'top',
+        onClose: () => {},
+      });
+    } catch (error) {
+      console.error('클립보드 복사 실패:', error);
+      openSnackbar({
+        message: '복사에 실패했습니다',
+        variant: 'bottom',
+        isError: true,
+        onClose: () => {},
+      });
+    }
   };
 
   return (
