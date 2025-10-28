@@ -12,7 +12,7 @@ import { MOCK_AI_WRITING } from '@/mocks/aiwrite.mock';
 const AIWrite = () => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
-  const { openSnackbar } = usePopupActions();
+  const { openSnackbar, openConfirm, closePopup } = usePopupActions();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +24,16 @@ const AIWrite = () => {
   }, []);
 
   const handleBackClick = () => {
-    navigate(`/rooms/${roomId}/memory`);
+    openConfirm({
+      title: 'AI 독서감상문 생성 (Beta)',
+      disc: '생성된 감상문은 다시 볼 수 없으며, 잔여 이용횟수는 차감돼요. 계속하시겠어요?',
+      confirmText: '확인',
+      cancelText: '취소',
+      onConfirm: () => {
+        closePopup();
+        navigate(`/rooms/${roomId}/memory`);
+      },
+    });
   };
 
   const handleCopyToClipboard = async () => {
