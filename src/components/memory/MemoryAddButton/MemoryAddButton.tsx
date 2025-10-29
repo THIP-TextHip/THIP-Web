@@ -77,8 +77,8 @@ const MemoryAddButton = () => {
           return;
         }
 
-        // 잔여 횟수가 0인 경우
-        if (recordReviewCount <= 0) {
+        // 잔여 횟수가 5회 이상인 경우 (이미 5회 모두 사용)
+        if (recordReviewCount >= 5) {
           openSnackbar({
             message: '사용자의 독후감 작성 수가 5회를 초과했습니다.',
             variant: 'top',
@@ -88,7 +88,7 @@ const MemoryAddButton = () => {
           return;
         }
 
-        // 모달 표시
+        // 모달 표시 (잔여 횟수 = 5 - 사용한 횟수)
         openConfirm({
           title: 'AI 독서감상문 생성 (Beta)',
           disc: `기록장에서 작성한 기록을 기반으로<br/>독서감상문을 생성하시겠어요?<br/>(서비스 내 잔여 이용횟수 : ${recordReviewCount}/5)`,
