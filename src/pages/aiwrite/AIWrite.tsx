@@ -132,8 +132,10 @@ const AIWrite = () => {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
+  min-width: 320px;
+  max-width: 767px;
   min-height: 100vh;
+  margin: 0 auto;
   background-color: ${colors.black.main};
   padding-top: 56px;
 `;
@@ -210,7 +212,10 @@ const ContentText = styled.div`
 const CopyButton = styled.button`
   position: fixed;
   bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
+  max-width: 767px;
   height: 50px;
   background-color: ${colors.purple.main};
   color: ${colors.white};
