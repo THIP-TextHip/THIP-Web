@@ -72,6 +72,12 @@ export interface UpdateVoteData {
   roomId: number; // 방 ID
 }
 
+// AI 독서감상문 생성 응답 데이터 타입
+export interface CreateAiReviewData {
+  content: string; // 생성된 독서감상문 내용
+  count: number; // 잔여 이용 횟수
+}
+
 // 공통 API 응답 타입
 export interface ApiResponse<T> {
   isSuccess: boolean;
