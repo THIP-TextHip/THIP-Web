@@ -78,6 +78,12 @@ export interface CreateAiReviewData {
   count: number; // 잔여 이용 횟수
 }
 
+// AI 이용 횟수 조회 응답 데이터 타입
+export interface AiUsageData {
+  recordReviewCount: number; // AI 독서감상문 작성 가능 횟수
+  recordCount: number; // 기록 작성 횟수
+}
+
 // 공통 API 응답 타입
 export interface ApiResponse<T> {
   isSuccess: boolean;
