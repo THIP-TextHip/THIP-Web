@@ -7,21 +7,65 @@ import TitleHeader from '@/components/common/TitleHeader';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import leftArrow from '@/assets/common/leftArrow.svg';
 import infoIcon from '@/assets/common/infoIcon_white.svg';
-import { MOCK_AI_WRITING } from '@/mocks/aiwrite.mock';
+import { createAiReview } from '@/api/record';
 
 const AIWrite = () => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
   const { openSnackbar, openConfirm, closePopup } = usePopupActions();
   const [isLoading, setIsLoading] = useState(true);
+  const [aiContent, setAiContent] = useState('');
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 5000);
+    const fetchAiReview = async () => {
+      if (!roomId) return;
 
-    return () => clearTimeout(timer);
-  }, []);
+      try {
+        const result = await createAiReview(Number(roomId));
+
+        if (result.isSuccess) {
+          setAiContent(result.data.content);
+        } else {
+          openSnackbar({
+            message: result.message,
+            variant: 'top',
+            isError: true,
+            onClose: () => {},
+          });
+          navigate(`/rooms/${roomId}/memory`);
+        }
+      } catch (error) {
+        console.error('AI 독서감상문 생성 실패:', error);
+        let errorMessage = 'AI 독서감상문 생성에 실패했습니다';
+
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as {
+            response?: {
+              data?: {
+                message?: string;
+              };
+            };
+          };
+          if (axiosError.response?.data?.message) {
+            errorMessage = axiosError.response.data.message;
+          }
+        }
+
+        openSnackbar({
+          message: errorMessage,
+          variant: 'top',
+          isError: true,
+          onClose: () => {},
+        });
+        navigate(`/rooms/${roomId}/memory`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAiReview();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId]);
 
   const handleBackClick = () => {
     openConfirm({
@@ -38,7 +82,7 @@ const AIWrite = () => {
 
   const handleCopyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(MOCK_AI_WRITING);
+      await navigator.clipboard.writeText(aiContent);
       openSnackbar({
         message: '클립보드에 복사가 완료되었어요',
         variant: 'top',
@@ -77,7 +121,7 @@ const AIWrite = () => {
             <img src={infoIcon} alt="정보" />
             <span>내 기록과 총평을 바탕으로 생성된 감상문입니다.</span>
           </InfoBanner>
-          <ContentText>{MOCK_AI_WRITING}</ContentText>
+          <ContentText>{aiContent}</ContentText>
           <CopyButton onClick={handleCopyToClipboard}>클립보드에 복사</CopyButton>
         </ResultContent>
       )}
@@ -88,8 +132,10 @@ const AIWrite = () => {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
+  min-width: 320px;
+  max-width: 767px;
   min-height: 100vh;
+  margin: 0 auto;
   background-color: ${colors.black.main};
   padding-top: 56px;
 `;
@@ -166,7 +212,10 @@ const ContentText = styled.div`
 const CopyButton = styled.button`
   position: fixed;
   bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
+  max-width: 767px;
   height: 50px;
   background-color: ${colors.purple.main};
   color: ${colors.white};
