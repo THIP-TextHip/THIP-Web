@@ -36,7 +36,6 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     performSearch,
     loadMoreSearchResults,
     loadMoreSavedBooks,
-    loadMoreGroupBooks,
   } = useBookSearch();
 
   // 컴포넌트가 열릴 때 초기 데이터 로드
@@ -89,7 +88,7 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     if (isSearchMode) {
       return loadMoreSearchResults;
     }
-    return activeTab === 'saved' ? loadMoreSavedBooks : loadMoreGroupBooks;
+    return loadMoreSavedBooks;
   };
   
   // 현재 상태에 맞는 무한 스크롤 정보

@@ -1,6 +1,6 @@
 import { TabContainer, Tab } from './BookSearchBottomSheet.styled';
 
-export type TabType = 'saved' | 'group';
+export type TabType = 'saved';
 
 interface BookSearchTabsProps {
   activeTab: TabType;
@@ -12,9 +12,6 @@ const BookSearchTabs = ({ activeTab, onTabChange }: BookSearchTabsProps) => {
     <TabContainer>
       <Tab active={activeTab === 'saved'} onClick={() => onTabChange('saved')}>
         저장한 책
-      </Tab>
-      <Tab active={activeTab === 'group'} onClick={() => onTabChange('group')}>
-        모임 책
       </Tab>
     </TabContainer>
   );
