@@ -15,9 +15,10 @@ interface BookSearchBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectBook: (book: Book) => void;
+  showGroupTab?: boolean;
 }
 
-const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBottomSheetProps) => {
+const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook, showGroupTab = true }: BookSearchBottomSheetProps) => {
   const {
     searchQuery,
     filteredBooks,
@@ -36,7 +37,8 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     performSearch,
     loadMoreSearchResults,
     loadMoreSavedBooks,
-  } = useBookSearch();
+    loadMoreGroupBooks,
+  } = useBookSearch(showGroupTab);
 
   // 컴포넌트가 열릴 때 초기 데이터 로드
   useEffect(() => {
@@ -88,7 +90,7 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     if (isSearchMode) {
       return loadMoreSearchResults;
     }
-    return loadMoreSavedBooks;
+    return activeTab === 'saved' ? loadMoreSavedBooks : loadMoreGroupBooks;
   };
   
   // 현재 상태에 맞는 무한 스크롤 정보
@@ -108,7 +110,7 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
           />
 
           {/* 탭 영역 */}
-          {showTabs && <BookSearchTabs activeTab={activeTab} onTabChange={handleTabChange} />}
+          {showTabs && <BookSearchTabs activeTab={activeTab} onTabChange={handleTabChange} showGroupTab={showGroupTab} />}
 
           {/* 책 목록 영역 */}
           <BookListContainer>
