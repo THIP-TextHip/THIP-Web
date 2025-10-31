@@ -246,6 +246,7 @@ const CreateGroup = () => {
           isOpen={isBookSearchOpen}
           onClose={handleBookSearchClose}
           onSelectBook={handleBookSelect}
+          showGroupTab={false}
         />
       </Container>
     </>
