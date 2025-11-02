@@ -21,7 +21,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     };
   }, []);
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<'진행중' | '모집중' | ''>('');
+  const [selected, setSelected] = useState<'진행중' | '모집중' | '완료' | ''>('');
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,12 +52,14 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
         setNextCursor(null);
         setIsLast(false);
 
-        const roomType: RoomType =
+        const roomType: RoomType | 'expired' =
           selected === '진행중'
             ? 'playing'
             : selected === '모집중'
               ? 'recruiting'
-              : 'playingAndRecruiting';
+              : selected === '완료'
+                ? 'expired'
+                : 'playingAndRecruiting';
 
         const response = await getMyRooms(roomType, null);
 
@@ -87,12 +89,14 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     isFetchingRef.current = true;
     setIsLoading(true);
     try {
-      const roomType: RoomType =
+      const roomType: RoomType | 'expired' =
         selected === '진행중'
           ? 'playing'
           : selected === '모집중'
             ? 'recruiting'
-            : 'playingAndRecruiting';
+            : selected === '완료'
+              ? 'expired'
+              : 'playingAndRecruiting';
 
       const res = await getMyRooms(roomType, nextCursor);
       if (res.isSuccess) {
@@ -120,40 +124,6 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
   };
 
   useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        setNextCursor(null);
-        setIsLast(false);
-
-        const roomType: RoomType =
-          selected === '진행중'
-            ? 'playing'
-            : selected === '모집중'
-              ? 'recruiting'
-              : 'playingAndRecruiting';
-
-        const res = await getMyRooms(roomType, null);
-        if (res.isSuccess) {
-          setRooms(res.data.roomList);
-          setNextCursor(res.data.nextCursor);
-          setIsLast(res.data.isLast);
-        } else {
-          setError(res.message);
-        }
-      } catch (e) {
-        console.log(e);
-        setError('방 목록을 불러오는데 실패했습니다.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRooms();
-  }, [selected]);
-
-  useEffect(() => {
     const tryFill = async () => {
       if (!contentRef.current || isLast) return;
       let guard = 2; // 최대 3페이지까지 자동 프리로드(필요시 늘리기)
@@ -169,6 +139,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
       }
     };
     tryFill();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rooms, nextCursor, isLast]);
 
   useEffect(() => {
@@ -180,7 +151,9 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
   const convertedGroups = rooms.map(convertRoomToGroup);
 
   const handleGroupCardClick = (group: Group) => {
-    if (selected === '모집중') {
+    if (selected === '완료') {
+      navigate(`/group/detail/joined/${group.id}`);
+    } else if (selected === '모집중') {
       navigate(`/group/detail/${group.id}`);
     } else if (selected === '진행중') {
       navigate(`/group/detail/joined/${group.id}`);
@@ -202,7 +175,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
         />
 
         <TabContainer>
-          {(['진행중', '모집중'] as const).map(tab => (
+          {(['진행중', '모집중', '완료'] as const).map(tab => (
             <Tab
               key={tab}
               selected={tab === selected}
@@ -222,6 +195,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
               group={group}
               isOngoing={group.isOnGoing}
               type="modal"
+              isCompleted={selected === '완료'}
               onClick={() => handleGroupCardClick(group)}
             />
           ))}
@@ -235,14 +209,18 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
                   ? '진행중인 모임방이 없어요'
                   : selected === '모집중'
                     ? '모집중인 모임방이 없어요'
-                    : '참여중인 모임방이 없어요'}
+                    : selected === '완료'
+                      ? '완료된 모임방이 없어요'
+                      : '참여중인 모임방이 없어요'}
               </EmptyTitle>
               <EmptySubText>
                 {selected === '진행중'
                   ? '진행중인 모임방에 참여해보세요!'
                   : selected === '모집중'
                     ? '모집중인 모임방에 참여해보세요!'
-                    : '첫 번째 모임방에 참여해보세요!'}
+                    : selected === '완료'
+                      ? '아직 완료된 모임방이 없습니다.'
+                      : '첫 번째 모임방에 참여해보세요!'}
               </EmptySubText>
             </EmptyState>
           )}

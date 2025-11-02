@@ -8,7 +8,6 @@ import styled from '@emotion/styled';
 import { RecruitingGroupCarousel, type Section } from '@/components/group/RecruitingGroupCarousel';
 import { useState, useEffect } from 'react';
 import { MyGroupModal } from '@/components/group/MyGroupModal';
-import CompletedGroupModal from '@/components/group/CompletedGroupModal';
 import { useNavigate } from 'react-router-dom';
 import makegroupfab from '../../assets/common/makegroupfab.svg';
 import searchChar from '../../assets/common/searchChar.svg';
@@ -32,7 +31,6 @@ const convertRoomItemToGroup = (
 const Group = () => {
   const navigate = useNavigate();
   const [isMyGroupModalOpen, setIsMyGroupModalOpen] = useState(false);
-  const [isCompletedGroupModalOpen, setIsCompletedGroupModalOpen] = useState(false);
   const [sections, setSections] = useState<Section[]>([
     { title: '최근 생성된 독서 모임방', groups: [] },
     { title: '마감 임박한 독서 모임방', groups: [] },
@@ -86,9 +84,6 @@ const Group = () => {
   const openMyGroupModal = () => setIsMyGroupModalOpen(true);
   const closeMyGroupModal = () => setIsMyGroupModalOpen(false);
 
-  const openCompletedGroupModal = () => setIsCompletedGroupModalOpen(true);
-  const closeCompletedGroupModal = () => setIsCompletedGroupModalOpen(false);
-
   const handleSearchBarClick = () => {
     navigate('/group/search');
   };
@@ -108,10 +103,9 @@ const Group = () => {
   return (
     <Wrapper>
       {isMyGroupModalOpen && <MyGroupModal onClose={closeMyGroupModal} />}
-      {isCompletedGroupModalOpen && <CompletedGroupModal onClose={closeCompletedGroupModal} />}
       <MainHeader
         type="group"
-        leftButtonClick={openCompletedGroupModal}
+        leftButtonClick={openMyGroupModal}
         rightButtonClick={handleNoticeButton}
       />
       <SearchBar placeholder="모임방 참여할 사람!" onClick={handleSearchBarClick} />
