@@ -103,11 +103,7 @@ const Group = () => {
   return (
     <Wrapper>
       {isMyGroupModalOpen && <MyGroupModal onClose={closeMyGroupModal} />}
-      <MainHeader
-        type="group"
-        leftButtonClick={openMyGroupModal}
-        rightButtonClick={handleNoticeButton}
-      />
+      <MainHeader type="group" rightButtonClick={handleNoticeButton} />
       <SearchBar placeholder="모임방 참여할 사람!" onClick={handleSearchBarClick} />
       <MyGroupBox onMyGroupsClick={openMyGroupModal}></MyGroupBox>
       <Blank height={'10px'} margin={'32px 0'}></Blank>

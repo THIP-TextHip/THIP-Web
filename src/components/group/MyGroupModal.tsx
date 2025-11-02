@@ -52,7 +52,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
         setNextCursor(null);
         setIsLast(false);
 
-        const roomType: RoomType | 'expired' =
+        const roomType: RoomType =
           selected === '진행중'
             ? 'playing'
             : selected === '모집중'
