@@ -89,7 +89,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     isFetchingRef.current = true;
     setIsLoading(true);
     try {
-      const roomType: RoomType | 'expired' =
+      const roomType: RoomType =
         selected === '진행중'
           ? 'playing'
           : selected === '모집중'
