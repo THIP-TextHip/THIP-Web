@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Fragment } from 'react';
 import FollowList from './FollowList';
 import FeedPost from './FeedPost';
 import RecommendedFeedSection from './RecommendedFeedSection';
@@ -14,19 +15,13 @@ const TotalFeed = ({ showHeader, posts = [], isTotalFeed }: FeedListProps) => {
       {hasPosts ? (
         <>
           {posts.map((post, index) => (
-            <>
-              <FeedPost
-                key={`${post.feedId}-${index}`}
-                showHeader={showHeader}
-                isMyFeed={isTotalFeed}
-                isLast={false}
-                {...post}
-              />
+            <Fragment key={`${post.feedId}-${index}`}>
+              <FeedPost showHeader={showHeader} isMyFeed={isTotalFeed} isLast={false} {...post} />
               {/* 10개마다 추천 섹션 반복 표시 */}
               {(index + 1) % 10 === 0 && (
                 <RecommendedFeedSection sectionIndex={Math.floor((index + 1) / 10) - 1} />
               )}
-            </>
+            </Fragment>
           ))}
         </>
       ) : (

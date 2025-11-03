@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import headerLogo from '../../assets/header/header-logo.svg';
-import groupDoneLogo from '../../assets/header/group-done.svg';
 import findUserLogo from '../../assets/header/findUser.svg';
 import bellLogo from '../../assets/header/bell.svg';
 import bellExistLogo from '../../assets/header/exist-bell.svg';
@@ -40,11 +39,10 @@ const MainHeader = ({ type, leftButtonClick, rightButtonClick }: MainHeaderProps
     <HeaderWrapper>
       <LogoImg src={headerLogo} alt="headerLogo" />
       <Actions>
-        <IconButton
-          onClick={leftButtonClick}
-          src={type === 'group' ? groupDoneLogo : findUserLogo}
-          alt={type === 'group' ? '모임 완료 아이콘' : '사용자 찾기 아이콘'}
-        />
+        {type === 'home' && (
+          <IconButton onClick={leftButtonClick} src={findUserLogo} alt={'사용자 찾기 아이콘'} />
+        )}
+
         <IconButton
           onClick={rightButtonClick}
           src={hasUnchecked ? bellExistLogo : bellLogo}
