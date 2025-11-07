@@ -4,7 +4,7 @@ import { getSearchBooks, convertToSearchedBooks, type SearchedBook } from '@/api
 import type { Book } from './BookList';
 import type { TabType } from './BookSearchTabs';
 
-export const useBookSearch = () => {
+export const useBookSearch = (showGroupTab: boolean = true) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>('saved');
@@ -17,7 +17,7 @@ export const useBookSearch = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  
+
   // 저장한 책/모임 책 무한 스크롤 관련 상태
   const [savedBooksCursor, setSavedBooksCursor] = useState<string | null>(null);
   const [groupBooksCursor, setGroupBooksCursor] = useState<string | null>(null);
@@ -185,7 +185,7 @@ export const useBookSearch = () => {
     if (isLoadingMoreSavedBooks || !hasSavedBooksNext) {
       return;
     }
-    
+
     await fetchSavedBooks(true);
   };
 
@@ -194,7 +194,7 @@ export const useBookSearch = () => {
     if (isLoadingMoreGroupBooks || !hasGroupBooksNext) {
       return;
     }
-    
+
     await fetchGroupBooks(true);
   };
 
@@ -251,7 +251,7 @@ export const useBookSearch = () => {
   const loadInitialData = () => {
     if (activeTab === 'saved' && savedBooks.length === 0) {
       fetchSavedBooks();
-    } else if (activeTab === 'group' && groupBooks.length === 0) {
+    } else if (activeTab === 'group' && groupBooks.length === 0 && showGroupTab) {
       fetchGroupBooks();
     }
   };
@@ -262,7 +262,7 @@ export const useBookSearch = () => {
   const hasBooks = isSearchMode ? searchResults.length > 0 : currentTabBooks.length > 0;
   const showEmptyState = !isLoading && !error && !hasBooks;
   const showTabs = !isSearchMode; // 검색 모드가 아닐 때는 항상 탭 표시
-  
+
   // 현재 탭의 무한 스크롤 상태
   const currentTabHasNext = activeTab === 'saved' ? hasSavedBooksNext : hasGroupBooksNext;
   const currentTabIsLoadingMore = activeTab === 'saved' ? isLoadingMoreSavedBooks : isLoadingMoreGroupBooks;

@@ -1,13 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { usePopupActions } from '@/hooks/usePopupActions';
+import { getAiUsage } from '@/api/record';
 import plusIcon from '../../../assets/memory/plus.svg';
 import penIcon from '../../../assets/memory/pen.svg';
 import voteIcon from '../../../assets/memory/vote.svg';
+import aiIcon from '../../../assets/memory/ai.svg';
 import { AddButton, DropdownContainer, DropdownItem } from './MemoryAddButton.styled';
 
 const MemoryAddButton = () => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>(); // useParams 추가
+  const { openConfirm, closePopup, openSnackbar } = usePopupActions();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -52,6 +56,69 @@ const MemoryAddButton = () => {
     console.log('투표 생성하기 - roomId:', currentRoomId);
   };
 
+  const handleAIWrite = async () => {
+    setIsOpen(false);
+    const currentRoomId = roomId || '1';
+
+    try {
+      const result = await getAiUsage(Number(currentRoomId));
+
+      if (result.isSuccess) {
+        const { recordCount, recordReviewCount } = result.data;
+
+        // 기록이 2개 미만인 경우 에러 표시
+        if (recordCount < 2) {
+          openSnackbar({
+            message: `독후감 생성을 위해서는 최소 2개의 기록이 필요합니다. 현재 기록 개수: ${recordCount}`,
+            variant: 'top',
+            isError: true,
+            onClose: () => {},
+          });
+          return;
+        }
+
+        // 잔여 횟수가 5회 이상인 경우 (이미 5회 모두 사용)
+        if (recordReviewCount >= 5) {
+          openSnackbar({
+            message: '사용자의 독후감 작성 수가 5회를 초과했습니다.',
+            variant: 'top',
+            isError: true,
+            onClose: () => {},
+          });
+          return;
+        }
+
+        // 모달 표시
+        openConfirm({
+          title: 'AI 독서감상문 생성 (Beta)',
+          disc: `기록장에서 작성한 기록을 기반으로<br/>독서감상문을 생성하시겠어요?<br/>(서비스 내 잔여 이용횟수 : ${recordReviewCount}/5)`,
+          confirmText: '확인',
+          cancelText: '취소',
+          onConfirm: () => {
+            closePopup();
+            navigate(`/aiwrite/${currentRoomId}`);
+            console.log('AI 독서 감상문 생성 시작 - roomId:', currentRoomId);
+          },
+        });
+      } else {
+        openSnackbar({
+          message: result.message,
+          variant: 'top',
+          isError: true,
+          onClose: () => {},
+        });
+      }
+    } catch (error) {
+      console.error('AI 이용 횟수 조회 실패:', error);
+      openSnackbar({
+        message: 'AI 이용 횟수 조회에 실패했습니다',
+        variant: 'top',
+        isError: true,
+        onClose: () => {},
+      });
+    }
+  };
+
   return (
     <div ref={dropdownRef}>
       <AddButton isOpen={isOpen} onClick={handleButtonClick}>
@@ -67,6 +134,10 @@ const MemoryAddButton = () => {
           <DropdownItem onClick={handlePollCreate}>
             <img src={voteIcon} alt="투표 생성" />
             <span>투표 생성</span>
+          </DropdownItem>
+          <DropdownItem onClick={handleAIWrite}>
+            <img src={aiIcon} alt="AI 독서 감상문 생성" />
+            <span>AI 독서 감상문 생성</span>
           </DropdownItem>
         </DropdownContainer>
       )}

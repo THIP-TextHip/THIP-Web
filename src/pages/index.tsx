@@ -40,6 +40,7 @@ import Notice from './notice/Notice';
 import ParticipatedGroupDetail from './groupDetail/ParticipatedGroupDetail';
 import GroupMembers from './groupMembers/GroupMembers';
 import Guide from './Guide';
+import AIWrite from './aiwrite/AIWrite';
 
 const Router = () => {
   const router = createBrowserRouter(
@@ -64,6 +65,7 @@ const Router = () => {
         <Route path="memory/record/edit/:roomId/:recordId" element={<RecordWrite />} />
         <Route path="memory/poll/write/:roomId" element={<PollWrite />} />
         <Route path="memory/poll/edit/:roomId/:voteId" element={<PollWrite />} />
+        <Route path="aiwrite/:roomId" element={<AIWrite />} />
         <Route path="feed" element={<Feed />} />
         <Route path="feed/search" element={<UserSearch />} />
         <Route path="feed/:feedId" element={<FeedDetailPage />} />

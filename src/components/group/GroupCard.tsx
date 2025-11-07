@@ -13,10 +13,14 @@ interface Props {
   onClick?: () => void;
   isFirstCard?: boolean;
   isPublic?: boolean;
+  isCompleted?: boolean;
 }
 
 export const GroupCard = forwardRef<HTMLDivElement, Props>(
-  ({ group, isOngoing, type = 'main', isRecommend = false, onClick, isFirstCard }, ref) => {
+  (
+    { group, isOngoing, type = 'main', isRecommend = false, onClick, isFirstCard, isCompleted },
+    ref,
+  ) => {
     return (
       <Card ref={ref} cardType={type} isFirstCard={isFirstCard} onClick={onClick}>
         <CoverWrapper>
@@ -33,9 +37,13 @@ export const GroupCard = forwardRef<HTMLDivElement, Props>(
             <Participant isRecommend={isRecommend}>
               <img src={peopleIcon} alt="people" />
               <p>{group.participants}</p>
-              <MaximumParticipants>/ {group.maximumParticipants}명</MaximumParticipants>
+              {!isCompleted && (
+                <MaximumParticipants>/ {group.maximumParticipants}명</MaximumParticipants>
+              )}
+              {isCompleted && <MaximumParticipants>명</MaximumParticipants>}
             </Participant>
-            {(type !== 'modal' || group.type !== 'expired') &&
+            {!isCompleted &&
+              (type !== 'modal' || group.type !== 'expired') &&
               (isOngoing === true ? (
                 <RecruitingDeadline isRecommend={isRecommend}>
                   {group.deadLine} 종료
@@ -138,7 +146,7 @@ const Bottom = styled.div`
 const Participant = styled.div<{ isRecommend: boolean }>`
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   color: ${colors.white};
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.medium};

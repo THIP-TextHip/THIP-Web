@@ -14,6 +14,8 @@ export interface ConfirmModalProps {
   disc: string;
   onConfirm?: () => void;
   onClose?: () => void;
+  confirmText?: string;
+  cancelText?: string;
 }
 
 export interface MoreMenuProps {
