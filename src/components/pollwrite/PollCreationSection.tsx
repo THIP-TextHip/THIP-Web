@@ -108,7 +108,7 @@ const PollCreationSection = ({
       <PollContentContainer>
         <PollInput
           ref={contentInputRef}
-          placeholder="투표 내용을 20자 이내로 입력하세요."
+          placeholder="투표 제목을 20자 이내로 입력하세요."
           value={content}
           onChange={handleContentChange}
           maxLength={maxContentLength}
