@@ -17,7 +17,7 @@ const Container = styled.div`
 `;
 
 const BorderBottom = styled.div`
-  width: 100%;
+  width: 94.8%;
   /* min-width: 280px;
   max-width: 500px; */
   margin: 0 auto;
