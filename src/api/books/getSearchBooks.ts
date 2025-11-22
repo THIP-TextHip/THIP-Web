@@ -1,6 +1,5 @@
 import { apiClient } from '../index';
 
-// 검색된 책 타입 (API 응답에서 받는 형태)
 export interface BookSearchItem {
   title: string;
   imageUrl: string;
@@ -9,7 +8,6 @@ export interface BookSearchItem {
   isbn: string;
 }
 
-// 검색된 책 타입 (컴포넌트에서 사용하는 형태)
 export interface SearchedBook {
   id: number;
   title: string;
@@ -19,7 +17,6 @@ export interface SearchedBook {
   isbn: string;
 }
 
-// API 응답 데이터 타입
 export interface SearchBooksData {
   searchResult: BookSearchItem[];
   page: number;
@@ -30,7 +27,6 @@ export interface SearchBooksData {
   first: boolean;
 }
 
-// API 응답 타입
 export interface SearchBooksResponse {
   isSuccess: boolean;
   code: number;
@@ -58,7 +54,10 @@ export const getSearchBooks = async (
   }
 };
 
-export const convertToSearchedBooks = (apiBooks: BookSearchItem[], startIndex: number = 0): SearchedBook[] => {
+export const convertToSearchedBooks = (
+  apiBooks: BookSearchItem[],
+  startIndex: number = 0,
+): SearchedBook[] => {
   return apiBooks.map((book, index) => ({
     id: startIndex + index + 1,
     title: book.title,

@@ -2,7 +2,6 @@ import { apiClient } from '../index';
 
 export type RoomType = 'playingAndRecruiting' | 'recruiting' | 'playing' | 'expired';
 
-// 방 데이터 타입
 export interface Room {
   roomId: number;
   bookImageUrl: string;
@@ -14,7 +13,6 @@ export interface Room {
   isPublic: boolean;
 }
 
-// 내 방 조회 응답 타입
 export interface MyRoomsResponse {
   isSuccess: boolean;
   code: number;

@@ -1,6 +1,5 @@
 import { apiClient } from '../index';
 
-// 인기 검색 도서 타입
 export interface MostSearchedBook {
   rank: number;
   title: string;
@@ -8,12 +7,10 @@ export interface MostSearchedBook {
   isbn: string;
 }
 
-// API 응답 데이터 타입
 export interface MostSearchedBooksData {
   bookList: MostSearchedBook[];
 }
 
-// API 응답 타입
 export interface MostSearchedBooksResponse {
   isSuccess: boolean;
   code: number;
