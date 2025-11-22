@@ -1,6 +1,5 @@
 import { apiClient } from '../index';
 
-// 책 상세 정보 타입
 export interface BookDetail {
   title: string;
   imageUrl: string;
@@ -13,7 +12,6 @@ export interface BookDetail {
   isSaved: boolean;
 }
 
-// API 응답 타입
 export interface BookDetailResponse {
   isSuccess: boolean;
   code: number;

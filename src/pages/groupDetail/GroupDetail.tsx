@@ -1,4 +1,3 @@
-// src/pages/group/GroupDetail.tsx
 import { useState, useEffect } from 'react';
 import {
   Wrapper,

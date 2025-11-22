@@ -1,17 +1,14 @@
 import { apiClient } from '../index';
 
-// 북마크 요청 타입
 export interface SaveBookRequest {
   type: boolean;
 }
 
-// 북마크 응답 데이터 타입
 export interface SaveBookData {
   isbn: string;
   isSaved: boolean;
 }
 
-// 북마크 응답 타입
 export interface SaveBookResponse {
   isSuccess: boolean;
   code: number;
