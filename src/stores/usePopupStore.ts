@@ -1,4 +1,3 @@
-// usePopupStore.ts
 import { create } from 'zustand';
 
 export type PopupType =

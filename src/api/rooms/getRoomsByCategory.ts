@@ -1,6 +1,5 @@
 import { apiClient } from '../index';
 
-// 방 목록 응답 데이터 타입
 export interface RoomItem {
   roomId: number;
   bookImageUrl: string;

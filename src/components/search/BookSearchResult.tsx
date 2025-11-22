@@ -64,10 +64,8 @@ export function BookSearchResult({
           ))
         )}
 
-        {/* 로딩 상태 표시 */}
         {isLoading && searchedBookList.length > 0 && <></>}
 
-        {/* 더 이상 데이터가 없음을 표시 */}
         {!hasMore && searchedBookList.length > 0 && <></>}
       </List>
     </Wrapper>
