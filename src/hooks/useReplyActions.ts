@@ -25,13 +25,12 @@ export const useReplyActions = () => {
 
     const requestBody = {
       content,
-      isReplyRequest: isReplying, // 답글 여부
-      parentId: isReplying ? parentId : null, // 답글이라면 부모 댓글 ID 포함
+      isReplyRequest: isReplying,
+      parentId: isReplying ? parentId : null,
       postType: postType.toUpperCase() as 'FEED' | 'RECORD' | 'VOTE',
     };
 
     try {
-      console.log('댓글or답글 작성 API 요청');
       const response = await postReply(postId, requestBody);
       console.log('댓글 작성 성공:', response);
       if (onSuccess) onSuccess();

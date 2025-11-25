@@ -75,7 +75,6 @@ const PostFooter = ({
       const response = await postFeedLike(feedId, !liked);
 
       if (response.isSuccess) {
-        // 성공 시 상태 업데이트
         setLiked(response.data.isLiked);
         setLikeCount(prev => (response.data.isLiked ? prev + 1 : prev - 1));
         console.log('좋아요 상태 변경 성공:', response.data.isLiked);
@@ -93,11 +92,9 @@ const PostFooter = ({
 
       if (response.isSuccess) {
         const newSaveState = response.data?.isSaved ?? !saved;
-        // 성공 시 상태 업데이트
         setSaved(newSaveState);
         console.log('저장 상태 변경 성공:', newSaveState);
-        
-        // 부모 컴포넌트에 알림
+
         if (onSaveToggle) {
           onSaveToggle(feedId, newSaveState);
         }

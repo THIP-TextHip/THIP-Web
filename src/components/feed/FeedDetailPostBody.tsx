@@ -23,8 +23,8 @@ const PostContent = styled.div<{ hasImage: boolean }>`
     font-size: var(--string-size-medium01, 14px);
     font-weight: var(--string-weight-regular, 400);
     line-height: var(--string-lineheight-feedcontent_height20, 20px);
-    white-space: pre-wrap; // 개행문자 유지
-    word-wrap: break-word; // 긴 텍스트 줄바꿈
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
 
   .imgContainer {
@@ -35,8 +35,8 @@ const PostContent = styled.div<{ hasImage: boolean }>`
     img {
       width: 100px;
       height: 100px;
-      flex-shrink: 0; //고정사이즈
-      object-fit: cover; //비율 유지하며 이미지 채우기
+      flex-shrink: 0;
+      object-fit: cover;
       cursor: pointer;
     }
   }
@@ -74,7 +74,7 @@ const TagContainer = styled.div`
 `;
 
 interface FeedDetailPostBodyProps extends PostBodyProps {
-  tags?: string[]; // API에 없지만 컴포넌트에서 사용
+  tags?: string[];
 }
 
 const FeedDetailPostBody = ({

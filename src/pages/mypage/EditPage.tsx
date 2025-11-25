@@ -27,7 +27,6 @@ const EditPage = () => {
       .then(res => res.json())
       .then((data: Genre[]) => {
         setGenres(data);
-        // aliasName과 일치하는 장르 찾기 (초기 로딩 시에만)
         if (selectedId === null) {
           const matchingGenre = data.find(g => g.subTitle === profile.aliasName);
           if (matchingGenre) {
@@ -38,28 +37,13 @@ const EditPage = () => {
       .catch(console.error);
   }, []);
 
-  // nicknameError 상태 변경 추적
-  useEffect(() => {
-    console.log('nicknameError 상태가 변경됨:', nicknameError);
-  }, [nicknameError]);
+  useEffect(() => {}, [nicknameError]);
 
   const onLeftClick = () => {
     navigate('/mypage');
   };
 
   const onRightClick = async () => {
-    // 닉네임 유효성 검사
-    // if (nickname.trim() === '') {
-    //   setNicknameError('변경할 닉네임을 입력해주세요.');
-    //   return;
-    // }
-
-    // if (nickname === currentNickname) {
-    //   setNicknameError('현재 닉네임과 같은 닉네임이에요.');
-    //   return;
-    // }
-
-    // 선택된 장르 찾기
     const selectedGenre = genres.find(g => g.id === selectedId);
     if (!selectedGenre) {
       console.error('선택된 장르를 찾을 수 없습니다.');
@@ -67,14 +51,12 @@ const EditPage = () => {
     }
 
     try {
-      // 프로필 업데이트 API 호출
       const result = await patchProfile({
         nickname: nickname,
         aliasName: selectedGenre.subTitle,
       });
 
       if (result.isSuccess) {
-        // 성공 시 Mypage로 이동
         navigate('/mypage');
       } else {
         const errorMessage = result.message;
@@ -91,7 +73,6 @@ const EditPage = () => {
     const filteredValue = inputValue.replace(/[^ㄱ-ㅎ가-힣a-z0-9]/g, '');
     setNickname(filteredValue);
 
-    // 입력이 변경되면 에러 상태 초기화
     if (nicknameError) {
       setNicknameError('');
     }

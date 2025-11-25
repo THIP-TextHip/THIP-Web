@@ -18,7 +18,7 @@ interface OtherFeedProps {
   isMyFeed?: boolean;
   profileData?: OtherProfileData | null;
   userId?: number;
-  showFollowButton?: boolean; // showFollowButton prop 추가
+  showFollowButton?: boolean;
   isMyself?: boolean;
 }
 
@@ -34,7 +34,6 @@ const OtherFeed = ({
   const [loading, setLoading] = useState(false);
   const [totalFeedCount, setTotalFeedCount] = useState(profileData?.totalFeedCount || 0);
 
-  // isMyself 값에 따라 적절한 API 호출
   useEffect(() => {
     const loadFeeds = async () => {
       if (!userId) return;
@@ -43,16 +42,13 @@ const OtherFeed = ({
         setLoading(true);
 
         if (isMyself) {
-          // 자신의 피드인 경우 getMyFeeds와 getMyProfile 병렬 호출
           const [feedsResponse, profileResponse] = await Promise.all([
             getMyFeeds(),
-            getMyProfile()
+            getMyProfile(),
           ]);
           setFeedPosts(feedsResponse.data.feedList);
-          // getMyProfile에서 총 피드 수 업데이트
           setTotalFeedCount(profileResponse.data.totalFeedCount);
         } else {
-          // 다른 사용자의 피드인 경우 getOtherFeed 호출
           const response = await getOtherFeed(userId);
           setFeedPosts(response.data.feedList);
         }

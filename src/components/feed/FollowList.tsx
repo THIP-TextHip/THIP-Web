@@ -12,7 +12,6 @@ const FollowList = () => {
   const [myFollowings, setMyFollowings] = useState<RecentWriterData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // API에서 최근 글 작성한 팔로우 리스트 조회
   const fetchRecentFollowing = async () => {
     try {
       setLoading(true);
@@ -21,7 +20,6 @@ const FollowList = () => {
       if (response.isSuccess) {
         setMyFollowings(response.data.myFollowingUsers);
       } else {
-        console.error('최근 팔로우 작성자 조회 실패:', response.message);
         setMyFollowings([]);
       }
     } catch (error) {
@@ -32,7 +30,6 @@ const FollowList = () => {
     }
   };
 
-  // 컴포넌트 마운트 시 데이터 조회
   useEffect(() => {
     fetchRecentFollowing();
   }, []);
@@ -119,11 +116,10 @@ const FollowContainer = styled.div`
     overflow-y: hidden;
     gap: 12px;
 
-    /* ✅ 스크롤바 숨기기 */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE, Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     .followerList::-webkit-scrollbar {
-      display: none; /* Chrome, Safari */
+      display: none;
     }
 
     .followers {
