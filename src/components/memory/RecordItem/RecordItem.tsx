@@ -51,30 +51,24 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     isWriter,
   } = record;
 
-  // 좋아요 상태 관리 - record 객체에서 isLiked 속성 가져오기
   const [isLiked, setIsLiked] = useState(record.isLiked || false);
   const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
 
-  // 전역 댓글 바텀시트
   const { openCommentBottomSheet } = useCommentBottomSheetStore();
 
-
-  // API에서 받은 isWriter 속성으로 내 기록인지 판단
   const isMyRecord = isWriter ?? false;
 
-  // 좋아요 클릭 핸들러 - API 연동
   const handleLikeClick = async () => {
     try {
       const postId = parseInt(id);
       const roomPostType = type === 'poll' ? 'VOTE' : 'RECORD';
 
       const response = await postRoomPostLike(postId, {
-        type: !isLiked, // 현재 상태 반대로 전송
+        type: !isLiked,
         roomPostType,
       });
 
       if (response.isSuccess) {
-        // 서버 응답으로 상태 업데이트
         setIsLiked(response.data.isLiked);
         setCurrentLikeCount((prev: number) => (response.data.isLiked ? prev + 1 : prev - 1));
         console.log('좋아요 상태 변경 성공:', response.data.isLiked);
@@ -97,40 +91,36 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     }
   };
 
-  // 페이지 정보 표시 함수
   const renderPageInfo = () => {
     if (recordType === 'overall') {
       return '총평';
     } else if (pageRange) {
       return `${pageRange}p`;
     }
-    return '0p'; // 기본값
+    return '0p';
   };
 
   const handleEdit = useCallback(() => {
     if (!roomId) return;
-    
-    // 바텀시트 닫기
+
     closePopup();
-    
+
     if (type === 'poll') {
-      // 투표 수정 페이지로 이동 (투표 정보를 쿼리 파라미터로 전달)
       const params = new URLSearchParams({
         content: content,
         pageRange: pageRange || '',
         recordType: recordType || 'normal',
-        options: JSON.stringify(pollOptions?.map(option => option.text) || [])
+        options: JSON.stringify(pollOptions?.map(option => option.text) || []),
       });
-      
+
       navigate(`/memory/poll/edit/${roomId}/${record.id}?${params.toString()}`);
     } else {
-      // 기록 수정 페이지로 이동 (기록 정보를 쿼리 파라미터로 전달)
       const params = new URLSearchParams({
         content: content,
         pageRange: pageRange || '',
-        recordType: recordType || 'normal'
+        recordType: recordType || 'normal',
       });
-      
+
       navigate(`/memory/record/edit/${roomId}/${record.id}?${params.toString()}`);
     }
   }, [roomId, record.id, content, pageRange, recordType, type, pollOptions, navigate, closePopup]);
@@ -155,9 +145,6 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
           variant: 'top',
           onClose: () => {},
         });
-
-        // TODO: 목록에서 해당 기록 제거 (부모 컴포넌트 업데이트 필요)
-        // 현재는 페이지 새로고침으로 임시 처리
         window.location.reload();
       } else {
         openSnackbar({
@@ -194,7 +181,6 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     });
   }, [openSnackbar]);
 
-  // 기록을 피드에 핀하기 핸들러
   const handlePinRecord = useCallback(async () => {
     const currentRoomId = roomId || '1';
     const recordId = parseInt(record.id);
@@ -203,10 +189,8 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       const response = await pinRecordToFeed(parseInt(currentRoomId), recordId);
 
       if (response.isSuccess) {
-        // 팝업 먼저 닫기
         closePopup();
-        
-        // 피드 작성 페이지로 이동하면서 데이터 전달
+
         navigate('/feed/write', {
           state: {
             pinData: {
@@ -233,7 +217,6 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
           errorMessage = '존재하지 않는 책입니다.';
         }
 
-        // 실패한 경우에도 팝업 닫기
         closePopup();
 
         openSnackbar({
@@ -244,10 +227,9 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       }
     } catch (error) {
       console.error('핀하기 API 호출 실패:', error);
-      
-      // 네트워크 오류 시에도 팝업 닫기
+
       closePopup();
-      
+
       openSnackbar({
         message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
         variant: 'top',
@@ -256,68 +238,64 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
     }
   }, [roomId, record.id, content, navigate, openSnackbar, closePopup]);
 
-  // 핀하기 확인 팝업 핸들러
   const handlePinConfirm = useCallback(() => {
     openConfirm({
       title: '이 기록을 피드에 핀할까요?',
       disc: '핀하면 내 피드에 글을 옮길 수 있어요.',
       onConfirm: handlePinRecord,
-      onClose: closePopup, // "아니오" 버튼 클릭 시 팝업 닫기
+      onClose: closePopup,
     });
   }, [openConfirm, handlePinRecord, closePopup]);
 
-  // 댓글 버튼 클릭 핸들러
   const handleCommentClick = useCallback(() => {
     openCommentBottomSheet(parseInt(id), type === 'poll' ? 'VOTE' : 'RECORD');
   }, [openCommentBottomSheet, id, type]);
 
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (shouldBlur) {
+        e.stopPropagation();
+        return;
+      }
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    // 블라인드된 상태에서는 클릭 이벤트 무시
-    if (shouldBlur) {
-      e.stopPropagation();
-      return;
-    }
-    
-    // 클릭으로 더보기 메뉴 표시
-    if (isMyRecord) {
-      if (type === 'text') {
-        // 기록(text)일 때는 핀하기 기능 포함
-        openMoreMenu({
-          onEdit: handleEdit,
-          onDelete: handleDeleteConfirm,
-          onClose: closePopup,
-          onPin: handlePinConfirm,
-          type: 'post' as const,
-          isWriter: true,
-        });
+      if (isMyRecord) {
+        if (type === 'text') {
+          openMoreMenu({
+            onEdit: handleEdit,
+            onDelete: handleDeleteConfirm,
+            onClose: closePopup,
+            onPin: handlePinConfirm,
+            type: 'post' as const,
+            isWriter: true,
+          });
+        } else {
+          openMoreMenu({
+            onEdit: handleEdit,
+            onDelete: handleDeleteConfirm,
+            onClose: closePopup,
+            type: 'post' as const,
+            isWriter: true,
+          });
+        }
       } else {
-        // 투표일 때는 핀하기 기능 제외
         openMoreMenu({
-          onEdit: handleEdit,
-          onDelete: handleDeleteConfirm,
+          onReport: handleReport,
           onClose: closePopup,
-          type: 'post' as const,
-          isWriter: true,
         });
       }
-    } else {
-      openMoreMenu({
-        onReport: handleReport,
-        onClose: closePopup,
-      });
-    }
-  }, [
-    isMyRecord,
-    type,
-    openMoreMenu,
-    handleReport,
-    handleEdit,
-    handleDeleteConfirm,
-    handlePinConfirm,
-    closePopup,
-    shouldBlur,
-  ]);
+    },
+    [
+      isMyRecord,
+      type,
+      openMoreMenu,
+      handleReport,
+      handleEdit,
+      handleDeleteConfirm,
+      handlePinConfirm,
+      closePopup,
+      shouldBlur,
+    ],
+  );
 
   return (
     <Container
@@ -339,7 +317,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
             zIndex: 10,
             cursor: 'default',
           }}
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
           }}
         />
@@ -363,7 +341,6 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
             postId={parseInt(id)}
             shouldBlur={shouldBlur}
             onVoteUpdate={updatedOptions => {
-              // TODO: 부모 컴포넌트로 투표 결과 업데이트 전달
               console.log('투표 결과 업데이트:', updatedOptions);
             }}
           />
@@ -414,7 +391,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
               shouldBlur
                 ? undefined
                 : e => {
-                    e.stopPropagation(); // 이벤트 버블링 방지
+                    e.stopPropagation();
                     handlePinConfirm();
                   }
             }
