@@ -58,7 +58,6 @@ export const useUserSearch = ({
     [size, isFinalized],
   );
 
-  // 디바운스된 키워드가 변경될 때 검색 실행
   useEffect(() => {
     searchUsers(debouncedKeyword);
   }, [debouncedKeyword, searchUsers]);

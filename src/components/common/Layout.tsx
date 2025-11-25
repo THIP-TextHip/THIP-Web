@@ -8,7 +8,6 @@ const Layout = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // 라우트별 페이지 타이틀 설정 (첫 세그먼트 기준으로 그룹핑)
     const path = location.pathname;
     const titleRules: Array<[RegExp, string]> = [
       [/^\/$/, 'THIP - 로그인'],

@@ -26,7 +26,6 @@ const FeedDetailPage = () => {
   const { isReplying, replyContent, setReplyContent, submitComment, cancelReply } =
     useReplyActions();
   const { nickname } = useReplyStore();
-  // 댓글 목록을 다시 로드하는 함수
   const reloadComments = useCallback(async () => {
     if (!feedId) return;
 
@@ -34,7 +33,6 @@ const FeedDetailPage = () => {
       const commentsResponse = await getComments(Number(feedId), { postType: 'FEED' });
       setCommentList(commentsResponse.data.commentList);
 
-      // 피드 데이터의 댓글 수를 실제 댓글 목록 길이로 업데이트
       if (feedData) {
         setFeedData(prev =>
           prev
@@ -50,14 +48,12 @@ const FeedDetailPage = () => {
     }
   }, [feedId, feedData]);
 
-  // 페이지를 떠날 때 답글 상태 초기화
   useEffect(() => {
     return () => {
       cancelReply();
     };
   }, [cancelReply]);
 
-  // 피드 상세 정보와 댓글 목록 로드
   useEffect(() => {
     const loadFeedDetailAndComments = async () => {
       if (!feedId) {
@@ -69,7 +65,6 @@ const FeedDetailPage = () => {
       try {
         setLoading(true);
 
-        // 피드 상세 정보와 댓글 목록을 병렬로 로드
         const [feedResponse, commentsResponse] = await Promise.all([
           getFeedDetail(Number(feedId)),
           getComments(Number(feedId), { postType: 'FEED' }),
@@ -99,7 +94,6 @@ const FeedDetailPage = () => {
 
   const handleMoreClick = () => {
     if (feedData?.isWriter) {
-      // 작성자인 경우: 수정하기, 삭제하기 메뉴
       openMoreMenu({
         onEdit: () => {
           closePopup();
@@ -166,10 +160,8 @@ const FeedDetailPage = () => {
   };
 
   const handleBackClick = () => {
-    // 새 탭에서 열린 경우 탭 닫기
     window.close();
 
-    // 만약 window.close()가 작동하지 않으면 (같은 도메인이 아닌 경우) 이전 페이지로 이동
     if (window.opener) {
       window.close();
     } else {

@@ -52,7 +52,6 @@ const Notice = () => {
   );
 
   useEffect(() => {
-    // 탭 변경 시 첫 페이지부터 다시 로드
     setNotifications([]);
     setNextCursor(null);
     setIsLast(false);
@@ -88,22 +87,12 @@ const Notice = () => {
       const res = await postNotificationsCheck(notif.notificationId);
       if (!res.isSuccess) return;
 
-      // UI 즉시 반영: 읽음 처리
-      // setNotifications(prev =>
-      //   prev.map(item =>
-      //     item.notificationId === notif.notificationId ? { ...item, isChecked: true } : item,
-      //   ),
-      // );
-
       const { route, params } = res.data as { route: string; params?: Record<string, unknown> };
 
-      // 서버 라우팅 키 → 실제 앱 경로 매핑
       switch (route) {
-        // 이동 없음
         case 'NONE':
           break;
 
-        // 피드 1번 (해당유저 피드로 이동)
         case 'FEED_USER': {
           const userId = (params?.userId as number) ?? undefined;
           if (userId !== undefined) {
@@ -112,7 +101,6 @@ const Notice = () => {
           break;
         }
 
-        // 피드 2~6번 (피드상세페이지로 이동)
         case 'FEED_DETAIL': {
           const feedId = (params?.feedId as number) ?? undefined;
           if (feedId !== undefined) {
@@ -121,21 +109,18 @@ const Notice = () => {
           break;
         }
 
-        // 모임 (모집조기마감 or 모임시작)
         case 'ROOM_MAIN': {
           const roomId = (params?.roomId as number) ?? undefined;
           if (roomId !== undefined) navigate(`/group/detail/joined/${roomId}`);
           break;
         }
 
-        // host일때, 누군가 모임 참여를 눌렀을 때
         case 'ROOM_DETAIL': {
           const roomId = (params?.roomId as number) ?? undefined;
           if (roomId !== undefined) navigate(`/group/detail/${roomId}`);
           break;
         }
 
-        // 모임방 -> 기록장 -> 해당 기록 필터링 화면으로 이동
         case 'ROOM_POST_DETAIL': {
           const roomId = (params?.roomId as number) ?? undefined;
           const postId = (params?.postId as number) ?? undefined;
@@ -159,7 +144,6 @@ const Notice = () => {
           break;
       }
     } catch (e) {
-      // noop: 실패 시 네비게이션 없이 무시
       console.error('알림 확인 처리 실패:', e);
     }
   };
@@ -202,7 +186,6 @@ const Notice = () => {
         )}
       </NotificationList>
 
-      {/* 무한 스크롤 감지용 센티넬 */}
       <Sentinel ref={sentinelRef} />
     </Wrapper>
   );
@@ -247,11 +230,10 @@ const NotificationList = styled.div`
   padding: 0 20px 20px 20px;
   width: 100%;
   overflow-y: auto;
-  /* Hide scrollbar but keep scroll */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
   }
 `;
 

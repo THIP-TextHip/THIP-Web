@@ -12,8 +12,6 @@ const AlertPage = () => {
 
   const [toggleStates, setToggleStates] = useState({
     push: true,
-    // feed: true,
-    // group: false,
   });
 
   const handleBack = () => {
@@ -36,8 +34,6 @@ const AlertPage = () => {
 
   const alertSettings = [
     { key: 'push' as const, label: '푸시 알림', desc: '알림센터의 모든 알림을 포함해요' },
-    // { key: 'feed' as const, label: '피드 알림', desc: '새로운 피드 소식을 알려드려요' },
-    // { key: 'group' as const, label: '모임 알림', desc: '모임 관련 소식을 알려드려요' },
   ];
 
   return (
