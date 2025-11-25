@@ -41,7 +41,6 @@ const MemoryAddButton = () => {
     const currentRoomId = roomId || '1';
 
     navigate(`/memory/record/write/${currentRoomId}`);
-    console.log('기록 작성하기 - roomId:', currentRoomId);
   };
 
   const handlePollCreate = () => {
@@ -50,7 +49,6 @@ const MemoryAddButton = () => {
     const currentRoomId = roomId || '1';
 
     navigate(`/memory/poll/write/${currentRoomId}`);
-    console.log('투표 생성하기 - roomId:', currentRoomId);
   };
 
   const handleAIWrite = async () => {
@@ -91,7 +89,6 @@ const MemoryAddButton = () => {
           onConfirm: () => {
             closePopup();
             navigate(`/aiwrite/${currentRoomId}`);
-            console.log('AI 독서 감상문 생성 시작 - roomId:', currentRoomId);
           },
         });
       } else {

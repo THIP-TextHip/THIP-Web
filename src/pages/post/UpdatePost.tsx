@@ -36,7 +36,6 @@ const UpdatePost = () => {
   const { openSnackbar, closePopup } = usePopupActions();
   const { updateExistingFeed, loading: updateLoading } = useUpdateFeed({
     onSuccess: feedId => {
-      console.log('피드 수정 성공! 피드 ID:', feedId);
       navigate(`/feed/${feedId}`);
     },
   });
