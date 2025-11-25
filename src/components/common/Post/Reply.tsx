@@ -59,7 +59,6 @@ const Reply = ({
   };
 
   const handleReplyClick = () => {
-    // 답글 작성 시에는 현재 댓글 작성자의 이름을 사용
     startReply(creatorNickname, commentId);
   };
 
@@ -69,7 +68,6 @@ const Reply = ({
       closePopup();
 
       if (response.isSuccess) {
-        // 약간의 지연 후 스낵바 오픈 → 진입 애니메이션이 확실히 보이도록
         setTimeout(() => {
           openSnackbar({
             message: '댓글이 삭제되었습니다.',
@@ -104,7 +102,6 @@ const Reply = ({
 
   const handleMoreClick = () => {
     if (isWriter) {
-      // 작성자인 경우: 삭제하기만 표시
       openMoreMenu({
         onDelete: handleDelete,
         type: 'reply',
@@ -112,7 +109,6 @@ const Reply = ({
         onClose: closePopup,
       });
     } else {
-      // 작성자가 아닌 경우: 신고하기만 표시
       openMoreMenu({
         onReport: () => {
           closePopup();
@@ -129,7 +125,6 @@ const Reply = ({
     }
   };
 
-  // 삭제된 댓글인 경우 처리
   if (isDeleted) {
     return (
       <DeletedContainer>

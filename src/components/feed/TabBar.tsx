@@ -59,7 +59,6 @@ interface TabProps {
 }
 
 const TabBar = ({ tabs, activeTab, onTabClick }: TabProps) => {
-  // 현재 활성 탭의 인덱스 계산
   const activeIndex = tabs.findIndex(tab => tab === activeTab);
 
   return (
@@ -73,7 +72,6 @@ const TabBar = ({ tabs, activeTab, onTabClick }: TabProps) => {
           {tab}
         </TabButton>
       ))}
-      {/* 슬라이드 애니메이션 밑줄 */}
       <ActiveIndicator activeIndex={activeIndex} />
     </Container>
   );

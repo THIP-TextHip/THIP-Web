@@ -23,15 +23,11 @@ const SignupGenre = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 소셜 로그인 토큰 발급 처리
   useSocialLoginToken();
 
-  // SignupNickname에서 넘어온 nickname 받기
   const nickname = location.state?.nickname;
 
-  // 페이지 로드 시 간단한 확인
   useEffect(() => {
-    // nickname이 없으면 이전 페이지로 돌아가기
     if (!nickname) {
       navigate(-1);
       return;
@@ -60,13 +56,8 @@ const SignupGenre = () => {
       });
 
       if (result.isSuccess) {
-        console.log('🎉 회원가입 성공! 사용자 ID:', result.data.userId);
-
-        // 회원가입 성공 시 새로운 access 토큰을 localStorage에 저장
         if (result.data.accessToken) {
           localStorage.setItem('authToken', result.data.accessToken);
-          console.log('✅ 새로운 access 토큰이 localStorage에 저장되었습니다.');
-          // 임시 토큰 제거
           localStorage.removeItem('preAuthToken');
         }
 

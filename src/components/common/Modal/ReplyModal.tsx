@@ -59,10 +59,6 @@ const ReplyModal = ({ isOpen, userId, commentId, position, onClose }: ReplyModal
     });
   };
 
-  // const handleReport = () => {
-  //   onClose();
-  // };
-
   if (!isOpen) return null;
 
   return (
@@ -75,7 +71,6 @@ const ReplyModal = ({ isOpen, userId, commentId, position, onClose }: ReplyModal
         }}
       >
         <ModalContent>
-          {/* 내 댓글이면 삭제하기, 다른 사람 댓글이면 신고하기 */}
           {isMyReply ? (
             <OptionItem className="report">
               <div className="option-text">신고하기</div>

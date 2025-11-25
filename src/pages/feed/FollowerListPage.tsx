@@ -15,7 +15,6 @@ const FollowerListPage = () => {
   const { type, userId } = useParams<{ type: UserProfileType; userId?: string }>();
   const title = type === 'followerlist' ? '띱 목록' : '내 띱 목록';
 
-  // 상태 관리
   const [userList, setUserList] = useState<FollowData[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -28,7 +27,6 @@ const FollowerListPage = () => {
     navigate(-1);
   };
 
-  // API 호출 함수
   const loadUserList = useCallback(
     async (cursor?: string) => {
       if (loading) return;
@@ -39,19 +37,15 @@ const FollowerListPage = () => {
         let response;
 
         if (type === 'followerlist') {
-          // 띱 목록 API 호출
           if (!userId) {
-            console.error('userId가 없습니다.');
             setError('사용자 ID가 없습니다.');
             return;
           }
           response = await getFollowerList(userId, { size: 10, cursor: cursor || null });
         } else {
-          // 내 띱 목록 API 호출
           response = await getFollowingList({ size: 10, cursor: cursor || null });
         }
 
-        // type에 따라 적절한 데이터 추출
         let userData: FollowData[] = [];
         if (type === 'followerlist') {
           userData = (response.data as { followers: FollowData[] })?.followers || [];
@@ -59,27 +53,19 @@ const FollowerListPage = () => {
           userData = (response.data as { followings: FollowData[] })?.followings || [];
         }
 
-        console.log('API 응답:', response);
-        console.log('추출된 사용자 데이터:', userData);
-
-        // API 응답이 유효한지 확인
         if (!response || !response.data) {
-          console.error('API 응답이 없습니다.');
           setError('API 응답이 없습니다.');
           return;
         }
 
         if (cursor) {
-          // 다음 페이지 데이터 추가 (무한 스크롤)
           setUserList(prev => [...prev, ...userData]);
         } else {
-          // 첫 페이지 데이터 설정
           setUserList(userData);
         }
 
         setNextCursor(response.data.nextCursor);
         setIsLast(response.data.isLast);
-        // 총합 카운트 설정 (API별 키 분기)
         if (type === 'followerlist') {
           const total = (response.data as { totalFollowerCount?: number }).totalFollowerCount;
           if (typeof total === 'number') setTotalCount(total);
@@ -87,13 +73,11 @@ const FollowerListPage = () => {
           const total = (response.data as { totalFollowingCount?: number }).totalFollowingCount;
           if (typeof total === 'number') setTotalCount(total);
         }
-        // setTotalCount(prev => prev + userData.length);
         setRetryCount(0);
       } catch (error) {
         console.error('사용자 목록 로드 실패:', error);
         setError('사용자 목록을 불러오는데 실패했습니다.');
         setRetryCount(prev => prev + 1);
-        // 에러 발생 시 로딩 상태를 false로 설정하여 무한 요청 방지
       } finally {
         setLoading(false);
       }
@@ -101,12 +85,9 @@ const FollowerListPage = () => {
     [type, userId],
   );
 
-  // 무한 스크롤 구현
   useEffect(() => {
     const handleScroll = () => {
-      // 로딩 중이거나 마지막 페이지이거나 에러가 있거나 재시도 횟수 초과시 요청하지 않음
       if (loading || isLast || error || retryCount >= 3 || !nextCursor) {
-        console.log('스크롤 요청 차단:', { loading, isLast, error, retryCount, nextCursor });
         return;
       }
 
@@ -123,12 +104,10 @@ const FollowerListPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isLast, error, retryCount, nextCursor, loadUserList]);
 
-  // 초기 데이터 로드
   useEffect(() => {
     loadUserList();
   }, [loadUserList]);
 
-  // 첫 페이지 높이가 뷰포트보다 작아 스크롤 이벤트가 발생하지 않는 경우 자동으로 다음 페이지를 프리페치
   useEffect(() => {
     const doc = document.documentElement;
     const needsMore = doc.scrollHeight <= window.innerHeight + 100;
@@ -201,7 +180,6 @@ const TotalBar = styled.div`
 
 const UserProfileList = styled.div`
   width: 100%;
-  /* 고정 헤더(TopBar) 영역을 제외한 최소 높이를 보장하여 하단 여백에도 배경이 비지 않도록 함 */
   min-height: 100vh;
   background-color: var(--color-black-main);
   padding-top: 105px;

@@ -32,8 +32,6 @@ const BookContainer = styled.div`
   display: flex;
   height: 44px;
   padding: 8px 4px 8px 12px;
-  /* min-width: 280px;
-  max-width: 500px; */
   flex-direction: row;
   align-items: center;
   justify-content: space-between;

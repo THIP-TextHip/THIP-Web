@@ -20,22 +20,18 @@ const SavePage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
-  // 피드 관련 상태
   const [savedFeeds, setSavedFeeds] = useState<SavedFeedInMy[]>([]);
   const [feedNextCursor, setFeedNextCursor] = useState<string | null>(null);
   const [feedIsLast, setFeedIsLast] = useState(false);
   const [feedLoading, setFeedLoading] = useState(false);
 
-  // 책 관련 상태
   const [savedBooks, setSavedBooks] = useState<SavedBookInMy[]>([]);
   const [bookNextCursor, setBookNextCursor] = useState<string | null>(null);
   const [bookIsLast, setBookIsLast] = useState(false);
   const [bookLoading, setBookLoading] = useState(false);
 
-  // 초기 로딩 상태
   const [initialLoading, setInitialLoading] = useState(true);
 
-  // Intersection Observer ref
   const feedObserverRef = useRef<HTMLDivElement>(null);
   const bookObserverRef = useRef<HTMLDivElement>(null);
 
@@ -43,17 +39,14 @@ const SavePage = () => {
     navigate('/mypage');
   };
 
-  // 저장된 책 목록 로드 함수 (무한스크롤)
   const loadSavedBooks = useCallback(async (cursor: string | null = null) => {
     try {
       setBookLoading(true);
       const response = await getSavedBooksInMy(cursor);
 
       if (cursor === null) {
-        // 첫 로드
         setSavedBooks(response.data.bookList);
       } else {
-        // 추가 로드
         setSavedBooks(prev => [...prev, ...response.data.bookList]);
       }
 
@@ -66,17 +59,14 @@ const SavePage = () => {
     }
   }, []);
 
-  // 저장된 피드 목록 로드 함수
   const loadSavedFeeds = useCallback(async (cursor: string | null = null) => {
     try {
       setFeedLoading(true);
       const response = await getSavedFeedsInMy(cursor);
 
       if (cursor === null) {
-        // 첫 로드
         setSavedFeeds(response.data.feedList);
       } else {
-        // 추가 로드
         setSavedFeeds(prev => [...prev, ...response.data.feedList]);
       }
 
@@ -89,7 +79,6 @@ const SavePage = () => {
     }
   }, []);
 
-  // 저장된 책 목록 로드 함수
   const loadMoreBooks = useCallback(async () => {
     if (!bookNextCursor || bookIsLast || bookLoading) return;
 
@@ -100,7 +89,6 @@ const SavePage = () => {
     }
   }, [bookNextCursor, bookIsLast, bookLoading, loadSavedBooks]);
 
-  // 책 Intersection Observer 콜백
   const lastBookElementCallback = useCallback(
     (node: HTMLDivElement | null) => {
       if (bookLoading || bookIsLast) return;
@@ -118,24 +106,20 @@ const SavePage = () => {
     [bookLoading, bookIsLast, loadMoreBooks],
   );
 
-  // 페이지 진입 시 모든 데이터 로드 (한 번만 실행)
   useEffect(() => {
     const loadAllData = async () => {
       try {
         setInitialLoading(true);
 
-        // 두 API를 병렬로 호출
         const [feedsResponse, booksResponse] = await Promise.all([
           getSavedFeedsInMy(null),
           getSavedBooksInMy(),
         ]);
 
-        // 피드 데이터 설정
         setSavedFeeds(feedsResponse.data.feedList);
         setFeedNextCursor(feedsResponse.data.nextCursor);
         setFeedIsLast(feedsResponse.data.isLast);
 
-        // 책 데이터 설정
         setSavedBooks(booksResponse.data.bookList);
         setBookNextCursor(booksResponse.data.nextCursor);
         setBookIsLast(booksResponse.data.isLast);
@@ -147,9 +131,8 @@ const SavePage = () => {
     };
 
     loadAllData();
-  }, []); // 빈 의존성 배열로 변경
+  }, []);
 
-  // Intersection Observer 설정 (피드)
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
@@ -181,29 +164,22 @@ const SavePage = () => {
       const newSaveState = !currentBook.isSaved;
       await postSaveBook(isbn, newSaveState);
 
-      // 저장 취소인 경우 저장된 책 목록을 다시 불러옴
       if (!newSaveState) {
         await loadSavedBooks();
       } else {
-        // 저장인 경우 로컬 상태만 업데이트
         setSavedBooks(prev =>
           prev.map(book => (book.isbn === isbn ? { ...book, isSaved: newSaveState } : book)),
         );
       }
-
-      console.log('저장 토글:', isbn, newSaveState);
     } catch (error) {
       console.error('저장 토글 실패:', error);
     }
   };
 
-  // 피드 저장 토글 처리
   const handleFeedSaveToggle = async (feedId: number, newSaveState: boolean) => {
     try {
       if (!newSaveState) {
-        // 저장 취소인 경우 리스트에서 제거
         setSavedFeeds(prev => prev.filter(feed => feed.feedId !== feedId));
-        console.log('피드 저장 취소 완료:', feedId);
       }
     } catch (error) {
       console.error('피드 저장 상태 변경 실패:', error);
