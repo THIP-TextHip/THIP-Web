@@ -19,9 +19,9 @@ import {
 interface PollRecordProps {
   content: string;
   pollOptions: PollOption[];
-  postId: number; // 투표 API 호출에 필요한 postId
-  shouldBlur?: boolean; // 블라인드 처리 여부
-  onVoteUpdate?: (updatedOptions: PollOption[]) => void; // 투표 결과 업데이트 콜백
+  postId: number;
+  shouldBlur?: boolean;
+  onVoteUpdate?: (updatedOptions: PollOption[]) => void;
 }
 
 const PollRecord = ({
@@ -43,7 +43,6 @@ const PollRecord = ({
       entries => {
         entries.forEach(entry => {
           if (entry.isIntersecting && !animate) {
-            // 약간의 지연 후 애니메이션 시작
             setTimeout(() => {
               setAnimate(true);
             }, 100);
@@ -51,7 +50,7 @@ const PollRecord = ({
         });
       },
       {
-        threshold: 0.3, // 30% 보일 때 애니메이션 시작
+        threshold: 0.3,
         rootMargin: '0px 0px -50px 0px',
       },
     );
@@ -68,14 +67,12 @@ const PollRecord = ({
     };
   }, [animate]);
 
-  // pollOptions가 변경되면 currentOptions 업데이트
   useEffect(() => {
     setCurrentOptions(pollOptions);
   }, [pollOptions]);
 
-  // 투표 옵션 클릭 핸들러
   const handleOptionClick = async (e: React.MouseEvent, option: PollOption) => {
-    e.stopPropagation(); // 이벤트 버블링 방지
+    e.stopPropagation();
     if (isVoting || !roomId || shouldBlur) return;
 
     setIsVoting(true);
@@ -83,13 +80,12 @@ const PollRecord = ({
     try {
       const voteData = {
         voteItemId: option.voteItemId,
-        type: !option.isVoted, // 현재 투표 상태의 반대로 설정
+        type: !option.isVoted,
       };
 
       const response = await postVote(parseInt(roomId), postId, voteData);
 
       if (response.isSuccess) {
-        // API 응답으로 받은 투표 결과를 현재 옵션 형태로 변환
         const updatedOptions = currentOptions.map(opt => {
           const updatedItem = response.data.voteItems.find(
             (item: PollOption) => item.voteItemId === opt.voteItemId,
@@ -111,7 +107,6 @@ const PollRecord = ({
         setCurrentOptions(updatedOptions);
         onVoteUpdate?.(updatedOptions);
 
-        // 성공 메시지
         const actionText = voteData.type ? '투표했습니다' : '투표를 취소했습니다';
         openSnackbar({
           message: actionText,
@@ -119,7 +114,6 @@ const PollRecord = ({
           onClose: () => {},
         });
       } else {
-        // 에러 처리
         let errorMessage = '투표 처리 중 오류가 발생했습니다.';
 
         if (response.code === 120001) {
@@ -131,7 +125,7 @@ const PollRecord = ({
         } else if (response.code === 120000) {
           errorMessage = '투표는 존재하지만 투표항목이 비어있습니다.';
         } else if (response.message) {
-          errorMessage = response.message; // 서버에서 보낸 메시지 사용
+          errorMessage = response.message;
         }
 
         openSnackbar({
@@ -152,13 +146,10 @@ const PollRecord = ({
     }
   };
 
-  // 아무도 투표하지 않았는지 확인 (모든 옵션이 0표인지 확인)
   const hasVotes = currentOptions.some(option => option.count > 0);
 
-  // 전체 투표수 계산
   const totalVotes = currentOptions.reduce((sum, option) => sum + option.count, 0);
 
-  // 각 옵션의 퍼센트 계산 (애니메이션용)
   const getPercentage = (count: number) => {
     if (totalVotes === 0) return 0;
     return (count / totalVotes) * 100;
@@ -184,7 +175,7 @@ const PollRecord = ({
                 percentage={hasVotes ? getPercentage(option.count) : 0}
                 isHighest={hasVotes && option.isHighest}
                 animate={hasVotes && animate}
-                delay={index * 200} // 각 옵션마다 200ms 지연
+                delay={index * 200}
               />
             </PollBar>
             <PollContent>

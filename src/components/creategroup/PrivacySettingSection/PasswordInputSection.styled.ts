@@ -32,7 +32,6 @@ export const PasswordInput = styled.input`
     color: ${colors.grey[300]};
   }
 
-  /* 숫자만 입력 가능하도록 설정 */
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;

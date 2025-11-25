@@ -27,7 +27,6 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
     if (onMemberClick) {
       onMemberClick(member.id);
     } else {
-      // isMyself가 true면 본인 프로필 페이지로, 아니면 다른 유저 페이지로 이동
       if (member.isMyself) {
         navigate(`/myfeed/${member.id}`);
       } else {
@@ -72,7 +71,6 @@ const MemberList = ({ members, onMemberClick }: MemberListProps) => {
   );
 };
 
-// 프로필 이미지가 있을 때 사용하는 스타일드 컴포넌트
 const ProfileImageWithSrc = styled.img`
   width: 36px;
   height: 36px;
