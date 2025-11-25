@@ -73,8 +73,7 @@ const CreatePost = () => {
 
   const { openSnackbar, closePopup } = usePopupActions();
   const { createNewFeed, loading } = useCreateFeed({
-    onSuccess: feedId => {
-      console.log('피드 작성 성공! 피드 ID:', feedId);
+    onSuccess: () => {
       navigate('/feed');
     },
   });

@@ -169,14 +169,9 @@ const PollWrite = () => {
           content: pollContent.trim(),
         };
 
-        console.log('투표 수정 API 호출:', updateData);
-        console.log('roomId:', roomId, 'voteId:', voteId);
-
         const response = await updateVote(parseInt(roomId), parseInt(voteId), updateData);
 
         if (response.isSuccess) {
-          console.log('투표 수정 성공:', response.data);
-
           openSnackbar({
             message: '투표 수정을 완료했어요.',
             variant: 'top',
@@ -237,14 +232,9 @@ const PollWrite = () => {
           voteItemList: validOptions.map(option => ({ itemName: option.trim() })),
         };
 
-        console.log('투표 생성 API 호출:', voteData);
-        console.log('roomId:', roomId);
-
         const response = await createVote(parseInt(roomId), voteData);
 
         if (response.isSuccess) {
-          console.log('투표 생성 성공:', response.data);
-
           navigate(`/rooms/${roomId}/memory`, {
             replace: true,
           });

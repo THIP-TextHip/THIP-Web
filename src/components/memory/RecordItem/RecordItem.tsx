@@ -71,10 +71,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
       if (response.isSuccess) {
         setIsLiked(response.data.isLiked);
         setCurrentLikeCount((prev: number) => (response.data.isLiked ? prev + 1 : prev - 1));
-        console.log('좋아요 상태 변경 성공:', response.data.isLiked);
       } else {
-        console.error('좋아요 상태 변경 실패:', response.message);
-
         openSnackbar({
           message: response.message || '좋아요 처리 중 오류가 발생했습니다.',
           variant: 'top',
@@ -340,9 +337,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
             pollOptions={pollOptions || []}
             postId={parseInt(id)}
             shouldBlur={shouldBlur}
-            onVoteUpdate={updatedOptions => {
-              console.log('투표 결과 업데이트:', updatedOptions);
-            }}
+            onVoteUpdate={() => {}}
           />
         )}
       </ContentSection>
