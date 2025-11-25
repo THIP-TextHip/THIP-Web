@@ -140,7 +140,6 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
     };
 
     const handleReport = () => {
-      console.log('메시지 신고');
       setSelectedMessageId(null);
     };
 

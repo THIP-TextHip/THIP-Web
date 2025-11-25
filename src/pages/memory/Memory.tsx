@@ -70,7 +70,6 @@ const Memory = () => {
     if (pageParam && filterParam === 'poll') {
       const page = parseInt(pageParam);
       if (!isNaN(page)) {
-        console.log('✅ 페이지 필터 적용:', { page });
         setSelectedPageRange({ start: page, end: page });
         setActiveFilter('page');
         setActiveTab('group');
@@ -81,7 +80,6 @@ const Memory = () => {
   }, [location.search]);
 
   const [error, setError] = useState<string | null>(null);
-  const [isOverviewEnabled, setIsOverviewEnabled] = useState(false);
 
   const [showUploadProgress, setShowUploadProgress] = useState(false);
 
@@ -94,7 +92,6 @@ const Memory = () => {
 
   const loadMemoryPosts = useCallback(async () => {
     if (!roomId) {
-      console.log('❌ roomId가 없습니다:', roomId);
       return;
     }
     setError(null);
@@ -126,8 +123,6 @@ const Memory = () => {
         } else {
           setMyRecords(convertedRecords);
         }
-
-        setIsOverviewEnabled(response.data.isOverviewEnabled);
 
         if (response.data.totalPages !== undefined) {
           setTotalPages(response.data.totalPages);
@@ -282,9 +277,6 @@ const Memory = () => {
   }, []);
 
   const readingProgress = totalPages > 0 ? Math.round((currentUserPage / totalPages) * 100) : 0;
-
-  const overviewStatus = isOverviewEnabled ? '총평 활성화' : '총평 비활성화';
-  console.log('📊 현재 상태:', overviewStatus, `진행률: ${readingProgress}%`);
 
   if (error) {
     return (

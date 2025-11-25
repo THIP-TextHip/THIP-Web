@@ -107,7 +107,6 @@ const ParticipatedGroupDetail = () => {
       title: '모임방을 삭제하시겠어요?',
       disc: '방을 삭제하게 되면\n독서메이트들과의 추억이 사라집니다.',
       onConfirm: () => {
-        console.log('방 삭제 확정');
         openSnackbar({
           message: '삭제 기능은 현재 개발 중입니다.',
           variant: 'top',
