@@ -1,4 +1,3 @@
-// 투표 아이템 타입
 export interface VoteItem {
   voteItemId: number;
   itemName: string;
@@ -7,7 +6,6 @@ export interface VoteItem {
   isVoted: boolean;
 }
 
-// 기록/투표 포스트 타입
 export interface Post {
   postId: number;
   postDate: string;
@@ -22,23 +20,21 @@ export interface Post {
   isOverview: boolean;
   isLiked: boolean;
   isWriter: boolean;
-  isLocked: boolean; // 블러 처리 여부
+  isLocked: boolean;
   voteItems: VoteItem[];
 }
 
-// 기록장 조회 요청 파라미터 타입
 export interface GetMemoryPostsParams {
   roomId: number;
-  type?: 'group' | 'mine'; // default: group
-  sort?: 'latest' | 'like' | 'comment'; // default: latest (type이 group인 경우만)
-  pageStart?: number | null; // 페이지 필터 시작 (default: null)
-  pageEnd?: number | null; // 페이지 필터 끝 (default: null)
-  isOverview?: boolean; // 총평 보기 필터 (default: false)
-  isPageFilter?: boolean; // 페이지 보기 필터 (default: false)
-  cursor?: string | null; // 페이지네이션 커서
+  type?: 'group' | 'mine';
+  sort?: 'latest' | 'like' | 'comment';
+  pageStart?: number | null;
+  pageEnd?: number | null;
+  isOverview?: boolean;
+  isPageFilter?: boolean;
+  cursor?: string | null;
 }
 
-// 기록장 조회 응답 데이터 타입
 export interface MemoryPostsData {
   postList: Post[];
   roomId: number;
@@ -46,11 +42,10 @@ export interface MemoryPostsData {
   isbn: string;
   nextCursor: string | null;
   isLast: boolean;
-  totalPages?: number; // 전체 페이지 수
-  currentUserPage?: number; // 현재 사용자가 읽은 페이지
+  totalPages?: number;
+  currentUserPage?: number;
 }
 
-// API 응답 타입
 export interface GetMemoryPostsResponse {
   isSuccess: boolean;
   code: number;
@@ -58,12 +53,11 @@ export interface GetMemoryPostsResponse {
   data: MemoryPostsData;
 }
 
-// Memory 페이지에서 사용하는 Record 타입 (좋아요 상태 포함)
 export interface Record {
   id: string;
   user: string;
   userPoints: number;
-  profileImageUrl: string; // 프로필 이미지 URL 추가
+  profileImageUrl: string;
   content: string;
   likeCount: number;
   commentCount: number;
@@ -73,18 +67,17 @@ export interface Record {
   recordType: 'page' | 'overall';
   pageRange?: string;
   isWriter: boolean;
-  isLiked: boolean; // 좋아요 상태 추가
-  isLocked: boolean; // 블러 처리 여부 추가
+  isLiked: boolean;
+  isLocked: boolean;
   pollOptions?: PollOption[];
 }
 
-// 투표 옵션 타입
 export interface PollOption {
   id: string;
   text: string;
   percentage: number;
   count: number;
   isHighest: boolean;
-  voteItemId: number; // 투표 API에 필요한 ID
-  isVoted: boolean; // 현재 사용자가 투표했는지 여부
+  voteItemId: number;
+  isVoted: boolean;
 }
