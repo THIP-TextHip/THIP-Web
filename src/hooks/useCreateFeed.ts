@@ -16,9 +16,7 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
     try {
       setLoading(true);
 
-      // ===== 클라이언트 선검증 (선택값일 때만 검사) =====
       if (body.tagList) {
-        // 최대 5개
         if (body.tagList.length > 5) {
           openSnackbar({
             message: '태그는 최대 5개까지 입력할 수 있어요.',
@@ -27,7 +25,6 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
           });
           return { success: false as const };
         }
-        // 중복 제거 체크
         const trimmed = body.tagList.map(t => t.trim()).filter(Boolean);
         const uniq = new Set(trimmed);
         if (uniq.size !== trimmed.length) {
@@ -43,7 +40,6 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
       let uploadedImageUrls: string[] = [];
 
       if (images && images.length > 0) {
-        // 최대 3장
         if (images.length > 3) {
           openSnackbar({
             message: '이미지는 최대 3장까지 업로드할 수 있어요.',
@@ -52,7 +48,6 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
           });
           return { success: false as const };
         }
-        // 빈 파일 금지
         if (images.some(f => f.size === 0)) {
           openSnackbar({
             message: '빈 이미지 파일이 포함되어 있어요.',
@@ -61,7 +56,6 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
           });
           return { success: false as const };
         }
-        // 확장자 제한
         const extOk = (name: string) => /\.(jpe?g|png|gif)$/i.test(name);
         if (images.some(f => !extOk(f.name))) {
           openSnackbar({
@@ -72,7 +66,6 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
           return { success: false as const };
         }
 
-        // Presigned URL 발급 요청
         const presignedRequests: PresignedUrlRequest[] = images.map(file => ({
           extension: file.name.split('.').pop()?.toLowerCase() || 'jpg',
           size: file.size,
@@ -80,7 +73,7 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
 
         try {
           const presignedResponse = await getPresignedUrl(presignedRequests);
-          
+
           if (!presignedResponse.isSuccess || !presignedResponse.data) {
             openSnackbar({
               message: presignedResponse.message || 'Presigned URL 발급에 실패했습니다.',
@@ -90,17 +83,15 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
             return { success: false as const };
           }
 
-          // S3에 이미지 업로드
           const uploadPromises = presignedResponse.data.presignedUrls.map(
             async (urlData, index) => {
               const success = await uploadFileToS3(urlData.presignedUrl, images[index]);
               return success ? urlData.fileUrl : null;
-            }
+            },
           );
 
           const uploadResults = await Promise.all(uploadPromises);
-          
-          // 업로드 실패한 파일이 있는지 확인
+
           if (uploadResults.some(result => result === null)) {
             openSnackbar({
               message: '이미지 업로드 중 오류가 발생했습니다.',
@@ -121,9 +112,7 @@ export const useCreateFeed = (options?: UseCreateFeedProps) => {
           return { success: false as const };
         }
       }
-      // ===== 선검증 끝 =====
 
-      // 피드 생성 요청에 업로드된 이미지 URL 포함
       const feedBody: CreateFeedBody = {
         ...body,
         ...(uploadedImageUrls.length > 0 && { imageUrls: uploadedImageUrls }),
