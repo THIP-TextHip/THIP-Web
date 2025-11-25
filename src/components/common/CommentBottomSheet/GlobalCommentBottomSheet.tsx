@@ -29,12 +29,11 @@ const GlobalCommentBottomSheet = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [roomCompleted, setRoomCompleted] = useState(false);
-  
+
   const { nickname, isReplying, cancelReply } = useReplyActions();
   const { parentId } = useReplyStore();
   const { openSnackbar } = usePopupActions();
 
-  // 댓글 목록 로드
   const loadComments = useCallback(async () => {
     if (!isOpen || !postId || !postType) return;
 
@@ -55,7 +54,6 @@ const GlobalCommentBottomSheet = () => {
     }
   }, [isOpen, postId, postType]);
 
-  // 댓글 전송
   const handleSendComment = async () => {
     if (!inputValue.trim() || isSending || !postId || !postType) return;
 
@@ -65,18 +63,16 @@ const GlobalCommentBottomSheet = () => {
         content: inputValue.trim(),
         isReplyRequest: isReplying,
         parentId: isReplying ? parentId : null,
-        postType: postType as 'FEED' | 'RECORD' | 'VOTE'
+        postType: postType as 'FEED' | 'RECORD' | 'VOTE',
       };
 
       const response = await postReply(postId, requestData);
 
       if (response.isSuccess) {
         setInputValue('');
-        cancelReply(); // 답글 상태 초기화
-        // 댓글 목록 새로고침
+        cancelReply();
         await loadComments();
       } else {
-        // 서버에서 받은 에러 메시지 표시
         openSnackbar({
           message: response.message || '댓글 작성 중 오류가 발생했습니다.',
           variant: 'top',
@@ -95,19 +91,16 @@ const GlobalCommentBottomSheet = () => {
     }
   };
 
-  // 답글 취소
   const handleCancelReply = () => {
     cancelReply();
   };
 
-  // Overlay 클릭 처리
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       closeCommentBottomSheet();
     }
   };
 
-  // 모임방 상태 확인
   useEffect(() => {
     const checkRoomStatus = async () => {
       if (!roomId) return;
@@ -128,14 +121,12 @@ const GlobalCommentBottomSheet = () => {
     }
   }, [isOpen, roomId]);
 
-  // 바텀시트가 열릴 때 댓글 로드
   useEffect(() => {
     if (isOpen) {
       loadComments();
     }
   }, [isOpen, postId, loadComments]);
 
-  // 바텀시트가 닫힐 때 상태 초기화
   useEffect(() => {
     if (!isOpen) {
       setInputValue('');
@@ -152,15 +143,12 @@ const GlobalCommentBottomSheet = () => {
         <Header>
           <Title>댓글</Title>
         </Header>
-        
+
         <Content>
           {isLoading ? (
             <LoadingState>댓글을 불러오는 중...</LoadingState>
           ) : (
-            <ReplyList 
-              commentList={commentList} 
-              onReload={loadComments}
-            />
+            <ReplyList commentList={commentList} onReload={loadComments} />
           )}
         </Content>
 

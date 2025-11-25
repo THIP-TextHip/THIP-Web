@@ -26,14 +26,10 @@ const ActivityPeriodSection = ({
   onEndDateChange,
   onValidationChange,
 }: ActivityPeriodSectionProps) => {
-  // 현재 년도와 다음 년도
   const currentYear = new Date().getFullYear();
   const years = [currentYear, currentYear + 1];
-
-  // 월 배열 (1-12)
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
-  // 일 배열 계산 (선택된 년/월에 따라 동적으로 변경)
   const getDaysInMonth = (year: number, month: number) => {
     const daysInMonth = new Date(year, month, 0).getDate();
     return Array.from({ length: daysInMonth }, (_, i) => i + 1);
@@ -42,40 +38,33 @@ const ActivityPeriodSection = ({
   const startDays = getDaysInMonth(startDate.year, startDate.month);
   const endDays = getDaysInMonth(endDate.year, endDate.month);
 
-  // 날짜 간 일수 계산
   const calculateDaysDifference = (start: Date, end: Date): number => {
     const timeDiff = end.getTime() - start.getTime();
-    return Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; // +1은 시작일 포함
+    return Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
   };
 
-  // 현재 선택된 날짜들로 일수 계산
   const daysDifference = useMemo(() => {
     const startDateObj = new Date(startDate.year, startDate.month - 1, startDate.day);
     const endDateObj = new Date(endDate.year, endDate.month - 1, endDate.day);
     return calculateDaysDifference(startDateObj, endDateObj);
   }, [startDate, endDate]);
 
-  // 90일 초과 여부 확인
   const isOverMaxDays = daysDifference > 90;
 
-  // 종료일이 시작일보다 빠른지 확인 (추가)
   const isEndDateBeforeStart = useMemo(() => {
     const startDateObj = new Date(startDate.year, startDate.month - 1, startDate.day);
     const endDateObj = new Date(endDate.year, endDate.month - 1, endDate.day);
     return endDateObj < startDateObj;
   }, [startDate, endDate]);
 
-  // 날짜 유효성 검사 결과
   const isDateValid = !isOverMaxDays && !isEndDateBeforeStart;
 
-  // 유효성 변경 시 부모에게 알림
   useEffect(() => {
     if (onValidationChange) {
       onValidationChange(isDateValid);
     }
   }, [isDateValid, onValidationChange]);
 
-  // 오늘 날짜로 초기값 설정
   const getInitialDate = () => {
     const today = new Date();
     return {
@@ -95,7 +84,6 @@ const ActivityPeriodSection = ({
     };
   };
 
-  // 날짜 유효성 검사 및 조정
   const validateAndAdjustDate = (
     date: { year: number; month: number; day: number },
     isEndDate = false,
@@ -106,23 +94,19 @@ const ActivityPeriodSection = ({
 
     let adjustedDate = { ...date };
 
-    // 일수가 해당 월의 최대 일수를 초과하는 경우 조정
     if (date.day > daysInSelectedMonth) {
       adjustedDate.day = daysInSelectedMonth;
     }
 
-    // 시작일이 오늘보다 이른 경우 조정
     if (!isEndDate && selectedDate < today) {
       adjustedDate = getInitialDate();
     }
 
-    // 종료일 검증
     if (isEndDate) {
       const startDateObj = new Date(startDate.year, startDate.month - 1, startDate.day);
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      // 종료일이 내일보다 이르거나 시작일보다 이른 경우 조정
       if (selectedDate < tomorrow || selectedDate < startDateObj) {
         adjustedDate = getInitialEndDate();
       }
@@ -131,12 +115,10 @@ const ActivityPeriodSection = ({
     return adjustedDate;
   };
 
-  // 시작일 변경 핸들러
   const handleStartYearChange = (year: number) => {
     const newDate = validateAndAdjustDate({ ...startDate, year });
     onStartDateChange(newDate);
 
-    // 종료일도 재검증
     const adjustedEndDate = validateAndAdjustDate(endDate, true);
     if (JSON.stringify(adjustedEndDate) !== JSON.stringify(endDate)) {
       onEndDateChange(adjustedEndDate);
@@ -147,7 +129,6 @@ const ActivityPeriodSection = ({
     const newDate = validateAndAdjustDate({ ...startDate, month });
     onStartDateChange(newDate);
 
-    // 종료일도 재검증
     const adjustedEndDate = validateAndAdjustDate(endDate, true);
     if (JSON.stringify(adjustedEndDate) !== JSON.stringify(endDate)) {
       onEndDateChange(adjustedEndDate);
@@ -158,14 +139,12 @@ const ActivityPeriodSection = ({
     const newDate = validateAndAdjustDate({ ...startDate, day });
     onStartDateChange(newDate);
 
-    // 종료일도 재검증
     const adjustedEndDate = validateAndAdjustDate(endDate, true);
     if (JSON.stringify(adjustedEndDate) !== JSON.stringify(endDate)) {
       onEndDateChange(adjustedEndDate);
     }
   };
 
-  // 종료일 변경 핸들러
   const handleEndYearChange = (year: number) => {
     const newDate = validateAndAdjustDate({ ...endDate, year }, true);
     onEndDateChange(newDate);
@@ -181,7 +160,6 @@ const ActivityPeriodSection = ({
     onEndDateChange(newDate);
   };
 
-  // 컴포넌트 마운트 시 초기 날짜 유효성 검사
   useEffect(() => {
     const validatedStartDate = validateAndAdjustDate(startDate);
     const validatedEndDate = validateAndAdjustDate(endDate, true);
@@ -200,7 +178,6 @@ const ActivityPeriodSection = ({
       <SectionTitle>모임 활동기간</SectionTitle>
       <DatePickerContainer>
         <DateRangeContainer>
-          {/* 시작일 */}
           <DateGroup alignItems="end">
             <DateWheel
               values={years}
@@ -229,7 +206,6 @@ const ActivityPeriodSection = ({
 
           <SeparatorText>~</SeparatorText>
 
-          {/* 종료일 */}
           <DateGroup alignItems="start">
             <DateWheel
               values={years}

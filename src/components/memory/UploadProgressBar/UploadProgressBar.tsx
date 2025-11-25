@@ -18,8 +18,8 @@ const UploadProgressBar = ({ isVisible, onComplete }: UploadProgressBarProps) =>
       return;
     }
 
-    const duration = 3000; // 3초
-    const interval = 50; // 50ms마다 업데이트
+    const duration = 3000;
+    const interval = 50;
     const increment = (100 / duration) * interval;
 
     const timer = setInterval(() => {
@@ -30,7 +30,7 @@ const UploadProgressBar = ({ isVisible, onComplete }: UploadProgressBarProps) =>
           setIsCompleted(true);
           setTimeout(() => {
             onComplete();
-          }, 1000); // 1초 후 완료 (완료 메시지를 보여주기 위해)
+          }, 1000);
         }
         return newProgress;
       });
