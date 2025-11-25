@@ -1,4 +1,3 @@
-// usePopupStore.ts
 import { create } from 'zustand';
 
 export type PopupType =
@@ -45,7 +44,6 @@ export interface ReplyModalProps {
   onClose: () => void;
 }
 
-/* 추가 */
 export interface CountingBarProps {
   message: string;
   duration?: number;
