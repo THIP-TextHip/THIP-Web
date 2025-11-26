@@ -15,7 +15,6 @@ interface PasswordInputSectionProps {
 const PasswordInputSection = ({ password, onPasswordChange }: PasswordInputSectionProps) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // 숫자만 허용하고 최대 4자리까지만 입력 가능
     const numericValue = value.replace(/[^0-9]/g, '');
     if (numericValue.length <= 4) {
       onPasswordChange(numericValue);
@@ -23,11 +22,10 @@ const PasswordInputSection = ({ password, onPasswordChange }: PasswordInputSecti
   };
 
   const handleClose = () => {
-    onPasswordChange(''); // 입력된 숫자 전체 삭제
+    onPasswordChange('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // 숫자, 백스페이스, 삭제, 탭, 엔터만 허용
     const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight'];
     const isNumber = /^[0-9]$/;
 
@@ -35,7 +33,6 @@ const PasswordInputSection = ({ password, onPasswordChange }: PasswordInputSecti
       e.preventDefault();
     }
 
-    // 이미 4자리면 새로운 숫자 입력 방지
     if (password.length >= 4 && isNumber.test(e.key)) {
       e.preventDefault();
     }

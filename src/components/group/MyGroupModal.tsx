@@ -126,7 +126,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
   useEffect(() => {
     const tryFill = async () => {
       if (!contentRef.current || isLast) return;
-      let guard = 2; // 최대 3페이지까지 자동 프리로드(필요시 늘리기)
+      let guard = 2;
       while (
         guard-- > 0 &&
         contentRef.current &&
@@ -284,7 +284,7 @@ const ErrorMessage = styled.div`
 `;
 
 const EmptyState = styled.div`
-  grid-column: 1 / -1; /* 그리드 2열일 때도 전체 너비 차지 */
+  grid-column: 1 / -1;
   flex: 1;
   min-height: 78vh;
   display: flex;

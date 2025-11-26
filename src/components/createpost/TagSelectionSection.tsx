@@ -25,7 +25,6 @@ const TagSelectionSection = ({ selectedTags, onTagToggle }: TagSelectionSectionP
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
-  // API에서 카테고리 및 태그 데이터 로드
   useEffect(() => {
     const loadWriteInfo = async () => {
       try {
@@ -34,7 +33,6 @@ const TagSelectionSection = ({ selectedTags, onTagToggle }: TagSelectionSectionP
 
         if (response.isSuccess && response.data.categoryList.length > 0) {
           setCategories(response.data.categoryList);
-          // 첫 번째 카테고리를 기본 선택
           setSelectedCategory(response.data.categoryList[0].category);
         }
       } catch (error) {
@@ -52,13 +50,11 @@ const TagSelectionSection = ({ selectedTags, onTagToggle }: TagSelectionSectionP
   };
 
   const handleTagToggle = (tag: string) => {
-    // 이미 선택된 태그면 해제
     if (selectedTags.includes(tag)) {
       onTagToggle(tag);
       return;
     }
 
-    // 5개 미만이면 추가 가능
     if (selectedTags.length < 5) {
       onTagToggle(tag);
     }
@@ -68,7 +64,6 @@ const TagSelectionSection = ({ selectedTags, onTagToggle }: TagSelectionSectionP
     onTagToggle(tag);
   };
 
-  // 현재 선택된 카테고리의 태그 목록
   const currentTags = categories.find(cat => cat.category === selectedCategory)?.tagList || [];
 
   if (loading) {
@@ -111,10 +106,8 @@ const TagSelectionSection = ({ selectedTags, onTagToggle }: TagSelectionSectionP
           ))}
         </SubTagGrid>
 
-        {/* 태그 선택 개수 표시 */}
         <TagCount>{selectedTags.length} / 5개</TagCount>
 
-        {/* 선택된 태그 목록 */}
         {selectedTags.length > 0 && (
           <SelectedTagsSection>
             <SelectedTagsTitle>선택된 태그</SelectedTagsTitle>

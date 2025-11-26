@@ -14,9 +14,7 @@ export const useUpdateFeed = (options?: UseUpdateFeedProps) => {
     try {
       setLoading(true);
 
-      // ===== 클라이언트 선검증 =====
       if (body.tagList) {
-        // 최대 5개
         if (body.tagList.length > 5) {
           openSnackbar({
             message: '태그는 최대 5개까지 입력할 수 있어요.',
@@ -25,7 +23,6 @@ export const useUpdateFeed = (options?: UseUpdateFeedProps) => {
           });
           return { success: false as const };
         }
-        // 중복 제거 체크
         const trimmed = body.tagList.map(t => t.trim()).filter(Boolean);
         const uniq = new Set(trimmed);
         if (uniq.size !== trimmed.length) {
@@ -37,7 +34,6 @@ export const useUpdateFeed = (options?: UseUpdateFeedProps) => {
           return { success: false as const };
         }
       }
-      // ===== 선검증 끝 =====
 
       const res: UpdateFeedResponse = await updateFeed(feedId, body);
 

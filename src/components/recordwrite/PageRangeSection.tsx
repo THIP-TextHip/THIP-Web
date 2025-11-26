@@ -36,7 +36,7 @@ interface PageRangeSectionProps {
   readingProgress: number;
   isOverviewPossible: boolean;
   isDisabled?: boolean;
-  hideToggle?: boolean; // 총평 토글 버튼 숨김 여부
+  hideToggle?: boolean;
 }
 
 const PageRangeSection = ({
@@ -53,21 +53,16 @@ const PageRangeSection = ({
   const [hasError, setHasError] = useState(false);
   const [showRedTooltip, setShowRedTooltip] = useState(false);
   const [showGreenTooltip, setShowGreenTooltip] = useState(false);
-
-  // 80% 이상일 때만 총평 활성화
   const canUseOverall = readingProgress >= 80;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    // 숫자만 입력 허용 (빈 문자열 또는 양수)
     if (value === '' || /^\d+$/.test(value)) {
       onPageRangeChange(value);
 
-      // 전체 페이지 수를 초과하면 에러 상태로 변경
       if (value !== '') {
         const page = parseInt(value);
-        // NaN 체크도 포함하여 안전성 확보
         setHasError(isNaN(page) || page <= 0 || page > totalPages);
       } else {
         setHasError(false);
@@ -84,14 +79,12 @@ const PageRangeSection = ({
     if (canUseOverall) {
       onOverallToggle();
     } else {
-      // 80% 미만이면 빨간 툴팁 표시
       setShowRedTooltip(true);
       setShowGreenTooltip(false);
     }
   };
 
   const handleInfoClick = () => {
-    // i 아이콘 클릭 시 초록 툴팁 표시
     setShowGreenTooltip(true);
     setShowRedTooltip(false);
   };

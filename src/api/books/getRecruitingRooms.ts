@@ -1,6 +1,5 @@
 import { apiClient } from '../index';
 
-// 모집중인 모임방 타입
 export interface RecruitingRoom {
   roomId: number;
   bookImageUrl: string;
@@ -11,7 +10,6 @@ export interface RecruitingRoom {
   isPublic: boolean;
 }
 
-// API 응답 데이터 타입
 export interface RecruitingRoomsData {
   recruitingRoomList: RecruitingRoom[];
   totalRoomCount: number;
@@ -19,7 +17,6 @@ export interface RecruitingRoomsData {
   isLast: boolean;
 }
 
-// API 응답 타입
 export interface RecruitingRoomsResponse {
   isSuccess: boolean;
   code: number;

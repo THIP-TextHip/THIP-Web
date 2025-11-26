@@ -36,12 +36,10 @@ const UpdatePost = () => {
   const { openSnackbar, closePopup } = usePopupActions();
   const { updateExistingFeed, loading: updateLoading } = useUpdateFeed({
     onSuccess: feedId => {
-      console.log('피드 수정 성공! 피드 ID:', feedId);
       navigate(`/feed/${feedId}`);
     },
   });
 
-  // 피드 상세 정보 로드
   useEffect(() => {
     const loadFeedDetail = async () => {
       if (!feedId) {
@@ -59,7 +57,6 @@ const UpdatePost = () => {
         const response = await getFeedDetail(Number(feedId));
         const data = response.data;
 
-        // 기존 데이터로 폼 초기화
         setSelectedBook({
           id: 0,
           title: data.bookTitle,
@@ -108,7 +105,7 @@ const UpdatePost = () => {
       contentBody: postContent.trim(),
       isPublic: !isPrivate,
       ...(selectedTags.length ? { tagList: selectedTags } : {}),
-      remainImageUrls, // 이미지가 없어도 빈 배열로 전송하여 삭제 처리
+      remainImageUrls,
     };
 
     const result = await updateExistingFeed(Number(feedId), body);
@@ -138,7 +135,6 @@ const UpdatePost = () => {
 
   const isFormValid = postContent.trim() !== '';
 
-  // 로딩 중
   if (loading) {
     return (
       <div style={{ padding: '56px 0', textAlign: 'center', color: 'white' }}>

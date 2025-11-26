@@ -45,16 +45,13 @@ const PhotoSection = ({
     if (files.length > 0) {
       onPhotoAdd(files);
     }
-    // input 값 초기화 (같은 파일을 다시 선택할 수 있도록)
     e.target.value = '';
   };
 
-  // 사진 파일들을 blob URL로 변환 (메모리 누수 방지)
   const photoUrls = useMemo(() => {
     return photos.map(file => URL.createObjectURL(file));
   }, [photos]);
 
-  // 컴포넌트 언마운트 또는 photos 변경 시 기존 blob URL 해제
   useEffect(() => {
     return () => {
       photoUrls.forEach(url => URL.revokeObjectURL(url));
