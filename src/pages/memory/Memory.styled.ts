@@ -24,9 +24,8 @@ export const ScrollableContent = styled.div`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: 100px; /* AddButton 공간 확보 */
+  padding-bottom: 100px;
 
-  /* 스크롤바 스타일링 */
   &::-webkit-scrollbar {
     width: 4px;
   }

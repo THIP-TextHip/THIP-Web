@@ -32,10 +32,8 @@ const MessageActionBottomSheet = ({
     <Overlay isOpen={isOpen} onClick={handleOverlayClick}>
       <BottomSheet isOpen={isOpen}>
         {isMyMessage ? (
-          // 내 댓글인 경우 - 삭제하기만 표시
           <DeleteActionItem onClick={onDelete}>삭제하기</DeleteActionItem>
         ) : (
-          // 타인의 댓글인 경우 - 신고하기만 표시
           <ReportActionItem onClick={onReport}>신고하기</ReportActionItem>
         )}
       </BottomSheet>

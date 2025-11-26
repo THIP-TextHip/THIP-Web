@@ -12,7 +12,6 @@ interface MemberLimitSectionProps {
 }
 
 const MemberLimitSection = ({ memberLimit, onMemberLimitChange }: MemberLimitSectionProps) => {
-  // 1부터 30까지의 배열 생성
   const memberNumbers = Array.from({ length: 30 }, (_, i) => i + 1);
 
   return (

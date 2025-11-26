@@ -216,31 +216,3 @@ export const globalStyles = css`
 
   ${coreDesignTokens}
 `;
-
-// Usage example:
-/*
-// In your components, use like this:
-
-const StyledButton = styled.button`
-  // Use core colors from the system
-  background-color: ${semanticColors.button.fill.primary};
-  color: ${semanticColors.text.primary};
-  
-  // Use core typography
-  font-size: ${typography.fontSize.base};
-  font-weight: ${typography.fontWeight.medium};
-  
-  // Use custom spacing and other properties
-  padding: 12px 24px;
-  margin: 8px 0;
-  border-radius: 8px;
-  border: none;
-`;
-
-const StyledHeading = styled.h1`
-  color: ${semanticColors.text.primary};
-  font-size: ${typography.fontSize['2xl']};
-  font-weight: ${typography.fontWeight.bold};
-  margin-bottom: 16px; // Custom spacing
-`;
-*/

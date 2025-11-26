@@ -7,13 +7,12 @@ import GenreSelectionSection from '../../components/creategroup/GenreSelectionSe
 import RoomInfoSection from '../../components/creategroup/RoomInfoSection';
 import ActivityPeriodSection from '../../components/creategroup/ActivityPeriodSection/ActivityPeriodSection';
 import MemberLimitSection from '../../components/creategroup/MemberLimitSection';
-import PrivacySettingSection from '../../components/creategroup//PrivacySettingSection/PrivacySettingSection';
+import PrivacySettingSection from '../../components/creategroup/PrivacySettingSection/PrivacySettingSection';
 import leftarrow from '../../assets/common/leftArrow.svg';
 import { Container } from './CreateGroup.styled';
 import { createRoom } from '../../api/rooms/createRoom';
 import type { CreateRoomRequest } from '@/types/room';
 
-// Book 타입 정의
 interface Book {
   id?: number;
   title: string;
@@ -81,21 +80,19 @@ const CreateGroup = () => {
   };
 
   const handleCompleteClick = async () => {
-    if (isSubmitting) return; // 중복 실행 방지
+    if (isSubmitting) return;
 
     setIsSubmitting(true);
 
     try {
-      // 날짜 형식 변환 (YYYY.MM.DD)
       const formatDate = (date: { year: number; month: number; day: number }) => {
         const month = date.month.toString().padStart(2, '0');
         const day = date.day.toString().padStart(2, '0');
         return `${date.year}.${month}.${day}`;
       };
 
-      // 방 생성 요청 데이터 구성
       const roomData: CreateRoomRequest = {
-        isbn: selectedBook?.isbn || '9788936434632', // 선택된 책의 ISBN 또는 기본값
+        isbn: selectedBook?.isbn || '9788936434632',
         category: selectedGenre,
         roomName: roomTitle.trim(),
         description: roomDescription.trim(),
@@ -103,18 +100,14 @@ const CreateGroup = () => {
         progressEndDate: formatDate(endDate),
         recruitCount: memberLimit,
         password: isPrivate ? password.trim() : null,
-        isPublic: !isPrivate, // isPrivate의 반대값
+        isPublic: !isPrivate,
       };
 
-
-      // 방 생성 API 호출
       const response = await createRoom(roomData);
 
-      // 두 가지 응답 형식 모두 확인
       const isSuccessful = response.isSuccess || response.isSuccess;
 
       if (isSuccessful) {
-        // 성공 시 모집 중인 방 상세 페이지로 이동
         navigate(`/group/detail/${response.data.roomId}`, {
           replace: true,
         });
@@ -122,7 +115,6 @@ const CreateGroup = () => {
         alert(`방 생성에 실패했습니다: ${response.message} (코드: ${response.code})`);
       }
     } catch (error) {
-      // 자세한 오류 정보 로깅
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as {
           response?: {
@@ -174,7 +166,6 @@ const CreateGroup = () => {
 
   const handlePrivacyToggle = () => {
     setIsPrivate(!isPrivate);
-    // 비공개 설정을 끄면 비밀번호도 초기화
     if (isPrivate) {
       setPassword('');
     }
@@ -188,14 +179,13 @@ const CreateGroup = () => {
     setPassword('');
   };
 
-  // 폼 유효성 검사 - 4자리 숫자 비밀번호 검증 포함
   const isFormValid =
     selectedBook !== null &&
     selectedGenre !== '' &&
     roomTitle.trim() !== '' &&
     roomDescription.trim() !== '' &&
-    isDateValid && // 날짜 유효성 검사 추가
-    (!isPrivate || (password.trim() !== '' && /^\d{4}$/.test(password.trim()))) && // 비공개방인 경우 4자리 숫자 필수
+    isDateValid &&
+    (!isPrivate || (password.trim() !== '' && /^\d{4}$/.test(password.trim()))) &&
     !isSubmitting;
 
   return (

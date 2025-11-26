@@ -64,7 +64,6 @@ const MessageInput = ({
 
   return (
     <Wrapper>
-      {/* 답글 작성 중일 때만 표시 */}
       {isReplying && nickname && (
         <ReplyContainer>
           <div className="left">
@@ -87,11 +86,11 @@ const MessageInput = ({
         <MessageInputWrapper>
           <StyledMessageInput
             ref={inputRef}
-            placeholder={disabled ? '전송 중...' : placeholder} // disabled일 때 placeholder 변경
+            placeholder={disabled ? '전송 중...' : placeholder}
             value={value}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            onCompositionStart={() => !disabled && setIsComposing(true)} // disabled일 때는 composing 상태 변경 안함
+            onCompositionStart={() => !disabled && setIsComposing(true)}
             onCompositionEnd={() => !disabled && setIsComposing(false)}
             rows={1}
             disabled={disabled}

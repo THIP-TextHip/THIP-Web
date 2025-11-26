@@ -48,8 +48,6 @@ const SubReply = ({
       const response = await postLike(commentId, !liked);
 
       if (response.isSuccess) {
-        console.log('좋아요 상태 변경 성공:', response);
-        // 서버 응답으로 상태 업데이트
         setLiked(response.data.isLiked);
         setCurrentLikeCount(prev => (response.data.isLiked ? prev + 1 : prev - 1));
       } else {

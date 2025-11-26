@@ -16,7 +16,6 @@ import type { GetMemoryPostsParams, Post, Record } from '../../types/memory';
 export type RecordType = 'group' | 'my';
 export type FilterType = 'page' | 'overall';
 
-// API 포스트를 기존 Record 타입으로 변환하는 함수
 const convertPostToRecord = (post: Post): Record => {
   return {
     id: post.postId.toString(),
@@ -55,7 +54,6 @@ const Memory = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { openCommentBottomSheet } = useCommentBottomSheetStore();
 
-  // 상태 관리
   const [activeTab, setActiveTab] = useState<RecordType>('group');
   const [activeFilter, setActiveFilter] = useState<FilterType | null>(null);
   const [selectedSort, setSelectedSort] = useState<SortType>('latest');
@@ -72,7 +70,6 @@ const Memory = () => {
     if (pageParam && filterParam === 'poll') {
       const page = parseInt(pageParam);
       if (!isNaN(page)) {
-        console.log('✅ 페이지 필터 적용:', { page });
         setSelectedPageRange({ start: page, end: page });
         setActiveFilter('page');
         setActiveTab('group');
@@ -82,44 +79,33 @@ const Memory = () => {
     }
   }, [location.search]);
 
-  // API 관련 상태
   const [error, setError] = useState<string | null>(null);
-  const [isOverviewEnabled, setIsOverviewEnabled] = useState(false);
 
-  // 업로드 프로그레스 상태
   const [showUploadProgress, setShowUploadProgress] = useState(false);
 
-  // 모임방 완료 상태
   const [roomCompleted, setRoomCompleted] = useState(false);
 
-  // 기록 데이터
   const [myRecords, setMyRecords] = useState<Record[]>([]);
   const [groupRecords, setGroupRecords] = useState<Record[]>([]);
-  // API에서 받은 페이지 정보
   const [totalPages, setTotalPages] = useState<number>(0);
   const [currentUserPage, setCurrentUserPage] = useState<number>(0);
 
-  // API 데이터 로드 함수
   const loadMemoryPosts = useCallback(async () => {
     if (!roomId) {
-      console.log('❌ roomId가 없습니다:', roomId);
       return;
     }
     setError(null);
 
     try {
-      // API 파라미터 구성
       const params: GetMemoryPostsParams = {
         roomId: parseInt(roomId),
         type: activeTab === 'group' ? 'group' : 'mine',
       };
 
-      // group 탭인 경우에만 sort 파라미터 추가
       if (activeTab === 'group') {
         params.sort = selectedSort;
       }
 
-      // 필터 적용
       if (activeFilter === 'overall') {
         params.isOverview = true;
       } else if (selectedPageRange) {
@@ -138,8 +124,6 @@ const Memory = () => {
           setMyRecords(convertedRecords);
         }
 
-        setIsOverviewEnabled(response.data.isOverviewEnabled);
-
         if (response.data.totalPages !== undefined) {
           setTotalPages(response.data.totalPages);
         }
@@ -150,13 +134,12 @@ const Memory = () => {
         setError(response.message);
       }
     } catch (error) {
-      // Axios 에러인 경우 상세 정보 출력
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as { response?: { data?: { code?: number } } };
         if (axiosError.response?.data?.code === 40002) {
           setError('독서 진행률이 80% 이상이어야 총평을 볼 수 있습니다.');
-          setActiveFilter(null); // 총평 필터를 자동으로 해제
-          return; // 다른 에러 메시지 설정하지 않음
+          setActiveFilter(null);
+          return;
         }
       }
 
@@ -164,7 +147,6 @@ const Memory = () => {
     }
   }, [roomId, activeTab, selectedSort, activeFilter, selectedPageRange]);
 
-  // 모임방 상태 확인
   useEffect(() => {
     const checkRoomStatus = async () => {
       if (!roomId) return;
@@ -183,12 +165,10 @@ const Memory = () => {
     checkRoomStatus();
   }, [roomId]);
 
-  // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     loadMemoryPosts();
   }, [loadMemoryPosts]);
 
-  // Notice에서 넘어온 state(page, focusPostId 등)로 초기 필터 적용
   useEffect(() => {
     type MemoryLocationState = {
       page?: number;
@@ -203,16 +183,13 @@ const Memory = () => {
       setActiveFilter('page');
     }
 
-    // 댓글 모달 자동 오픈 처리
     if (state?.openComments && state.focusPostId && state.postType) {
       openCommentBottomSheet(state.focusPostId, state.postType);
-      // 동일 경로 재진입 시 중복 오픈 방지를 위해 state 제거
       navigate(location.pathname, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state, roomId]);
 
-  // 새로운 기록이 추가되었을 때 처리 (작성 완료 후 돌아왔을 때)
   useEffect(() => {
     if (location.state?.newRecord) {
       const newRecord = location.state.newRecord as Record;
@@ -224,22 +201,18 @@ const Memory = () => {
         setMyRecords(prev => [newRecord, ...prev]);
       }
 
-      // 상태 정리
       navigate(location.pathname, { replace: true });
     }
   }, [location.state, activeTab, navigate, location.pathname]);
 
-  // 현재 탭에 따른 기록 목록 결정
   const currentRecords = useMemo(() => {
     return activeTab === 'group' ? groupRecords : myRecords;
   }, [activeTab, groupRecords, myRecords]);
 
-  // 정렬된 기록 목록
   const sortedRecords = useMemo(() => {
     return currentRecords;
   }, [currentRecords]);
 
-  // 필터링된 기록 목록
   const filteredRecords = useMemo(() => {
     const filtered = sortedRecords;
 
@@ -258,7 +231,6 @@ const Memory = () => {
     return filtered;
   }, [sortedRecords, activeFilter, selectedPageRange]);
 
-  // 이벤트 핸들러들
   const handleBackClick = useCallback(() => {
     if (roomId) {
       navigate(`/group/detail/joined/${roomId}`);
@@ -304,14 +276,8 @@ const Memory = () => {
     setShowUploadProgress(false);
   }, []);
 
-  // 독서 진행률 계산 (전체 페이지 대비 현재 페이지 퍼센트)
   const readingProgress = totalPages > 0 ? Math.round((currentUserPage / totalPages) * 100) : 0;
 
-  // 총평 활성화 상태를 읽기 진행률에 따라 표시용으로 활용
-  const overviewStatus = isOverviewEnabled ? '총평 활성화' : '총평 비활성화';
-  console.log('📊 현재 상태:', overviewStatus, `진행률: ${readingProgress}%`);
-
-  // 에러 상태 렌더링
   if (error) {
     return (
       <Container>
@@ -328,7 +294,6 @@ const Memory = () => {
     );
   }
 
-  // 메인 렌더링
   return (
     <Container>
       <FixedHeader>
