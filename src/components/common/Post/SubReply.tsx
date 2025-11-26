@@ -63,27 +63,9 @@ const SubReply = ({
     }
   };
 
-  // 이전 더보기 모달
-  // const handleMoreClick = () => {
-  //   if (containerRef.current) {
-  //     const rect = containerRef.current.getBoundingClientRect();
-  //     openReplyModal({
-  //       isOpen: true,
-  //       userId: creatorId,
-  //       commentId: commentId,
-  //       position: {
-  //         x: rect.right,
-  //         y: rect.bottom,
-  //       },
-  //       onClose: closePopup,
-  //     });
-  //   }
-  // };
-
   const handleDelete = async () => {
     try {
       const response = await deleteComment(commentId);
-      // 먼저 현재 모달/메뉴를 닫아 UI를 정리
       closePopup();
 
       if (response.isSuccess) {
@@ -119,7 +101,6 @@ const SubReply = ({
 
   const handleMoreClick = () => {
     if (isWriter) {
-      // 작성자인 경우: 삭제하기만 표시
       openMoreMenu({
         onDelete: handleDelete,
         type: 'reply',
@@ -127,7 +108,6 @@ const SubReply = ({
         onClose: closePopup,
       });
     } else {
-      // 작성자가 아닌 경우: 신고하기만 표시
       openMoreMenu({
         onReport: () => {
           closePopup();
@@ -144,7 +124,6 @@ const SubReply = ({
     }
   };
 
-  // 삭제된 댓글인 경우 처리
   if (isDeleted) {
     return (
       <DeletedContainer>

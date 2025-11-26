@@ -6,7 +6,6 @@ import {
 } from 'react-router-dom';
 import Layout from '../components/common/Layout';
 import Login from './login/Login';
-// import Signup from './signup/Signup';
 import SignupGenre from './signup/SignupGenre';
 import SignupNickname from './signup/SignupNickname';
 import SignupDone from './signup/SignupDone';

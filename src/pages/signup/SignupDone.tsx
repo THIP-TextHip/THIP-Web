@@ -6,8 +6,6 @@ import TitleHeader from '../../components/common/TitleHeader';
 const SignupDone = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // SignupGenre에서 전달된 데이터 받기
   const { nickName, aliasName, aliasColor, aliasIconUrl } = location.state || {};
 
   const handleBackClick = () => {

@@ -63,12 +63,10 @@ const Mypage = () => {
       title: '로그아웃',
       disc: '또 THIP 해주실거죠?',
       onConfirm: () => {
-        console.log('로그아웃 실행');
         closePopup();
-        logout(); // 실제 로그아웃 로직 실행
+        logout();
       },
       onClose: () => {
-        console.log('로그아웃 취소');
         closePopup();
       },
     });

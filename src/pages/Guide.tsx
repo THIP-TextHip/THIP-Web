@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 
-// Import guide images
 import guide1 from '@/assets/signup/guide1.svg';
 import guide2 from '@/assets/signup/guide2.svg';
 import guide3 from '@/assets/signup/guide3.svg';
@@ -26,43 +25,35 @@ const Guide = () => {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // SignupGenre에서 전달받은 모든 정보
   const nickname = location.state?.nickname || '사용자';
   const aliasName = location.state?.aliasName || '독서가';
   const aliasColor = location.state?.aliasColor;
   const aliasIconUrl = location.state?.aliasIconUrl;
-  // 터치 시작
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
   };
 
-  // 터치 종료
   const handleTouchEnd = (e: React.TouchEvent) => {
     setTouchEnd(e.changedTouches[0].clientX);
   };
 
-  // 슬라이드 처리
   useEffect(() => {
     if (!touchStart || !touchEnd) return;
 
     const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50; // 왼쪽으로 50px 이상 스와이프
-    const isRightSwipe = distance < -50; // 오른쪽으로 50px 이상 스와이프
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
 
     if (isLeftSwipe && currentStep < guideSteps.length - 1) {
-      // 왼쪽으로 스와이프: 다음 단계
       setCurrentStep(currentStep + 1);
     } else if (isRightSwipe && currentStep > 0) {
-      // 오른쪽으로 스와이프: 이전 단계
       setCurrentStep(currentStep - 1);
     }
 
-    // 터치 상태 초기화
     setTouchStart(null);
     setTouchEnd(null);
   }, [touchStart, touchEnd, currentStep]);
 
-  // 마우스 드래그 기능
   const [mouseStart, setMouseStart] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -77,10 +68,8 @@ const Guide = () => {
     const distance = mouseStart - e.clientX;
     if (Math.abs(distance) > 50) {
       if (distance > 0 && currentStep < guideSteps.length - 1) {
-        // 왼쪽으로 드래그: 다음 단계
         setCurrentStep(currentStep + 1);
       } else if (distance < 0 && currentStep > 0) {
-        // 오른쪽으로 드래그: 이전 단계
         setCurrentStep(currentStep - 1);
       }
       setIsDragging(false);
@@ -136,11 +125,9 @@ const Guide = () => {
   ];
 
   const handleNext = () => {
-    // active 상태일 때만 다음 단계로 이동
     if (currentStep < guideSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // 마지막 단계에서 완료 처리 - SignupDone으로 모든 정보 전달
       navigate('/signup/done', {
         state: {
           nickName: nickname,
@@ -222,7 +209,7 @@ const Container = styled.div<{ isDragging?: boolean }>`
   justify-content: center;
   background: ${colors.black.main};
   color: ${colors.white};
-  user-select: none; /* 텍스트 선택 방지 */
+  user-select: none;
   cursor: ${({ isDragging }) => (isDragging ? 'grabbing' : 'grab')};
 `;
 

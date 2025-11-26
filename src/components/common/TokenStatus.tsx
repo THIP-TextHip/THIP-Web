@@ -16,7 +16,6 @@ const TokenStatus = () => {
     };
 
     checkToken();
-    // 5초마다 상태 확인
     const interval = setInterval(checkToken, 5000);
 
     return () => clearInterval(interval);

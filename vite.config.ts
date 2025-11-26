@@ -9,7 +9,6 @@ export default defineConfig(({ mode }) => ({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  // production 빌드에서 console.log/info/debug 제거 (error/warn 유지)
   esbuild:
     mode === 'production'
       ? {

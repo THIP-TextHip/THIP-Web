@@ -11,7 +11,6 @@ const SignupNickname = () => {
   const maxLength = 10;
   const navigate = useNavigate();
 
-  // 소셜 로그인 토큰 발급 처리
   const { waitForToken } = useSocialLoginToken();
 
   const isNextActive = nickname.length >= 2 && nickname.length <= maxLength;
@@ -24,31 +23,20 @@ const SignupNickname = () => {
     if (!isNextActive) return;
     setError('');
 
-    console.log('=== 🚀 닉네임 검증 시작 ===');
-    console.log('👤 입력된 닉네임:', nickname);
-
     try {
-      // 토큰 발급 완료 대기
       await waitForToken();
 
-      // 임시 토큰 존재 여부 확인 (회원가입 진행 중)
       const preAuthToken = localStorage.getItem('preAuthToken');
       if (!preAuthToken) {
-        console.log('❌ 임시 토큰이 없어 닉네임 검증을 할 수 없습니다.');
         setError('인증 토큰이 없습니다. 다시 시도해주세요.');
         return;
       }
 
-      console.log('✅ 임시 토큰 확인 완료, 닉네임 검증 API 호출');
       const result = await postNickname(nickname);
 
       if (result.data.isVerified) {
-        console.log('✅ 닉네임 검증 성공!');
-        // 닉네임 검증 성공 - 다음 단계로 진행
         navigate('/signup/genre', { state: { nickname } });
       } else {
-        console.log('❌ 닉네임 검증 실패 - 이미 사용중');
-        // 닉네임 검증 실패 - 우리가 정한 에러 메시지
         setError('이미 사용중인 닉네임이에요.');
       }
     } catch (error) {
