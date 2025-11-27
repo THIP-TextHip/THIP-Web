@@ -1,6 +1,5 @@
 import { apiClient } from '../index';
 
-// 오늘의 한마디 삭제 응답 타입
 export interface DeleteDailyGreetingResponse {
   isSuccess: boolean;
   code: number;
@@ -10,7 +9,6 @@ export interface DeleteDailyGreetingResponse {
   };
 }
 
-// 오늘의 한마디 삭제 API 함수
 export const deleteDailyGreeting = async (
   roomId: number,
   attendanceCheckId: number,

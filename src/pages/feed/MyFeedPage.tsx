@@ -28,7 +28,6 @@ const MyFeedPage = () => {
     navigate(-1);
   };
 
-  // 다른 사용자 피드 및 프로필 데이터 로드
   useEffect(() => {
     const loadOtherData = async () => {
       if (!userId) {
@@ -44,9 +43,6 @@ const MyFeedPage = () => {
           getOtherFeed(Number(userId)),
           getOtherProfile(Number(userId)),
         ]);
-
-        console.log('🔍 MyFeedPage - Profile Response:', profileResponse.data);
-        console.log('🔍 MyFeedPage - isWriter 값:', profileResponse.data.isWriter);
 
         setFeedData(feedResponse.data.feedList);
         setProfileData(profileResponse.data);
@@ -82,7 +78,7 @@ const MyFeedPage = () => {
         posts={feedData}
         isMyFeed={true}
         profileData={profileData}
-        showFollowButton={false} // 띱하기 버튼 숨김
+        showFollowButton={false}
         isMyself={true}
       />
       <NavBar src={writefab} path="/post/create" />

@@ -10,7 +10,6 @@ export interface RoomMember {
   isMyself: boolean;
 }
 
-// 독서메이트 조회 응답 타입
 export interface RoomMembersResponse {
   isSuccess: boolean;
   code: number;
@@ -20,7 +19,6 @@ export interface RoomMembersResponse {
   };
 }
 
-// 기존 Member 타입과 연결하기 위한 변환 함수
 export interface Member {
   id: string;
   nickname: string;
@@ -53,12 +51,11 @@ export const getRoomMembers = async (roomId: number): Promise<RoomMembersRespons
     return response.data;
   } catch (error: unknown) {
     console.error('독서메이트 조회 API 오류:', error);
-    
-    // 방 접근 권한이 없는 경우
+
     if (error instanceof AxiosError && error.response?.data?.code === 140011) {
       throw new Error('방 접근 권한이 없습니다.');
     }
-    
+
     throw error;
   }
 };

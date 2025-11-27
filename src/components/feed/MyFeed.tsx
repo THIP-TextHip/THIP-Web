@@ -14,7 +14,6 @@ const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
 
   const hasPosts = posts.length > 0;
 
-  // 프로필 데이터 로드
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -32,10 +31,7 @@ const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
   }, []);
 
   if (loading || !profileData) {
-    return (
-      <></>
-      // <LoadingSpinner message="내 피드 정보를 불러오는 중..." size="large" fullHeight={true} />
-    );
+    return <></>;
   }
 
   return (
@@ -73,7 +69,7 @@ const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
 const Container = styled.div`
   min-height: 100vh;
   padding-top: 136px;
-  padding-bottom: 125px; //이전 76px
+  padding-bottom: 125px;
   background-color: var(--color-black-main);
 `;
 

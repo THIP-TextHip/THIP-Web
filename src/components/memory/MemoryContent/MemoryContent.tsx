@@ -42,14 +42,11 @@ const MemoryContent = ({
 }: MemoryContentProps) => {
   return (
     <Content>
-      {/* 고정 영역: 탭과 필터만 */}
       <FixedSection>
         <RecordTabs activeTab={activeTab} onTabChange={onTabChange} />
 
-        {/* 업로드 프로그레스 바 - 탭 바로 아래에 위치 */}
         <UploadProgressBar isVisible={showUploadProgress} onComplete={onUploadComplete} />
 
-        {/* 그룹 기록일 때만 필터 표시 */}
         {activeTab === 'group' && (
           <RecordFilters
             activeFilter={activeFilter}
@@ -64,15 +61,11 @@ const MemoryContent = ({
         )}
       </FixedSection>
 
-      {/* 스크롤 가능한 영역: 안내 메시지부터 기록 목록까지 모두 */}
       <ScrollableSection>
-        {/* 그룹 기록이고 기록이 있을 때만 안내 메시지 표시 */}
         {activeTab === 'group' && records.length > 0 && <RecordInfoMessage />}
 
-        {/* 기록이 없을 때 빈 상태 표시 */}
         {records.length === 0 && <EmptyRecord type={activeTab} />}
 
-        {/* 기록 목록 */}
         {records.length > 0 && <RecordList records={records} />}
       </ScrollableSection>
     </Content>

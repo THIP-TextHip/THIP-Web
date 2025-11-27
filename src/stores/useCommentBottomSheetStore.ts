@@ -11,16 +11,15 @@ interface CommentBottomSheetActions {
   closeCommentBottomSheet: () => void;
 }
 
-export const useCommentBottomSheetStore = create<CommentBottomSheetState & CommentBottomSheetActions>((set) => ({
-  // 상태
+export const useCommentBottomSheetStore = create<
+  CommentBottomSheetState & CommentBottomSheetActions
+>(set => ({
   isOpen: false,
   postId: null,
   postType: null,
 
-  // 액션
   openCommentBottomSheet: (postId: number, postType: 'RECORD' | 'VOTE') =>
     set({ isOpen: true, postId, postType }),
-  
-  closeCommentBottomSheet: () =>
-    set({ isOpen: false, postId: null, postType: null }),
+
+  closeCommentBottomSheet: () => set({ isOpen: false, postId: null, postType: null }),
 }));

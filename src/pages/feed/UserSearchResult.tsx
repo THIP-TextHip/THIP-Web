@@ -24,7 +24,6 @@ export function UserSearchResult({
     else return false;
   };
 
-  // 무한 스크롤을 위한 Intersection Observer
   const observerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,8 +80,6 @@ const List = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  /* min-width: 320px;
-  max-width: 540px; */
   margin: 0 auto;
   margin-bottom: 72px;
 `;
@@ -108,7 +105,7 @@ const EmptyWrapper = styled.div`
   text-align: center;
   font-size: var(--string-size-large01, 18px);
   font-weight: var(--string-weight-semibold, 600);
-  line-height: var(--string-lineheight-height24, 24px); /* 133.333% */
+  line-height: var(--string-lineheight-height24, 24px);
 `;
 
 const ObserverDiv = styled.div`

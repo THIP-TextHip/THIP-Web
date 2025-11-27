@@ -22,7 +22,6 @@ export const TextArea = styled.textarea<{ readOnly?: boolean }>`
   padding: 0;
   caret-color: ${colors.neongreen};
 
-  /* 얇은 스크롤바 스타일 */
   &::-webkit-scrollbar {
     width: 4px;
   }
@@ -40,7 +39,6 @@ export const TextArea = styled.textarea<{ readOnly?: boolean }>`
     background-color: ${semanticColors.text.tertiary};
   }
 
-  /* Firefox 스크롤바 스타일 */
   scrollbar-width: thin;
   scrollbar-color: ${semanticColors.text.ghost} transparent;
 

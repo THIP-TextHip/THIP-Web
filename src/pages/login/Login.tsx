@@ -7,24 +7,11 @@ import Google from '../../assets/login/google.svg';
 import { Wrapper } from '@/components/common/Wrapper';
 
 const Login = () => {
-  // const navigate = useNavigate();
-
-  // 이미 토큰이 있으면 /feed로 바로 이동
-  // useEffect(() => {
-  //   const authToken = localStorage.getItem('authToken');
-  //   if (authToken) {
-  //     console.log('✅ 이미 토큰이 있어서 /feed로 바로 이동합니다.');
-  //     navigate('/feed');
-  //   }
-  // }, [navigate]);
-
   const handleKakaoLogin = () => {
-    // 직접 카카오 로그인 URL로 리다이렉션
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/kakao`;
   };
 
   const handleGoogleLogin = () => {
-    // 직접 구글 로그인 URL로 리다이렉션
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/google`;
   };
 

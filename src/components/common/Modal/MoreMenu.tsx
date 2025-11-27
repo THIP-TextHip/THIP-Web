@@ -6,7 +6,6 @@ const MoreMenu = ({ onEdit, onDelete, onClose, onReport, isWriter, type }: MoreM
   return (
     <Overlay onClick={() => onClose?.()}>
       {type === 'post' ? (
-        // post 타입: 기존 로직 유지
         <>
           {isWriter ? (
             <>
@@ -28,7 +27,6 @@ const MoreMenu = ({ onEdit, onDelete, onClose, onReport, isWriter, type }: MoreM
           )}
         </>
       ) : (
-        // reply 타입: isWriter에 따라 삭제하기 또는 신고하기만 표시
         <>
           {isWriter ? (
             <ReportContainer onClick={e => e.stopPropagation()}>
@@ -56,15 +54,12 @@ const Overlay = styled.div`
   justify-content: center;
   align-items: flex-end;
 
-  /* ⬇︎ 핵심: 실제 보이는 높이로 맞추기 (dvh 폴백 포함) */
   height: 100vh;
   @supports (height: 100dvh) {
     height: 100dvh;
   }
-  /* JS 폴백 변수 */
   height: var(--vvh, 100dvh);
 
-  /* ⬇︎ 하단 안전영역만큼 띄워서 탭바/홈바를 피함 */
   padding-bottom: env(safe-area-inset-bottom, 0);
 
   width: 100vw;
@@ -87,7 +82,6 @@ const ReportContainer = styled.div`
   background-color: ${colors.darkgrey.main};
 `;
 
-// 3개 버튼을 위한 컨테이너 (핀하기 포함)
 const RecordContainer = styled.div`
   position: relative;
   display: flex;

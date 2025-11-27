@@ -28,7 +28,6 @@ const OtherFeedPage = () => {
     navigate(-1);
   };
 
-  // 다른 사용자 피드 및 프로필 데이터 로드
   useEffect(() => {
     const loadOtherData = async () => {
       if (!userId) {
@@ -40,7 +39,6 @@ const OtherFeedPage = () => {
       try {
         setLoading(true);
 
-        // 피드 데이터와 프로필 데이터를 병렬로 로드
         const [feedResponse, profileResponse] = await Promise.all([
           getOtherFeed(Number(userId)),
           getOtherProfile(Number(userId)),
@@ -80,7 +78,7 @@ const OtherFeedPage = () => {
         posts={feedData}
         isMyFeed={false}
         profileData={profileData}
-        showFollowButton={!profileData?.isWriter} // isWriter가 true면 팔로우 버튼 숨김
+        showFollowButton={!profileData?.isWriter}
       />
       <NavBar src={writefab} path="/post/create" />
     </Container>

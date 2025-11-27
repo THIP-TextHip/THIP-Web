@@ -16,7 +16,6 @@ const RecordWrite = () => {
   const { roomId, recordId } = useParams<{ roomId: string; recordId: string }>();
   const [searchParams] = useSearchParams();
 
-  // 수정 모드인지 판단
   const isEditMode = Boolean(recordId);
   const { openSnackbar } = usePopupActions();
 
@@ -25,13 +24,11 @@ const RecordWrite = () => {
   const [isOverallEnabled, setIsOverallEnabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // API에서 받아올 데이터
   const [totalPages, setTotalPages] = useState(0);
   const [lastRecordedPage, setLastRecordedPage] = useState(0);
   const [isOverviewPossible, setIsOverviewPossible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 컴포넌트 마운트 시 책 페이지 정보 조회 (생성 모드) 또는 기록 내용 로드 (수정 모드)
   useEffect(() => {
     const initializeData = async () => {
       if (!roomId) {
@@ -48,7 +45,6 @@ const RecordWrite = () => {
         setIsLoading(true);
 
         if (isEditMode) {
-          // 수정 모드: 쿼리 파라미터에서 기존 내용과 페이지 정보 로드
           const existingContent = searchParams.get('content');
           const existingPageRange = searchParams.get('pageRange');
           const existingRecordType = searchParams.get('recordType');
@@ -65,7 +61,6 @@ const RecordWrite = () => {
             setIsOverallEnabled(true);
           }
 
-          // 수정 모드에서도 전체 페이지 수는 필요하므로 책 정보 조회
           const response = await getBookPage(parseInt(roomId));
           if (response.isSuccess) {
             setTotalPages(response.data.totalBookPage);
@@ -75,7 +70,6 @@ const RecordWrite = () => {
           return;
         }
 
-        // 생성 모드: 책 페이지 정보 조회
         const response = await getBookPage(parseInt(roomId));
 
         if (response.isSuccess) {
@@ -126,7 +120,6 @@ const RecordWrite = () => {
     initializeData();
   }, [roomId, isEditMode]);
 
-  // 총평 모드가 변경될 때 isOverviewPossible 체크
   useEffect(() => {
     if (isOverallEnabled && !isOverviewPossible) {
       setIsOverallEnabled(false);
@@ -149,7 +142,6 @@ const RecordWrite = () => {
 
     try {
       if (isEditMode) {
-        // 수정 모드: 내용만 수정
         if (!recordId) {
           openSnackbar({
             message: '기록 정보를 찾을 수 없습니다.',
@@ -173,7 +165,6 @@ const RecordWrite = () => {
             onClose: () => {},
           });
 
-          // 성공 시 기록장으로 이동
           navigate(`/rooms/${roomId}/memory`, {
             replace: true,
           });
@@ -186,15 +177,11 @@ const RecordWrite = () => {
           setIsSubmitting(false);
         }
       } else {
-        // 생성 모드: 기존 로직 유지
-        // 페이지 범위 결정
         let finalPage: number;
 
         if (isOverallEnabled) {
-          // 총평인 경우: 책의 마지막 페이지 또는 전체 페이지 수 사용
           finalPage = totalPages;
         } else {
-          // 일반 기록인 경우
           if (pageRange.trim() !== '') {
             finalPage = parseInt(pageRange.trim());
           } else {
@@ -202,7 +189,6 @@ const RecordWrite = () => {
           }
         }
 
-        // 페이지 유효성 검사
         if (finalPage <= 0 || finalPage > totalPages) {
           openSnackbar({
             message: `유효하지 않은 페이지입니다. (1-${totalPages} 사이의 값을 입력해주세요)`,
@@ -213,18 +199,15 @@ const RecordWrite = () => {
           return;
         }
 
-        // API 요청 데이터 생성
         const recordData: CreateRecordRequest = {
           page: finalPage,
           isOverview: isOverallEnabled,
           content: content.trim(),
         };
 
-        // API 호출
         const response = await createRecord(parseInt(roomId), recordData);
 
         if (response.isSuccess) {
-          // 성공 시 기록장으로 이동
           navigate(`/rooms/${roomId}/memory`, {
             replace: true,
           });
@@ -238,7 +221,6 @@ const RecordWrite = () => {
         }
       }
     } catch (error) {
-      // 에러 타입에 따른 메시지 처리
       let errorMessage = isEditMode
         ? '기록 수정 중 오류가 발생했습니다.'
         : '기록 저장 중 오류가 발생했습니다.';
@@ -273,7 +255,6 @@ const RecordWrite = () => {
     }
   };
 
-  // 로딩 중일 때 표시
   if (isLoading) {
     return (
       <>
@@ -317,10 +298,10 @@ const RecordWrite = () => {
           lastRecordedPage={lastRecordedPage}
           isOverallEnabled={isOverallEnabled}
           onOverallToggle={() => setIsOverallEnabled(prev => !prev)}
-          readingProgress={isOverviewPossible ? 80 : 70} // 총평 가능하면 80% 이상으로 표시
+          readingProgress={isOverviewPossible ? 80 : 70}
           isOverviewPossible={isOverviewPossible}
-          isDisabled={isEditMode} // 수정 모드일 때 비활성화
-          hideToggle={isEditMode} // 수정 모드일 때 총평 토글 숨김
+          isDisabled={isEditMode}
+          hideToggle={isEditMode}
         />
         <RecordContentSection
           content={content}

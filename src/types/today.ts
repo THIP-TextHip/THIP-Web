@@ -9,7 +9,6 @@ export interface Message {
   isWriter?: boolean;
 }
 
-// 오늘의 한마디 관련 타입들
 export interface TodayCommentItem {
   attendanceCheckId: number;
   creatorId: number;

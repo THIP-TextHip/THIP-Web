@@ -28,19 +28,8 @@ const UserSearch = () => {
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
 
   const fetchRecentSearches = async () => {
-    try {
-      const response = await getRecentSearch('USER');
-
-      if (response.isSuccess) {
-        setRecentSearches(response.data.recentSearchList);
-      } else {
-        console.error('최근 검색어 조회 실패:', response.message);
-        setRecentSearches([]);
-      }
-    } catch (error) {
-      console.error('최근 검색어 조회 오류:', error);
-      setRecentSearches([]);
-    }
+    const response = await getRecentSearch('USER');
+    setRecentSearches(response.data.recentSearchList);
   };
 
   useEffect(() => {
@@ -62,17 +51,10 @@ const UserSearch = () => {
   };
 
   const handleDelete = async (recentSearchId: number) => {
-    try {
-      const response = await deleteRecentSearch(recentSearchId);
+    const response = await deleteRecentSearch(recentSearchId);
 
-      if (response.isSuccess) {
-        // 삭제 성공 후 최근 검색어 리스트를 다시 호출
-        await fetchRecentSearches();
-      } else {
-        console.error('최근 검색어 삭제 실패:', response.message);
-      }
-    } catch (error) {
-      console.error('최근 검색어 삭제 오류:', error);
+    if (response.isSuccess) {
+      await fetchRecentSearches();
     }
   };
 

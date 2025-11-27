@@ -33,15 +33,7 @@ export interface MessageListRef {
 }
 
 const MessageList = forwardRef<MessageListRef, MessageListProps>(
-  (
-    {
-      messages: initialMessages,
-      currentUserId = 'user.01',
-      onMessageDelete,
-      roomId,
-    },
-    ref,
-  ) => {
+  ({ messages: initialMessages, currentUserId = 'user.01', onMessageDelete, roomId }, ref) => {
     const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
     const [messages, setMessages] = useState(initialMessages);
     const { openSnackbar } = usePopupActions();
@@ -71,16 +63,12 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
       setMessages(prevMessages => [...prevMessages, newMessage]);
     };
 
-    // ref를 통해 외부에서 addMessage 함수에 접근할 수 있도록 함
     useImperativeHandle(ref, () => ({
       addMessage,
     }));
 
-    // 먼저 모든 메시지를 시간순으로 정렬 (아래로 올수록 최신)
-    // ID를 기준으로 정렬 (ID가 클수록 최신)
     const sortedMessages = messages.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-    // 날짜별로 메시지 그룹화
     const groupedMessages = sortedMessages.reduce(
       (groups, message) => {
         const date = message.timestamp;
@@ -93,7 +81,6 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
       {} as Record<string, Message[]>,
     );
 
-    // 날짜를 오래된 순으로 정렬 (아래로 올수록 최신)
     const sortedDates = Object.keys(groupedMessages).sort((a, b) => a.localeCompare(b));
 
     const handleMoreClick = (messageId: string) => {
@@ -107,22 +94,17 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
     const handleDelete = async () => {
       if (selectedMessageId && roomId) {
         try {
-          // API에서는 attendanceCheckId가 필요하므로 selectedMessageId를 사용
           const attendanceCheckId = parseInt(selectedMessageId);
-          
+
           const result = await deleteDailyGreeting(roomId, attendanceCheckId);
-          
+
           if (result.isSuccess) {
-            // 로컬 상태에서 메시지 제거
-            setMessages(prevMessages => 
-              prevMessages.filter(msg => msg.id !== selectedMessageId)
-            );
-            
-            // 부모 컴포넌트에 삭제 알림
+            setMessages(prevMessages => prevMessages.filter(msg => msg.id !== selectedMessageId));
+
             if (onMessageDelete) {
               onMessageDelete(selectedMessageId);
             }
-            
+
             openSnackbar({
               message: '오늘의 한마디가 삭제되었습니다.',
               variant: 'top',
@@ -158,7 +140,6 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
     };
 
     const handleReport = () => {
-      console.log('메시지 신고');
       setSelectedMessageId(null);
     };
 
@@ -192,7 +173,6 @@ const MessageList = forwardRef<MessageListRef, MessageListProps>(
                 ))}
               </DateGroup>
 
-              {/* 마지막 그룹이 아닐 때만 구분선 표시 */}
               {groupIndex < sortedDates.length - 1 && <Separator />}
             </div>
           ))}
