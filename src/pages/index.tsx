@@ -38,7 +38,7 @@ import EditPage from './mypage/EditPage';
 import Notice from './notice/Notice';
 import ParticipatedGroupDetail from './groupDetail/ParticipatedGroupDetail';
 import GroupMembers from './groupMembers/GroupMembers';
-import Guide from './Guide';
+import Guide from './guide/Guide';
 import AIWrite from './aiwrite/AIWrite';
 
 const Router = () => {
