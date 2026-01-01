@@ -9,9 +9,8 @@ import GroupSearchResult from '@/components/search/GroupSearchResult';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
 import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms';
-import styled from '@emotion/styled';
-import { colors, typography } from '@/styles/global/global';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { AllRoomsButton, LoadingMessage } from './GroupSearch.styled';
 
 type SortKey = 'deadline' | 'memberCount';
 type SearchStatus = 'idle' | 'searching' | 'searched';
@@ -367,23 +366,3 @@ const GroupSearch = () => {
 };
 
 export default GroupSearch;
-
-const LoadingMessage = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
-  color: ${colors.white};
-  font-size: ${typography.fontSize.base};
-`;
-
-const AllRoomsButton = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 30px 20px;
-  background-color: transparent;
-  color: ${colors.grey[100]};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  cursor: pointer;
-`;
