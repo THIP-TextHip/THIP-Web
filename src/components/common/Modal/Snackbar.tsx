@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
-import type { SnackbarProps } from '@/stores/usePopupStore';
+import type { SnackbarProps } from '@/stores/popupStore';
 import { useEffect, useState } from 'react';
 
 const Snackbar = ({ message, actionText, variant, isError, onActionClick, onClose }: SnackbarProps) => {

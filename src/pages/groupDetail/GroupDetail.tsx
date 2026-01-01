@@ -45,7 +45,7 @@ import type { Group } from '@/components/group/MyGroupBox';
 import bookCoverLargeImg from '../../assets/books/bookCoverLarge.svg';
 
 import PasswordModal from '@/components/group/PasswordModal';
-import { usePopupStore } from '@/stores/usePopupStore';
+import { usePopupStore } from '@/stores/popupStore';
 
 const GroupDetail = () => {
   const { roomId } = useParams<{ roomId: string }>();
