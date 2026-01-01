@@ -55,3 +55,23 @@ export const Meta = styled.div`
     gap: 2px;
   }
 `;
+
+export const LoadingContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--color-grey-200);
+  font-size: var(--string-size-base, 16px);
+`;
+
+export const ErrorContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--color-red);
+  font-size: var(--string-size-base, 16px);
+  text-align: center;
+  padding: 20px;
+`;

@@ -21,6 +21,8 @@ import {
   MetaTopRow,
   MetaInfo,
   Meta,
+  LoadingContainer,
+  ErrorContainer,
 } from './ParticipatedGroupDetail.styled';
 import RecordSection from '../../components/group/RecordSection';
 import CommentSection from '../../components/group/CommentSection';
@@ -42,7 +44,6 @@ import { IconButton } from '@/components/common/IconButton';
 import lockIcon from '../../assets/group/lock.svg';
 import calendarIcon from '../../assets/group/calendar.svg';
 import peopleIcon from '../../assets/common/darkPeople.svg';
-import styled from '@emotion/styled';
 import { isRoomCompleted } from '@/utils/roomStatus';
 
 const ParticipatedGroupDetail = () => {
@@ -314,25 +315,5 @@ const ParticipatedGroupDetail = () => {
     </ParticipatedWrapper>
   );
 };
-
-const LoadingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  color: var(--color-grey-200);
-  font-size: var(--string-size-base, 16px);
-`;
-
-const ErrorContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  color: var(--color-red);
-  font-size: var(--string-size-base, 16px);
-  text-align: center;
-  padding: 20px;
-`;
 
 export default ParticipatedGroupDetail;
