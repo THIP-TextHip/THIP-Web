@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import styled from '@emotion/styled';
 import like from '../../../assets/feed/like.svg';
 import activeLike from '../../../assets/feed/activeLike.svg';
 import comment from '../../../assets/feed/comment.svg';
@@ -8,40 +7,7 @@ import activeSave from '../../../assets/feed/activeSave.svg';
 import lockIcon from '../../../assets/feed/lockIcon.svg';
 import { postSaveFeed } from '@/api/feeds/postSave';
 import { postFeedLike } from '@/api/feeds/postFeedLike';
-
-const Container = styled.div<{ isDetail: boolean }>`
-  width: 100%;
-  height: 24px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
-  img {
-    cursor: pointer;
-  }
-
-  .left {
-    display: flex;
-    flex-direction: row;
-    gap: 12px;
-    .count {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      color: var(--color-white);
-      font-size: var(--string-size-small03, 12px);
-      font-weight: var(--string-weight-medium, 500);
-      line-height: normal;
-      letter-spacing: 0.012px;
-      gap: 2px;
-
-      &.comment img {
-        cursor: ${({ isDetail }) => (isDetail ? 'default' : 'pointer')};
-      }
-    }
-  }
-`;
+import { Container } from './PostFooter.styled';
 
 interface PostFooterProps {
   likeCount: number;
@@ -96,7 +62,7 @@ const PostFooter = ({
         // 성공 시 상태 업데이트
         setSaved(newSaveState);
         console.log('저장 상태 변경 성공:', newSaveState);
-        
+
         // 부모 컴포넌트에 알림
         if (onSaveToggle) {
           onSaveToggle(feedId, newSaveState);

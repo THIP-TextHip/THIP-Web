@@ -1,15 +1,6 @@
-import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 import type { FabProps } from '../../types/fab';
-
-const Button = styled.div`
-  position: absolute;
-  right: 20px;
-  bottom: 105px;
-  img {
-    cursor: pointer;
-  }
-`;
+import { Button } from './Fab.styled';
 
 const Fab = ({ src, path }: FabProps) => {
   const navigate = useNavigate();
