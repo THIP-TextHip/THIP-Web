@@ -218,3 +218,12 @@ export const EmptySubText = styled.p`
   font-weight: ${typography.fontWeight.regular};
   color: ${colors.grey[100]};
 `;
+
+export const LoadingBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 20px;
+  color: ${colors.white};
+  font-size: ${typography.fontSize.base};
+`;
