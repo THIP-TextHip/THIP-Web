@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import './main.css';
 import App from './App.tsx';
-import { initGA } from './lib/ga.ts';
+import { initGA } from './shared/lib/analytics/ga';
 
 initGA();
 
