@@ -1,13 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
-import styled from '@emotion/styled';
 import TitleHeader from '../common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import type { Group } from './MyGroupBox';
 import { GroupCard } from './GroupCard';
 import { Modal, Overlay } from './Modal.styles';
 import { getMyRooms, type Room, type RoomType } from '@/api/rooms/getMyRooms';
-import { colors, typography } from '@/styles/global/global';
 import { useNavigate } from 'react-router-dom';
+import {
+  TabContainer,
+  Tab,
+  Content,
+  BottomSpinner,
+  ErrorMessage,
+  EmptyState,
+  EmptyTitle,
+  EmptySubText,
+} from './MyGroupModal.styled';
 
 interface MyGroupModalProps {
   onClose: () => void;
@@ -229,83 +237,3 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     </Overlay>
   );
 };
-
-const TabContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  margin: 20px;
-`;
-
-const Tab = styled.button<{ selected: boolean }>`
-  white-space: nowrap;
-  padding: 8px 12px;
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-  border: none;
-  border-radius: 16px;
-  background: ${({ selected }) => (selected ? colors.purple.main : colors.darkgrey.main)};
-  color: #fff;
-  cursor: pointer;
-`;
-
-const Content = styled.div`
-  display: grid;
-  gap: 20px;
-  overflow-y: auto;
-  padding: 0 20px 20px 20px;
-  grid-template-columns: 1fr;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  margin-bottom: 60px;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  @media (min-width: 584px) {
-    grid-template-columns: 1fr 1fr;
-  }
-`;
-
-const BottomSpinner = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px 0 24px;
-  color: ${colors.grey[100]};
-  font-size: ${typography.fontSize.sm};
-`;
-
-const ErrorMessage = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
-  color: #ff6b6b;
-  font-size: ${typography.fontSize.base};
-`;
-
-const EmptyState = styled.div`
-  grid-column: 1 / -1;
-  flex: 1;
-  min-height: 78vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
-  margin-bottom: 70px;
-  color: ${colors.grey[100]};
-  text-align: center;
-`;
-
-const EmptyTitle = styled.p`
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  margin-bottom: 8px;
-  color: ${colors.white};
-`;
-
-const EmptySubText = styled.p`
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-  color: ${colors.grey[100]};
-`;
