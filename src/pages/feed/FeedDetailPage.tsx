@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
-import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
 import FeedDetailPost from '@/components/feed/FeedDetailPost';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -13,6 +12,7 @@ import { getFeedDetail, type FeedDetailData } from '@/api/feeds/getFeedDetail';
 import { getComments, type CommentData } from '@/api/comments/getComments';
 import { deleteFeedPost } from '@/api/feeds/deleteFeedPost';
 import { useReplyStore } from '@/stores/useReplyStore';
+import { Wrapper } from './FeedDetailPage.styled';
 
 const FeedDetailPage = () => {
   const navigate = useNavigate();
@@ -203,18 +203,5 @@ const FeedDetailPage = () => {
     </Wrapper>
   );
 };
-
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  align-items: center;
-  min-width: 320px;
-  max-width: 767px;
-  min-height: 100vh;
-  padding-top: 56px;
-  margin: 0 auto;
-  background-color: #121212;
-`;
 
 export default FeedDetailPage;
