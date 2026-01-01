@@ -2,7 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import ScrollToTop from './ScrollToTop';
 import AsideDecoration from './AsideDecoration';
-import { sendPageView } from '@/lib/ga';
+import { sendPageView } from '@/shared/lib/analytics/ga';
 
 const Layout = () => {
   const location = useLocation();
