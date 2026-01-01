@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { Wrapper } from './Blank.styled';
 
 interface BlankProps {
   height: string | number;
@@ -11,8 +11,3 @@ const Blank = ({ height, color = 'var(--color-darkgrey-dark)', margin }: BlankPr
 };
 
 export default Blank;
-
-const Wrapper = styled.div`
-  width: 100%;
-  min-height: 10px;
-`;
