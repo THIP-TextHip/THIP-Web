@@ -1,8 +1,7 @@
-import styled from '@emotion/styled';
 import FollowList from './FollowList';
 import FeedPost from './FeedPost';
 import type { FeedListProps } from '../../types/post';
-import { colors, typography } from '@/styles/global/global';
+import { Container, EmptyState } from './TotalFeed.styled';
 
 const TotalFeed = ({ showHeader, posts = [], isTotalFeed, isLast = false }: FeedListProps) => {
   const hasPosts = posts.length > 0;
@@ -28,26 +27,4 @@ const TotalFeed = ({ showHeader, posts = [], isTotalFeed, isLast = false }: Feed
     </Container>
   );
 };
-
-const Container = styled.div`
-  min-height: 100vh;
-  padding-top: 136px;
-  padding-bottom: 125px;
-  background-color: var(--color-black-main);
-`;
-
-const EmptyState = styled.div`
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-
-  margin-top: 150px;
-  color: ${colors.white};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  line-height: 24px;
-  letter-spacing: 0.018px;
-`;
-
 export default TotalFeed;
