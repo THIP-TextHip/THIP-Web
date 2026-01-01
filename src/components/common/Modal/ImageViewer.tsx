@@ -1,9 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
-import styled from '@emotion/styled';
 import TitleHeader from '../TitleHeader';
 import rightArrow from '../../../assets/common/right-Chevron.svg';
-import { colors } from '../../../styles/global/global';
 import leftArrow from '../../../assets/common/leftArrow.svg';
+import {
+  ModalOverlay,
+  ModalContainer,
+  ImageContainer,
+  Image,
+  DotsContainer,
+  Dot,
+  PrevButton,
+  NextButton,
+  ButtonIcon,
+} from './ImageViewer.styled';
 
 interface ImageViewerProps {
   images: string[];
@@ -130,119 +139,5 @@ const ImageViewer = ({ images, initialIndex, isOpen, onClose }: ImageViewerProps
     </ModalOverlay>
   );
 };
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  /* min-width: 320px;
-  max-width: 767px;
-  margin: 0 auto; */
-  /* background-color: ${colors.black.main}; */
-  background-color: rgba(18, 18, 18, 0.8);
-  backdrop-filter: blur(1.5px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
-
-const ModalContainer = styled.div`
-  position: relative;
-  width: 100%;
-  min-width: 320px;
-  max-width: 767px;
-  max-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const ImageContainer = styled.div`
-  position: relative;
-  max-width: 100%;
-  max-height: 600px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-  user-select: none;
-
-  &:active {
-    cursor: grabbing;
-  }
-`;
-
-const Image = styled.img`
-  width: auto; /* 가로는 자동 조절 */
-  height: auto; /* 세로는 자동 조절 */
-  max-width: 100%; /* 컨테이너의 가로를 넘지 않음 */
-  max-height: 600px; /* 세로는 최대 600px로 제한 */
-  object-fit: contain; /* 비율 유지하며 컨테이너에 맞춤 */
-  pointer-events: none;
-`;
-
-const DotsContainer = styled.div`
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 12px;
-  z-index: 1001;
-`;
-
-const Dot = styled.div<{ isActive: boolean }>`
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background-color: ${props => (props.isActive ? colors.white : colors.grey[300])};
-`;
-
-const PrevButton = styled.div`
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 1002;
-`;
-
-const NextButton = styled.div`
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 1002;
-
-  /* &:hover {
-    background-color: rgba(0, 0, 0, 0.7);
-  }
-
-  &:active {
-    transform: translateY(-50%) scale(0.95);
-  } */
-`;
-
-const ButtonIcon = styled.img<{ isNext?: boolean }>`
-  width: 24px;
-  height: 24px;
-  transform: ${props => (props.isNext ? 'rotate(180deg)' : 'none')};
-`;
 
 export default ImageViewer;
