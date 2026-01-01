@@ -26,4 +26,5 @@ const BookInfoCard = ({ bookTitle, bookAuthor, isbn }: BookInfoCardProps) => {
     </BookContainer>
   );
 };
+
 export default BookInfoCard;
