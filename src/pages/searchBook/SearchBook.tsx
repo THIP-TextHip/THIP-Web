@@ -39,7 +39,7 @@ import FeedPost from '@/components/feed/FeedPost';
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
-import { usePopupStore } from '@/stores/usePopupStore';
+import { usePopupStore } from '@/stores/popupStore';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const FILTER = ['최신순', '인기순'] as const;

@@ -3,8 +3,8 @@ import type {
   MoreMenuProps,
   SnackbarProps,
   ReplyModalProps,
-} from '@/stores/usePopupStore';
-import { usePopupStore } from '@/stores/usePopupStore';
+} from '@/stores/popupStore';
+import { usePopupStore } from '@/stores/popupStore';
 
 export const usePopupActions = () => {
   const { openPopup, closePopup } = usePopupStore();

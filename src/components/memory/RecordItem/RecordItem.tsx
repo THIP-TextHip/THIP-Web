@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import type { Record } from '../../../types/memory';
 import TextRecord from './TextRecord';
 import PollRecord from './PollRecord';
-import { useCommentBottomSheetStore } from '@/stores/useCommentBottomSheetStore';
+import { useCommentBottomSheetStore } from '@/stores/commentBottomSheetStore';
 import heartIcon from '../../../assets/memory/heart.svg';
 import heartFilledIcon from '../../../assets/memory/heart-filled.svg';
 import commentIcon from '../../../assets/memory/comment.svg';
