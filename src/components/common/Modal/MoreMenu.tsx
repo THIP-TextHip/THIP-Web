@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
-import type { MoreMenuProps } from '@/stores/usePopupStore';
+import type { MoreMenuProps } from '@/stores/popupStore';
 
 const MoreMenu = ({ onEdit, onDelete, onClose, onReport, isWriter, type }: MoreMenuProps) => {
   return (

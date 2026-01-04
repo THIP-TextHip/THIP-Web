@@ -11,8 +11,8 @@ import { useReplyActions } from '@/hooks/useReplyActions';
 import { getFeedDetail, type FeedDetailData } from '@/api/feeds/getFeedDetail';
 import { getComments, type CommentData } from '@/api/comments/getComments';
 import { deleteFeedPost } from '@/api/feeds/deleteFeedPost';
-import { useReplyStore } from '@/stores/useReplyStore';
 import { Wrapper } from './FeedDetailPage.styled';
+import { useReplyStore } from '@/stores/replyStore';
 
 const FeedDetailPage = () => {
   const navigate = useNavigate();

@@ -38,7 +38,7 @@ import { postSaveBook } from '@/api/books/postSaveBook';
 import { Filter } from '@/components/common/Filter';
 import FeedPost from '@/components/feed/FeedPost';
 import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
-import { usePopupStore } from '@/stores/usePopupStore';
+import { usePopupStore } from '@/stores/popupStore';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const FILTER = ['최신순', '인기순'] as const;

@@ -6,7 +6,7 @@ import bellExistLogo from '../../assets/header/exist-bell.svg';
 import styled from '@emotion/styled';
 import { IconButton } from './IconButton';
 import { getNotificationExist } from '@/api/notifications/getNotificationExist';
-import { useAuthReadyStore } from '@/stores/useAuthReadyStore';
+import { useAuthReadyStore } from '@/stores/authReadyStore';
 
 interface MainHeaderProps {
   type: 'home' | 'group';

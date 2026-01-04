@@ -6,7 +6,7 @@ import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
 import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddButton';
 import Snackbar from '../../components/common/Modal/Snackbar';
 import GlobalCommentBottomSheet from '../../components/common/CommentBottomSheet/GlobalCommentBottomSheet';
-import { useCommentBottomSheetStore } from '@/stores/useCommentBottomSheetStore';
+import { useCommentBottomSheetStore } from '@/stores/commentBottomSheetStore';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
 import { getRoomPlaying } from '../../api/rooms/getRoomPlaying';

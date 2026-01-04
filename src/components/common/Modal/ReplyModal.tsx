@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { colors, typography } from '@/styles/global/global';
 import { deleteComment } from '@/api/comments/deleteComment';
 import { usePopupActions } from '@/hooks/usePopupActions';
-import type { ReplyModalProps } from '@/stores/usePopupStore';
+import type { ReplyModalProps } from '@/stores/popupStore';
 
 const ReplyModal = ({ isOpen, userId, commentId, position, onClose }: ReplyModalProps) => {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
