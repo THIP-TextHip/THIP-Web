@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { usePopupStore } from '@/stores/usePopupStore';
+import { usePopupStore } from '@/stores/popupStore';
 import ConfirmModal from './ConfirmModal';
 import MoreMenu from './MoreMenu';
 import Snackbar from './Snackbar';
@@ -12,7 +12,7 @@ import type {
   SnackbarProps,
   ReplyModalProps,
   CountingBarProps,
-} from '@/stores/usePopupStore';
+} from '@/stores/popupStore';
 
 const PopupContainer = () => {
   const { popupType, popupProps, isOpen, closePopup } = usePopupStore();

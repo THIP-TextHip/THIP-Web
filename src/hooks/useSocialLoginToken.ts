@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getToken } from '@/api/auth';
-import { useAuthReadyStore } from '@/stores/useAuthReadyStore';
+import { useAuthReadyStore } from '@/stores/authReadyStore';
 
 export const useSocialLoginToken = () => {
   const location = useLocation();

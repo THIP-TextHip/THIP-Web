@@ -1,4 +1,4 @@
-import { useReplyStore } from '@/stores/useReplyStore';
+import { useReplyStore } from '@/stores/replyStore';
 import { postReply } from '@/api/comments/postReply';
 
 interface SubmitCommentProps {

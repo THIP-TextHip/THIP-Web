@@ -5,7 +5,7 @@ import rightArrow from '../../assets/feed/rightArrow.svg';
 import type { UserProfileItemProps } from '@/types/user';
 import { colors, typography } from '@/styles/global/global';
 import { postFollow } from '@/api/users/postFollow';
-import { usePopupStore } from '@/stores/usePopupStore';
+import { usePopupStore } from '@/stores/popupStore';
 
 const UserProfileItem = ({
   profileImageUrl,

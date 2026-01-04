@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import MyFollower from './MyFollower';
 import { postFollow } from '@/api/users/postFollow';
-import { usePopupStore } from '@/stores/usePopupStore';
+import { usePopupStore } from '@/stores/popupStore';
 
 export interface ProfileProps {
   showFollowButton?: boolean;
