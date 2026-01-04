@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
-import styled from '@emotion/styled';
 import TitleHeader from '@/components/common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import UserProfileItem from '@/components/feed/UserProfileItem';
@@ -9,6 +8,7 @@ import { getFollowerList } from '@/api/users/getFollowerList';
 import { getFollowingList } from '@/api/users/getFollowingList';
 import type { FollowData } from '@/types/follow';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { TotalBar, UserProfileList, Wrapper } from './FollowerListPage.syled';
 
 const FollowerListPage = () => {
   const navigate = useNavigate();
@@ -149,41 +149,5 @@ const FollowerListPage = () => {
     </Wrapper>
   );
 };
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 320px;
-  max-width: 767px;
-  min-height: 100vh;
-  padding: 0 20px;
-  margin: 0 auto;
-  background-color: var(--color-black-main);
-`;
-
-const TotalBar = styled.div`
-  position: fixed;
-  top: 0;
-  width: 94.8%;
-  max-width: 727px;
-  min-width: 320px;
-  padding: 76px 0px 4px 0px;
-  border-bottom: 1px solid var(--color-darkgrey-dark);
-  background-color: var(--color-black-main);
-
-  color: var(--color-grey-100);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: 24px;
-`;
-
-const UserProfileList = styled.div`
-  width: 100%;
-  min-height: 100vh;
-  background-color: var(--color-black-main);
-  padding-top: 105px;
-  padding-bottom: 20px;
-`;
 
 export default FollowerListPage;

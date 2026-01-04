@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import styled from '@emotion/styled';
 import NavBar from '../../components/common/NavBar';
 import TabBar from '../../components/feed/TabBar';
 import MyFeed from '../../components/feed/MyFeed';
@@ -11,6 +10,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
 import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
+import { Container } from './Feed.styled';
 import type { PostData } from '@/types/post';
 
 const tabs = ['피드', '내 피드'];
@@ -189,13 +189,5 @@ const Feed = () => {
     </Container>
   );
 };
-
-const Container = styled.div`
-  min-width: 320px;
-  max-width: 767px;
-  height: 100vh;
-  background-color: var(--color-black-main);
-  margin: 0 auto;
-`;
 
 export default Feed;
