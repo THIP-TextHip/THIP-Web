@@ -1,9 +1,7 @@
-import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
 import Profile from './Profile';
 import FeedPost from './FeedPost';
 import TotalBar from './TotalBar';
-import { colors, typography } from '../../styles/global/global';
 import type { OtherFeedItem } from '@/api/feeds/getOtherFeed';
 import type { OtherProfileData } from '@/types/profile';
 import { getOtherFeed } from '@/api/feeds/getOtherFeed';
@@ -11,6 +9,7 @@ import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import { getMyProfile } from '@/api/feeds/getMyProfile';
 import type { PostData } from '@/types/post';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { Container, EmptyState } from './OtherFeed.styled';
 
 interface OtherFeedProps {
   showHeader?: boolean;
@@ -99,26 +98,5 @@ const OtherFeed = ({
     </Container>
   );
 };
-
-const Container = styled.div`
-  min-height: 100vh;
-  padding-top: 56px;
-  padding-bottom: 155px;
-  background-color: var(--color-black-main);
-`;
-
-const EmptyState = styled.div`
-  display: flex;
-  height: 473px;
-  padding: 32px 0 20px 0;
-  justify-content: center;
-  align-items: center;
-
-  color: ${colors.white};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  line-height: 24px;
-  letter-spacing: 0.018px;
-`;
 
 export default OtherFeed;

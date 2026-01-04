@@ -1,0 +1,99 @@
+import styled from '@emotion/styled';
+import { colors, typography } from '@/styles/global/global';
+
+export const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+  margin-bottom: 72px;
+`;
+
+export const List = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const BookItem = styled.div`
+  display: flex;
+  border-bottom: 1px solid ${colors.darkgrey.dark};
+  padding: 12px 0;
+  cursor: pointer;
+`;
+
+export const ResultHeader = styled.div`
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.medium};
+  color: ${colors.white};
+  padding-bottom: 8px;
+  border-bottom: 1px solid ${colors.darkgrey.dark};
+`;
+
+export const Cover = styled.img`
+  width: 80px;
+  height: 107px;
+  flex-shrink: 0;
+  object-fit: cover;
+`;
+
+export const BookInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 12px;
+  min-width: 0;
+`;
+
+export const Title = styled.h3`
+  font-size: ${typography.fontSize.base};
+  font-weight: ${typography.fontWeight.semibold};
+  color: ${colors.white};
+  line-height: 20px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+`;
+
+export const Subtitle = styled.span`
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.medium};
+  color: ${colors.grey[200]};
+  margin-top: 8px;
+  line-height: 20px;
+`;
+
+export const EmptyWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+`;
+
+export const MainText = styled.p`
+  color: ${colors.white};
+  font-size: ${typography.fontSize.lg};
+  font-weight: ${typography.fontWeight.semibold};
+  margin-bottom: 8px;
+`;
+
+export const SubText = styled.p`
+  color: ${colors.grey[100]};
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.regular};
+  margin-bottom: 20px;
+`;
+
+export const RequestButton = styled.button`
+  background-color: ${colors.purple.main};
+  color: ${colors.white};
+  padding: 10px 12px;
+  font-size: ${typography.fontSize.base};
+  border: none;
+  border-radius: 12px;
+  font-weight: ${typography.fontWeight.semibold};
+  cursor: pointer;
+`;
+
+

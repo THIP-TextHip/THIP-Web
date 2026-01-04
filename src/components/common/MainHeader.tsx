@@ -3,9 +3,9 @@ import headerLogo from '../../assets/header/header-logo.svg';
 import findUserLogo from '../../assets/header/findUser.svg';
 import bellLogo from '../../assets/header/bell.svg';
 import bellExistLogo from '../../assets/header/exist-bell.svg';
-import styled from '@emotion/styled';
 import { IconButton } from './IconButton';
 import { getNotificationExist } from '@/api/notifications/getNotificationExist';
+import { HeaderWrapper, LogoImg, Actions } from './MainHeader.styled';
 import { useAuthReadyStore } from '@/stores/authReadyStore';
 
 interface MainHeaderProps {
@@ -54,27 +54,3 @@ const MainHeader = ({ type, leftButtonClick, rightButtonClick }: MainHeaderProps
 };
 
 export default MainHeader;
-
-const HeaderWrapper = styled.div`
-  background-color: var(--color-black-main);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  max-width: 767px;
-  margin: 0 auto;
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-`;
-
-const LogoImg = styled.img`
-  height: 24px;
-`;
-
-const Actions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-`;

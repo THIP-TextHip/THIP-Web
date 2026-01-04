@@ -1,9 +1,8 @@
-import { colors, typography } from '@/styles/global/global';
-import styled from '@emotion/styled';
 import { useState } from 'react';
 import { IconButton } from './IconButton';
 import downImg from '../../assets/filter/filterDown.svg';
 import upImg from '../../assets/filter/filterUp.svg';
+import { Container, Text, SelectedText, Modal } from './Filter.styled';
 
 interface FilterProps {
   filters: string[];
@@ -44,34 +43,4 @@ export const Filter = ({ filters, selectedFilter, setSelectedFilter }: FilterPro
   );
 };
 
-const Container = styled.div`
-  display: flex;
-  position: relative;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Text = styled.p`
-  color: ${colors.grey[200]};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-`;
-
-const SelectedText = styled.p`
-  color: ${colors.white};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-`;
-
-const Modal = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 12px 20px;
-  position: absolute;
-  top: 30px;
-  left: -20px;
-  border: solid 1px ${colors.grey[200]};
-  border-radius: 16px;
-  background: ${colors.black.main};
-`;
+export { Text as FilterText, SelectedText as FilterSelectedText };
