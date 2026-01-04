@@ -21,6 +21,7 @@ import {
   EmptyTitle,
   EmptySubText,
   FeedPostContainer,
+  LoadingBox,
 } from './SearchBook.styled';
 import { useNavigate, useParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -36,10 +37,8 @@ import { getRecruitingRooms, type RecruitingRoomsData } from '@/api/books/getRec
 import { postSaveBook } from '@/api/books/postSaveBook';
 import { Filter } from '@/components/common/Filter';
 import FeedPost from '@/components/feed/FeedPost';
-import styled from '@emotion/styled';
-import { colors, typography } from '@/styles/global/global';
 import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
-import { usePopupStore } from '@/stores/usePopupStore';
+import { usePopupStore } from '@/stores/popupStore';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const FILTER = ['최신순', '인기순'] as const;
@@ -345,12 +344,3 @@ const SearchBook = () => {
 };
 
 export default SearchBook;
-
-const LoadingBox = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 32px 20px;
-  color: ${colors.white};
-  font-size: ${typography.fontSize.base};
-`;

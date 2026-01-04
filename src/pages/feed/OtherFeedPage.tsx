@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import styled from '@emotion/styled';
 import NavBar from '../../components/common/NavBar';
 import TitleHeader from '@/components/common/TitleHeader';
 import writefab from '../../assets/common/writefab.svg';
@@ -9,12 +8,7 @@ import OtherFeed from '@/components/feed/OtherFeed';
 import { getOtherFeed, type OtherFeedItem } from '@/api/feeds/getOtherFeed';
 import { getOtherProfile } from '@/api/users/getOtherProfile';
 import type { OtherProfileData } from '@/types/profile';
-
-const Container = styled.div`
-  min-width: 320px;
-  max-width: 767px;
-  margin: 0 auto;
-`;
+import { Container } from './MyFeedPage.styled';
 
 const OtherFeedPage = () => {
   const navigate = useNavigate();

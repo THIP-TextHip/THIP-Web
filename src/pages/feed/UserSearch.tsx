@@ -2,8 +2,6 @@ import NavBar from '@/components/common/NavBar';
 import TitleHeader from '@/components/common/TitleHeader';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import SearchBar from '@/components/search/SearchBar';
-import { colors } from '@/styles/global/global';
-import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { UserSearchResult } from './UserSearchResult';
@@ -11,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserSearch } from '@/hooks/useUserSearch';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
+import { Content, SearchBarContainer, Wrapper } from './UserSearch.styled';
 
 const UserSearch = () => {
   const navigate = useNavigate();
@@ -135,28 +134,3 @@ const UserSearch = () => {
 };
 
 export default UserSearch;
-
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  min-width: 320px;
-  max-width: 767px;
-  height: 100vh;
-  margin: 0 auto;
-  background: ${colors.black.main};
-`;
-
-const SearchBarContainer = styled.div`
-  position: fixed;
-  top: 56px;
-  left: 0;
-  right: 0;
-  max-width: 767px;
-  margin: 0 auto;
-  background: ${colors.black.main};
-`;
-
-const Content = styled.div`
-  margin-top: 132px;
-`;
