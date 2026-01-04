@@ -3,8 +3,8 @@ import { useState } from 'react';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import type { UserProfileItemProps } from '@/types/user';
 import { postFollow } from '@/api/users/postFollow';
-import { usePopupStore } from '@/stores/usePopupStore';
 import { Wrapper, UserProfile } from './UserProfileItem.styled';
+import { usePopupStore } from '@/stores/popupStore';
 
 const UserProfileItem = ({
   profileImageUrl,

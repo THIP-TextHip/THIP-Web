@@ -1,4 +1,4 @@
-import type { SnackbarProps } from '@/stores/usePopupStore';
+import type { SnackbarProps } from '@/stores/popupStore';
 import { useEffect, useState } from 'react';
 import { Container, Discription, Button } from './Snackbar.styled';
 

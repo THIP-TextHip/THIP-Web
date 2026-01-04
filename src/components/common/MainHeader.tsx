@@ -5,8 +5,8 @@ import bellLogo from '../../assets/header/bell.svg';
 import bellExistLogo from '../../assets/header/exist-bell.svg';
 import { IconButton } from './IconButton';
 import { getNotificationExist } from '@/api/notifications/getNotificationExist';
-import { useAuthReadyStore } from '@/stores/useAuthReadyStore';
 import { HeaderWrapper, LogoImg, Actions } from './MainHeader.styled';
+import { useAuthReadyStore } from '@/stores/authReadyStore';
 
 interface MainHeaderProps {
   type: 'home' | 'group';

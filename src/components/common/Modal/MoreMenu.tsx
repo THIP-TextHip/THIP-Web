@@ -1,5 +1,6 @@
-import type { MoreMenuProps } from '@/stores/usePopupStore';
+
 import { Overlay, ReportContainer, RecordContainer, Button } from './MoreMenu.styled';
+import type { MoreMenuProps } from '@/stores/popupStore';
 
 const MoreMenu = ({ onEdit, onDelete, onClose, onReport, isWriter, type }: MoreMenuProps) => {
   return (

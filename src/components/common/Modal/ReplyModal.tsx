@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { deleteComment } from '@/api/comments/deleteComment';
 import { usePopupActions } from '@/hooks/usePopupActions';
-import type { ReplyModalProps } from '@/stores/usePopupStore';
 import { Overlay, ModalContainer, ModalContent, OptionItem } from './ReplyModal.styled';
+import type { ReplyModalProps } from '@/stores/popupStore';
 
 const ReplyModal = ({ isOpen, userId, commentId, position, onClose }: ReplyModalProps) => {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);

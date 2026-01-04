@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import MyFollower from './MyFollower';
 import { postFollow } from '@/api/users/postFollow';
-import { usePopupStore } from '@/stores/usePopupStore';
 import { Container, UserProfile } from './Profile.styled';
+import { usePopupStore } from '@/stores/popupStore';
 
 export interface ProfileProps {
   showFollowButton?: boolean;

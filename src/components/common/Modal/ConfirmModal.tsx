@@ -1,5 +1,5 @@
-import type { ConfirmModalProps } from '@/stores/usePopupStore';
 import { Container, ButtonContainer, Button } from './ConfirmModal.styled';
+import type { ConfirmModalProps } from '@/stores/popupStore';
 
 const ConfirmModal = ({
   title,
