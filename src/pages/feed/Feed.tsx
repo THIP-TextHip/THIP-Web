@@ -4,13 +4,13 @@ import TabBar from '../../components/feed/TabBar';
 import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import FeedPostSkeleton from '@/shared/ui/Skeleton/FeedPostSkeleton';
 import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
 import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
-import { Container } from './Feed.styled';
+import { Container, SkeletonWrapper } from './Feed.styled';
 import type { PostData } from '@/types/post';
 
 const tabs = ['피드', '내 피드'];
@@ -166,7 +166,11 @@ const Feed = () => {
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {initialLoading || tabLoading ? (
-        <LoadingSpinner size="large" fullHeight={true} />
+        <SkeletonWrapper>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <FeedPostSkeleton key={index} />
+          ))}
+        </SkeletonWrapper>
       ) : (
         <>
           {activeTab === '피드' ? (
