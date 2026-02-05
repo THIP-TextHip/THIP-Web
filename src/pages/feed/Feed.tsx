@@ -143,10 +143,12 @@ const Feed = () => {
       setTabLoading(true);
 
       try {
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 1000));
+
         if (activeTab === '피드') {
-          await loadTotalFeeds();
+          await Promise.all([loadTotalFeeds(), minLoadingTime]);
         } else if (activeTab === '내 피드') {
-          await loadMyFeeds();
+          await Promise.all([loadMyFeeds(), minLoadingTime]);
         }
       } finally {
         setTabLoading(false);
