@@ -8,7 +8,7 @@ import OtherFeed from '@/components/feed/OtherFeed';
 import { getOtherFeed, type OtherFeedItem } from '@/api/feeds/getOtherFeed';
 import { getOtherProfile } from '@/api/users/getOtherProfile';
 import type { OtherProfileData } from '@/types/profile';
-import { Container } from './MyFeedPage.styled';
+import { Container, LoadingScreen } from './MyFeedPage.styled';
 
 const OtherFeedPage = () => {
   const navigate = useNavigate();
@@ -53,7 +53,14 @@ const OtherFeedPage = () => {
   }, [userId]);
 
   if (loading) {
-    return <></>;
+    return (
+      <LoadingScreen>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+      </LoadingScreen>
+    );
   }
 
   if (error) {
