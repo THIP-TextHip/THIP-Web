@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserSearch } from '@/hooks/useUserSearch';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
-import { Content, SearchBarContainer, Wrapper } from './UserSearch.styled';
+import { Content, SearchBarContainer, Wrapper, LoadingMessage } from './UserSearch.styled';
 
 const UserSearch = () => {
   const navigate = useNavigate();
@@ -106,7 +106,9 @@ const UserSearch = () => {
       <Content>
         {isSearching ? (
           <>
-            {isSearched ? (
+            {userList.length === 0 && (loading || !isSearched) ? (
+              <LoadingMessage>검색 중...</LoadingMessage>
+            ) : isSearched ? (
               <UserSearchResult
                 type={'searched'}
                 searchedUserList={userList}

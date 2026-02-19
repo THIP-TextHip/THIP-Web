@@ -18,10 +18,7 @@ export function UserSearchResult({
   hasMore,
   onLoadMore,
 }: UserSearchResultProps) {
-  const isEmptySearchedUserList = () => {
-    if (searchedUserList.length === 0) return true;
-    else return false;
-  };
+  const isEmpty = searchedUserList.length === 0 && type !== 'searching';
 
   const observerRef = useRef<HTMLDivElement>(null);
 
@@ -47,7 +44,7 @@ export function UserSearchResult({
       <List>
         {type === 'searching' ? <></> : <ResultHeader>전체 {searchedUserList.length}</ResultHeader>}
 
-        {isEmptySearchedUserList() ? (
+        {isEmpty ? (
           <EmptyWrapper>{loading ? '사용자 찾는 중...' : '찾는 사용자가 없어요.'}</EmptyWrapper>
         ) : (
           <>
