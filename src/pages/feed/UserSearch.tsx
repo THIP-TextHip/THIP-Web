@@ -25,10 +25,16 @@ const UserSearch = () => {
   });
 
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
+  const [isRecentLoading, setIsRecentLoading] = useState(false);
 
   const fetchRecentSearches = async () => {
-    const response = await getRecentSearch('USER');
-    setRecentSearches(response.data.recentSearchList);
+    setIsRecentLoading(true);
+    try {
+      const response = await getRecentSearch('USER');
+      setRecentSearches(response.data.recentSearchList);
+    } finally {
+      setIsRecentLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -124,6 +130,7 @@ const UserSearch = () => {
               recentSearches={recentSearches.map(item => item.searchTerm)}
               handleDelete={handleDeleteWrapper}
               handleRecentSearchClick={handleRecentSearchClick}
+              isLoading={isRecentLoading}
             />
           </>
         )}

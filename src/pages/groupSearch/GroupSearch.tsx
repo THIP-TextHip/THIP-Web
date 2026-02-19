@@ -38,6 +38,7 @@ const GroupSearch = () => {
   const [category, setCategory] = useState<string>('');
 
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
+  const [isRecentLoading, setIsRecentLoading] = useState(false);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const [showTabs, setShowTabs] = useState(false);
@@ -46,11 +47,14 @@ const GroupSearch = () => {
 
   useEffect(() => {
     (async () => {
+      setIsRecentLoading(true);
       try {
         const response = await getRecentSearch('ROOM');
         setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
       } catch {
         setRecentSearches([]);
+      } finally {
+        setIsRecentLoading(false);
       }
     })();
   }, []);
@@ -62,11 +66,14 @@ const GroupSearch = () => {
   }, [searchStatus]);
 
   const fetchRecentSearches = async () => {
+    setIsRecentLoading(true);
     try {
       const response = await getRecentSearch('ROOM');
       setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
     } catch {
       setRecentSearches([]);
+    } finally {
+      setIsRecentLoading(false);
     }
   };
 
@@ -375,6 +382,7 @@ const GroupSearch = () => {
                 }
               }}
               handleRecentSearchClick={handleRecentSearchClick}
+              isLoading={isRecentLoading}
             />
             <AllRoomsButton onClick={handleAllRoomsClick}>
               <p>전체 모임방 둘러보기</p>
