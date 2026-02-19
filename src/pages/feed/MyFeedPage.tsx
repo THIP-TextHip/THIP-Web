@@ -8,7 +8,8 @@ import OtherFeed from '@/components/feed/OtherFeed';
 import { getOtherFeed, type OtherFeedItem } from '@/api/feeds/getOtherFeed';
 import { getOtherProfile } from '@/api/users/getOtherProfile';
 import type { OtherProfileData } from '@/types/profile';
-import { Container } from './MyFeedPage.styled';
+import FeedPostSkeleton from '@/shared/ui/Skeleton/FeedPostSkeleton';
+import { Container, SkeletonWrapper } from './MyFeedPage.styled';
 
 const MyFeedPage = () => {
   const navigate = useNavigate();
@@ -33,10 +34,16 @@ const MyFeedPage = () => {
       try {
         setLoading(true);
 
-        const [feedResponse, profileResponse] = await Promise.all([
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [feedResponse, profileResponse] = (await Promise.all([
           getOtherFeed(Number(userId)),
           getOtherProfile(Number(userId)),
-        ]);
+          minLoadingTime,
+        ])) as [
+          Awaited<ReturnType<typeof getOtherFeed>>,
+          Awaited<ReturnType<typeof getOtherProfile>>,
+          void,
+        ];
 
         setFeedData(feedResponse.data.feedList);
         setProfileData(profileResponse.data);
@@ -53,7 +60,20 @@ const MyFeedPage = () => {
   }, [userId]);
 
   if (loading) {
-    return <></>;
+    return (
+      <Container>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+        <SkeletonWrapper>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <FeedPostSkeleton key={index} />
+          ))}
+        </SkeletonWrapper>
+        <NavBar src={writefab} path="/post/create" />
+      </Container>
+    );
   }
 
   if (error) {

@@ -5,3 +5,8 @@ export const Container = styled.div`
   max-width: 767px;
   margin: 0 auto;
 `;
+
+export const SkeletonWrapper = styled.div`
+  padding-top: 56px;
+  background-color: var(--color-black-main);
+`;
