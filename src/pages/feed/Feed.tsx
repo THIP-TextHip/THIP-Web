@@ -5,6 +5,7 @@ import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
 import FeedPostSkeleton from '@/shared/ui/Skeleton/FeedPostSkeleton';
+import OtherFeedSkeleton from '@/shared/ui/Skeleton/OtherFeedSkeleton';
 import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
@@ -168,11 +169,15 @@ const Feed = () => {
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {initialLoading || tabLoading ? (
-        <SkeletonWrapper>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <FeedPostSkeleton key={index} />
-          ))}
-        </SkeletonWrapper>
+        activeTab === '내 피드' ? (
+          <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />
+        ) : (
+          <SkeletonWrapper>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <FeedPostSkeleton key={index} />
+            ))}
+          </SkeletonWrapper>
+        )
       ) : (
         <>
           {activeTab === '피드' ? (

@@ -6,10 +6,10 @@ import writefab from '../../assets/common/writefab.svg';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import OtherFeed from '@/components/feed/OtherFeed';
 import { getOtherFeed, type OtherFeedItem } from '@/api/feeds/getOtherFeed';
-import { getOtherProfile } from '@/api/users/getOtherProfile';
+import { getMyProfile } from '@/api/feeds/getMyProfile';
 import type { OtherProfileData } from '@/types/profile';
-import FeedPostSkeleton from '@/shared/ui/Skeleton/FeedPostSkeleton';
-import { Container, SkeletonWrapper } from './MyFeedPage.styled';
+import OtherFeedSkeleton from '@/shared/ui/Skeleton/OtherFeedSkeleton';
+import { Container } from './MyFeedPage.styled';
 
 const MyFeedPage = () => {
   const navigate = useNavigate();
@@ -37,16 +37,16 @@ const MyFeedPage = () => {
         const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [feedResponse, profileResponse] = (await Promise.all([
           getOtherFeed(Number(userId)),
-          getOtherProfile(Number(userId)),
+          getMyProfile(),
           minLoadingTime,
         ])) as [
           Awaited<ReturnType<typeof getOtherFeed>>,
-          Awaited<ReturnType<typeof getOtherProfile>>,
+          Awaited<ReturnType<typeof getMyProfile>>,
           void,
         ];
 
         setFeedData(feedResponse.data.feedList);
-        setProfileData(profileResponse.data);
+        setProfileData({ ...profileResponse.data, isFollowing: false });
         setError(null);
       } catch (err) {
         console.error('다른 사용자 데이터 로드 실패:', err);
@@ -66,11 +66,7 @@ const MyFeedPage = () => {
           leftIcon={<img src={leftArrow} alt="뒤로가기" />}
           onLeftClick={handleBackClick}
         />
-        <SkeletonWrapper>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <FeedPostSkeleton key={index} />
-          ))}
-        </SkeletonWrapper>
+        <OtherFeedSkeleton showFollowButton={false} />
         <NavBar src={writefab} path="/post/create" />
       </Container>
     );
