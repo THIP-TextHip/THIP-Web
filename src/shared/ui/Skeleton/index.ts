@@ -8,5 +8,13 @@ export { FeedPostSkeleton, OtherFeedSkeleton, ProfileSkeleton, TotalBarSkeleton 
 export { MessageListSkeleton } from './todaywords';
 
 // Group skeletons
-export { GroupDetailSkeleton, BannerSkeleton, BookSkeleton } from './group';
+export {
+  GroupDetailSkeleton,
+  BannerSkeleton,
+  BookSkeleton,
+  GroupBookSectionSkeleton,
+  RecordSectionSkeleton,
+  CommentSectionSkeleton,
+  HotTopicSectionSkeleton,
+} from './group';
 
