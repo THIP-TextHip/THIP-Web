@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import type { UserProfileItemProps } from '@/types/user';
 import { postFollow } from '@/api/users/postFollow';
 import { Wrapper, UserProfile } from './UserProfileItem.styled';
 import { usePopupStore } from '@/stores/popupStore';
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 
 const UserProfileItem = ({
   profileImageUrl,
@@ -19,8 +20,10 @@ const UserProfileItem = ({
   isMyself,
 }: UserProfileItemProps) => {
   const navigate = useNavigate();
-  const [followed, setFollowed] = useState(isFollowing);
+  const [followed, setFollowed] = useState(!!isFollowing);
+  const followedRef = useRef<boolean>(!!isFollowing);
   const { openPopup } = usePopupStore();
+  const { isLoading: isFollowLoading, run: runFollow } = usePreventDoubleClick();
 
   const handleProfileClick = () => {
     if (isMyself) {
@@ -30,25 +33,37 @@ const UserProfileItem = ({
     }
   };
 
-  const toggleFollow = async (e: React.MouseEvent) => {
+  const toggleFollow = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!userId) return;
+    runFollow(async () => {
+      const nextFollowed = !followedRef.current;
+      followedRef.current = nextFollowed;
+      setFollowed(nextFollowed);
 
-    try {
-      const response = await postFollow(userId, !followed);
-      setFollowed(response.data.isFollowing);
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-      const message = response.data.isFollowing
-        ? `${nickname}님을 띱 했어요.`
-        : `${nickname}님을 띱 취소했어요.`;
+      try {
+        const response = await postFollow(userId, nextFollowed);
+        if (followedRef.current !== nextFollowed) return;
 
-      openPopup('snackbar', {
-        message,
-        variant: 'top',
-        onClose: () => {},
-      });
-    } catch (error) {
-      console.error('팔로우/언팔로우 실패:', error);
-    }
+        if (response.data.isFollowing !== nextFollowed) {
+          followedRef.current = response.data.isFollowing;
+          setFollowed(response.data.isFollowing);
+        }
+
+        openPopup('snackbar', {
+          message: response.data.isFollowing ? `${nickname}님을 띱 했어요.` : `${nickname}님을 띱 취소했어요.`,
+          variant: 'top',
+          onClose: () => {},
+        });
+      } catch {
+        if (followedRef.current !== nextFollowed) return;
+        const rollbackState = !nextFollowed;
+        followedRef.current = rollbackState;
+        setFollowed(rollbackState);
+      }
+    });
   };
 
   return (
@@ -64,7 +79,7 @@ const UserProfileItem = ({
           </div>
         </div>
         {type === 'followlist' && (
-          <div className="followbutton" onClick={toggleFollow}>
+          <div className="followbutton" onClick={toggleFollow} style={{ opacity: isFollowLoading ? 0.6 : 1 }}>
             {followed ? '띱 취소' : '띱 하기'}
           </div>
         )}
