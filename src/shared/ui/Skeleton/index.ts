@@ -7,3 +7,6 @@ export { FeedPostSkeleton, OtherFeedSkeleton, ProfileSkeleton, TotalBarSkeleton 
 // TodayWords skeletons
 export { MessageListSkeleton } from './todaywords';
 
+// Group skeletons
+export { GroupDetailSkeleton, BannerSkeleton, BookSkeleton } from './group';
+

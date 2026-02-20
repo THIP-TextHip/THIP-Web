@@ -46,6 +46,7 @@ import bookCoverLargeImg from '../../assets/books/bookCoverLarge.svg';
 
 import PasswordModal from '@/components/group/PasswordModal';
 import { usePopupStore } from '@/stores/popupStore';
+import { BannerSkeleton, BookSkeleton } from '@/shared/ui/Skeleton';
 
 const GroupDetail = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -89,7 +90,11 @@ const GroupDetail = () => {
         setIsLoading(true);
         setError(null);
 
-        const response = await getRoomDetail(Number(roomId));
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [response] = await Promise.all([
+          getRoomDetail(Number(roomId)),
+          minLoadingTime,
+        ]);
 
         if (response.isSuccess) {
           setRoomData(response.data);
@@ -124,31 +129,17 @@ const GroupDetail = () => {
     }
   }, [roomData]);
 
-  if (isLoading) {
-    return <div>로딩 중...</div>;
-  }
-
-  if (error || !roomData) {
+  if (error) {
     return <div>에러: {error}</div>;
   }
 
   const {
-    roomName,
-    isPublic,
-    roomDescription,
-    progressStartDate,
-    progressEndDate,
-    memberCount,
-    recruitCount,
-    recruitEndDate,
-    category,
-    bookTitle,
-    authorName,
-    bookDescription,
-    publisher,
-    bookImageUrl,
-    recommendRooms,
-  } = roomData;
+    isPublic = true,
+    memberCount = 0,
+    recruitCount = 0,
+    category = '',
+    recommendRooms = [],
+  } = roomData || {};
 
   const handleBookSectionClick = () => {
     const isbn = roomData?.isbn;
@@ -162,7 +153,7 @@ const GroupDetail = () => {
   };
 
   const handleBottomButtonClick = async () => {
-    if (!roomId) return;
+    if (!roomId || !roomData) return;
 
     if (roomData.isHost) {
       openPopup('confirm-modal', {
@@ -281,61 +272,76 @@ const GroupDetail = () => {
           <IconButton src={leftArrow} onClick={handleBackButton} />
         </Header>
         <BannerSection>
-          <GroupTitle>
-            {roomName} {!isPublic && <img src={lockIcon} alt="자물쇠 아이콘" />}
-          </GroupTitle>
-          <SubTitle>
-            <div>소개글</div>
-            <br />
-            <Intro>{roomDescription}</Intro>
-          </SubTitle>
-          <MetaInfo>
-            <Meta>
-              <span>
-                <IconButton src={calendarIcon} alt="달력 아이콘" /> 모임 활동기간
-              </span>
-              <MetaDate>
-                {progressStartDate} ~ {progressEndDate}
-              </MetaDate>
-            </Meta>
-            <Meta>
-              <span>
-                <IconButton src={peopleIcon} alt="사람 아이콘" /> 참여 중인 독서메이트
-              </span>
-              <span>
-                <MetaMember>{memberCount}</MetaMember>
-                <MetaTotalMember>/ {recruitCount}명</MetaTotalMember>
-              </span>
-            </Meta>
-          </MetaInfo>
-          <TagRow>
-            <Tag>
-              모집 <strong>{recruitEndDate}</strong>
-            </Tag>
-            <Tag>
-              장르 <TagGenre>{category}</TagGenre>
-            </Tag>
-          </TagRow>
+          {isLoading || !roomData ? (
+            <BannerSkeleton />
+          ) : (
+            <>
+              <GroupTitle>
+                {roomData.roomName} {!roomData.isPublic && <img src={lockIcon} alt="자물쇠 아이콘" />}
+              </GroupTitle>
+              <SubTitle>
+                <div>소개글</div>
+                <br />
+                <Intro>{roomData.roomDescription}</Intro>
+              </SubTitle>
+              <MetaInfo>
+                <Meta>
+                  <span>
+                    <IconButton src={calendarIcon} alt="달력 아이콘" /> 모임 활동기간
+                  </span>
+                  <MetaDate>
+                    {roomData.progressStartDate} ~ {roomData.progressEndDate}
+                  </MetaDate>
+                </Meta>
+                <Meta>
+                  <span>
+                    <IconButton src={peopleIcon} alt="사람 아이콘" /> 참여 중인 독서메이트
+                  </span>
+                  <span>
+                    <MetaMember>{roomData.memberCount}</MetaMember>
+                    <MetaTotalMember>/ {roomData.recruitCount}명</MetaTotalMember>
+                  </span>
+                </Meta>
+              </MetaInfo>
+              <TagRow>
+                <Tag>
+                  모집 <strong>{roomData.recruitEndDate}</strong>
+                </Tag>
+                <Tag>
+                  장르 <TagGenre>{roomData.category}</TagGenre>
+                </Tag>
+              </TagRow>
+            </>
+          )}
         </BannerSection>
       </TopBackground>
 
-      <BookSection onClick={handleBookSectionClick}>
-        <BookHeader>
-          <h3>{bookTitle}</h3>
-          <IconButton src={rightChevron} alt="책 이동 버튼" />
-        </BookHeader>
-        <BookInfo>
-          <BookCover src={bookImageUrl ? bookImageUrl : bookCoverLargeImg} alt={bookTitle} />
-          <BookDetails>
-            <div>
-              {authorName} 저 · {publisher}
-            </div>
-            <BookIntro>
-              도서 소개 <br />
-              <p>{bookDescription}</p>
-            </BookIntro>
-          </BookDetails>
-        </BookInfo>
+      <BookSection onClick={isLoading || !roomData ? undefined : handleBookSectionClick}>
+        {isLoading || !roomData ? (
+          <BookSkeleton />
+        ) : (
+          <>
+            <BookHeader>
+              <h3>{roomData.bookTitle}</h3>
+              <IconButton src={rightChevron} alt="책 이동 버튼" />
+            </BookHeader>
+            <BookInfo>
+              <BookCover
+                src={roomData.bookImageUrl ? roomData.bookImageUrl : bookCoverLargeImg}
+                alt={roomData.bookTitle}
+              />
+              <BookDetails>
+                <div>
+                  {roomData.authorName} 저 · {roomData.publisher}
+                </div>
+                <BookIntro>
+                  도서 소개 <br />
+                  <p>{roomData.bookDescription}</p>
+                </BookIntro>
+              </BookDetails>
+            </BookInfo>
+          </>
+        )}
       </BookSection>
 
       {recommendRooms.length > 0 && (
@@ -358,9 +364,20 @@ const GroupDetail = () => {
 
       <BottomButton
         onClick={handleBottomButtonClick}
-        disabled={isSubmitting || (!roomData.isHost && !isJoining && memberCount >= recruitCount)}
+        disabled={
+          isLoading ||
+          !roomData ||
+          isSubmitting ||
+          (!roomData.isHost && !isJoining && memberCount >= recruitCount)
+        }
       >
-        {roomData.isHost ? '모집 마감하기' : isJoining ? '참여 취소하기' : '참여하기'}
+        {!roomData
+          ? '로딩 중...'
+          : roomData.isHost
+            ? '모집 마감하기'
+            : isJoining
+              ? '참여 취소하기'
+              : '참여하기'}
       </BottomButton>
 
       {showPasswordModal && roomId && (
