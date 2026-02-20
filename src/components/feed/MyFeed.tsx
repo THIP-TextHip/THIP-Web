@@ -5,7 +5,7 @@ import type { FeedListProps } from '../../types/post';
 import TotalBar from './TotalBar';
 import { getMyProfile } from '@/api/feeds/getMyProfile';
 import type { MyProfileData } from '@/types/profile';
-import OtherFeedSkeleton from '@/shared/ui/Skeleton/OtherFeedSkeleton';
+import { OtherFeedSkeleton } from '@/shared/ui/Skeleton';
 import { Container, EmptyState } from './MyFeed.styled';
 
 const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {

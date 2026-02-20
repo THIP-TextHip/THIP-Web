@@ -8,7 +8,7 @@ import OtherFeed from '@/components/feed/OtherFeed';
 import { getOtherFeed, type OtherFeedItem } from '@/api/feeds/getOtherFeed';
 import { getMyProfile } from '@/api/feeds/getMyProfile';
 import type { OtherProfileData } from '@/types/profile';
-import OtherFeedSkeleton from '@/shared/ui/Skeleton/OtherFeedSkeleton';
+import { OtherFeedSkeleton } from '@/shared/ui/Skeleton';
 import { Container } from './MyFeedPage.styled';
 
 const MyFeedPage = () => {
