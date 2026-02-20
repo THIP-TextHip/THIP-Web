@@ -136,3 +136,35 @@ export const BottomMenu = styled.div`
   line-height: 20px;
   cursor: pointer;
 `;
+
+export const SkeletonWrapper = styled.div`
+  width: 100%;
+`;
+
+export const ProfileSkeletonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 20px;
+`;
+
+export const ProfileSkeletonLeft = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const ProfileSkeletonText = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+export const MenuItemSkeleton = styled.div`
+  width: 100%;
+  height: 56px;
+  border-radius: 12px;
+`;
