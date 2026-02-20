@@ -31,7 +31,9 @@ const UserSearch = () => {
     setIsRecentLoading(true);
     try {
       const response = await getRecentSearch('USER');
-      setRecentSearches(response.data.recentSearchList);
+      setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
+    } catch {
+      setRecentSearches([]);
     } finally {
       setIsRecentLoading(false);
     }

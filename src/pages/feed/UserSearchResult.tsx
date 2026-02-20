@@ -45,7 +45,7 @@ export function UserSearchResult({
         {type === 'searching' ? <></> : <ResultHeader>전체 {searchedUserList.length}</ResultHeader>}
 
         {isEmpty ? (
-          <EmptyWrapper>{loading ? '사용자 찾는 중...' : '찾는 사용자가 없어요.'}</EmptyWrapper>
+          <EmptyWrapper>찾는 사용자가 없어요.</EmptyWrapper>
         ) : (
           <>
             {searchedUserList.map((user, index) => (
