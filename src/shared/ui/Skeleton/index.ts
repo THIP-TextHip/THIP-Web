@@ -18,3 +18,5 @@ export {
   HotTopicSectionSkeleton,
 } from './group';
 
+// Memory skeletons
+export { RecordItemSkeleton } from './memory';
