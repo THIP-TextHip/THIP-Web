@@ -22,4 +22,4 @@ export {
 export { RecordItemSkeleton } from './memory';
 
 // SearchBook skeletons
-export { BookDetailSkeleton } from './searchBook';
+export { BookDetailSkeleton, BookItemSkeleton } from './searchBook';

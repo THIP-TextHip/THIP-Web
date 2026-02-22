@@ -10,7 +10,9 @@ import leftArrow from '../../assets/common/leftArrow.svg';
 import { getSearchBooks, convertToSearchedBooks } from '@/api/books/getSearchBooks';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
-import { Wrapper, Header, SearchBarContainer, Content, LoadingMessage } from './Search.styled';
+import { Wrapper, Header, SearchBarContainer, Content } from './Search.styled';
+import { BookItemSkeleton } from '@/shared/ui/Skeleton';
+import { Wrapper as BookListWrapper, List } from '@/components/search/BookSearchResult.styled';
 
 export interface SearchedBook {
   id: number;
@@ -156,7 +158,11 @@ const Search = () => {
     setHasMore(true);
 
     try {
-      const response = await getSearchBooks(term, 1, isManualSearch);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([
+        getSearchBooks(term, 1, isManualSearch),
+        minLoadingTime,
+      ]);
 
       if (response.isSuccess) {
         const convertedResults = convertToSearchedBooks(response.data.searchResult);
@@ -280,7 +286,13 @@ const Search = () => {
         {isSearching ? (
           <>
             {isLoading && searchResults.length === 0 ? (
-              <LoadingMessage>검색 중...</LoadingMessage>
+              <BookListWrapper>
+                <List>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <BookItemSkeleton key={i} />
+                  ))}
+                </List>
+              </BookListWrapper>
             ) : (
               <BookSearchResult
                 type={isFinalized ? 'searched' : 'searching'}
