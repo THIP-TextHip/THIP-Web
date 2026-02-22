@@ -23,3 +23,6 @@ export { RecordItemSkeleton } from './memory';
 
 // SearchBook skeletons
 export { BookDetailSkeleton, BookItemSkeleton } from './searchBook';
+
+// Search skeletons
+export { MostSearchedBooksSkeleton, RecentSearchTabsSkeleton } from './search';

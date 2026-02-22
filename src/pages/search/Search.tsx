@@ -11,7 +11,7 @@ import { getSearchBooks, convertToSearchedBooks } from '@/api/books/getSearchBoo
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
 import { Wrapper, Header, SearchBarContainer, Content } from './Search.styled';
-import { BookItemSkeleton } from '@/shared/ui/Skeleton';
+import { BookItemSkeleton, RecentSearchTabsSkeleton } from '@/shared/ui/Skeleton';
 import { Wrapper as BookListWrapper, List } from '@/components/search/BookSearchResult.styled';
 
 export interface SearchedBook {
@@ -37,6 +37,7 @@ const Search = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
+  const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -44,7 +45,12 @@ const Search = () => {
 
   const fetchRecentSearches = async () => {
     try {
-      const response = await getRecentSearch('BOOK');
+      setIsLoadingRecentSearches(true);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([
+        getRecentSearch('BOOK'),
+        minLoadingTime,
+      ]);
 
       if (response.isSuccess) {
         setRecentSearches(response.data.recentSearchList);
@@ -55,6 +61,8 @@ const Search = () => {
     } catch (error) {
       console.error('최근 검색어 조회 오류:', error);
       setRecentSearches([]);
+    } finally {
+      setIsLoadingRecentSearches(false);
     }
   };
 
@@ -306,11 +314,15 @@ const Search = () => {
           </>
         ) : (
           <>
-            <RecentSearchTabs
-              recentSearches={recentSearches.map(item => item.searchTerm)}
-              handleDelete={handleDeleteWrapper}
-              handleRecentSearchClick={handleRecentSearchClick}
-            />
+            {isLoadingRecentSearches ? (
+              <RecentSearchTabsSkeleton />
+            ) : (
+              <RecentSearchTabs
+                recentSearches={recentSearches.map(item => item.searchTerm)}
+                handleDelete={handleDeleteWrapper}
+                handleRecentSearchClick={handleRecentSearchClick}
+              />
+            )}
             <MostSearchedBooks />
           </>
         )}
