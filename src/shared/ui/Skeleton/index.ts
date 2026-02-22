@@ -16,6 +16,7 @@ export {
   RecordSectionSkeleton,
   CommentSectionSkeleton,
   HotTopicSectionSkeleton,
+  GroupCardSkeleton,
 } from './group';
 
 // Memory skeletons
