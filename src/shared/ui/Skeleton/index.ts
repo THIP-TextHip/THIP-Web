@@ -20,3 +20,6 @@ export {
 
 // Memory skeletons
 export { RecordItemSkeleton } from './memory';
+
+// SearchBook skeletons
+export { BookDetailSkeleton } from './searchBook';
