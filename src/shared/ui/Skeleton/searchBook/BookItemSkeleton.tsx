@@ -4,7 +4,15 @@ import { BookItem, Cover, BookInfo } from '@/components/search/BookSearchResult.
 const BookItemSkeleton = () => {
   return (
     <BookItem style={{ cursor: 'default', pointerEvents: 'none' }}>
-      <Cover as="div" style={{ background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Cover
+        as="div"
+        style={{
+          background: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <Skeleton.Box width={80} height={107} />
       </Cover>
       <BookInfo>

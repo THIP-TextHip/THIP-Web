@@ -27,3 +27,6 @@ export { BookDetailSkeleton, BookItemSkeleton } from './searchBook';
 
 // Search skeletons
 export { MostSearchedBooksSkeleton, RecentSearchTabsSkeleton } from './search';
+
+// Members skeletons
+export { MemberListSkeleton } from './members';
