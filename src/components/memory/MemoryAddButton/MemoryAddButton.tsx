@@ -53,6 +53,13 @@ const MemoryAddButton = () => {
 
   const handleAIWrite = async () => {
     setIsOpen(false);
+    openSnackbar({
+      message: '해당 기능은 준비중입니다.',
+      variant: 'top',
+      onClose: () => {},
+    });
+    return;
+
     const currentRoomId = roomId || '1';
 
     try {
