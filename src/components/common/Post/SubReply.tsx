@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import PostHeader from './PostHeader';
 import type { ReplyData } from '@/api/comments/getComments';
 import like from '../../../assets/feed/like.svg';
@@ -39,6 +39,11 @@ const SubReply = ({
 
   const { startReply } = useReplyActions();
   const { openMoreMenu, closePopup, openSnackbar } = usePopupActions();
+
+  useEffect(() => {
+    setLiked(isLike);
+    setCurrentLikeCount(likeCount);
+  }, [isLike, likeCount]);
 
   const handleReplyClick = () => {
     startReply(creatorNickname, commentId);

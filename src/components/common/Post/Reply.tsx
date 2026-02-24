@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import PostHeader from './PostHeader';
 import type { CommentData } from '@/api/comments/getComments';
 import like from '../../../assets/feed/like.svg';
@@ -37,6 +37,11 @@ const Reply = ({
 
   const { startReply } = useReplyActions();
   const { openMoreMenu, closePopup, openSnackbar } = usePopupActions();
+
+  useEffect(() => {
+    setLiked(isLike);
+    setLikeCount(initialLikeCount);
+  }, [isLike, initialLikeCount]);
 
   const handleLike = () => {
     runLike(async () => {
