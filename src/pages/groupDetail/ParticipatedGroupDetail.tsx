@@ -225,143 +225,107 @@ const ParticipatedGroupDetail = () => {
     );
   }
 
-  const data = roomData?.data;
+  if (loading || !roomData) {
+    return (
+      <ParticipatedWrapper>
+        <TopBackground genre="">
+          <Header>
+            <IconButton src={leftArrow} onClick={handleBackButton} />
+          </Header>
+          <BannerSection>
+            <BannerSkeleton />
+          </BannerSection>
+        </TopBackground>
+        <GroupBookSectionSkeleton />
+        <RecordSectionSkeleton />
+        <CommentSectionSkeleton />
+        <HotTopicSectionSkeleton />
+      </ParticipatedWrapper>
+    );
+  }
 
-  const polls: Poll[] = data ? convertVotesToPolls(data.currentVotes) : [];
+  const data = roomData.data;
+  const polls: Poll[] = convertVotesToPolls(data.currentVotes);
   const hasPolls = polls.length > 0;
-
-  const formatDate = (dateString: string) => {
-    return dateString.replace(/-/g, '.');
-  };
-
-  const getGenreForBackground = () => {
-    return data?.category || '';
-  };
-
-  const commentData = {
-    message: '모임방 멤버들과 간단한 인사를 나눠보세요!',
-  };
-
-  const isCompleted = roomData && data ? isRoomCompleted(data.progressEndDate) : false;
+  const isCompleted = isRoomCompleted(data.progressEndDate);
+  const formatDate = (dateString: string) => dateString.replace(/-/g, '.');
 
   return (
     <ParticipatedWrapper>
-      <TopBackground genre={getGenreForBackground()}>
+      <TopBackground genre={data.category}>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
-          {!loading && data && !isCompleted && (
-            <IconButton src={moreIcon} onClick={handleMoreButton} />
-          )}
+          {!isCompleted && <IconButton src={moreIcon} onClick={handleMoreButton} />}
         </Header>
         <BannerSection>
-          {loading || !data ? (
-            <BannerSkeleton />
-          ) : (
-            (() => {
-              const {
-                roomName,
-                isPublic,
-                roomDescription,
-                progressStartDate,
-                progressEndDate,
-                memberCount,
-                category,
-              } = data;
-              return (
-                <>
-                  <GroupTitle>
-                    {roomName} {!isPublic && <img src={lockIcon} alt="자물쇠 아이콘"></img>}
-                  </GroupTitle>
-                  <SubTitle>
-                    <div>소개글</div>
-                    <br />
-                    <Intro>{roomDescription}</Intro>
-                  </SubTitle>
-                  <MetaInfo>
-                    <Meta>
-                      <span>
-                        <IconButton src={calendarIcon} alt="달력 아이콘" /> 모임 활동기간
-                      </span>
-                      <MetaDate>
-                        {formatDate(progressStartDate)} ~ {formatDate(progressEndDate)}
-                      </MetaDate>
-                    </Meta>
-                    <Meta>
-                      <ClickableMeta onClick={handleMembersClick}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                          <MetaTopRow>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                              <IconButton src={peopleIcon} alt="사람 아이콘" />
-                              <span>독서메이트</span>
-                            </div>
-                            <MetaChevron src={rightChevron} alt="독서메이트 목록 보기" />
-                          </MetaTopRow>
-                          <span>
-                            <MetaMember>{memberCount}</MetaMember>
-                            <MetaTotalMember>명 참여 중</MetaTotalMember>
-                          </span>
-                        </div>
-                      </ClickableMeta>
-                    </Meta>
-                  </MetaInfo>
-                  <TagRow>
-                    <Tag>
-                      장르 <TagGenre genre={category}>{category}</TagGenre>
-                    </Tag>
-                  </TagRow>
-                </>
-              );
-            })()
-          )}
+          <GroupTitle>
+            {data.roomName} {!data.isPublic && <img src={lockIcon} alt="자물쇠 아이콘" />}
+          </GroupTitle>
+          <SubTitle>
+            <div>소개글</div>
+            <br />
+            <Intro>{data.roomDescription}</Intro>
+          </SubTitle>
+          <MetaInfo>
+            <Meta>
+              <span>
+                <IconButton src={calendarIcon} alt="달력 아이콘" /> 모임 활동기간
+              </span>
+              <MetaDate>
+                {formatDate(data.progressStartDate)} ~ {formatDate(data.progressEndDate)}
+              </MetaDate>
+            </Meta>
+            <Meta>
+              <ClickableMeta onClick={handleMembersClick}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <MetaTopRow>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                      <IconButton src={peopleIcon} alt="사람 아이콘" />
+                      <span>독서메이트</span>
+                    </div>
+                    <MetaChevron src={rightChevron} alt="독서메이트 목록 보기" />
+                  </MetaTopRow>
+                  <span>
+                    <MetaMember>{data.memberCount}</MetaMember>
+                    <MetaTotalMember>명 참여 중</MetaTotalMember>
+                  </span>
+                </div>
+              </ClickableMeta>
+            </Meta>
+          </MetaInfo>
+          <TagRow>
+            <Tag>
+              장르 <TagGenre genre={data.category}>{data.category}</TagGenre>
+            </Tag>
+          </TagRow>
         </BannerSection>
       </TopBackground>
 
-      {loading || !data ? (
-        <>
-          <GroupBookSectionSkeleton />
-          <RecordSectionSkeleton />
-          <CommentSectionSkeleton />
-          <HotTopicSectionSkeleton />
-        </>
-      ) : (
-        (() => {
-          const { bookTitle, authorName, currentPage, userPercentage } = data;
-          return (
-            <>
-              <GroupBookSection title={bookTitle} author={authorName} onClick={handleBookSectionClick} />
+      <GroupBookSection title={data.bookTitle} author={data.authorName} onClick={handleBookSectionClick} />
+      <RecordSection
+        currentPage={data.currentPage}
+        progress={data.userPercentage}
+        onClick={handleRecordSectionClick}
+      />
+      <CommentSection
+        message="모임방 멤버들과 간단한 인사를 나눠보세요!"
+        onClick={handleCommentSectionClick}
+      />
+      <HotTopicSection
+        polls={polls}
+        hasPolls={hasPolls}
+        onClick={handleHotTopicSectionClick}
+        onPollClick={handlePollClick}
+      />
 
-              <RecordSection
-                currentPage={currentPage}
-                progress={userPercentage}
-                onClick={handleRecordSectionClick}
-              />
-
-              <CommentSection message={commentData.message} onClick={handleCommentSectionClick} />
-
-              <HotTopicSection
-                polls={polls}
-                hasPolls={hasPolls}
-                onClick={handleHotTopicSectionClick}
-                onPollClick={handlePollClick}
-              />
-            </>
-          );
-        })()
-      )}
-
-      {data && (() => {
-        const { isHost } = data;
-        return (
-          <GroupActionBottomSheet
-            isOpen={isBottomSheetOpen}
-            isGroupOwner={isHost}
-            onClose={handleCloseBottomSheet}
-            onDeleteGroup={handleDeleteGroup}
-            onLeaveGroup={handleLeaveGroup}
-            onReportGroup={handleReportGroup}
-          />
-        );
-      })()}
+      <GroupActionBottomSheet
+        isOpen={isBottomSheetOpen}
+        isGroupOwner={data.isHost}
+        onClose={handleCloseBottomSheet}
+        onDeleteGroup={handleDeleteGroup}
+        onLeaveGroup={handleLeaveGroup}
+        onReportGroup={handleReportGroup}
+      />
     </ParticipatedWrapper>
   );
 };

@@ -133,18 +133,30 @@ const GroupDetail = () => {
     return <div>에러: {error}</div>;
   }
 
-  const {
-    isPublic = true,
-    memberCount = 0,
-    recruitCount = 0,
-    category = '',
-    recommendRooms = [],
-  } = roomData || {};
+  if (isLoading || !roomData) {
+    return (
+      <Wrapper>
+        <TopBackground genre="">
+          <Header>
+            <IconButton src={leftArrow} onClick={handleBackButton} />
+          </Header>
+          <BannerSection>
+            <BannerSkeleton />
+          </BannerSection>
+        </TopBackground>
+        <BookSection>
+          <BookSkeleton />
+        </BookSection>
+        <BottomButton disabled>로딩 중...</BottomButton>
+      </Wrapper>
+    );
+  }
+
+  const { memberCount, recruitCount, category, recommendRooms } = roomData;
 
   const handleBookSectionClick = () => {
-    const isbn = roomData?.isbn;
-    if (isbn) {
-      navigate(`/search/book/${isbn}`);
+    if (roomData.isbn) {
+      navigate(`/search/book/${roomData.isbn}`);
     }
   };
 
@@ -153,7 +165,7 @@ const GroupDetail = () => {
   };
 
   const handleBottomButtonClick = async () => {
-    if (!roomId || !roomData) return;
+    if (!roomId) return;
 
     if (roomData.isHost) {
       openPopup('confirm-modal', {
@@ -212,7 +224,7 @@ const GroupDetail = () => {
       return;
     }
 
-    if (nextType === 'join' && !isPublic) {
+    if (nextType === 'join' && !roomData.isPublic) {
       setShowPasswordModal(true);
       return;
     }
@@ -266,7 +278,6 @@ const GroupDetail = () => {
   };
 
   const buttonProps = (() => {
-    if (isLoading || !roomData) return { text: '로딩 중...', disabled: true };
     if (roomData.isHost) return { text: '모집 마감하기', disabled: isSubmitting };
     if (isJoining) return { text: '참여 취소하기', disabled: isSubmitting };
     const isFull = memberCount >= recruitCount;
@@ -280,76 +291,64 @@ const GroupDetail = () => {
           <IconButton src={leftArrow} onClick={handleBackButton} />
         </Header>
         <BannerSection>
-          {isLoading || !roomData ? (
-            <BannerSkeleton />
-          ) : (
-            <>
-              <GroupTitle>
-                {roomData.roomName} {!roomData.isPublic && <img src={lockIcon} alt="자물쇠 아이콘" />}
-              </GroupTitle>
-              <SubTitle>
-                <div>소개글</div>
-                <br />
-                <Intro>{roomData.roomDescription}</Intro>
-              </SubTitle>
-              <MetaInfo>
-                <Meta>
-                  <span>
-                    <IconButton src={calendarIcon} alt="달력 아이콘" /> 모임 활동기간
-                  </span>
-                  <MetaDate>
-                    {roomData.progressStartDate} ~ {roomData.progressEndDate}
-                  </MetaDate>
-                </Meta>
-                <Meta>
-                  <span>
-                    <IconButton src={peopleIcon} alt="사람 아이콘" /> 참여 중인 독서메이트
-                  </span>
-                  <span>
-                    <MetaMember>{roomData.memberCount}</MetaMember>
-                    <MetaTotalMember>/ {roomData.recruitCount}명</MetaTotalMember>
-                  </span>
-                </Meta>
-              </MetaInfo>
-              <TagRow>
-                <Tag>
-                  모집 <strong>{roomData.recruitEndDate}</strong>
-                </Tag>
-                <Tag>
-                  장르 <TagGenre>{roomData.category}</TagGenre>
-                </Tag>
-              </TagRow>
-            </>
-          )}
+          <GroupTitle>
+            {roomData.roomName} {!roomData.isPublic && <img src={lockIcon} alt="자물쇠 아이콘" />}
+          </GroupTitle>
+          <SubTitle>
+            <div>소개글</div>
+            <br />
+            <Intro>{roomData.roomDescription}</Intro>
+          </SubTitle>
+          <MetaInfo>
+            <Meta>
+              <span>
+                <IconButton src={calendarIcon} alt="달력 아이콘" /> 모임 활동기간
+              </span>
+              <MetaDate>
+                {roomData.progressStartDate} ~ {roomData.progressEndDate}
+              </MetaDate>
+            </Meta>
+            <Meta>
+              <span>
+                <IconButton src={peopleIcon} alt="사람 아이콘" /> 참여 중인 독서메이트
+              </span>
+              <span>
+                <MetaMember>{roomData.memberCount}</MetaMember>
+                <MetaTotalMember>/ {roomData.recruitCount}명</MetaTotalMember>
+              </span>
+            </Meta>
+          </MetaInfo>
+          <TagRow>
+            <Tag>
+              모집 <strong>{roomData.recruitEndDate}</strong>
+            </Tag>
+            <Tag>
+              장르 <TagGenre>{roomData.category}</TagGenre>
+            </Tag>
+          </TagRow>
         </BannerSection>
       </TopBackground>
 
-      <BookSection onClick={isLoading || !roomData ? undefined : handleBookSectionClick}>
-        {isLoading || !roomData ? (
-          <BookSkeleton />
-        ) : (
-          <>
-            <BookHeader>
-              <h3>{roomData.bookTitle}</h3>
-              <IconButton src={rightChevron} alt="책 이동 버튼" />
-            </BookHeader>
-            <BookInfo>
-              <BookCover
-                src={roomData.bookImageUrl ? roomData.bookImageUrl : bookCoverLargeImg}
-                alt={roomData.bookTitle}
-              />
-              <BookDetails>
-                <div>
-                  {roomData.authorName} 저 · {roomData.publisher}
-                </div>
-                <BookIntro>
-                  도서 소개 <br />
-                  <p>{roomData.bookDescription}</p>
-                </BookIntro>
-              </BookDetails>
-            </BookInfo>
-          </>
-        )}
+      <BookSection onClick={handleBookSectionClick}>
+        <BookHeader>
+          <h3>{roomData.bookTitle}</h3>
+          <IconButton src={rightChevron} alt="책 이동 버튼" />
+        </BookHeader>
+        <BookInfo>
+          <BookCover
+            src={roomData.bookImageUrl ? roomData.bookImageUrl : bookCoverLargeImg}
+            alt={roomData.bookTitle}
+          />
+          <BookDetails>
+            <div>
+              {roomData.authorName} 저 · {roomData.publisher}
+            </div>
+            <BookIntro>
+              도서 소개 <br />
+              <p>{roomData.bookDescription}</p>
+            </BookIntro>
+          </BookDetails>
+        </BookInfo>
       </BookSection>
 
       {recommendRooms.length > 0 && (
