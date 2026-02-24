@@ -51,6 +51,18 @@ const Profile = ({
         const response = await postFollow(userId, nextFollowed);
         if (followedRef.current !== nextFollowed) return;
 
+        if (!response.isSuccess) {
+          const rollbackState = !nextFollowed;
+          followedRef.current = rollbackState;
+          setFollowed(rollbackState);
+          openPopup('snackbar', {
+            message: response.message || (nextFollowed ? '띱하기에 실패했어요.' : '띱취소에 실패했어요.'),
+            variant: 'top',
+            onClose: () => {},
+          });
+          return;
+        }
+
         if (response.data.isFollowing !== nextFollowed) {
           followedRef.current = response.data.isFollowing;
           setFollowed(response.data.isFollowing);
@@ -66,6 +78,11 @@ const Profile = ({
         const rollbackState = !nextFollowed;
         followedRef.current = rollbackState;
         setFollowed(rollbackState);
+        openPopup('snackbar', {
+          message: nextFollowed ? '띱하기에 실패했어요.' : '띱취소에 실패했어요.',
+          variant: 'top',
+          onClose: () => {},
+        });
       }
     });
   };
