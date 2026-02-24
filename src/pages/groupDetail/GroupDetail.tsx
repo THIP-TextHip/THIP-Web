@@ -130,7 +130,14 @@ const GroupDetail = () => {
   }, [roomData]);
 
   if (error) {
-    return <div>에러: {error}</div>;
+    return (
+      <Wrapper>
+        <Header>
+          <IconButton src={leftArrow} onClick={handleBackButton} />
+        </Header>
+        <div style={{ padding: '100px 20px', textAlign: 'center' }}>{error}</div>
+      </Wrapper>
+    );
   }
 
   if (isLoading || !roomData) {
