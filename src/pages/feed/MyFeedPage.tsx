@@ -6,7 +6,7 @@ import writefab from '../../assets/common/writefab.svg';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import OtherFeed from '@/components/feed/OtherFeed';
 import { getOtherFeed, type OtherFeedItem } from '@/api/feeds/getOtherFeed';
-import { getMyProfile } from '@/api/feeds/getMyProfile';
+import { getOtherProfile } from '@/api/users/getOtherProfile';
 import type { OtherProfileData } from '@/types/profile';
 import { OtherFeedSkeleton } from '@/shared/ui/Skeleton';
 import { Container } from './MyFeedPage.styled';
@@ -37,16 +37,16 @@ const MyFeedPage = () => {
         const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [feedResponse, profileResponse] = (await Promise.all([
           getOtherFeed(Number(userId)),
-          getMyProfile(),
+          getOtherProfile(Number(userId)),
           minLoadingTime,
         ])) as [
           Awaited<ReturnType<typeof getOtherFeed>>,
-          Awaited<ReturnType<typeof getMyProfile>>,
+          Awaited<ReturnType<typeof getOtherProfile>>,
           void,
         ];
 
         setFeedData(feedResponse.data.feedList);
-        setProfileData({ ...profileResponse.data, isFollowing: false });
+        setProfileData(profileResponse.data);
         setError(null);
       } catch (err) {
         console.error('다른 사용자 데이터 로드 실패:', err);
