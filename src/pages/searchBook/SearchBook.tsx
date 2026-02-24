@@ -40,6 +40,7 @@ import FeedPost from '@/components/feed/FeedPost';
 import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
 import { usePopupStore } from '@/stores/popupStore';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 
 const FILTER = ['최신순', '인기순'] as const;
 const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
@@ -54,7 +55,8 @@ const SearchBook = () => {
   const [bookDetail, setBookDetail] = useState<BookDetail | null>(null);
   const [recruitingRoomsData, setRecruitingRoomsData] = useState<RecruitingRoomsData | null>(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const isSavedRef = useRef(false);
+  const { isLoading: isSaveLoading, run: runSave } = usePreventDoubleClick();
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,17 +90,15 @@ const SearchBook = () => {
         if (bookResponse.isSuccess) {
           setBookDetail(bookResponse.data);
           setIsSaved(bookResponse.data.isSaved);
+          isSavedRef.current = bookResponse.data.isSaved;
         } else {
           setError(bookResponse.message);
         }
 
         if (recruitingResponse.isSuccess) {
           setRecruitingRoomsData(recruitingResponse.data);
-        } else {
-          console.error('모집중인 모임방 조회 실패:', recruitingResponse.message);
         }
-      } catch (err) {
-        console.error('데이터 조회 오류:', err);
+      } catch {
         setError('정보를 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
@@ -121,11 +121,9 @@ const SearchBook = () => {
         setFeeds(res.data.feeds);
         setNextCursor(res.data.nextCursor);
         setIsLast(res.data.isLast);
-      } else {
-        console.error('피드 조회 실패:', res.message);
       }
-    } catch (e) {
-      console.error('피드 조회 오류:', e);
+    } catch {
+      // no-op
     } finally {
       setIsLoadingFeeds(false);
     }
@@ -144,11 +142,9 @@ const SearchBook = () => {
         setFeeds(prev => [...prev, ...res.data.feeds]);
         setNextCursor(res.data.nextCursor);
         setIsLast(res.data.isLast);
-      } else {
-        console.error('피드 추가 로드 실패:', res.message);
       }
-    } catch (e) {
-      console.error('피드 추가 로드 오류:', e);
+    } catch {
+      // no-op
     } finally {
       setIsLoadingMore(false);
     }
@@ -209,21 +205,28 @@ const SearchBook = () => {
     }
   };
 
-  const handleSaveButton = async () => {
-    if (!isbn || isSaving) return;
-    try {
-      setIsSaving(true);
-      const response = await postSaveBook(isbn, !isSaved);
-      if (response.isSuccess) {
-        setIsSaved(response.data.isSaved);
-      } else {
-        console.error('북마크 실패:', response.message);
+  const handleSaveButton = () => {
+    if (!isbn) return;
+    runSave(async () => {
+      const nextSaved = !isSavedRef.current;
+      isSavedRef.current = nextSaved;
+      setIsSaved(nextSaved);
+
+      try {
+        const response = await postSaveBook(isbn, nextSaved);
+        if (!response.isSuccess && isSavedRef.current === nextSaved) {
+          const rollback = !nextSaved;
+          isSavedRef.current = rollback;
+          setIsSaved(rollback);
+        }
+      } catch {
+        if (isSavedRef.current === nextSaved) {
+          const rollback = !nextSaved;
+          isSavedRef.current = rollback;
+          setIsSaved(rollback);
+        }
       }
-    } catch (error) {
-      console.error('북마크 중 오류 발생:', error);
-    } finally {
-      setIsSaving(false);
-    }
+    });
   };
 
   useEffect(() => {
@@ -281,7 +284,7 @@ const SearchBook = () => {
             <WritePostButton onClick={handleWritePostButton}>
               피드에 글쓰기 <img src={plusIcon} alt="더하기 아이콘" />
             </WritePostButton>
-            <SaveButton onClick={handleSaveButton} disabled={isSaving}>
+            <SaveButton onClick={handleSaveButton} style={{ opacity: isSaveLoading ? 0.6 : 1 }}>
               <img src={isSaved ? filledSaveIcon : saveIcon} alt="저장 버튼" />
             </SaveButton>
           </RightArea>
