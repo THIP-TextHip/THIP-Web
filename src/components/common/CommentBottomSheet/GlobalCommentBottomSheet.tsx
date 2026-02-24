@@ -123,6 +123,7 @@ const GlobalCommentBottomSheet = () => {
               postType={postType}
               reloadKey={`${replyReloadKey}-${isOpen ? 'open' : 'closed'}`}
               rootRef={contentRef}
+              disableBottomMargin={true}
             />
           ) : null}
         </Content>

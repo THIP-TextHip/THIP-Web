@@ -14,6 +14,7 @@ interface ReplyListProps {
   postType?: 'FEED' | 'RECORD' | 'VOTE';
   reloadKey?: string;
   rootRef?: RefObject<HTMLElement | null>;
+  disableBottomMargin?: boolean;
 }
 
 const ReplyList = ({
@@ -23,6 +24,7 @@ const ReplyList = ({
   postType,
   reloadKey = '',
   rootRef,
+  disableBottomMargin = false,
 }: ReplyListProps) => {
   const isInfiniteMode = Boolean(postId && postType);
   const commentFeed = useInifinieScroll<CommentData>({
@@ -62,7 +64,7 @@ const ReplyList = ({
   }, [commentFeed, isInfiniteMode, onReload]);
 
   return (
-    <Container>
+    <Container disableBottomMargin={disableBottomMargin}>
       {isInfiniteMode && commentFeed.isLoading && list.length === 0 && (
         <LoadingSpinner size="small" fullHeight={false} />
       )}
@@ -80,7 +82,7 @@ const ReplyList = ({
           </div>
         ))
       ) : (
-        <EmptyState>
+        <EmptyState disableBottomMargin={disableBottomMargin}>
           <div className="title">아직 댓글이 없어요</div>
           <div className="sub-title">첫번째 댓글을 남겨보세요</div>
         </EmptyState>
