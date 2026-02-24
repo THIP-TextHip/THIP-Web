@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import type { UserProfileItemProps } from '@/types/user';
 import { postFollow } from '@/api/users/postFollow';
@@ -24,6 +24,11 @@ const UserProfileItem = ({
   const followedRef = useRef<boolean>(!!isFollowing);
   const { openPopup } = usePopupStore();
   const { isLoading: isFollowLoading, run: runFollow } = usePreventDoubleClick();
+
+  useEffect(() => {
+    setFollowed(!!isFollowing);
+    followedRef.current = !!isFollowing;
+  }, [isFollowing]);
 
   const handleProfileClick = () => {
     if (isMyself) {
