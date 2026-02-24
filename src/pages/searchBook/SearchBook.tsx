@@ -30,7 +30,7 @@ import saveIcon from '../../assets/common/SaveIcon.svg';
 import filledSaveIcon from '../../assets/common/filledSaveIcon.svg';
 import rightChevron from '../../assets/common/right-Chevron.svg';
 import plusIcon from '../../assets/common/plus.svg';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IntroModal } from '@/components/search/IntroModal';
 import { getBookDetail, type BookDetail } from '@/api/books/getBookDetail';
 import { getRecruitingRooms, type RecruitingRoomsData } from '@/api/books/getRecruitingRooms';
@@ -41,6 +41,7 @@ import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFee
 import { usePopupStore } from '@/stores/popupStore';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 
 const FILTER = ['최신순', '인기순'] as const;
 const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
@@ -61,13 +62,6 @@ const SearchBook = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [feeds, setFeeds] = useState<FeedItem[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [isLast, setIsLast] = useState(true);
-  const [isLoadingFeeds, setIsLoadingFeeds] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const openPopup = usePopupStore(state => state.openPopup);
 
   useEffect(() => {
@@ -108,63 +102,20 @@ const SearchBook = () => {
     fetchBookDetail();
   }, [isbn]);
 
-  const loadFirstFeeds = useCallback(async () => {
-    if (!isbn) return;
-    try {
-      setIsLoadingFeeds(true);
-      setFeeds([]);
-      setNextCursor(null);
-      setIsLast(true);
-
-      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), null);
-      if (res.isSuccess) {
-        setFeeds(res.data.feeds);
-        setNextCursor(res.data.nextCursor);
-        setIsLast(res.data.isLast);
-      }
-    } catch {
-      // no-op
-    } finally {
-      setIsLoadingFeeds(false);
-    }
-  }, [isbn, selectedFilter]);
-
-  useEffect(() => {
-    loadFirstFeeds();
-  }, [loadFirstFeeds]);
-
-  const loadMore = useCallback(async () => {
-    if (!isbn || !nextCursor || isLast || isLoadingMore) return;
-    try {
-      setIsLoadingMore(true);
-      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), nextCursor);
-      if (res.isSuccess) {
-        setFeeds(prev => [...prev, ...res.data.feeds]);
-        setNextCursor(res.data.nextCursor);
-        setIsLast(res.data.isLast);
-      }
-    } catch {
-      // no-op
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [isbn, nextCursor, isLast, isLoadingMore, selectedFilter]);
-
-  const lastFeedElementCallback = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isLoadingMore || isLast) return;
-
-      if (observerRef.current) observerRef.current.disconnect();
-
-      observerRef.current = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && !isLoadingMore && !isLast) {
-          loadMore();
-        }
-      });
-      if (node) observerRef.current.observe(node);
+  const feeds = useInifinieScroll<FeedItem>({
+    enabled: !!isbn,
+    reloadKey: `${isbn ?? ''}-${selectedFilter}`,
+    fetchPage: async cursor => {
+      const res = await getFeedsByIsbn(isbn!, toFeedSort(selectedFilter), cursor);
+      return {
+        items: res.data.feeds,
+        nextCursor: res.data.nextCursor || null,
+        isLast: res.data.isLast,
+      };
     },
-    [isLoadingMore, isLast, loadMore],
-  );
+    rootMargin: '100px 0px',
+    threshold: 0.1,
+  });
 
   const handleBackButton = () => navigate(-1);
   const handleIntroClick = () => setShowIntroModal(true);
@@ -303,15 +254,12 @@ const SearchBook = () => {
             setSelectedFilter={filter => setSelectedFilter(filter as (typeof FILTER)[number])}
           />
         </FilterContainer>
-        {isLoadingFeeds && feeds.length === 0 ? (
+        {feeds.isLoading && feeds.items.length === 0 ? (
           <LoadingBox>불러오는 중...</LoadingBox>
-        ) : feeds.length > 0 ? (
+        ) : feeds.items.length > 0 ? (
           <FeedPostContainer>
-            {feeds.map((post, idx) => (
-              <div
-                key={post.feedId}
-                ref={idx === feeds.length - 1 ? el => lastFeedElementCallback(el) : undefined}
-              >
+            {feeds.items.map(post => (
+              <div key={post.feedId}>
                 <FeedPost
                   showHeader={true}
                   isMyFeed={false}
@@ -332,6 +280,8 @@ const SearchBook = () => {
                 />
               </div>
             ))}
+            {!feeds.isLast && <div ref={feeds.sentinelRef} style={{ height: 20 }} />}
+            {feeds.isLoadingMore && <LoadingBox>불러오는 중...</LoadingBox>}
           </FeedPostContainer>
         ) : (
           <EmptyState>
