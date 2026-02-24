@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Record } from '../../../types/memory';
 import TextRecord from './TextRecord';
@@ -53,8 +53,13 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
 
   const [isLiked, setIsLiked] = useState(record.isLiked || false);
   const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
+  const [currentPollOptions, setCurrentPollOptions] = useState(pollOptions || []);
 
   const { openCommentBottomSheet } = useCommentBottomSheetStore();
+
+  useEffect(() => {
+    setCurrentPollOptions(pollOptions || []);
+  }, [pollOptions]);
 
   const isMyRecord = isWriter ?? false;
 
@@ -334,10 +339,10 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
         ) : (
           <PollRecord
             content={content}
-            pollOptions={pollOptions || []}
+            pollOptions={currentPollOptions}
             postId={parseInt(id)}
             shouldBlur={shouldBlur}
-            onVoteUpdate={() => {}}
+            onVoteUpdate={setCurrentPollOptions}
           />
         )}
       </ContentSection>
