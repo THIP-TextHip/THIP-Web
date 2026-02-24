@@ -13,7 +13,9 @@ const HotTopicSectionSkeleton = () => {
       </HotTopicSectionHeader>
       <HotTopicContent>
         <div style={{ padding: '16px 0' }}>
-          <Skeleton.Text width="80%" height={16} style={{ marginBottom: '16px' }} />
+          <div style={{ marginBottom: '16px' }}>
+            <Skeleton.Text width="80%" height={16} />
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <Skeleton.Box width="100%" height={40} borderRadius={8} />
             <Skeleton.Box width="100%" height={40} borderRadius={8} />
