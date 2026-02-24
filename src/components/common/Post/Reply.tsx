@@ -47,8 +47,6 @@ const Reply = ({
       setLiked(nextLiked);
       setLikeCount(prev => (nextLiked ? prev + 1 : prev - 1));
 
-      await new Promise(resolve => setTimeout(resolve, 300));
-
       try {
         const response = await postLike(commentId, nextLiked);
         if (!response.isSuccess) {

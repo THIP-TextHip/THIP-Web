@@ -212,8 +212,6 @@ const SearchBook = () => {
       isSavedRef.current = nextSaved;
       setIsSaved(nextSaved);
 
-      await new Promise(resolve => setTimeout(resolve, 300));
-
       try {
         const response = await postSaveBook(isbn, nextSaved);
         if (!response.isSuccess && isSavedRef.current === nextSaved) {

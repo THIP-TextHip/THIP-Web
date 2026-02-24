@@ -149,8 +149,6 @@ const PollRecord = ({
       setCurrentOptions(normalizedOptions);
       onVoteUpdate?.(normalizedOptions);
 
-      await new Promise(resolve => setTimeout(resolve, 300));
-
       try {
         const response = await postVote(parseInt(roomId, 10), postId, {
           voteItemId: option.voteItemId,

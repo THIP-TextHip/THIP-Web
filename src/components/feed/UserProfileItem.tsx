@@ -41,8 +41,6 @@ const UserProfileItem = ({
       followedRef.current = nextFollowed;
       setFollowed(nextFollowed);
 
-      await new Promise(resolve => setTimeout(resolve, 300));
-
       try {
         const response = await postFollow(userId, nextFollowed);
         if (followedRef.current !== nextFollowed) return;
