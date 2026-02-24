@@ -23,6 +23,7 @@ import {
   Meta,
   ErrorContainer,
 } from './ParticipatedGroupDetail.styled';
+import TitleHeader from '@/components/common/TitleHeader';
 import RecordSection from '../../components/group/RecordSection';
 import CommentSection from '../../components/group/CommentSection';
 import HotTopicSection from '../../components/group/HotTopicSection';
@@ -62,6 +63,10 @@ const ParticipatedGroupDetail = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
+  const handleBackClick = () => {
+    navigate(-1);
+  };
 
   useEffect(() => {
     const fetchRoomDetail = async () => {
@@ -211,6 +216,10 @@ const ParticipatedGroupDetail = () => {
   if (error) {
     return (
       <ParticipatedWrapper>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
         <ErrorContainer>{error}</ErrorContainer>
       </ParticipatedWrapper>
     );
