@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserSearch } from '@/hooks/useUserSearch';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
-import { Content, SearchBarContainer, Wrapper } from './UserSearch.styled';
+import { Content, SearchBarContainer, Wrapper, LoadingMessage } from './UserSearch.styled';
 
 const UserSearch = () => {
   const navigate = useNavigate();
@@ -25,10 +25,18 @@ const UserSearch = () => {
   });
 
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
+  const [isRecentLoading, setIsRecentLoading] = useState(false);
 
   const fetchRecentSearches = async () => {
-    const response = await getRecentSearch('USER');
-    setRecentSearches(response.data.recentSearchList);
+    setIsRecentLoading(true);
+    try {
+      const response = await getRecentSearch('USER');
+      setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
+    } catch {
+      setRecentSearches([]);
+    } finally {
+      setIsRecentLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -100,7 +108,9 @@ const UserSearch = () => {
       <Content>
         {isSearching ? (
           <>
-            {isSearched ? (
+            {userList.length === 0 && (loading || !isSearched) ? (
+              <LoadingMessage>검색 중...</LoadingMessage>
+            ) : isSearched ? (
               <UserSearchResult
                 type={'searched'}
                 searchedUserList={userList}
@@ -124,6 +134,7 @@ const UserSearch = () => {
               recentSearches={recentSearches.map(item => item.searchTerm)}
               handleDelete={handleDeleteWrapper}
               handleRecentSearchClick={handleRecentSearchClick}
+              isLoading={isRecentLoading}
             />
           </>
         )}

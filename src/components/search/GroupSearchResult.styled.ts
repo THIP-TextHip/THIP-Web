@@ -21,11 +21,13 @@ export const Tab = styled.button<{ selected?: boolean }>`
   cursor: pointer;
 `;
 
-export const Content = styled.div`
+export const Content = styled.div<{ isRefetching?: boolean }>`
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   padding: 0 20px 60px;
+  opacity: ${({ isRefetching }) => (isRefetching ? 0.45 : 1)};
+  transition: opacity 0.15s ease;
 
   &::-webkit-scrollbar {
     display: none;
