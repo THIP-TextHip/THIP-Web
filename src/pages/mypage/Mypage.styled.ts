@@ -163,8 +163,3 @@ export const ProfileSkeletonText = styled.div`
   gap: 4px;
 `;
 
-export const MenuItemSkeleton = styled.div`
-  width: 100%;
-  height: 56px;
-  border-radius: 12px;
-`;
