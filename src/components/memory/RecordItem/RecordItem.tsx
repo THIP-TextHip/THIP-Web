@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import type { Record } from '../../../types/memory';
+import type { Record, PollOption } from '../../../types/memory';
 import TextRecord from './TextRecord';
 import PollRecord from './PollRecord';
 import { useCommentBottomSheetStore } from '@/stores/commentBottomSheetStore';
@@ -31,6 +31,25 @@ interface RecordItemProps {
   shouldBlur?: boolean;
 }
 
+const isSamePollOptions = (a: PollOption[], b: PollOption[]) => {
+  if (a.length !== b.length) return false;
+
+  return a.every((item, index) => {
+    const target = b[index];
+    if (!target) return false;
+
+    return (
+      item.id === target.id &&
+      item.voteItemId === target.voteItemId &&
+      item.text === target.text &&
+      item.count === target.count &&
+      item.percentage === target.percentage &&
+      item.isVoted === target.isVoted &&
+      item.isHighest === target.isHighest
+    );
+  });
+};
+
 const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
@@ -58,7 +77,8 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
   const { openCommentBottomSheet } = useCommentBottomSheetStore();
 
   useEffect(() => {
-    setCurrentPollOptions(pollOptions || []);
+    const nextOptions = pollOptions || [];
+    setCurrentPollOptions(prev => (isSamePollOptions(prev, nextOptions) ? prev : nextOptions));
   }, [pollOptions]);
 
   const isMyRecord = isWriter ?? false;
