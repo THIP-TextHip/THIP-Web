@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import MessageInput from '@/components/today-words/MessageInput';
 import ReplyList from '@/components/common/Post/ReplyList';
-import { getComments, type CommentData } from '@/api/comments/getComments';
 import { postReply } from '@/api/comments/postReply';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { useReplyStore } from '@/stores/replyStore';
@@ -16,7 +15,6 @@ import {
   Header,
   Title,
   Content,
-  LoadingState,
   InputSection,
 } from './GlobalCommentBottomSheet.styled';
 
@@ -24,35 +22,15 @@ const GlobalCommentBottomSheet = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { isOpen, postId, postType, closeCommentBottomSheet } = useCommentBottomSheetStore();
 
-  const [commentList, setCommentList] = useState<CommentData[]>([]);
   const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [roomCompleted, setRoomCompleted] = useState(false);
+  const [replyReloadKey, setReplyReloadKey] = useState(0);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   const { nickname, isReplying, cancelReply } = useReplyActions();
   const { parentId } = useReplyStore();
   const { openSnackbar } = usePopupActions();
-
-  const loadComments = useCallback(async () => {
-    if (!isOpen || !postId || !postType) return;
-
-    setIsLoading(true);
-    try {
-      const response = await getComments(postId, {
-        postType,
-        size: 20,
-      });
-
-      if (response.data) {
-        setCommentList(response.data.commentList);
-      }
-    } catch (error) {
-      console.error('댓글 로드 실패:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isOpen, postId, postType]);
 
   const handleSendComment = async () => {
     if (!inputValue.trim() || isSending || !postId || !postType) return;
@@ -71,7 +49,7 @@ const GlobalCommentBottomSheet = () => {
       if (response.isSuccess) {
         setInputValue('');
         cancelReply();
-        await loadComments();
+        setReplyReloadKey(prev => prev + 1);
       } else {
         openSnackbar({
           message: response.message || '댓글 작성 중 오류가 발생했습니다.',
@@ -122,16 +100,10 @@ const GlobalCommentBottomSheet = () => {
   }, [isOpen, roomId]);
 
   useEffect(() => {
-    if (isOpen) {
-      loadComments();
-    }
-  }, [isOpen, postId, loadComments]);
-
-  useEffect(() => {
     if (!isOpen) {
       setInputValue('');
       cancelReply();
-      setCommentList([]);
+      setReplyReloadKey(0);
     }
   }, [isOpen, cancelReply]);
 
@@ -144,12 +116,15 @@ const GlobalCommentBottomSheet = () => {
           <Title>댓글</Title>
         </Header>
 
-        <Content>
-          {isLoading ? (
-            <LoadingState>댓글을 불러오는 중...</LoadingState>
-          ) : (
-            <ReplyList commentList={commentList} onReload={loadComments} />
-          )}
+        <Content ref={contentRef}>
+          {postId && postType ? (
+            <ReplyList
+              postId={postId}
+              postType={postType}
+              reloadKey={`${replyReloadKey}-${isOpen ? 'open' : 'closed'}`}
+              rootRef={contentRef}
+            />
+          ) : null}
         </Content>
 
         {!roomCompleted && (
