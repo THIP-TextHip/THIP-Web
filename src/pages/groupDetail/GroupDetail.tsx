@@ -265,6 +265,14 @@ const GroupDetail = () => {
     });
   };
 
+  const buttonProps = (() => {
+    if (isLoading || !roomData) return { text: '로딩 중...', disabled: true };
+    if (roomData.isHost) return { text: '모집 마감하기', disabled: isSubmitting };
+    if (isJoining) return { text: '참여 취소하기', disabled: isSubmitting };
+    const isFull = memberCount >= recruitCount;
+    return { text: '참여하기', disabled: isSubmitting || isFull };
+  })();
+
   return (
     <Wrapper>
       <TopBackground genre={category}>
@@ -362,22 +370,8 @@ const GroupDetail = () => {
         </RecommendSection>
       )}
 
-      <BottomButton
-        onClick={handleBottomButtonClick}
-        disabled={
-          isLoading ||
-          !roomData ||
-          isSubmitting ||
-          (!roomData.isHost && !isJoining && memberCount >= recruitCount)
-        }
-      >
-        {!roomData
-          ? '로딩 중...'
-          : roomData.isHost
-            ? '모집 마감하기'
-            : isJoining
-              ? '참여 취소하기'
-              : '참여하기'}
+      <BottomButton onClick={handleBottomButtonClick} disabled={buttonProps.disabled}>
+        {buttonProps.text}
       </BottomButton>
 
       {showPasswordModal && roomId && (
