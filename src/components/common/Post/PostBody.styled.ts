@@ -22,8 +22,9 @@ export const PostContent = styled.div<{ hasImage: boolean }>`
     font-weight: var(--string-weight-regular, 400);
     line-height: var(--string-lineheight-feedcontent_height20, 20px);
     cursor: pointer;
-    white-space: pre-wrap; // 개행문자 유지
-    /* word-wrap: break-word; // 긴 텍스트 줄바꿈 */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 
     display: -webkit-box;
     -webkit-box-orient: vertical;
