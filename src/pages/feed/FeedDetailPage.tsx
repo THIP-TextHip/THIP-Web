@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import TitleHeader from '@/components/common/TitleHeader';
 import FeedDetailPost from '@/components/feed/FeedDetailPost';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -9,7 +9,6 @@ import MessageInput from '@/components/today-words/MessageInput';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { getFeedDetail, type FeedDetailData } from '@/api/feeds/getFeedDetail';
-import { getComments, type CommentData } from '@/api/comments/getComments';
 import { deleteFeedPost } from '@/api/feeds/deleteFeedPost';
 import { Wrapper } from './FeedDetailPage.styled';
 import { useReplyStore } from '@/stores/replyStore';
@@ -18,7 +17,7 @@ const FeedDetailPage = () => {
   const navigate = useNavigate();
   const { feedId } = useParams<{ feedId: string }>();
   const [feedData, setFeedData] = useState<FeedDetailData | null>(null);
-  const [commentList, setCommentList] = useState<CommentData[]>([]);
+  const [replyReloadKey, setReplyReloadKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,27 +25,6 @@ const FeedDetailPage = () => {
   const { isReplying, replyContent, setReplyContent, submitComment, cancelReply } =
     useReplyActions();
   const { nickname } = useReplyStore();
-  const reloadComments = useCallback(async () => {
-    if (!feedId) return;
-
-    try {
-      const commentsResponse = await getComments(Number(feedId), { postType: 'FEED' });
-      setCommentList(commentsResponse.data.commentList);
-
-      if (feedData) {
-        setFeedData(prev =>
-          prev
-            ? {
-                ...prev,
-                commentCount: commentsResponse.data.commentList.length,
-              }
-            : null,
-        );
-      }
-    } catch (err) {
-      console.error('댓글 목록 다시 로드 실패:', err);
-    }
-  }, [feedId, feedData]);
 
   useEffect(() => {
     return () => {
@@ -55,7 +33,7 @@ const FeedDetailPage = () => {
   }, [cancelReply]);
 
   useEffect(() => {
-    const loadFeedDetailAndComments = async () => {
+    const loadFeedDetail = async () => {
       if (!feedId) {
         setError('피드 ID가 없습니다.');
         setLoading(false);
@@ -65,30 +43,26 @@ const FeedDetailPage = () => {
       try {
         setLoading(true);
 
-        const [feedResponse, commentsResponse] = await Promise.all([
-          getFeedDetail(Number(feedId)),
-          getComments(Number(feedId), { postType: 'FEED' }),
-        ]);
+        const feedResponse = await getFeedDetail(Number(feedId));
 
         setFeedData(feedResponse.data);
-        setCommentList(commentsResponse.data.commentList);
         setError(null);
       } catch (err) {
-        console.error('피드 상세 정보 또는 댓글 로드 실패:', err);
+        console.error('피드 상세 정보 로드 실패:', err);
         setError('피드 정보를 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
       }
     };
 
-    loadFeedDetailAndComments();
+    loadFeedDetail();
   }, [feedId]);
 
   const handleCommentSubmit = async () => {
     await submitComment({
       postId: Number(feedId),
       postType: 'FEED',
-      onSuccess: reloadComments,
+      onSuccess: () => setReplyReloadKey(prev => prev + 1),
     });
   };
 
@@ -190,7 +164,7 @@ const FeedDetailPage = () => {
         onRightClick={handleMoreClick}
       />
       <FeedDetailPost {...feedData} />
-      <ReplyList commentList={commentList} onReload={reloadComments} />
+      <ReplyList postId={Number(feedId)} postType="FEED" reloadKey={`${replyReloadKey}`} />
       <MessageInput
         placeholder="여러분의 생각을 남겨주세요."
         value={replyContent}
