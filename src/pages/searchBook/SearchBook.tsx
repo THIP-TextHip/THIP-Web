@@ -259,7 +259,7 @@ const SearchBook = () => {
 
   return (
     <Wrapper>
-      <TopBackground bookImgUrl={bookDetail?.imageUrl || ''} />
+      {bookDetail && <TopBackground bookImgUrl={bookDetail.imageUrl} />}
       <Header>
         <IconButton src={leftArrow} onClick={handleBackButton} />
       </Header>
