@@ -317,7 +317,7 @@ const Memory = () => {
       <ScrollableContent>
         {loading ? (
           <Content>
-            <FixedSection style={{ pointerEvents: 'none' }}>
+            <FixedSection inert>
               <RecordTabs activeTab={activeTab} onTabChange={handleTabChange} />
               {activeTab === 'group' && (
                 <RecordFilters
