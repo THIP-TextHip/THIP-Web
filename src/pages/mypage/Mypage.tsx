@@ -105,7 +105,7 @@ const Mypage = () => {
     <Wrapper>
       <Header>내 정보</Header>
       <Container>
-        {loading || !profile ? (
+        {loading ? (
           <ProfileSkeletonContainer>
             <ProfileSkeletonLeft>
               <Skeleton.Circle width={54} />
@@ -116,7 +116,7 @@ const Mypage = () => {
             </ProfileSkeletonLeft>
             <Skeleton.Box width={52} height={34} borderRadius={20} />
           </ProfileSkeletonContainer>
-        ) : (
+        ) : !profile ? null : (
           <UserProfile>
             <div className="userInfo">
               <img src={profile.profileImageUrl} alt={`${profile.nickname} 프로필`} />
