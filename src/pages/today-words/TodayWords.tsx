@@ -7,6 +7,7 @@ import type { MessageListRef } from '../../components/today-words/MessageList/Me
 import MessageInput from '../../components/today-words/MessageInput';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import leftarrow from '../../assets/common/leftArrow.svg';
+import { MessageListSkeleton } from '@/shared/ui/Skeleton';
 import { Container, ContentArea } from './TodayWords.styled';
 import type { Message, TodayCommentItem } from '../../types/today';
 import { createDailyGreeting } from '../../api/rooms/createDailyGreeting';
@@ -90,10 +91,14 @@ const TodayWords = () => {
           setIsLoadingMore(true);
         }
 
-        const response = await getDailyGreeting({
-          roomId: parseInt(roomId),
-          cursor: cursor || undefined,
-        });
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [response] = await Promise.all([
+          getDailyGreeting({
+            roomId: parseInt(roomId),
+            cursor: cursor || undefined,
+          }),
+          isRefresh ? minLoadingTime : Promise.resolve(),
+        ]);
 
         if (response.isSuccess) {
           const newMessages = response.data.todayCommentList.map(convertToMessage);
@@ -315,16 +320,7 @@ const TodayWords = () => {
       <Container>
         <ContentArea>
           {isLoading && !hasInitiallyLoaded ? (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '200px',
-              }}
-            >
-              <LoadingSpinner />
-            </div>
+            <MessageListSkeleton />
           ) : messages.length === 0 ? (
             <EmptyState />
           ) : (

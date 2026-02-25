@@ -111,3 +111,22 @@ export const SaveIcon = styled.div`
   height: 24px;
   cursor: pointer;
 `;
+
+export const SkeletonWrapper = styled.div`
+  width: 100%;
+`;
+
+export const BookSkeletonItem = styled.div`
+  width: 94.8%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid ${colors.darkgrey.dark};
+  padding: 12px;
+`;
+
+export const BookSkeletonLeft = styled.div`
+  display: flex;
+  gap: 12px;
+`;

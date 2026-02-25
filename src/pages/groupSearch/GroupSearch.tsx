@@ -10,7 +10,9 @@ import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRe
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
 import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AllRoomsButton, LoadingMessage } from './GroupSearch.styled';
+import { AllRoomsButton } from './GroupSearch.styled';
+import { GroupCardSkeleton, RecentSearchTabsSkeleton } from '@/shared/ui/Skeleton';
+import { Content } from '@/components/search/GroupSearchResult.styled';
 
 type SortKey = 'deadline' | 'memberCount';
 type SearchStatus = 'idle' | 'searching' | 'searched';
@@ -38,7 +40,7 @@ const GroupSearch = () => {
   const [category, setCategory] = useState<string>('');
 
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
-  const [isRecentLoading, setIsRecentLoading] = useState(false);
+  const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const [showTabs, setShowTabs] = useState(false);
@@ -46,17 +48,8 @@ const GroupSearch = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    (async () => {
-      setIsRecentLoading(true);
-      try {
-        const response = await getRecentSearch('ROOM');
-        setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
-      } catch {
-        setRecentSearches([]);
-      } finally {
-        setIsRecentLoading(false);
-      }
-    })();
+    fetchRecentSearches();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -66,14 +59,15 @@ const GroupSearch = () => {
   }, [searchStatus]);
 
   const fetchRecentSearches = async () => {
-    setIsRecentLoading(true);
     try {
-      const response = await getRecentSearch('ROOM');
+      setIsLoadingRecentSearches(true);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([getRecentSearch('ROOM'), minLoadingTime]);
       setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
     } catch {
       setRecentSearches([]);
     } finally {
-      setIsRecentLoading(false);
+      setIsLoadingRecentSearches(false);
     }
   };
 
@@ -96,14 +90,18 @@ const GroupSearch = () => {
 
       try {
         const isFinalized = status === 'searched';
-        const res = await getSearchRooms(
-          term.trim(),
-          sortKey,
-          undefined,
-          isFinalized,
-          categoryParam,
-          isAllCategory,
-        );
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [res] = await Promise.all([
+          getSearchRooms(
+            term.trim(),
+            sortKey,
+            undefined,
+            isFinalized,
+            categoryParam,
+            isAllCategory,
+          ),
+        ]);
+        await minLoadingTime;
         if (res.isSuccess) {
           const { roomList, nextCursor: nc, isLast: last } = res.data;
 
@@ -348,9 +346,12 @@ const GroupSearch = () => {
 
         {searchStatus !== 'idle' ? (
           <>
-            {(isLoading && rooms.length === 0) ||
-            (searchStatus === 'searching' && rooms.length === 0) ? (
-              <LoadingMessage>검색 중...</LoadingMessage>
+            {isLoading && rooms.length === 0 ? (
+              <Content>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <GroupCardSkeleton key={i} type="search" />
+                ))}
+              </Content>
             ) : (
               <GroupSearchResult
                 type={searchStatus}
@@ -371,19 +372,26 @@ const GroupSearch = () => {
           </>
         ) : (
           <>
-            <RecentSearchTabs
-              recentSearches={recentSearches.map(i => i.searchTerm)}
-              handleDelete={async (term: string) => {
-                const x = recentSearches.find(i => i.searchTerm === term);
-                if (!x) return;
-                const res = await deleteRecentSearch(x.recentSearchId);
-                if (res.isSuccess) {
-                  await fetchRecentSearches();
-                }
-              }}
-              handleRecentSearchClick={handleRecentSearchClick}
-              isLoading={isRecentLoading}
-            />
+            {isLoadingRecentSearches ? (
+              <RecentSearchTabsSkeleton />
+            ) : (
+              <RecentSearchTabs
+                recentSearches={recentSearches.map(i => i.searchTerm)}
+                handleDelete={async (term: string) => {
+                  try {
+                    const x = recentSearches.find(i => i.searchTerm === term);
+                    if (!x) return;
+                    const res = await deleteRecentSearch(x.recentSearchId);
+                    if (res.isSuccess) {
+                      await fetchRecentSearches();
+                    }
+                  } catch (err) {
+                    console.error('최근 검색어 삭제 실패:', err);
+                  }
+                }}
+                handleRecentSearchClick={handleRecentSearchClick}
+              />
+            )}
             <AllRoomsButton onClick={handleAllRoomsClick}>
               <p>전체 모임방 둘러보기</p>
               <img src={rightChevron} alt="전체 모임방 버튼" />

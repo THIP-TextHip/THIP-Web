@@ -10,6 +10,7 @@ import { getSavedBooksInMy, type SavedBookInMy } from '@/api/books/getSavedBooks
 import { getSavedFeedsInMy, type SavedFeedInMy } from '@/api/feeds/getSavedFeedsInMy';
 import { postSaveBook } from '@/api/books/postSaveBook';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import Skeleton, { FeedPostSkeleton } from '@/shared/ui/Skeleton';
 import {
   Wrapper,
   FeedContainer,
@@ -22,6 +23,9 @@ import {
   Title,
   Subtitle,
   SaveIcon,
+  SkeletonWrapper,
+  BookSkeletonItem,
+  BookSkeletonLeft,
 } from './SavePage.styled';
 
 const tabs = ['피드', '책'];
@@ -121,10 +125,12 @@ const SavePage = () => {
       try {
         setInitialLoading(true);
 
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [feedsResponse, booksResponse] = await Promise.all([
           getSavedFeedsInMy(null),
           getSavedBooksInMy(),
         ]);
+        await minLoadingTime;
 
         setSavedFeeds(feedsResponse.data.feedList);
         setFeedNextCursor(feedsResponse.data.nextCursor);
@@ -205,7 +211,28 @@ const SavePage = () => {
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {initialLoading ? (
-        <LoadingSpinner fullHeight={true} size="large" />
+        activeTab === '피드' ? (
+          <SkeletonWrapper>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <FeedPostSkeleton key={index} />
+            ))}
+          </SkeletonWrapper>
+        ) : (
+          <SkeletonWrapper>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <BookSkeletonItem key={index}>
+                <BookSkeletonLeft>
+                  <Skeleton.Box width={80} height={107} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <Skeleton.Text width={120} height={16} />
+                    <Skeleton.Text width={100} height={12} />
+                  </div>
+                </BookSkeletonLeft>
+                <Skeleton.Box width={24} height={24} />
+              </BookSkeletonItem>
+            ))}
+          </SkeletonWrapper>
+        )
       ) : activeTab === '피드' ? (
         <>
           {savedFeeds.length > 0 ? (

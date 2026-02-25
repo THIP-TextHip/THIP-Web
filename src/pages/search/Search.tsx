@@ -10,7 +10,9 @@ import leftArrow from '../../assets/common/leftArrow.svg';
 import { getSearchBooks, convertToSearchedBooks } from '@/api/books/getSearchBooks';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
-import { Wrapper, Header, SearchBarContainer, Content, LoadingMessage } from './Search.styled';
+import { Wrapper, Header, SearchBarContainer, Content } from './Search.styled';
+import { BookItemSkeleton, RecentSearchTabsSkeleton } from '@/shared/ui/Skeleton';
+import { Wrapper as BookListWrapper, List } from '@/components/search/BookSearchResult.styled';
 
 export interface SearchedBook {
   id: number;
@@ -35,6 +37,7 @@ const Search = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
+  const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -42,7 +45,12 @@ const Search = () => {
 
   const fetchRecentSearches = async () => {
     try {
-      const response = await getRecentSearch('BOOK');
+      setIsLoadingRecentSearches(true);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([
+        getRecentSearch('BOOK'),
+      ]);
+      await minLoadingTime;
 
       if (response.isSuccess) {
         setRecentSearches(response.data.recentSearchList);
@@ -53,6 +61,8 @@ const Search = () => {
     } catch (error) {
       console.error('최근 검색어 조회 오류:', error);
       setRecentSearches([]);
+    } finally {
+      setIsLoadingRecentSearches(false);
     }
   };
 
@@ -156,7 +166,11 @@ const Search = () => {
     setHasMore(true);
 
     try {
-      const response = await getSearchBooks(term, 1, isManualSearch);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([
+        getSearchBooks(term, 1, isManualSearch),
+      ]);
+      await minLoadingTime;
 
       if (response.isSuccess) {
         const convertedResults = convertToSearchedBooks(response.data.searchResult);
@@ -280,7 +294,13 @@ const Search = () => {
         {isSearching ? (
           <>
             {isLoading && searchResults.length === 0 ? (
-              <LoadingMessage>검색 중...</LoadingMessage>
+              <BookListWrapper>
+                <List>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <BookItemSkeleton key={i} />
+                  ))}
+                </List>
+              </BookListWrapper>
             ) : (
               <BookSearchResult
                 type={isFinalized ? 'searched' : 'searching'}
@@ -294,11 +314,15 @@ const Search = () => {
           </>
         ) : (
           <>
-            <RecentSearchTabs
-              recentSearches={recentSearches.map(item => item.searchTerm)}
-              handleDelete={handleDeleteWrapper}
-              handleRecentSearchClick={handleRecentSearchClick}
-            />
+            {isLoadingRecentSearches ? (
+              <RecentSearchTabsSkeleton />
+            ) : (
+              <RecentSearchTabs
+                recentSearches={recentSearches.map(item => item.searchTerm)}
+                handleDelete={handleDeleteWrapper}
+                handleRecentSearchClick={handleRecentSearchClick}
+              />
+            )}
             <MostSearchedBooks />
           </>
         )}
