@@ -3,6 +3,7 @@ import NavBar from '../../components/common/NavBar';
 import TabBar from '../../components/feed/TabBar';
 import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
+import FollowList from '../../components/feed/FollowList';
 import MainHeader from '@/components/common/MainHeader';
 import { FeedPostSkeleton, OtherFeedSkeleton } from '@/shared/ui/Skeleton';
 import writefab from '../../assets/common/writefab.svg';
@@ -22,6 +23,7 @@ const Feed = () => {
   const location = useLocation();
   const initialTabFromState = (location.state as { initialTab?: string } | null)?.initialTab;
   const [activeTab, setActiveTab] = useState<string>(initialTabFromState ?? tabs[0]);
+  const [isFollowListLoading, setIsFollowListLoading] = useState(activeTab === '피드');
 
   const { waitForToken } = useSocialLoginToken();
 
@@ -77,8 +79,17 @@ const Feed = () => {
     window.scrollTo(0, 0);
   }, [activeTab]);
 
+  useEffect(() => {
+    if (activeTab === '피드') {
+      setIsFollowListLoading(true);
+    }
+  }, [activeTab]);
+
   const currentFeed = activeTab === '피드' ? totalFeed : myFeed;
-  const showInitialLoading = currentFeed.isLoading && currentFeed.items.length === 0;
+  const showFeedInitialLoading = totalFeed.isLoading && totalFeed.items.length === 0;
+  const showMyFeedInitialLoading = myFeed.isLoading && myFeed.items.length === 0;
+  const showInitialLoading =
+    activeTab === '피드' ? showFeedInitialLoading || isFollowListLoading : showMyFeedInitialLoading;
 
   return (
     <Container>
@@ -88,6 +99,7 @@ const Feed = () => {
         rightButtonClick={handleNoticeButton}
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
+      {activeTab === '피드' && <FollowList onLoadingChange={setIsFollowListLoading} />}
       {showInitialLoading ? (
         activeTab === '내 피드' ? (
           <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />

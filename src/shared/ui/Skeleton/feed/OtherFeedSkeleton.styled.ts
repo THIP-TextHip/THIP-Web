@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 export const SkeletonContainer = styled.div<{ paddingTop?: number }>`
-  padding-top: ${({ paddingTop }) => (paddingTop !== undefined ? `${paddingTop}px` : '56px')};
+  /* padding-top: ${({ paddingTop }) => (paddingTop !== undefined ? `${paddingTop}px` : '56px')}; */
   background-color: var(--color-black-main);
   min-height: 100vh;
 `;

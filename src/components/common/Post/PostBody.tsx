@@ -12,7 +12,8 @@ const PostBody = ({
   feedId,
   contentUrls = [],
 }: PostBodyProps) => {
-  const hasImage = contentUrls.length > 0;
+  const previewImages = contentUrls.slice(0, 3);
+  const hasImage = previewImages.length > 0;
   const contentRef = useRef<HTMLDivElement>(null);
   const [isTruncated, setIsTruncated] = useState(false);
 
@@ -43,8 +44,17 @@ const PostBody = ({
       <ImageContainer>
         {hasImage && (
           <>
-            {contentUrls.map((src: string, i: number) => (
-              <img key={i} src={src} />
+            {previewImages.map((src: string, i: number) => (
+              <img
+                key={`${feedId}-${i}`}
+                src={src}
+                alt={`피드 이미지 ${i + 1}`}
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
+                width={100}
+                height={100}
+              />
             ))}
           </>
         )}

@@ -14,10 +14,30 @@ export const Container = styled.div`
   .title {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    gap: 4px;
     color: var(--color-white);
     font-size: ${typography.fontSize['2xs']};
     font-weight: var(--font-weight-medium);
     line-height: 20px;
+
+    img {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+  }
+
+  .titleSkeletonIcon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .titleSkeletonText {
+    display: flex;
+    align-items: center;
+    height: 20px;
   }
 `;
 
@@ -26,6 +46,7 @@ export const FollowContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  min-height: 58px;
 
   img {
     cursor: pointer;
@@ -73,6 +94,37 @@ export const FollowContainer = styled.div`
         border: 0.5px solid #888;
       }
     }
+
+    .skeletonItem {
+      cursor: default;
+    }
+  }
+
+  .arrowSkeleton {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+`;
+
+export const FollowListLoading = styled.div`
+  display: flex;
+  align-items: center;
+  min-height: 58px;
+
+  .placeholderList {
+    display: flex;
+    gap: 12px;
+  }
+
+  .placeholderItem {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--color-darkgrey-dark);
   }
 `;
 

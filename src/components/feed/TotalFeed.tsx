@@ -1,4 +1,3 @@
-import FollowList from './FollowList';
 import FeedPost from './FeedPost';
 import type { FeedListProps } from '../../types/post';
 import { Container, EmptyState } from './TotalFeed.styled';
@@ -8,7 +7,6 @@ const TotalFeed = ({ showHeader, posts = [], isTotalFeed, isLast = false }: Feed
 
   return (
     <Container>
-      <FollowList />
       {hasPosts ? (
         posts.map((post, index) => (
           <FeedPost

@@ -4,9 +4,14 @@ import rightArrow from '../../assets/feed/rightArrow.svg';
 import people from '../../assets/feed/people.svg';
 import character from '../../assets/feed/character.svg';
 import { getRecentFollowing, type RecentWriterData } from '@/api/users/getRecentFollowing';
+import Skeleton from '@/shared/ui/Skeleton';
 import { Container, FollowContainer, EmptyFollowerContainer } from './FollowList.styled';
 
-const FollowList = () => {
+interface FollowListProps {
+  onLoadingChange?: (loading: boolean) => void;
+}
+
+const FollowList = ({ onLoadingChange }: FollowListProps) => {
   const navigate = useNavigate();
   const [myFollowings, setMyFollowings] = useState<RecentWriterData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +19,8 @@ const FollowList = () => {
   const fetchRecentFollowing = async () => {
     try {
       setLoading(true);
-      const response = await getRecentFollowing();
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([getRecentFollowing(), minLoadingTime]);
 
       if (response.isSuccess) {
         setMyFollowings(response.data.myFollowingUsers);
@@ -33,6 +39,10 @@ const FollowList = () => {
     fetchRecentFollowing();
   }, []);
 
+  useEffect(() => {
+    onLoadingChange?.(loading);
+  }, [loading, onLoadingChange]);
+
   const hasFollowers = myFollowings.length > 0;
   const visible = hasFollowers ? myFollowings.slice(0, 10) : [];
 
@@ -50,12 +60,37 @@ const FollowList = () => {
 
   return (
     <Container>
-      <div className="title">
-        <img src={people} />
-        <div>내 띱</div>
-      </div>
       {loading ? (
-        <></>
+        <div className="title">
+          <div className="titleSkeletonIcon">
+            <Skeleton.Box width={14} height={14} />
+          </div>
+          <div className="titleSkeletonText">
+            <Skeleton.Text width={24} height={12} />
+          </div>
+        </div>
+      ) : (
+        <div className="title">
+          <img src={people} alt="내 띱" />
+          <div>내 띱</div>
+        </div>
+      )}
+      {loading ? (
+        <FollowContainer>
+          <div className="followerList">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div className="followers skeletonItem" key={i}>
+                <Skeleton.Circle width={36} />
+                <div className="username skeletonUsername">
+                  <Skeleton.Text width={30} height={10} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="arrowSkeleton">
+            <Skeleton.Box width={16} height={16} />
+          </div>
+        </FollowContainer>
       ) : hasFollowers ? (
         <FollowContainer>
           <div className="followerList">
