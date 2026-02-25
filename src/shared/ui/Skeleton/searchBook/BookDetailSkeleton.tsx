@@ -29,12 +29,13 @@ const BookDetailSkeleton = () => {
 
       <ButtonSection>
         <RecruitingGroupButton
+          disabled
           style={{ cursor: 'default', pointerEvents: 'none', marginTop: '5px' }}
         >
           <Skeleton.Text width={120} height={14} />
         </RecruitingGroupButton>
         <RightArea>
-          <WritePostButton style={{ cursor: 'default', pointerEvents: 'none' }}>
+          <WritePostButton disabled style={{ cursor: 'default', pointerEvents: 'none' }}>
             <Skeleton.Text width={80} height={14} />
           </WritePostButton>
           <SaveButton disabled style={{ cursor: 'default', pointerEvents: 'none' }}>
