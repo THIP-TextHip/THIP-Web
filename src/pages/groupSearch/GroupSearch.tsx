@@ -378,11 +378,15 @@ const GroupSearch = () => {
               <RecentSearchTabs
                 recentSearches={recentSearches.map(i => i.searchTerm)}
                 handleDelete={async (term: string) => {
-                  const x = recentSearches.find(i => i.searchTerm === term);
-                  if (!x) return;
-                  const res = await deleteRecentSearch(x.recentSearchId);
-                  if (res.isSuccess) {
-                    await fetchRecentSearches();
+                  try {
+                    const x = recentSearches.find(i => i.searchTerm === term);
+                    if (!x) return;
+                    const res = await deleteRecentSearch(x.recentSearchId);
+                    if (res.isSuccess) {
+                      await fetchRecentSearches();
+                    }
+                  } catch (err) {
+                    console.error('최근 검색어 삭제 실패:', err);
                   }
                 }}
                 handleRecentSearchClick={handleRecentSearchClick}
