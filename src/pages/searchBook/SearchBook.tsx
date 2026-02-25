@@ -251,7 +251,7 @@ const SearchBook = () => {
           <IconButton src={leftArrow} onClick={handleBackButton} />
         </Header>
         <div style={{ padding: '100px 20px', textAlign: 'center', color: 'white' }}>
-          {error || '책 정보를 찾을 수 없습니다.'}
+          {error}
         </div>
       </Wrapper>
     );
