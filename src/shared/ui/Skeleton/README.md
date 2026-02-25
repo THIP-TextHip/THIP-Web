@@ -23,6 +23,7 @@ import Skeleton from '@/shared/ui/Skeleton';
 ## API
 
 ### Skeleton (기본)
+
 | Props | Type | Default | Description |
 |-------|------|---------|-------------|
 | width | string \| number | '100%' | 너비 (px 또는 문자열) |
@@ -31,15 +32,18 @@ import Skeleton from '@/shared/ui/Skeleton';
 | className | string | - | 추가 스타일을 위한 클래스명 |
 
 ### Skeleton.Box
+
 기본 Skeleton과 동일한 props 사용
 
 ### Skeleton.Circle
+
 | Props | Type | Default | Description |
 |-------|------|---------|-------------|
 | width | string \| number | 40 | 원의 크기 (width, height 동일) |
 | className | string | - | 추가 스타일을 위한 클래스명 |
 
 ### Skeleton.Text
+
 | Props | Type | Default | Description |
 |-------|------|---------|-------------|
 | lines | number | 1 | 텍스트 라인 개수 |
