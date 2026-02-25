@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import like from '../../../assets/feed/like.svg';
 import activeLike from '../../../assets/feed/activeLike.svg';
 import comment from '../../../assets/feed/comment.svg';
@@ -8,6 +7,7 @@ import activeSave from '../../../assets/feed/activeSave.svg';
 import lockIcon from '../../../assets/feed/lockIcon.svg';
 import { postSaveFeed } from '@/api/feeds/postSave';
 import { postFeedLike } from '@/api/feeds/postFeedLike';
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 import { Container } from './PostFooter.styled';
 
 interface PostFooterProps {
@@ -38,39 +38,71 @@ const PostFooter = ({
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
   const [saved, setSaved] = useState(isSaved);
 
-  const handleLike = async () => {
-    try {
-      const response = await postFeedLike(feedId, !liked);
+  const likedRef = useRef(isLiked);
+  const savedRef = useRef(isSaved);
+  const { isLoading: isLikeLoading, run: runLike } = usePreventDoubleClick();
+  const { isLoading: isSaveLoading, run: runSave } = usePreventDoubleClick();
 
-      if (response.isSuccess) {
-        setLiked(response.data.isLiked);
-        setLikeCount(prev => (response.data.isLiked ? prev + 1 : prev - 1));
-        console.log('좋아요 상태 변경 성공:', response.data.isLiked);
-      } else {
-        console.error('좋아요 상태 변경 실패:', response.message);
+  useEffect(() => {
+    setLiked(isLiked);
+    likedRef.current = isLiked;
+  }, [isLiked]);
+
+  useEffect(() => {
+    setSaved(isSaved);
+    savedRef.current = isSaved;
+  }, [isSaved]);
+
+  const handleLike = () => {
+    runLike(async () => {
+      const nextLiked = !likedRef.current;
+      likedRef.current = nextLiked;
+      setLiked(nextLiked);
+      setLikeCount(prev => (nextLiked ? prev + 1 : prev - 1));
+
+      try {
+        const response = await postFeedLike(feedId, nextLiked);
+        if (!response.isSuccess && likedRef.current === nextLiked) {
+          const rollbackState = !nextLiked;
+          likedRef.current = rollbackState;
+          setLiked(rollbackState);
+          setLikeCount(prev => (nextLiked ? prev - 1 : prev + 1));
+        }
+      } catch {
+        if (likedRef.current === nextLiked) {
+          const rollbackState = !nextLiked;
+          likedRef.current = rollbackState;
+          setLiked(rollbackState);
+          setLikeCount(prev => (nextLiked ? prev - 1 : prev + 1));
+        }
       }
-    } catch (error) {
-      console.error('좋아요 API 호출 실패:', error);
-    }
+    });
   };
 
-  const handleSave = async () => {
-    try {
-      const response = await postSaveFeed(feedId, !saved);
+  const handleSave = () => {
+    runSave(async () => {
+      const nextSaved = !savedRef.current;
+      savedRef.current = nextSaved;
+      setSaved(nextSaved);
+      onSaveToggle?.(feedId, nextSaved);
 
-      if (response.isSuccess) {
-        const newSaveState = response.data?.isSaved ?? !saved;
-        setSaved(newSaveState);
-        console.log('저장 상태 변경 성공:', newSaveState);
-        if (onSaveToggle) {
-          onSaveToggle(feedId, newSaveState);
+      try {
+        const response = await postSaveFeed(feedId, nextSaved);
+        if (!response.isSuccess && savedRef.current === nextSaved) {
+          const rollbackState = !nextSaved;
+          savedRef.current = rollbackState;
+          setSaved(rollbackState);
+          onSaveToggle?.(feedId, rollbackState);
         }
-      } else {
-        console.error('저장 상태 변경 실패:', response.message);
+      } catch {
+        if (savedRef.current === nextSaved) {
+          const rollbackState = !nextSaved;
+          savedRef.current = rollbackState;
+          setSaved(rollbackState);
+          onSaveToggle?.(feedId, rollbackState);
+        }
       }
-    } catch (error) {
-      console.error('저장 API 호출 실패:', error);
-    }
+    });
   };
 
   const handleComment = () => {
@@ -82,7 +114,7 @@ const PostFooter = ({
     <Container isDetail={isDetail}>
       <div className="left">
         <div className="count">
-          <img src={liked ? activeLike : like} onClick={handleLike} />
+          <img src={liked ? activeLike : like} onClick={handleLike} style={{ opacity: isLikeLoading ? 0.6 : 1 }} />
           <div>{likeCount}</div>
         </div>
         <div className="count comment">
@@ -98,7 +130,12 @@ const PostFooter = ({
             <img src={lockIcon} alt="비공개" />
           )
         ) : (
-          <img src={saved ? activeSave : save} onClick={handleSave} alt="저장" />
+          <img
+            src={saved ? activeSave : save}
+            onClick={handleSave}
+            alt="저장"
+            style={{ opacity: isSaveLoading ? 0.6 : 1 }}
+          />
         )}
       </div>
     </Container>

@@ -25,3 +25,12 @@ export const SearchBarContainer = styled.div`
 export const Content = styled.div`
   margin-top: 132px;
 `;
+
+export const LoadingMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  color: ${colors.white};
+  font-size: 16px;
+`;
