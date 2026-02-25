@@ -6,7 +6,7 @@ import {
 
 const GroupBookSectionSkeleton = () => {
   return (
-    <StyledGroupBookSection style={{ cursor: 'default' }}>
+    <StyledGroupBookSection style={{ cursor: 'default', pointerEvents: 'none' }}>
       <Skeleton.Text width={150} height={16} />
       <RightSection>
         <Skeleton.Text width={80} height={12} />
