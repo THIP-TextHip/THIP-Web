@@ -67,6 +67,10 @@ Skeleton.Text = ({
   lastLineWidth = '70%',
   className,
 }: SkeletonTextProps) => {
+  if (lines <= 0) {
+    return null;
+  }
+
   if (lines === 1) {
     return <SkeletonTextLine width={width} height={height} className={className} />;
   }
