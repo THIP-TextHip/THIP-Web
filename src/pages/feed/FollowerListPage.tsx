@@ -19,52 +19,23 @@ const FollowerListPage = () => {
 
   const [totalCount, setTotalCount] = useState(0);
 
-  const handleBackClick = () => {
-    navigate(-1);
-  };
+  const userList = useInifinieScroll<FollowData>({
+    enabled: !!type,
+    reloadKey: `${type}-${userId ?? ''}`,
+    fetchPage: async cursor => {
+      const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
 
-  const loadUserList = useCallback(
-    async (cursor?: string) => {
-      if (loading) return;
-
-      try {
-        setLoading(true);
-        setError(null);
-        let response;
-
-        const minLoadingTime = !cursor ? new Promise(resolve => setTimeout(resolve, 500)) : null;
-
-        if (type === 'followerlist') {
-          if (!userId) {
-            setError('사용자 ID가 없습니다.');
-            return;
-          }
-          const [data] = await Promise.all([
-            getFollowerList(userId, { size: 10, cursor: cursor || null }),
-          ]);
-          response = data;
-        } else {
-          const [data] = await Promise.all([
-            getFollowingList({ size: 10, cursor: cursor || null }),
-          ]);
-          response = data;
-        }
-        await minLoadingTime;
-
-        let userData: FollowData[] = [];
-        if (type === 'followerlist') {
-          userData = (response.data as { followers: FollowData[] })?.followers || [];
-        } else {
-          userData = (response.data as { followings: FollowData[] })?.followings || [];
+      if (type === 'followerlist') {
+        if (!userId) {
+          throw new Error('사용자 ID가 없습니다.');
         }
 
-        if (!response || !response.data) {
-          setError('API 응답이 없습니다.');
-          return;
-        }
         const response = await getFollowerList(userId, { size: 10, cursor });
+        if (minLoadingTime) await minLoadingTime;
+
         const total = response.data.totalFollowerCount;
         if (typeof total === 'number') setTotalCount(total);
+
         return {
           items: response.data.followers || [],
           nextCursor: response.data.nextCursor || null,
@@ -73,8 +44,11 @@ const FollowerListPage = () => {
       }
 
       const response = await getFollowingList({ size: 10, cursor });
+      if (minLoadingTime) await minLoadingTime;
+
       const total = response.data.totalFollowingCount;
       if (typeof total === 'number') setTotalCount(total);
+
       return {
         items: response.data.followings || [],
         nextCursor: response.data.nextCursor || null,
@@ -89,11 +63,18 @@ const FollowerListPage = () => {
     window.scrollTo(0, 0);
   }, [type, userId]);
 
+  const showInitialSkeleton = userList.isLoading && userList.items.length === 0;
+
   return (
     <Wrapper>
-      <TitleHeader leftIcon={<img src={leftArrow} alt="뒤로가기" />} onLeftClick={handleBackClick} title={title} />
+      <TitleHeader
+        leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+        onLeftClick={() => navigate(-1)}
+        title={title}
+      />
       <TotalBar>전체 {totalCount}</TotalBar>
-      {loading && userList.length === 0 ? (
+
+      {showInitialSkeleton ? (
         <UserProfileList>
           {Array.from({ length: 5 }).map((_, i) => (
             <UserProfileItemSkeleton key={i} type={type as UserProfileType} />
@@ -116,6 +97,7 @@ const FollowerListPage = () => {
               isMyself={user.isMyself}
             />
           ))}
+
           {!userList.isLast && <div ref={userList.sentinelRef} style={{ height: 20 }} />}
           {userList.isLoadingMore && (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>

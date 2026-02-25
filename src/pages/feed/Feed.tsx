@@ -11,6 +11,7 @@ import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
 import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
 import { useInifinieScroll } from '@/hooks/useInifinieScroll';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { Container, SkeletonWrapper } from './Feed.styled';
 import type { PostData } from '@/types/post';
 
@@ -77,29 +78,7 @@ const Feed = () => {
   }, [activeTab]);
 
   const currentFeed = activeTab === '피드' ? totalFeed : myFeed;
-
-  useEffect(() => {
-    const loadFeedsWithToken = async () => {
-      await waitForToken();
-
-      setTabLoading(true);
-
-      try {
-        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
-
-        if (activeTab === '피드') {
-          await Promise.all([loadTotalFeeds(), minLoadingTime]);
-        } else if (activeTab === '내 피드') {
-          await Promise.all([loadMyFeeds(), minLoadingTime]);
-        }
-      } finally {
-        setTabLoading(false);
-        setInitialLoading(false);
-      }
-    };
-
-    loadFeedsWithToken();
-  }, [activeTab, waitForToken, loadTotalFeeds, loadMyFeeds]);
+  const showInitialLoading = currentFeed.isLoading && currentFeed.items.length === 0;
 
   return (
     <Container>
@@ -109,7 +88,7 @@ const Feed = () => {
         rightButtonClick={handleNoticeButton}
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-      {initialLoading || tabLoading ? (
+      {showInitialLoading ? (
         activeTab === '내 피드' ? (
           <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />
         ) : (
@@ -126,7 +105,7 @@ const Feed = () => {
               <TotalFeed
                 showHeader={true}
                 posts={totalFeed.items}
-                isMyFeed={false}
+                isTotalFeed={true}
                 isLast={totalFeed.isLast}
               />
             </>

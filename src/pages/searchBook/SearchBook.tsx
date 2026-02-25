@@ -21,6 +21,7 @@ import {
   EmptyTitle,
   EmptySubText,
   FeedPostContainer,
+  LoadingBox,
 } from './SearchBook.styled';
 import { useNavigate, useParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -103,64 +104,23 @@ const SearchBook = () => {
     fetchBookDetail();
   }, [isbn]);
 
-  const loadFirstFeeds = useCallback(async () => {
-    if (!isbn) return;
-    try {
-      setIsLoadingFeeds(true);
-      setFeeds([]);
-      setNextCursor(null);
-      setIsLast(true);
-
-      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
-      const [res] = await Promise.all([
-        getFeedsByIsbn(isbn, toFeedSort(selectedFilter), null),
-      ]);
-      await minLoadingTime;
-      if (res.isSuccess) {
-        setFeeds(res.data.feeds);
-        setNextCursor(res.data.nextCursor);
-        setIsLast(res.data.isLast);
+  const feeds = useInifinieScroll<FeedItem>({
+    enabled: !!isbn,
+    reloadKey: `${isbn ?? ''}-${selectedFilter}`,
+    fetchPage: async cursor => {
+      if (!isbn) {
+        return { items: [], nextCursor: null, isLast: true };
       }
-    } catch {
-      // no-op
-    } finally {
-      setIsLoadingFeeds(false);
-    }
-  }, [isbn, selectedFilter]);
 
-  useEffect(() => {
-    loadFirstFeeds();
-  }, [loadFirstFeeds]);
+      const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
+      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), cursor);
+      if (minLoadingTime) await minLoadingTime;
 
-  const loadMore = useCallback(async () => {
-    if (!isbn || !nextCursor || isLast || isLoadingMore) return;
-    try {
-      setIsLoadingMore(true);
-      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), nextCursor);
-      if (res.isSuccess) {
-        setFeeds(prev => [...prev, ...res.data.feeds]);
-        setNextCursor(res.data.nextCursor);
-        setIsLast(res.data.isLast);
-      }
-    } catch {
-      // no-op
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [isbn, nextCursor, isLast, isLoadingMore, selectedFilter]);
-
-  const lastFeedElementCallback = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isLoadingMore || isLast) return;
-
-      if (observerRef.current) observerRef.current.disconnect();
-
-      observerRef.current = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && !isLoadingMore && !isLast) {
-          loadMore();
-        }
-      });
-      if (node) observerRef.current.observe(node);
+      return {
+        items: res.data.feeds,
+        nextCursor: res.data.nextCursor || null,
+        isLast: res.data.isLast,
+      };
     },
     rootMargin: '100px 0px',
     threshold: 0.1,
@@ -302,13 +262,13 @@ const SearchBook = () => {
             setSelectedFilter={filter => setSelectedFilter(filter as (typeof FILTER)[number])}
           />
         </FilterContainer>
-        {isLoadingFeeds && feeds.length === 0 ? (
+        {feeds.isLoading && feeds.items.length === 0 ? (
           <FeedPostContainer>
             {Array.from({ length: 3 }).map((_, i) => (
               <FeedPostSkeleton key={i} />
             ))}
           </FeedPostContainer>
-        ) : feeds.length > 0 ? (
+        ) : feeds.items.length > 0 ? (
           <FeedPostContainer>
             {feeds.items.map(post => (
               <div key={post.feedId}>

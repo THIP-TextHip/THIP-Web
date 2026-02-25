@@ -6,12 +6,11 @@ import rightChevron from '../../assets/common/right-Chevron.svg';
 import { useState, useEffect, useCallback } from 'react';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import GroupSearchResult from '@/components/search/GroupSearchResult';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
 import { getSearchRooms } from '@/api/rooms/getSearchRooms';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AllRoomsButton, LoadingMessage } from './GroupSearch.styled';
+import { AllRoomsButton } from './GroupSearch.styled';
 import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 import { GroupCardSkeleton, RecentSearchTabsSkeleton } from '@/shared/ui/Skeleton';
 import { Content } from '@/components/search/GroupSearchResult.styled';
@@ -25,7 +24,6 @@ const GroupSearch = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchStatus, setSearchStatus] = useState<SearchStatus>('idle');
-
   const [selectedFilter, setSelectedFilter] = useState<string>('마감임박순');
   const toSortKey = useCallback(
     (f: string): SortKey => (f === '인기순' ? 'memberCount' : 'deadline'),
@@ -33,12 +31,9 @@ const GroupSearch = () => {
   );
   const [category, setCategory] = useState<string>('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
-
   const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
-
   const [showTabs, setShowTabs] = useState(false);
 
   useEffect(() => {
@@ -52,7 +47,7 @@ const GroupSearch = () => {
     }
   }, [searchStatus]);
 
-  const fetchRecentSearches = async () => {
+  const fetchRecentSearches = useCallback(async () => {
     try {
       setIsLoadingRecentSearches(true);
       const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
@@ -63,62 +58,14 @@ const GroupSearch = () => {
     } finally {
       setIsLoadingRecentSearches(false);
     }
-  };
-
-  const searchFirstPage = useCallback(
-    async (
-      term: string,
-      sortKey: SortKey,
-      status: 'searching' | 'searched',
-      categoryParam: string,
-      isAllCategory: boolean = false,
-      keepPrevious: boolean = false,
-    ) => {
-      setIsLoading(true);
-      setError(null);
-      if (!keepPrevious) {
-        setRooms([]);
-        setNextCursor(null);
-        setIsLast(true);
-      }
-
-      try {
-        const isFinalized = status === 'searched';
-        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
-        const [res] = await Promise.all([
-          getSearchRooms(
-            term.trim(),
-            sortKey,
-            undefined,
-            isFinalized,
-            categoryParam,
-            isAllCategory,
-          ),
-        ]);
-        await minLoadingTime;
-        if (res.isSuccess) {
-          const { roomList, nextCursor: nc, isLast: last } = res.data;
-
-          setRooms(roomList);
-          setNextCursor(nc);
-          setIsLast(last);
-        } else {
-          setError(res.message || '검색 실패');
-        }
-      } catch {
-        setError('네트워크 오류가 발생했습니다.');
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [],
-  );
+  }, []);
 
   useEffect(() => {
     if (location.state?.allRooms) {
       navigate(location.pathname, { replace: true });
 
       setSearchTerm('');
+      setDebouncedSearchTerm('');
       setSearchStatus('searched');
       setShowTabs(true);
       setCategory('');
@@ -141,7 +88,7 @@ const GroupSearch = () => {
     setSearchStatus('searching');
     setShowTabs(false);
     const id = setTimeout(() => {
-      searchFirstPage(trimmed, toSortKey(selectedFilter), 'searching', category, false, true);
+      setDebouncedSearchTerm(trimmed);
     }, 300);
     setSearchTimeoutId(id);
   };
@@ -180,80 +127,34 @@ const GroupSearch = () => {
     setCategory('');
   };
 
-  const searchStatusRef = useRef(searchStatus);
-  const categoryRef = useRef(category);
-  const selectedFilterRef = useRef(selectedFilter);
-  const searchTermRef = useRef(searchTerm);
-
-  useEffect(() => {
-    searchStatusRef.current = searchStatus;
-    categoryRef.current = category;
-    selectedFilterRef.current = selectedFilter;
-    searchTermRef.current = searchTerm;
-  });
-
-  useEffect(() => {
-    if (searchStatus !== 'searched') return;
-
-    const term = searchTermRef.current.trim();
-    const currentCategory = categoryRef.current;
-    const isAllCategory = !term && currentCategory === '';
-
-    searchFirstPage(
-      term,
-      toSortKey(selectedFilterRef.current),
-      'searched',
-      currentCategory,
-      isAllCategory,
-      true,
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchStatus, searchTerm]);
-
-  useEffect(() => {
-    if (searchStatusRef.current !== 'searched') return;
-
-    const term = searchTermRef.current.trim();
-    const isAllCategory = !term && category === '';
-
-    searchFirstPage(term, toSortKey(selectedFilter), 'searched', category, isAllCategory, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFilter, category]);
-
   useEffect(() => {
     if (searchStatus === 'searched') {
       setDebouncedSearchTerm(searchTerm.trim());
     }
   }, [searchStatus, searchTerm]);
 
-    const id = setTimeout(() => {
-      const currentCategory = categoryRef.current;
-      searchFirstPage(term, toSortKey(selectedFilter), 'searching', currentCategory, false, true);
-    }, 300);
-    setSearchTimeoutId(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, searchStatus, selectedFilter]);
+  const queryTerm = searchStatus === 'searched' ? searchTerm.trim() : debouncedSearchTerm.trim();
+  const isAllCategory = !queryTerm && category === '';
 
-  const loadMore = useCallback(async () => {
-    const trimmedTerm = searchTerm.trim();
-    const isAllCategory = !trimmedTerm && category === '';
-    if ((!isAllCategory && !trimmedTerm) || !nextCursor || isLast || isLoadingMore) return;
-    try {
-      setIsLoadingMore(true);
-      const isFinalized = searchStatus === 'searched';
-      const isAllCategory = !queryTerm && category === '';
+  const searchResult = useInifinieScroll({
+    enabled: searchStatus !== 'idle' && (searchStatus === 'searched' || !!queryTerm),
+    reloadKey: `${searchStatus}-${queryTerm}-${selectedFilter}-${category}`,
+    fetchPage: async cursor => {
       if (searchStatus === 'searching' && !queryTerm) {
         return { items: [], nextCursor: null, isLast: true };
       }
 
+      const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
       const res = await getSearchRooms(
         queryTerm,
         toSortKey(selectedFilter),
         cursor ?? undefined,
-        isFinalized,
+        searchStatus === 'searched',
         category,
         isAllCategory,
       );
+
+      if (minLoadingTime) await minLoadingTime;
 
       if (!res.isSuccess) {
         throw new Error(res.message || '검색 실패');
@@ -317,7 +218,7 @@ const GroupSearch = () => {
 
         {searchStatus !== 'idle' ? (
           <>
-            {isLoading && rooms.length === 0 ? (
+            {searchResult.isLoading && searchResult.items.length === 0 ? (
               <Content>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <GroupCardSkeleton key={i} type="search" />
