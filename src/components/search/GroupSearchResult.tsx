@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
+import type { RefObject } from 'react';
 import { GroupCard } from '../group/GroupCard';
 import { Filter } from '../common/Filter';
 import type { SearchRoomItem } from '@/api/rooms/getSearchRooms';
+import LoadingSpinner from '../common/LoadingSpinner';
 import {
   TabContainer,
   Tab,
@@ -26,7 +28,7 @@ interface Props {
   isLoading: boolean;
   isLoadingMore?: boolean;
   hasMore?: boolean;
-  lastRoomElementCallback?: (node: HTMLDivElement | null) => void;
+  sentinelRef?: RefObject<HTMLDivElement | null>;
   error: string | null;
   selectedFilter: string;
   setSelectedFilter: (v: string) => void;
@@ -53,7 +55,8 @@ const GroupSearchResult = ({
   rooms,
   isLoading,
   isLoadingMore = false,
-  lastRoomElementCallback,
+  hasMore = false,
+  sentinelRef,
   error,
   selectedFilter,
   setSelectedFilter,
@@ -117,12 +120,16 @@ const GroupSearchResult = ({
               isOngoing={false}
               isFirstCard={type === 'searching' && idx === 0}
               onClick={() => onClickRoom(Number(group.id))}
-              ref={idx === mapped.length - 1 ? lastRoomElementCallback : undefined}
             />
           ))
         )}
 
-        {isLoadingMore && mapped.length > 0 && <LoadingText>불러오는 중...</LoadingText>}
+        {hasMore && <div ref={sentinelRef} style={{ height: 20 }} />}
+        {isLoadingMore && mapped.length > 0 && (
+          <LoadingText>
+            <LoadingSpinner size="small" fullHeight={false} />
+          </LoadingText>
+        )}
       </Content>
     </>
   );

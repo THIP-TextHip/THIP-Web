@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { typography, colors } from '@/styles/global/global';
 
-export const Container = styled.div`
+export const Container = styled.div<{ disableBottomMargin?: boolean }>`
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -9,7 +9,7 @@ export const Container = styled.div`
   max-width: 540px; */
   padding: 40px 20px;
   margin: 0 auto;
-  margin-bottom: 56px;
+  margin-bottom: ${({ disableBottomMargin }) => (disableBottomMargin ? '0' : '56px')};
   gap: 24px;
   flex: 1;
 
@@ -20,7 +20,7 @@ export const Container = styled.div`
   }
 `;
 
-export const EmptyState = styled.div`
+export const EmptyState = styled.div<{ disableBottomMargin?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,7 +30,7 @@ export const EmptyState = styled.div`
   max-width: 540px;
   padding: 40px 20px;
   margin: 0 auto;
-  margin-bottom: 56px;
+  margin-bottom: ${({ disableBottomMargin }) => (disableBottomMargin ? '0' : '56px')};
   gap: 8px;
   flex: 1;
 

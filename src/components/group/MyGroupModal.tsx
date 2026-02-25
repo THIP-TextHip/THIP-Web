@@ -6,6 +6,8 @@ import { GroupCard } from './GroupCard';
 import { Modal, Overlay } from './Modal.styles';
 import { getMyRooms, type Room, type RoomType } from '@/api/rooms/getMyRooms';
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from '../common/LoadingSpinner';
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 import {
   TabContainer,
   Tab,
@@ -30,12 +32,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
   }, []);
   const navigate = useNavigate();
   const [selected, setSelected] = useState<'진행중' | '모집중' | '완료' | ''>('');
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [isLast, setIsLast] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   const convertRoomToGroup = (room: Room): Group => {
     return {
@@ -52,103 +49,33 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     };
   };
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        setNextCursor(null);
-        setIsLast(false);
+  const roomType: RoomType =
+    selected === '진행중'
+      ? 'playing'
+      : selected === '모집중'
+        ? 'recruiting'
+        : selected === '완료'
+          ? 'expired'
+          : 'playingAndRecruiting';
 
-        const roomType: RoomType =
-          selected === '진행중'
-            ? 'playing'
-            : selected === '모집중'
-              ? 'recruiting'
-              : selected === '완료'
-                ? 'expired'
-                : 'playingAndRecruiting';
-
-        const response = await getMyRooms(roomType, null);
-
-        if (response.isSuccess) {
-          setRooms(response.data.roomList);
-          setNextCursor(response.data.nextCursor);
-          setIsLast(response.data.isLast);
-        } else {
-          setError(response.message);
-        }
-      } catch (error) {
-        console.error('방 목록 조회 실패:', error);
-        setError('방 목록을 불러오는데 실패했습니다.');
-      } finally {
-        setIsLoading(false);
+  const roomList = useInifinieScroll<Room>({
+    enabled: true,
+    reloadKey: roomType,
+    rootRef: contentRef,
+    fetchPage: async cursor => {
+      const response = await getMyRooms(roomType, cursor);
+      if (!response.isSuccess) {
+        throw new Error(response.message || '방 목록을 불러오는데 실패했습니다.');
       }
-    };
-
-    fetchRooms();
-  }, [selected]);
-
-  const isFetchingRef = useRef(false);
-
-  const loadMore = async () => {
-    if (isFetchingRef.current || isLast || !nextCursor) return;
-
-    isFetchingRef.current = true;
-    setIsLoading(true);
-    try {
-      const roomType: RoomType =
-        selected === '진행중'
-          ? 'playing'
-          : selected === '모집중'
-            ? 'recruiting'
-            : selected === '완료'
-              ? 'expired'
-              : 'playingAndRecruiting';
-
-      const res = await getMyRooms(roomType, nextCursor);
-      if (res.isSuccess) {
-        setRooms(prev => [...prev, ...res.data.roomList]);
-        setNextCursor(res.data.nextCursor);
-        setIsLast(res.data.isLast);
-      } else {
-        setError(res.message);
-      }
-    } catch (e) {
-      console.log(e);
-      setError('방 목록을 불러오는데 실패했습니다.');
-    } finally {
-      setIsLoading(false);
-      isFetchingRef.current = false;
-    }
-  };
-
-  const handleScroll = async (e: React.UIEvent<HTMLDivElement>) => {
-    const el = e.currentTarget;
-    const { scrollTop, scrollHeight, clientHeight } = el;
-    if (scrollHeight - scrollTop - clientHeight < 100) {
-      await loadMore();
-    }
-  };
-
-  useEffect(() => {
-    const tryFill = async () => {
-      if (!contentRef.current || isLast) return;
-      let guard = 2;
-      while (
-        guard-- > 0 &&
-        contentRef.current &&
-        contentRef.current.scrollHeight <= contentRef.current.clientHeight &&
-        !isLast &&
-        nextCursor
-      ) {
-        await loadMore();
-        await new Promise(requestAnimationFrame);
-      }
-    };
-    tryFill();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rooms, nextCursor, isLast]);
+      return {
+        items: response.data.roomList,
+        nextCursor: response.data.nextCursor,
+        isLast: response.data.isLast,
+      };
+    },
+    rootMargin: '100px 0px',
+    threshold: 0.1,
+  });
 
   useEffect(() => {
     if (contentRef.current) {
@@ -156,7 +83,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     }
   }, [selected]);
 
-  const convertedGroups = rooms.map(convertRoomToGroup);
+  const convertedGroups = roomList.items.map(convertRoomToGroup);
 
   const handleGroupCardClick = (group: Group) => {
     if (selected === '완료') {
@@ -194,8 +121,8 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
           ))}
         </TabContainer>
 
-        <Content ref={contentRef} onScroll={handleScroll}>
-          {error && <ErrorMessage>{error}</ErrorMessage>}
+        <Content ref={contentRef}>
+          {roomList.error && <ErrorMessage>{roomList.error}</ErrorMessage>}
 
           {convertedGroups.map(group => (
             <GroupCard
@@ -208,9 +135,16 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
             />
           ))}
 
-          {isLoading && <BottomSpinner>불러오는 중…</BottomSpinner>}
+          {!roomList.isLast && (
+            <div ref={roomList.sentinelRef} style={{ gridColumn: '1 / -1', height: 20 }} />
+          )}
+          {roomList.isLoadingMore && (
+            <BottomSpinner>
+              <LoadingSpinner size="small" fullHeight={false} />
+            </BottomSpinner>
+          )}
 
-          {!isLoading && convertedGroups.length === 0 && (
+          {!roomList.isLoading && convertedGroups.length === 0 && !roomList.error && (
             <EmptyState>
               <EmptyTitle>
                 {selected === '진행중'

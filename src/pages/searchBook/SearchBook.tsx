@@ -29,7 +29,7 @@ import saveIcon from '../../assets/common/SaveIcon.svg';
 import filledSaveIcon from '../../assets/common/filledSaveIcon.svg';
 import rightChevron from '../../assets/common/right-Chevron.svg';
 import plusIcon from '../../assets/common/plus.svg';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IntroModal } from '@/components/search/IntroModal';
 import { getBookDetail, type BookDetail } from '@/api/books/getBookDetail';
 import { getRecruitingRooms, type RecruitingRoomsData } from '@/api/books/getRecruitingRooms';
@@ -40,6 +40,7 @@ import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFee
 import { usePopupStore } from '@/stores/popupStore';
 import { FeedPostSkeleton, BookDetailSkeleton } from '@/shared/ui/Skeleton';
 import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 
 const FILTER = ['최신순', '인기순'] as const;
 const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
@@ -60,13 +61,6 @@ const SearchBook = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [feeds, setFeeds] = useState<FeedItem[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [isLast, setIsLast] = useState(true);
-  const [isLoadingFeeds, setIsLoadingFeeds] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const openPopup = usePopupStore(state => state.openPopup);
 
   useEffect(() => {
@@ -168,8 +162,9 @@ const SearchBook = () => {
       });
       if (node) observerRef.current.observe(node);
     },
-    [isLoadingMore, isLast, loadMore],
-  );
+    rootMargin: '100px 0px',
+    threshold: 0.1,
+  });
 
   const handleBackButton = () => navigate(-1);
   const handleIntroClick = () => setShowIntroModal(true);
@@ -315,11 +310,8 @@ const SearchBook = () => {
           </FeedPostContainer>
         ) : feeds.length > 0 ? (
           <FeedPostContainer>
-            {feeds.map((post, idx) => (
-              <div
-                key={post.feedId}
-                ref={idx === feeds.length - 1 ? el => lastFeedElementCallback(el) : undefined}
-              >
+            {feeds.items.map(post => (
+              <div key={post.feedId}>
                 <FeedPost
                   showHeader={true}
                   isMyFeed={false}
@@ -340,6 +332,8 @@ const SearchBook = () => {
                 />
               </div>
             ))}
+            {!feeds.isLast && <div ref={feeds.sentinelRef} style={{ height: 20 }} />}
+            {feeds.isLoadingMore && <LoadingBox>불러오는 중...</LoadingBox>}
           </FeedPostContainer>
         ) : (
           <EmptyState>

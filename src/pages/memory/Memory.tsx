@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import type { SortType } from '../../components/memory/SortDropdown';
 import MemoryHeader from '../../components/memory/MemoryHeader/MemoryHeader';
@@ -6,7 +6,9 @@ import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
 import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddButton';
 import Snackbar from '../../components/common/Modal/Snackbar';
 import GlobalCommentBottomSheet from '../../components/common/CommentBottomSheet/GlobalCommentBottomSheet';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useCommentBottomSheetStore } from '@/stores/commentBottomSheetStore';
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
 import { getRoomPlaying } from '../../api/rooms/getRoomPlaying';
@@ -94,10 +96,18 @@ const Memory = () => {
 
   const [roomCompleted, setRoomCompleted] = useState(false);
 
-  const [myRecords, setMyRecords] = useState<Record[]>([]);
-  const [groupRecords, setGroupRecords] = useState<Record[]>([]);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [currentUserPage, setCurrentUserPage] = useState<number>(0);
+  const scrollRootRef = useRef<HTMLDivElement | null>(null);
+
+  const recordsList = useInifinieScroll<Record>({
+    enabled: !!roomId,
+    reloadKey: `${roomId}-${activeTab}-${selectedSort}-${activeFilter}-${selectedPageRange?.start ?? ''}-${selectedPageRange?.end ?? ''}`,
+    rootRef: scrollRootRef,
+    fetchPage: async cursor => {
+      if (!roomId) {
+        return { items: [], nextCursor: null, isLast: true };
+      }
 
   const loadMemoryPosts = useCallback(async () => {
     if (!roomId) {
@@ -108,8 +118,9 @@ const Memory = () => {
 
     try {
       const params: GetMemoryPostsParams = {
-        roomId: parseInt(roomId),
+        roomId: parseInt(roomId, 10),
         type: activeTab === 'group' ? 'group' : 'mine',
+        cursor,
       };
 
       if (activeTab === 'group') {
@@ -130,10 +141,8 @@ const Memory = () => {
       if (response.isSuccess) {
         const convertedRecords = response.data.postList.map(convertPostToRecord);
 
-        if (activeTab === 'group') {
-          setGroupRecords(convertedRecords);
-        } else {
-          setMyRecords(convertedRecords);
+        if (!response.isSuccess) {
+          throw new Error(response.message || '기록을 불러오는 중 오류가 발생했습니다.');
         }
 
         if (response.data.totalPages !== undefined) {
@@ -142,17 +151,21 @@ const Memory = () => {
         if (response.data.currentUserPage !== undefined) {
           setCurrentUserPage(response.data.currentUserPage);
         }
-      } else {
-        setError(response.message);
-      }
-    } catch (error) {
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response?: { data?: { code?: number } } };
-        if (axiosError.response?.data?.code === 40002) {
-          setError('독서 진행률이 80% 이상이어야 총평을 볼 수 있습니다.');
-          setActiveFilter(null);
-          return;
+
+        return {
+          items: response.data.postList.map(convertPostToRecord),
+          nextCursor: response.data.nextCursor,
+          isLast: response.data.isLast,
+        };
+      } catch (error) {
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as { response?: { data?: { code?: number } } };
+          if (axiosError.response?.data?.code === 40002) {
+            setActiveFilter(null);
+            throw new Error('독서 진행률이 80% 이상이어야 총평을 볼 수 있습니다.');
+          }
         }
+        throw new Error('기록을 불러오는 중 오류가 발생했습니다.');
       }
 
       setError('기록을 불러오는 중 오류가 발생했습니다.');
@@ -180,10 +193,6 @@ const Memory = () => {
   }, [roomId]);
 
   useEffect(() => {
-    loadMemoryPosts();
-  }, [loadMemoryPosts]);
-
-  useEffect(() => {
     type MemoryLocationState = {
       page?: number;
       focusPostId?: number;
@@ -208,20 +217,13 @@ const Memory = () => {
     if (location.state?.newRecord) {
       const newRecord = location.state.newRecord as Record;
       setShowUploadProgress(true);
-
-      if (activeTab === 'group') {
-        setGroupRecords(prev => [newRecord, ...prev]);
-      } else {
-        setMyRecords(prev => [newRecord, ...prev]);
-      }
+      setRecordItems(prev => [newRecord, ...prev]);
 
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, activeTab, navigate, location.pathname]);
+  }, [location.state, navigate, location.pathname, setRecordItems]);
 
-  const currentRecords = useMemo(() => {
-    return activeTab === 'group' ? groupRecords : myRecords;
-  }, [activeTab, groupRecords, myRecords]);
+  const currentRecords = useMemo(() => recordsList.items, [recordsList.items]);
 
   const sortedRecords = useMemo(() => {
     return currentRecords;
@@ -292,15 +294,15 @@ const Memory = () => {
 
   const readingProgress = totalPages > 0 ? Math.round((currentUserPage / totalPages) * 100) : 0;
 
-  if (error) {
+  if (recordsList.error) {
     return (
       <Container>
         <FixedHeader>
           <MemoryHeader onBackClick={handleBackClick} />
         </FixedHeader>
         <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>
-          오류가 발생했습니다: {error}
-          <button onClick={loadMemoryPosts} style={{ marginLeft: '10px' }}>
+          오류가 발생했습니다: {recordsList.error}
+          <button onClick={() => recordsList.reload()} style={{ marginLeft: '10px' }}>
             다시 시도
           </button>
         </div>
@@ -313,7 +315,6 @@ const Memory = () => {
       <FixedHeader>
         <MemoryHeader onBackClick={handleBackClick} />
       </FixedHeader>
-
       <ScrollableContent>
         {loading ? (
           <Content>
