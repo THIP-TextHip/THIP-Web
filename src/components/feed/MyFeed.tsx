@@ -5,6 +5,7 @@ import type { FeedListProps } from '../../types/post';
 import TotalBar from './TotalBar';
 import { getMyProfile } from '@/api/feeds/getMyProfile';
 import type { MyProfileData } from '@/types/profile';
+import { OtherFeedSkeleton } from '@/shared/ui/Skeleton';
 import { Container, EmptyState } from './MyFeed.styled';
 
 const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
@@ -29,8 +30,18 @@ const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
     loadProfile();
   }, []);
 
-  if (loading || !profileData) {
-    return <></>;
+  if (loading) {
+    return <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />;
+  }
+
+  if (!profileData) {
+    return (
+      <Container>
+        <EmptyState>
+          <div>프로필 정보를 불러오지 못했어요</div>
+        </EmptyState>
+      </Container>
+    );
   }
 
   return (

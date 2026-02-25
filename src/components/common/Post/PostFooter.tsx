@@ -59,8 +59,6 @@ const PostFooter = ({
       setLiked(nextLiked);
       setLikeCount(prev => (nextLiked ? prev + 1 : prev - 1));
 
-      await new Promise(resolve => setTimeout(resolve, 300));
-
       try {
         const response = await postFeedLike(feedId, nextLiked);
         if (!response.isSuccess && likedRef.current === nextLiked) {
@@ -86,8 +84,6 @@ const PostFooter = ({
       savedRef.current = nextSaved;
       setSaved(nextSaved);
       onSaveToggle?.(feedId, nextSaved);
-
-      await new Promise(resolve => setTimeout(resolve, 300));
 
       try {
         const response = await postSaveFeed(feedId, nextSaved);

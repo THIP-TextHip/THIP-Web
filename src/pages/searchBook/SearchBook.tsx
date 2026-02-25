@@ -21,7 +21,6 @@ import {
   EmptyTitle,
   EmptySubText,
   FeedPostContainer,
-  LoadingBox,
 } from './SearchBook.styled';
 import { useNavigate, useParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -39,7 +38,7 @@ import { Filter } from '@/components/common/Filter';
 import FeedPost from '@/components/feed/FeedPost';
 import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
 import { usePopupStore } from '@/stores/popupStore';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { FeedPostSkeleton, BookDetailSkeleton } from '@/shared/ui/Skeleton';
 import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 
@@ -76,10 +75,12 @@ const SearchBook = () => {
         setIsLoading(true);
         setError(null);
 
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [bookResponse, recruitingResponse] = await Promise.all([
           getBookDetail(isbn),
           getRecruitingRooms(isbn),
         ]);
+        await minLoadingTime;
 
         if (bookResponse.isSuccess) {
           setBookDetail(bookResponse.data);
@@ -102,16 +103,64 @@ const SearchBook = () => {
     fetchBookDetail();
   }, [isbn]);
 
-  const feeds = useInifinieScroll<FeedItem>({
-    enabled: !!isbn,
-    reloadKey: `${isbn ?? ''}-${selectedFilter}`,
-    fetchPage: async cursor => {
-      const res = await getFeedsByIsbn(isbn!, toFeedSort(selectedFilter), cursor);
-      return {
-        items: res.data.feeds,
-        nextCursor: res.data.nextCursor || null,
-        isLast: res.data.isLast,
-      };
+  const loadFirstFeeds = useCallback(async () => {
+    if (!isbn) return;
+    try {
+      setIsLoadingFeeds(true);
+      setFeeds([]);
+      setNextCursor(null);
+      setIsLast(true);
+
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [res] = await Promise.all([
+        getFeedsByIsbn(isbn, toFeedSort(selectedFilter), null),
+      ]);
+      await minLoadingTime;
+      if (res.isSuccess) {
+        setFeeds(res.data.feeds);
+        setNextCursor(res.data.nextCursor);
+        setIsLast(res.data.isLast);
+      }
+    } catch {
+      // no-op
+    } finally {
+      setIsLoadingFeeds(false);
+    }
+  }, [isbn, selectedFilter]);
+
+  useEffect(() => {
+    loadFirstFeeds();
+  }, [loadFirstFeeds]);
+
+  const loadMore = useCallback(async () => {
+    if (!isbn || !nextCursor || isLast || isLoadingMore) return;
+    try {
+      setIsLoadingMore(true);
+      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), nextCursor);
+      if (res.isSuccess) {
+        setFeeds(prev => [...prev, ...res.data.feeds]);
+        setNextCursor(res.data.nextCursor);
+        setIsLast(res.data.isLast);
+      }
+    } catch {
+      // no-op
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isbn, nextCursor, isLast, isLoadingMore, selectedFilter]);
+
+  const lastFeedElementCallback = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoadingMore || isLast) return;
+
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && !isLoadingMore && !isLast) {
+          loadMore();
+        }
+      });
+      if (node) observerRef.current.observe(node);
     },
     rootMargin: '100px 0px',
     threshold: 0.1,
@@ -163,8 +212,6 @@ const SearchBook = () => {
       isSavedRef.current = nextSaved;
       setIsSaved(nextSaved);
 
-      await new Promise(resolve => setTimeout(resolve, 300));
-
       try {
         const response = await postSaveBook(isbn, nextSaved);
         if (!response.isSuccess && isSavedRef.current === nextSaved) {
@@ -192,17 +239,14 @@ const SearchBook = () => {
     }
   }, [bookDetail, openPopup]);
 
-  if (isLoading || error || !bookDetail) {
-    if (isLoading) {
-      return <LoadingSpinner fullHeight={true} size="large" message="책 정보 불러오는 중..." />;
-    }
+  if (error) {
     return (
       <Wrapper>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
         </Header>
         <div style={{ padding: '100px 20px', textAlign: 'center', color: 'white' }}>
-          {isLoading ? '로딩 중...' : error || '책 정보를 찾을 수 없습니다.'}
+          {error}
         </div>
       </Wrapper>
     );
@@ -210,23 +254,26 @@ const SearchBook = () => {
 
   return (
     <Wrapper>
-      <TopBackground bookImgUrl={bookDetail.imageUrl} />
+      {bookDetail && <TopBackground bookImgUrl={bookDetail.imageUrl} />}
       <Header>
         <IconButton src={leftArrow} onClick={handleBackButton} />
       </Header>
 
-      <BannerSection>
-        <BookInfo>
-          <BookTitle>{bookDetail.title}</BookTitle>
-          <Author>
-            {bookDetail.authorName} 저 · {bookDetail.publisher}
-          </Author>
-        </BookInfo>
+      {isLoading || !bookDetail ? (
+        <BookDetailSkeleton />
+      ) : (
+        <BannerSection>
+          <BookInfo>
+            <BookTitle>{bookDetail.title}</BookTitle>
+            <Author>
+              {bookDetail.authorName} 저 · {bookDetail.publisher}
+            </Author>
+          </BookInfo>
 
-        <Intro onClick={handleIntroClick}>
-          <SubTitle>소개</SubTitle>
-          <SubText>{bookDetail.description}</SubText>
-        </Intro>
+          <Intro onClick={handleIntroClick}>
+            <SubTitle>소개</SubTitle>
+            <SubText>{bookDetail.description}</SubText>
+          </Intro>
 
         <ButtonSection>
           <RecruitingGroupButton onClick={handleRecruitingGroupButton}>
@@ -243,6 +290,7 @@ const SearchBook = () => {
           </RightArea>
         </ButtonSection>
       </BannerSection>
+      )}
 
       <FeedSection>
         <FeedTitle>피드 글 둘러보기</FeedTitle>
@@ -254,9 +302,13 @@ const SearchBook = () => {
             setSelectedFilter={filter => setSelectedFilter(filter as (typeof FILTER)[number])}
           />
         </FilterContainer>
-        {feeds.isLoading && feeds.items.length === 0 ? (
-          <LoadingBox>불러오는 중...</LoadingBox>
-        ) : feeds.items.length > 0 ? (
+        {isLoadingFeeds && feeds.length === 0 ? (
+          <FeedPostContainer>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <FeedPostSkeleton key={i} />
+            ))}
+          </FeedPostContainer>
+        ) : feeds.length > 0 ? (
           <FeedPostContainer>
             {feeds.items.map(post => (
               <div key={post.feedId}>
@@ -291,7 +343,7 @@ const SearchBook = () => {
         )}
       </FeedSection>
 
-      {showIntroModal && (
+      {showIntroModal && bookDetail && (
         <IntroModal title="소개" content={bookDetail.description} onClose={handleCloseIntroModal} />
       )}
     </Wrapper>

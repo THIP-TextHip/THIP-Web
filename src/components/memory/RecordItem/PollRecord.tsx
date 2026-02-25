@@ -4,6 +4,7 @@ import type { PollOption } from '../../../types/memory';
 import { postVote } from '@/api/record/postVote';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
+import type { VoteItemResult } from '@/types/record';
 import {
   PollSection,
   PollQuestion,
@@ -39,6 +40,32 @@ const PollRecord = ({
   const pollRef = useRef<HTMLDivElement>(null);
   const { roomId } = useParams<{ roomId: string }>();
   const { openSnackbar } = usePopupActions();
+
+  const mergeServerVoteItems = (
+    serverVoteItems: VoteItemResult[],
+    baseOptions: PollOption[],
+  ): PollOption[] => {
+    const serverByVoteItemId = new Map(serverVoteItems.map(item => [item.voteItemId, item]));
+
+    const mergedInBaseOrder = baseOptions.map(base => {
+      const server = serverByVoteItemId.get(base.voteItemId);
+      if (!server) return base;
+
+      return {
+        ...base,
+        percentage: server.percentage,
+        count: server.count,
+        isVoted: server.isVoted,
+        voteItemId: server.voteItemId,
+      };
+    });
+
+    const maxCount = Math.max(...mergedInBaseOrder.map(item => item.count));
+    return mergedInBaseOrder.map(item => ({
+      ...item,
+      isHighest: item.count === maxCount,
+    }));
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -83,13 +110,32 @@ const PollRecord = ({
       const latest = optionsRef.current.find(item => item.voteItemId === option.voteItemId);
       if (!latest) return;
 
-      const nextVoted = !latest.isVoted;
+      const previousVotedOption = optionsRef.current.find(item => item.isVoted);
+      const isSwitchingVote =
+        !!previousVotedOption && previousVotedOption.voteItemId !== option.voteItemId;
+      const nextVoted = isSwitchingVote ? true : !latest.isVoted;
+
       const optimisticOptions = optionsRef.current.map(item => {
-        if (item.voteItemId !== option.voteItemId) return item;
+        if (item.voteItemId === option.voteItemId) {
+          return {
+            ...item,
+            isVoted: nextVoted,
+            count: Math.max(0, item.count + (nextVoted ? 1 : -1)),
+          };
+        }
+
+        if (isSwitchingVote && item.voteItemId === previousVotedOption?.voteItemId) {
+          return {
+            ...item,
+            isVoted: false,
+            count: Math.max(0, item.count - 1),
+          };
+        }
+
         return {
           ...item,
-          isVoted: nextVoted,
-          count: item.count + (nextVoted ? 1 : -1),
+          isVoted: item.isVoted,
+          count: item.count,
         };
       });
 
@@ -101,8 +147,7 @@ const PollRecord = ({
 
       optionsRef.current = normalizedOptions;
       setCurrentOptions(normalizedOptions);
-
-      await new Promise(resolve => setTimeout(resolve, 300));
+      onVoteUpdate?.(normalizedOptions);
 
       try {
         const response = await postVote(parseInt(roomId, 10), postId, {
@@ -115,6 +160,7 @@ const PollRecord = ({
         if (!response.isSuccess) {
           optionsRef.current = previousOptions;
           setCurrentOptions(previousOptions);
+          onVoteUpdate?.(previousOptions);
           openSnackbar({
             message: response.message || '투표 처리 중 오류가 발생했습니다.',
             variant: 'top',
@@ -123,11 +169,7 @@ const PollRecord = ({
           return;
         }
 
-        const serverMaxCount = Math.max(...response.data.voteItems.map((item: PollOption) => item.count));
-        const updatedOptions = response.data.voteItems.map((item: PollOption) => ({
-          ...item,
-          isHighest: item.count === serverMaxCount,
-        }));
+        const updatedOptions = mergeServerVoteItems(response.data.voteItems, optionsRef.current);
         optionsRef.current = updatedOptions;
         setCurrentOptions(updatedOptions);
         onVoteUpdate?.(updatedOptions);
@@ -142,6 +184,7 @@ const PollRecord = ({
         if (target && target.isVoted === nextVoted) {
           optionsRef.current = previousOptions;
           setCurrentOptions(previousOptions);
+          onVoteUpdate?.(previousOptions);
         }
         openSnackbar({
           message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',

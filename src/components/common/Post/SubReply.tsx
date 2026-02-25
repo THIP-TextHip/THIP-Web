@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import PostHeader from './PostHeader';
 import type { ReplyData } from '@/api/comments/getComments';
 import like from '../../../assets/feed/like.svg';
@@ -40,6 +40,11 @@ const SubReply = ({
   const { startReply } = useReplyActions();
   const { openMoreMenu, closePopup, openSnackbar } = usePopupActions();
 
+  useEffect(() => {
+    setLiked(isLike);
+    setCurrentLikeCount(likeCount);
+  }, [isLike, likeCount]);
+
   const handleReplyClick = () => {
     startReply(creatorNickname, commentId);
   };
@@ -52,8 +57,6 @@ const SubReply = ({
 
       setLiked(nextLiked);
       setCurrentLikeCount(prev => (nextLiked ? prev + 1 : prev - 1));
-
-      await new Promise(resolve => setTimeout(resolve, 300));
 
       try {
         const response = await postLike(commentId, nextLiked);

@@ -66,7 +66,10 @@ const GroupSearchResult = ({
   onClickRoom,
 }: Props) => {
   const mapped = useMemo(() => rooms.map(mapToGroupCardModel), [rooms]);
-  const isEmpty = !isLoading && mapped.length === 0;
+  // searching 중에는 아직 debounce 대기 중일 수 있으므로 빈 결과 화면을 표시하지 않음
+  const isEmpty = !isLoading && mapped.length === 0 && type !== 'searching';
+  // 기존 결과를 유지한 채 재검색 중인 상태 (필터·카테고리 변경 시)
+  const isRefetching = isLoading && mapped.length > 0;
 
   return (
     <>
@@ -90,7 +93,8 @@ const GroupSearchResult = ({
 
       {(showTabs || type === 'searched') && (
         <GroupCardHeader>
-          <GroupNum>전체 {mapped.length}</GroupNum>
+          {/* 재검색 중엔 이전 카운트를 유지하고, 초기 검색 완료 시 카운트를 표시 */}
+          <GroupNum>{isLoading && !isRefetching ? '' : `전체 ${mapped.length}`}</GroupNum>
           <Filter
             filters={FILTER}
             selectedFilter={selectedFilter}
@@ -99,7 +103,7 @@ const GroupSearchResult = ({
         </GroupCardHeader>
       )}
 
-      <Content>
+      <Content isRefetching={isRefetching}>
         {error && <ErrorText>{error}</ErrorText>}
 
         {isEmpty ? (

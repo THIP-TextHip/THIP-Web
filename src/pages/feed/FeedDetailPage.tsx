@@ -10,7 +10,8 @@ import { usePopupActions } from '@/hooks/usePopupActions';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { getFeedDetail, type FeedDetailData } from '@/api/feeds/getFeedDetail';
 import { deleteFeedPost } from '@/api/feeds/deleteFeedPost';
-import { Wrapper } from './FeedDetailPage.styled';
+import Skeleton, { FeedPostSkeleton } from '@/shared/ui/Skeleton';
+import { Wrapper, SkeletonWrapper, CommentSkeletonItem } from './FeedDetailPage.styled';
 import { useReplyStore } from '@/stores/replyStore';
 
 const FeedDetailPage = () => {
@@ -44,6 +45,12 @@ const FeedDetailPage = () => {
         setLoading(true);
 
         const feedResponse = await getFeedDetail(Number(feedId));
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [feedResponse, commentsResponse] = await Promise.all([
+          getFeedDetail(Number(feedId)),
+          getComments(Number(feedId), { postType: 'FEED' }),
+        ]);
+        await minLoadingTime;
 
         setFeedData(feedResponse.data);
         setError(null);
@@ -144,7 +151,26 @@ const FeedDetailPage = () => {
   };
 
   if (loading) {
-    return <></>;
+    return (
+      <Wrapper>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+        <SkeletonWrapper>
+          <FeedPostSkeleton />
+          {Array.from({ length: 5 }).map((_, index) => (
+            <CommentSkeletonItem key={index}>
+              <Skeleton.Circle width={36} />
+              <div style={{ flex: 1 }}>
+                <Skeleton.Text width={80} height={14} />
+                <Skeleton.Text lines={2} height={14} gap={6} />
+              </div>
+            </CommentSkeletonItem>
+          ))}
+        </SkeletonWrapper>
+      </Wrapper>
+    );
   }
 
   if (error) {

@@ -14,6 +14,14 @@ import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
 import { getRoomPlaying } from '../../api/rooms/getRoomPlaying';
 import { isRoomCompleted } from '../../utils/roomStatus';
 import type { GetMemoryPostsParams, Post, Record } from '../../types/memory';
+import { RecordItemSkeleton } from '@/shared/ui/Skeleton';
+import RecordTabs from '../../components/memory/RecordTabs';
+import RecordFilters from '../../components/memory/RecordFilters/RecordFilters';
+import {
+  Content,
+  FixedSection,
+  ScrollableSection,
+} from '../../components/memory/MemoryContent/MemoryContent.styled';
 
 export type RecordType = 'group' | 'my';
 export type FilterType = 'page' | 'overall';
@@ -81,6 +89,9 @@ const Memory = () => {
     }
   }, [location.search]);
 
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const [showUploadProgress, setShowUploadProgress] = useState(false);
 
   const [roomCompleted, setRoomCompleted] = useState(false);
@@ -98,6 +109,14 @@ const Memory = () => {
         return { items: [], nextCursor: null, isLast: true };
       }
 
+  const loadMemoryPosts = useCallback(async () => {
+    if (!roomId) {
+      return;
+    }
+    setError(null);
+    setLoading(true);
+
+    try {
       const params: GetMemoryPostsParams = {
         roomId: parseInt(roomId, 10),
         type: activeTab === 'group' ? 'group' : 'mine',
@@ -116,8 +135,11 @@ const Memory = () => {
         params.isPageFilter = true;
       }
 
-      try {
-        const response = await getMemoryPosts(params);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([getMemoryPosts(params), minLoadingTime]);
+
+      if (response.isSuccess) {
+        const convertedRecords = response.data.postList.map(convertPostToRecord);
 
         if (!response.isSuccess) {
           throw new Error(response.message || '기록을 불러오는 중 오류가 발생했습니다.');
@@ -145,11 +167,12 @@ const Memory = () => {
         }
         throw new Error('기록을 불러오는 중 오류가 발생했습니다.');
       }
-    },
-    rootMargin: '100px 0px',
-    threshold: 0.1,
-  });
-  const { setItems: setRecordItems } = recordsList;
+
+      setError('기록을 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  }, [roomId, activeTab, selectedSort, activeFilter, selectedPageRange]);
 
   useEffect(() => {
     const checkRoomStatus = async () => {
@@ -292,25 +315,49 @@ const Memory = () => {
       <FixedHeader>
         <MemoryHeader onBackClick={handleBackClick} />
       </FixedHeader>
-
-      <ScrollableContent ref={scrollRootRef}>
-        <MemoryContent
-          activeTab={activeTab}
-          activeFilter={activeFilter}
-          readingProgress={readingProgress}
-          selectedSort={selectedSort}
-          records={filteredRecords}
-          selectedPageRange={selectedPageRange}
-          showUploadProgress={showUploadProgress}
-          onTabChange={handleTabChange}
-          onFilterChange={handleFilterChange}
-          onSortChange={handleSortChange}
-          onPageRangeClear={handlePageRangeClear}
-          onPageRangeSet={handlePageRangeSet}
-          onUploadComplete={handleUploadComplete}
-        />
-        {!recordsList.isLast && <div ref={recordsList.sentinelRef} style={{ height: 20 }} />}
-        {recordsList.isLoadingMore && <LoadingSpinner size="small" fullHeight={false} />}
+      <ScrollableContent>
+        {loading ? (
+          <Content>
+            <FixedSection inert>
+              <RecordTabs activeTab={activeTab} onTabChange={handleTabChange} />
+              {activeTab === 'group' && (
+                <RecordFilters
+                  activeFilter={activeFilter}
+                  readingProgress={readingProgress}
+                  selectedSort={selectedSort}
+                  onFilterChange={handleFilterChange}
+                  onSortChange={handleSortChange}
+                  selectedPageRange={selectedPageRange}
+                  onPageRangeClear={handlePageRangeClear}
+                  onPageRangeSet={handlePageRangeSet}
+                />
+              )}
+            </FixedSection>
+            <ScrollableSection>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <RecordItemSkeleton key={i} />
+                ))}
+              </div>
+            </ScrollableSection>
+          </Content>
+        ) : (
+          <MemoryContent
+            activeTab={activeTab}
+            activeFilter={activeFilter}
+            readingProgress={readingProgress}
+            selectedSort={selectedSort}
+            records={filteredRecords}
+            selectedPageRange={selectedPageRange}
+            showUploadProgress={showUploadProgress}
+            onTabChange={handleTabChange}
+            onFilterChange={handleFilterChange}
+            onSortChange={handleSortChange}
+            onPageRangeClear={handlePageRangeClear}
+            onPageRangeSet={handlePageRangeSet}
+            onUploadComplete={handleUploadComplete}
+          />
+        )}
       </ScrollableContent>
 
       {!roomCompleted && (

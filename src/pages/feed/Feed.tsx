@@ -4,14 +4,14 @@ import TabBar from '../../components/feed/TabBar';
 import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { FeedPostSkeleton, OtherFeedSkeleton } from '@/shared/ui/Skeleton';
 import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
 import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
 import { useInifinieScroll } from '@/hooks/useInifinieScroll';
-import { Container } from './Feed.styled';
+import { Container, SkeletonWrapper } from './Feed.styled';
 import type { PostData } from '@/types/post';
 
 const tabs = ['피드', '내 피드'];
@@ -78,6 +78,29 @@ const Feed = () => {
 
   const currentFeed = activeTab === '피드' ? totalFeed : myFeed;
 
+  useEffect(() => {
+    const loadFeedsWithToken = async () => {
+      await waitForToken();
+
+      setTabLoading(true);
+
+      try {
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+
+        if (activeTab === '피드') {
+          await Promise.all([loadTotalFeeds(), minLoadingTime]);
+        } else if (activeTab === '내 피드') {
+          await Promise.all([loadMyFeeds(), minLoadingTime]);
+        }
+      } finally {
+        setTabLoading(false);
+        setInitialLoading(false);
+      }
+    };
+
+    loadFeedsWithToken();
+  }, [activeTab, waitForToken, loadTotalFeeds, loadMyFeeds]);
+
   return (
     <Container>
       <MainHeader
@@ -86,8 +109,16 @@ const Feed = () => {
         rightButtonClick={handleNoticeButton}
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-      {currentFeed.isLoading && currentFeed.items.length === 0 ? (
-        <LoadingSpinner size="large" fullHeight={true} />
+      {initialLoading || tabLoading ? (
+        activeTab === '내 피드' ? (
+          <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />
+        ) : (
+          <SkeletonWrapper>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <FeedPostSkeleton key={index} />
+            ))}
+          </SkeletonWrapper>
+        )
       ) : (
         <>
           {activeTab === '피드' ? (

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import type { UserProfileItemProps } from '@/types/user';
 import { postFollow } from '@/api/users/postFollow';
@@ -25,6 +25,11 @@ const UserProfileItem = ({
   const { openPopup } = usePopupStore();
   const { isLoading: isFollowLoading, run: runFollow } = usePreventDoubleClick();
 
+  useEffect(() => {
+    setFollowed(!!isFollowing);
+    followedRef.current = !!isFollowing;
+  }, [isFollowing]);
+
   const handleProfileClick = () => {
     if (isMyself) {
       navigate(`/myfeed/${userId}`);
@@ -40,8 +45,6 @@ const UserProfileItem = ({
       const nextFollowed = !followedRef.current;
       followedRef.current = nextFollowed;
       setFollowed(nextFollowed);
-
-      await new Promise(resolve => setTimeout(resolve, 300));
 
       try {
         const response = await postFollow(userId, nextFollowed);

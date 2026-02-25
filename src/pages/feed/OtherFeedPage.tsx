@@ -8,6 +8,7 @@ import OtherFeed from '@/components/feed/OtherFeed';
 import { getOtherFeed, type OtherFeedItem } from '@/api/feeds/getOtherFeed';
 import { getOtherProfile } from '@/api/users/getOtherProfile';
 import type { OtherProfileData } from '@/types/profile';
+import { OtherFeedSkeleton } from '@/shared/ui/Skeleton';
 import { Container } from './MyFeedPage.styled';
 
 const OtherFeedPage = () => {
@@ -33,10 +34,15 @@ const OtherFeedPage = () => {
       try {
         setLoading(true);
 
-        const [feedResponse, profileResponse] = await Promise.all([
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [feedResponse, profileResponse] = (await Promise.all([
           getOtherFeed(Number(userId)),
           getOtherProfile(Number(userId)),
-        ]);
+        ])) as [
+          Awaited<ReturnType<typeof getOtherFeed>>,
+          Awaited<ReturnType<typeof getOtherProfile>>,
+        ];
+        await minLoadingTime;
 
         setFeedData(feedResponse.data.feedList);
         setProfileData(profileResponse.data);
@@ -53,7 +59,16 @@ const OtherFeedPage = () => {
   }, [userId]);
 
   if (loading) {
-    return <></>;
+    return (
+      <Container>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+        <OtherFeedSkeleton />
+        <NavBar src={writefab} path="/post/create" />
+      </Container>
+    );
   }
 
   if (error) {
