@@ -6,6 +6,7 @@ import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
 import ReplyList from '@/components/common/Post/ReplyList';
 import MessageInput from '@/components/today-words/MessageInput';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { getFeedDetail, type FeedDetailData } from '@/api/feeds/getFeedDetail';
@@ -164,15 +165,15 @@ const FeedDetailPage = () => {
   };
 
   if (loading) {
-    return <></>;
+    return (
+      <Wrapper>
+        <LoadingSpinner size="large" fullHeight={true} />
+      </Wrapper>
+    );
   }
 
-  if (error) {
-    return <></>;
-  }
-
-  if (!feedData) {
-    return <></>;
+  if (error || !feedData) {
+    return <Wrapper />;
   }
 
   return (
