@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BookInfoCard from '../../feed/BookInfoCard';
 import type { PostBodyProps } from '@/types/post';
 import lookmore from '../../../assets/feed/lookmore.svg';
@@ -12,13 +13,13 @@ const PostBody = ({
   feedId,
   contentUrls = [],
 }: PostBodyProps) => {
+  const navigate = useNavigate();
   const hasImage = contentUrls.length > 0;
   const contentRef = useRef<HTMLDivElement>(null);
   const [isTruncated, setIsTruncated] = useState(false);
 
   const handlePostClick = (feedId: number) => {
-    // 새 탭에서 피드 상세 페이지 열기
-    window.open(`/feed/${feedId}`, '_blank');
+    navigate(`/feed/${feedId}`);
   };
 
   useEffect(() => {

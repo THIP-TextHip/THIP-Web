@@ -160,13 +160,7 @@ const FeedDetailPage = () => {
   };
 
   const handleBackClick = () => {
-    window.close();
-
-    if (window.opener) {
-      window.close();
-    } else {
-      navigate(-1);
-    }
+    navigate(-1);
   };
 
   if (loading) {

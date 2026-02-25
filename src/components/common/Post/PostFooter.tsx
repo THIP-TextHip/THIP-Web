@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import like from '../../../assets/feed/like.svg';
 import activeLike from '../../../assets/feed/activeLike.svg';
 import comment from '../../../assets/feed/comment.svg';
@@ -32,6 +33,7 @@ const PostFooter = ({
   isDetail = false,
   onSaveToggle,
 }: PostFooterProps) => {
+  const navigate = useNavigate();
   const [liked, setLiked] = useState(isLiked);
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
   const [saved, setSaved] = useState(isSaved);
@@ -73,7 +75,7 @@ const PostFooter = ({
 
   const handleComment = () => {
     if (isDetail) return;
-    window.open(`/feed/${feedId}`, '_blank');
+    navigate(`/feed/${feedId}`);
   };
 
   return (
