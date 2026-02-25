@@ -70,8 +70,8 @@ const FeedDetailPage = () => {
         const [feedResponse, commentsResponse] = await Promise.all([
           getFeedDetail(Number(feedId)),
           getComments(Number(feedId), { postType: 'FEED' }),
-          minLoadingTime,
         ]);
+        await minLoadingTime;
 
         setFeedData(feedResponse.data);
         setCommentList(commentsResponse.data.commentList);
