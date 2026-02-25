@@ -156,7 +156,9 @@ const Feed = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    if (initialLoading || tabLoading || totalFeedPosts.length === 0) return;
+    const activeTabHasPosts =
+      activeTab === '피드' ? totalFeedPosts.length > 0 : myFeedPosts.length > 0;
+    if (initialLoading || tabLoading || !activeTabHasPosts) return;
     writeFeedCache({
       activeTab,
       totalFeedPosts,
