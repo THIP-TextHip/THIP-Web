@@ -9,6 +9,7 @@ import { postSaveFeed } from '@/api/feeds/postSave';
 import { postFeedLike } from '@/api/feeds/postFeedLike';
 import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 import { Container } from './PostFooter.styled';
+import { useNavigate } from 'react-router-dom';
 
 interface PostFooterProps {
   likeCount: number;
@@ -114,7 +115,11 @@ const PostFooter = ({
     <Container isDetail={isDetail}>
       <div className="left">
         <div className="count">
-          <img src={liked ? activeLike : like} onClick={handleLike} style={{ opacity: isLikeLoading ? 0.6 : 1 }} />
+          <img
+            src={liked ? activeLike : like}
+            onClick={handleLike}
+            style={{ opacity: isLikeLoading ? 0.6 : 1 }}
+          />
           <div>{likeCount}</div>
         </div>
         <div className="count comment">
