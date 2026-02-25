@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import MyFollower from './MyFollower';
 import { postFollow } from '@/api/users/postFollow';
 import { Container, UserProfile } from './Profile.styled';
 import { usePopupStore } from '@/stores/popupStore';
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 
 export interface ProfileProps {
   showFollowButton?: boolean;
@@ -30,34 +31,60 @@ const Profile = ({
   isMyFeed,
 }: ProfileProps) => {
   const [followed, setFollowed] = useState(isFollowing);
+  const followedRef = useRef<boolean>(!!isFollowing);
   const { openPopup } = usePopupStore();
+  const { isLoading: isFollowLoading, run: runFollow } = usePreventDoubleClick();
 
   useEffect(() => {
     setFollowed(isFollowing);
+    followedRef.current = !!isFollowing;
   }, [isFollowing]);
 
-  const toggleFollow = async () => {
-    if (!userId) {
-      return;
-    }
+  const toggleFollow = () => {
+    if (!userId) return;
+    runFollow(async () => {
+      const nextFollowed = !followedRef.current;
+      followedRef.current = nextFollowed;
+      setFollowed(nextFollowed);
 
-    try {
-      const response = await postFollow(userId, !followed);
+      try {
+        const response = await postFollow(userId, nextFollowed);
+        if (followedRef.current !== nextFollowed) return;
 
-      setFollowed(response.data.isFollowing);
+        if (!response.isSuccess) {
+          const rollbackState = !nextFollowed;
+          followedRef.current = rollbackState;
+          setFollowed(rollbackState);
+          openPopup('snackbar', {
+            message: response.message || (nextFollowed ? '띱하기에 실패했어요.' : '띱취소에 실패했어요.'),
+            variant: 'top',
+            onClose: () => {},
+          });
+          return;
+        }
 
-      const message = response.data.isFollowing
-        ? `${nickname}님을 띱 했어요.`
-        : `${nickname}님을 띱 취소했어요.`;
+        if (response.data.isFollowing !== nextFollowed) {
+          followedRef.current = response.data.isFollowing;
+          setFollowed(response.data.isFollowing);
+        }
 
-      openPopup('snackbar', {
-        message,
-        variant: 'top',
-        onClose: () => {},
-      });
-    } catch (error) {
-      console.error('띱하기 실패:', error);
-    }
+        openPopup('snackbar', {
+          message: response.data.isFollowing ? `${nickname}님을 띱 했어요.` : `${nickname}님을 띱 취소했어요.`,
+          variant: 'top',
+          onClose: () => {},
+        });
+      } catch {
+        if (followedRef.current !== nextFollowed) return;
+        const rollbackState = !nextFollowed;
+        followedRef.current = rollbackState;
+        setFollowed(rollbackState);
+        openPopup('snackbar', {
+          message: nextFollowed ? '띱하기에 실패했어요.' : '띱취소에 실패했어요.',
+          variant: 'top',
+          onClose: () => {},
+        });
+      }
+    });
   };
 
   return (
@@ -73,7 +100,7 @@ const Profile = ({
           </div>
         </div>
         {showFollowButton && !isMyFeed && (
-          <div className="followbutton" onClick={toggleFollow}>
+          <div className="followbutton" onClick={toggleFollow} style={{ opacity: isFollowLoading ? 0.6 : 1 }}>
             {followed ? '띱 취소' : '띱 하기'}
           </div>
         )}

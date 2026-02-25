@@ -78,12 +78,15 @@ const GroupSearch = () => {
       status: 'searching' | 'searched',
       categoryParam: string,
       isAllCategory: boolean = false,
+      keepPrevious: boolean = false,
     ) => {
       setIsLoading(true);
       setError(null);
-      setRooms([]);
-      setNextCursor(null);
-      setIsLast(true);
+      if (!keepPrevious) {
+        setRooms([]);
+        setNextCursor(null);
+        setIsLast(true);
+      }
 
       try {
         const isFinalized = status === 'searched';
@@ -147,7 +150,7 @@ const GroupSearch = () => {
     setSearchStatus('searching');
     setShowTabs(false);
     const id = setTimeout(() => {
-      searchFirstPage(trimmed, toSortKey(selectedFilter), 'searching', category);
+      searchFirstPage(trimmed, toSortKey(selectedFilter), 'searching', category, false, true);
     }, 300);
     setSearchTimeoutId(id);
   };
@@ -200,12 +203,30 @@ const GroupSearch = () => {
   useEffect(() => {
     if (searchStatus !== 'searched') return;
 
-    const term = searchTerm.trim();
+    const term = searchTermRef.current.trim();
+    const currentCategory = categoryRef.current;
+    const isAllCategory = !term && currentCategory === '';
+
+    searchFirstPage(
+      term,
+      toSortKey(selectedFilterRef.current),
+      'searched',
+      currentCategory,
+      isAllCategory,
+      true,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchStatus, searchTerm]);
+
+  useEffect(() => {
+    if (searchStatusRef.current !== 'searched') return;
+
+    const term = searchTermRef.current.trim();
     const isAllCategory = !term && category === '';
 
-    searchFirstPage(term, toSortKey(selectedFilter), 'searched', category, isAllCategory);
+    searchFirstPage(term, toSortKey(selectedFilter), 'searched', category, isAllCategory, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFilter, category, searchStatus, searchTerm]);
+  }, [selectedFilter, category]);
 
   useEffect(() => {
     const term = searchTerm.trim();
@@ -218,7 +239,7 @@ const GroupSearch = () => {
 
     const id = setTimeout(() => {
       const currentCategory = categoryRef.current;
-      searchFirstPage(term, toSortKey(selectedFilter), 'searching', currentCategory);
+      searchFirstPage(term, toSortKey(selectedFilter), 'searching', currentCategory, false, true);
     }, 300);
     setSearchTimeoutId(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps

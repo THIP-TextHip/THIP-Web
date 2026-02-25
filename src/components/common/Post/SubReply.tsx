@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import PostHeader from './PostHeader';
 import type { ReplyData } from '@/api/comments/getComments';
 import like from '../../../assets/feed/like.svg';
@@ -6,6 +6,7 @@ import activeLike from '../../../assets/feed/activeLike.svg';
 import replyIcon from '../../../assets/feed/replyIcon.svg';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 import { postLike } from '@/api/comments/postLike';
 import { deleteComment } from '@/api/comments/deleteComment';
 import { DeletedContainer, Container, ReplyIcon, Content, ReplySection } from './SubReply.styled';
@@ -34,32 +35,50 @@ const SubReply = ({
   const [liked, setLiked] = useState<boolean>(isLike);
   const [currentLikeCount, setCurrentLikeCount] = useState<number>(likeCount);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { isLoading: isLikeLoading, run: runLike } = usePreventDoubleClick();
 
   const { startReply } = useReplyActions();
   const { openMoreMenu, closePopup, openSnackbar } = usePopupActions();
+
+  useEffect(() => {
+    setLiked(isLike);
+    setCurrentLikeCount(likeCount);
+  }, [isLike, likeCount]);
 
   const handleReplyClick = () => {
     startReply(creatorNickname, commentId);
   };
 
-  const handleLike = async () => {
-    try {
-      const response = await postLike(commentId, !liked);
+  const handleLike = () => {
+    runLike(async () => {
+      const previousLiked = liked;
+      const previousLikeCount = currentLikeCount;
+      const nextLiked = !liked;
 
-      if (response.isSuccess) {
-        setLiked(response.data.isLiked);
-        setCurrentLikeCount(prev => (response.data.isLiked ? prev + 1 : prev - 1));
-      } else {
-        console.error('좋아요 상태 변경 실패:', response.message);
+      setLiked(nextLiked);
+      setCurrentLikeCount(prev => (nextLiked ? prev + 1 : prev - 1));
+
+      try {
+        const response = await postLike(commentId, nextLiked);
+        if (!response.isSuccess) {
+          setLiked(previousLiked);
+          setCurrentLikeCount(previousLikeCount);
+          openSnackbar({
+            message: response.message || '좋아요 처리 중 오류가 발생했습니다.',
+            variant: 'top',
+            onClose: () => {},
+          });
+        }
+      } catch {
+        setLiked(previousLiked);
+        setCurrentLikeCount(previousLikeCount);
         openSnackbar({
-          message: response.message || '좋아요 처리 중 오류가 발생했습니다.',
+          message: '좋아요 처리 중 오류가 발생했습니다.',
           variant: 'top',
           onClose: () => {},
         });
       }
-    } catch (error) {
-      console.error('좋아요 상태 변경 실패:', error);
-    }
+    });
   };
 
   const handleDelete = async () => {
@@ -170,6 +189,7 @@ const SubReply = ({
                 handleLike();
               }}
               alt="좋아요"
+              style={{ opacity: isLikeLoading ? 0.6 : 1 }}
             />
             <div className="count">{currentLikeCount}</div>
           </div>
