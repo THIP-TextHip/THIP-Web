@@ -135,7 +135,7 @@ const GroupDetail = () => {
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
         </Header>
-        <div style={{ padding: '100px 20px', textAlign: 'center' }}>{error}</div>
+        <div style={{ padding: '100px 20px', textAlign: 'center', color: 'white' }}>{error}</div>
       </Wrapper>
     );
   }
