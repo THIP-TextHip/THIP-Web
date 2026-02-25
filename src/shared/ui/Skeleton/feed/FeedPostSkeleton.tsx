@@ -1,4 +1,4 @@
-import Skeleton from './Skeleton';
+import Skeleton from '../base/Skeleton';
 import {
   Container,
   Header,

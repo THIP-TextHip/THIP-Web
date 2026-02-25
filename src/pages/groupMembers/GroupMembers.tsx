@@ -3,13 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import MemberList from '../../components/members/MemberList';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import { Wrapper, LoadingContainer, ErrorContainer, EmptyContainer } from './GroupMembers.styled';
+import { Wrapper, ErrorContainer, EmptyContainer } from './GroupMembers.styled';
 import {
   getRoomMembers,
   convertRoomMembersToMembers,
   type Member,
-  type RoomMembersResponse,
 } from '@/api/rooms/getRoomMembers';
+import { MemberListSkeleton } from '@/shared/ui/Skeleton';
 
 const GroupMembers = () => {
   const navigate = useNavigate();
@@ -31,7 +31,11 @@ const GroupMembers = () => {
 
       try {
         setLoading(true);
-        const response: RoomMembersResponse = await getRoomMembers(parseInt(currentRoomId));
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [response] = await Promise.all([
+          getRoomMembers(parseInt(currentRoomId)),
+          minLoadingTime,
+        ]);
 
         if (response.isSuccess) {
           const convertedMembers = convertRoomMembersToMembers(response.data.userList);
@@ -78,7 +82,7 @@ const GroupMembers = () => {
           onLeftClick={handleBackClick}
         />
         <Wrapper>
-          <LoadingContainer>로딩 중...</LoadingContainer>
+          <MemberListSkeleton />
         </Wrapper>
       </>
     );

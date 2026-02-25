@@ -12,6 +12,14 @@ import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
 import { getRoomPlaying } from '../../api/rooms/getRoomPlaying';
 import { isRoomCompleted } from '../../utils/roomStatus';
 import type { GetMemoryPostsParams, Post, Record } from '../../types/memory';
+import { RecordItemSkeleton } from '@/shared/ui/Skeleton';
+import RecordTabs from '../../components/memory/RecordTabs';
+import RecordFilters from '../../components/memory/RecordFilters/RecordFilters';
+import {
+  Content,
+  FixedSection,
+  ScrollableSection,
+} from '../../components/memory/MemoryContent/MemoryContent.styled';
 
 export type RecordType = 'group' | 'my';
 export type FilterType = 'page' | 'overall';
@@ -80,6 +88,7 @@ const Memory = () => {
   }, [location.search]);
 
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [showUploadProgress, setShowUploadProgress] = useState(false);
 
@@ -95,6 +104,7 @@ const Memory = () => {
       return;
     }
     setError(null);
+    setLoading(true);
 
     try {
       const params: GetMemoryPostsParams = {
@@ -114,7 +124,9 @@ const Memory = () => {
         params.isPageFilter = true;
       }
 
-      const response = await getMemoryPosts(params);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([getMemoryPosts(params), minLoadingTime]);
+
       if (response.isSuccess) {
         const convertedRecords = response.data.postList.map(convertPostToRecord);
 
@@ -144,6 +156,8 @@ const Memory = () => {
       }
 
       setError('기록을 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
     }
   }, [roomId, activeTab, selectedSort, activeFilter, selectedPageRange]);
 
@@ -301,21 +315,48 @@ const Memory = () => {
       </FixedHeader>
 
       <ScrollableContent>
-        <MemoryContent
-          activeTab={activeTab}
-          activeFilter={activeFilter}
-          readingProgress={readingProgress}
-          selectedSort={selectedSort}
-          records={filteredRecords}
-          selectedPageRange={selectedPageRange}
-          showUploadProgress={showUploadProgress}
-          onTabChange={handleTabChange}
-          onFilterChange={handleFilterChange}
-          onSortChange={handleSortChange}
-          onPageRangeClear={handlePageRangeClear}
-          onPageRangeSet={handlePageRangeSet}
-          onUploadComplete={handleUploadComplete}
-        />
+        {loading ? (
+          <Content>
+            <FixedSection style={{ pointerEvents: 'none' }}>
+              <RecordTabs activeTab={activeTab} onTabChange={handleTabChange} />
+              {activeTab === 'group' && (
+                <RecordFilters
+                  activeFilter={activeFilter}
+                  readingProgress={readingProgress}
+                  selectedSort={selectedSort}
+                  onFilterChange={handleFilterChange}
+                  onSortChange={handleSortChange}
+                  selectedPageRange={selectedPageRange}
+                  onPageRangeClear={handlePageRangeClear}
+                  onPageRangeSet={handlePageRangeSet}
+                />
+              )}
+            </FixedSection>
+            <ScrollableSection>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <RecordItemSkeleton key={i} />
+                ))}
+              </div>
+            </ScrollableSection>
+          </Content>
+        ) : (
+          <MemoryContent
+            activeTab={activeTab}
+            activeFilter={activeFilter}
+            readingProgress={readingProgress}
+            selectedSort={selectedSort}
+            records={filteredRecords}
+            selectedPageRange={selectedPageRange}
+            showUploadProgress={showUploadProgress}
+            onTabChange={handleTabChange}
+            onFilterChange={handleFilterChange}
+            onSortChange={handleSortChange}
+            onPageRangeClear={handlePageRangeClear}
+            onPageRangeSet={handlePageRangeSet}
+            onUploadComplete={handleUploadComplete}
+          />
+        )}
       </ScrollableContent>
 
       {!roomCompleted && (

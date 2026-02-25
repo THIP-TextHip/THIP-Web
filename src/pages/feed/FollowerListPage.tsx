@@ -9,6 +9,7 @@ import { getFollowingList } from '@/api/users/getFollowingList';
 import type { FollowData } from '@/types/follow';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { TotalBar, UserProfileList, Wrapper } from './FollowerListPage.syled';
+import { UserProfileItemSkeleton } from '@/shared/ui/Skeleton';
 
 const FollowerListPage = () => {
   const navigate = useNavigate();
@@ -36,14 +37,24 @@ const FollowerListPage = () => {
         setError(null);
         let response;
 
+        const minLoadingTime = !cursor ? new Promise(resolve => setTimeout(resolve, 500)) : null;
+
         if (type === 'followerlist') {
           if (!userId) {
             setError('사용자 ID가 없습니다.');
             return;
           }
-          response = await getFollowerList(userId, { size: 10, cursor: cursor || null });
+          const [data] = await Promise.all([
+            getFollowerList(userId, { size: 10, cursor: cursor || null }),
+            minLoadingTime,
+          ]);
+          response = data;
         } else {
-          response = await getFollowingList({ size: 10, cursor: cursor || null });
+          const [data] = await Promise.all([
+            getFollowingList({ size: 10, cursor: cursor || null }),
+            minLoadingTime,
+          ]);
+          response = data;
         }
 
         let userData: FollowData[] = [];
@@ -121,7 +132,11 @@ const FollowerListPage = () => {
       <TitleHeader leftIcon={<img src={leftArrow} />} onLeftClick={handleBackClick} title={title} />
       <TotalBar>전체 {totalCount}</TotalBar>
       {loading && userList.length === 0 ? (
-        <LoadingSpinner size="medium" fullHeight={true} />
+        <UserProfileList>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <UserProfileItemSkeleton key={i} type={type as UserProfileType} />
+          ))}
+        </UserProfileList>
       ) : (
         <UserProfileList>
           {userList.map((user, index) => (

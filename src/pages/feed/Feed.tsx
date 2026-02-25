@@ -4,7 +4,7 @@ import TabBar from '../../components/feed/TabBar';
 import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
-import FeedPostSkeleton from '@/shared/ui/Skeleton/FeedPostSkeleton';
+import { FeedPostSkeleton, OtherFeedSkeleton } from '@/shared/ui/Skeleton';
 import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
@@ -143,7 +143,7 @@ const Feed = () => {
       setTabLoading(true);
 
       try {
-        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 1000));
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
 
         if (activeTab === '피드') {
           await Promise.all([loadTotalFeeds(), minLoadingTime]);
@@ -168,11 +168,15 @@ const Feed = () => {
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {initialLoading || tabLoading ? (
-        <SkeletonWrapper>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <FeedPostSkeleton key={index} />
-          ))}
-        </SkeletonWrapper>
+        activeTab === '내 피드' ? (
+          <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />
+        ) : (
+          <SkeletonWrapper>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <FeedPostSkeleton key={index} />
+            ))}
+          </SkeletonWrapper>
+        )
       ) : (
         <>
           {activeTab === '피드' ? (

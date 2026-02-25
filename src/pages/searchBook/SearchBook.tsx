@@ -21,7 +21,6 @@ import {
   EmptyTitle,
   EmptySubText,
   FeedPostContainer,
-  LoadingBox,
 } from './SearchBook.styled';
 import { useNavigate, useParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -39,7 +38,7 @@ import { Filter } from '@/components/common/Filter';
 import FeedPost from '@/components/feed/FeedPost';
 import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
 import { usePopupStore } from '@/stores/popupStore';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { FeedPostSkeleton, BookDetailSkeleton } from '@/shared/ui/Skeleton';
 
 const FILTER = ['최신순', '인기순'] as const;
 const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
@@ -80,9 +79,11 @@ const SearchBook = () => {
         setIsLoading(true);
         setError(null);
 
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [bookResponse, recruitingResponse] = await Promise.all([
           getBookDetail(isbn),
           getRecruitingRooms(isbn),
+          minLoadingTime,
         ]);
 
         if (bookResponse.isSuccess) {
@@ -116,7 +117,11 @@ const SearchBook = () => {
       setNextCursor(null);
       setIsLast(true);
 
-      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), null);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [res] = await Promise.all([
+        getFeedsByIsbn(isbn, toFeedSort(selectedFilter), null),
+        minLoadingTime,
+      ]);
       if (res.isSuccess) {
         setFeeds(res.data.feeds);
         setNextCursor(res.data.nextCursor);
@@ -236,17 +241,14 @@ const SearchBook = () => {
     }
   }, [bookDetail, openPopup]);
 
-  if (isLoading || error || !bookDetail) {
-    if (isLoading) {
-      return <LoadingSpinner fullHeight={true} size="large" message="책 정보 불러오는 중..." />;
-    }
+  if (error) {
     return (
       <Wrapper>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
         </Header>
         <div style={{ padding: '100px 20px', textAlign: 'center', color: 'white' }}>
-          {isLoading ? '로딩 중...' : error || '책 정보를 찾을 수 없습니다.'}
+          {error || '책 정보를 찾을 수 없습니다.'}
         </div>
       </Wrapper>
     );
@@ -254,39 +256,43 @@ const SearchBook = () => {
 
   return (
     <Wrapper>
-      <TopBackground bookImgUrl={bookDetail.imageUrl} />
+      <TopBackground bookImgUrl={bookDetail?.imageUrl || ''} />
       <Header>
         <IconButton src={leftArrow} onClick={handleBackButton} />
       </Header>
 
-      <BannerSection>
-        <BookInfo>
-          <BookTitle>{bookDetail.title}</BookTitle>
-          <Author>
-            {bookDetail.authorName} 저 · {bookDetail.publisher}
-          </Author>
-        </BookInfo>
+      {isLoading || !bookDetail ? (
+        <BookDetailSkeleton />
+      ) : (
+        <BannerSection>
+          <BookInfo>
+            <BookTitle>{bookDetail.title}</BookTitle>
+            <Author>
+              {bookDetail.authorName} 저 · {bookDetail.publisher}
+            </Author>
+          </BookInfo>
 
-        <Intro onClick={handleIntroClick}>
-          <SubTitle>소개</SubTitle>
-          <SubText>{bookDetail.description}</SubText>
-        </Intro>
+          <Intro onClick={handleIntroClick}>
+            <SubTitle>소개</SubTitle>
+            <SubText>{bookDetail.description}</SubText>
+          </Intro>
 
-        <ButtonSection>
-          <RecruitingGroupButton onClick={handleRecruitingGroupButton}>
-            모집중인 모임방 {recruitingRoomsData?.totalRoomCount || 0}개{' '}
-            <img src={rightChevron} alt="오른쪽 화살표 아이콘" />
-          </RecruitingGroupButton>
-          <RightArea>
-            <WritePostButton onClick={handleWritePostButton}>
-              피드에 글쓰기 <img src={plusIcon} alt="더하기 아이콘" />
-            </WritePostButton>
-            <SaveButton onClick={handleSaveButton} disabled={isSaving}>
-              <img src={isSaved ? filledSaveIcon : saveIcon} alt="저장 버튼" />
-            </SaveButton>
-          </RightArea>
-        </ButtonSection>
-      </BannerSection>
+          <ButtonSection>
+            <RecruitingGroupButton onClick={handleRecruitingGroupButton}>
+              모집중인 모임방 {recruitingRoomsData?.totalRoomCount || 0}개{' '}
+              <img src={rightChevron} alt="오른쪽 화살표 아이콘" />
+            </RecruitingGroupButton>
+            <RightArea>
+              <WritePostButton onClick={handleWritePostButton}>
+                피드에 글쓰기 <img src={plusIcon} alt="더하기 아이콘" />
+              </WritePostButton>
+              <SaveButton onClick={handleSaveButton} disabled={isSaving}>
+                <img src={isSaved ? filledSaveIcon : saveIcon} alt="저장 버튼" />
+              </SaveButton>
+            </RightArea>
+          </ButtonSection>
+        </BannerSection>
+      )}
 
       <FeedSection>
         <FeedTitle>피드 글 둘러보기</FeedTitle>
@@ -299,7 +305,11 @@ const SearchBook = () => {
           />
         </FilterContainer>
         {isLoadingFeeds && feeds.length === 0 ? (
-          <LoadingBox>불러오는 중...</LoadingBox>
+          <FeedPostContainer>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <FeedPostSkeleton key={i} />
+            ))}
+          </FeedPostContainer>
         ) : feeds.length > 0 ? (
           <FeedPostContainer>
             {feeds.map((post, idx) => (
@@ -336,7 +346,7 @@ const SearchBook = () => {
         )}
       </FeedSection>
 
-      {showIntroModal && (
+      {showIntroModal && bookDetail && (
         <IntroModal title="소개" content={bookDetail.description} onClose={handleCloseIntroModal} />
       )}
     </Wrapper>

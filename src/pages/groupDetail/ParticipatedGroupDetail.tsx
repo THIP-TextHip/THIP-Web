@@ -21,15 +21,22 @@ import {
   MetaTopRow,
   MetaInfo,
   Meta,
-  LoadingContainer,
   ErrorContainer,
 } from './ParticipatedGroupDetail.styled';
+import TitleHeader from '@/components/common/TitleHeader';
 import RecordSection from '../../components/group/RecordSection';
 import CommentSection from '../../components/group/CommentSection';
 import HotTopicSection from '../../components/group/HotTopicSection';
 import GroupBookSection from '../../components/group/GroupBookSection';
 import GroupActionBottomSheet from '../../components/group/GroupActionBottomSheet';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import {
+  BannerSkeleton,
+  GroupBookSectionSkeleton,
+  RecordSectionSkeleton,
+  CommentSectionSkeleton,
+  HotTopicSectionSkeleton,
+} from '@/shared/ui/Skeleton';
 import {
   getRoomPlaying,
   type RoomPlayingResponse,
@@ -57,6 +64,10 @@ const ParticipatedGroupDetail = () => {
 
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
   useEffect(() => {
     const fetchRoomDetail = async () => {
       if (!roomId) {
@@ -67,7 +78,12 @@ const ParticipatedGroupDetail = () => {
 
       try {
         setLoading(true);
-        const response = await getRoomPlaying(parseInt(roomId));
+
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [response] = await Promise.all([
+          getRoomPlaying(parseInt(roomId)),
+          minLoadingTime,
+        ]);
 
         if (response.isSuccess) {
           setRoomData(response);
@@ -197,51 +213,53 @@ const ParticipatedGroupDetail = () => {
     navigate(`/group/${roomId}/members`);
   };
 
-  if (loading) {
+  if (error) {
     return (
       <ParticipatedWrapper>
-        <LoadingContainer>로딩 중...</LoadingContainer>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+        <ErrorContainer>{error}</ErrorContainer>
       </ParticipatedWrapper>
     );
   }
 
-  if (error || !roomData) {
+  if (loading || !roomData) {
     return (
       <ParticipatedWrapper>
-        <ErrorContainer>{error || '데이터를 불러올 수 없습니다.'}</ErrorContainer>
+        <TopBackground genre="">
+          <Header>
+            <IconButton src={leftArrow} onClick={handleBackButton} />
+          </Header>
+          <BannerSection>
+            <BannerSkeleton />
+          </BannerSection>
+        </TopBackground>
+        <GroupBookSectionSkeleton />
+        <RecordSectionSkeleton />
+        <CommentSectionSkeleton />
+        <HotTopicSectionSkeleton />
       </ParticipatedWrapper>
     );
   }
 
-  const { data } = roomData;
-
+  const data = roomData.data;
   const polls: Poll[] = convertVotesToPolls(data.currentVotes);
   const hasPolls = polls.length > 0;
-
-  const formatDate = (dateString: string) => {
-    return dateString.replace(/-/g, '.');
-  };
-
-  const getGenreForBackground = () => {
-    return data.category;
-  };
-
-  const commentData = {
-    message: '모임방 멤버들과 간단한 인사를 나눠보세요!',
-  };
-
-  const isCompleted = roomData ? isRoomCompleted(roomData.data.progressEndDate) : false;
+  const isCompleted = isRoomCompleted(data.progressEndDate);
+  const formatDate = (dateString: string) => dateString.replace(/-/g, '.');
 
   return (
     <ParticipatedWrapper>
-      <TopBackground genre={getGenreForBackground()}>
+      <TopBackground genre={data.category}>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
           {!isCompleted && <IconButton src={moreIcon} onClick={handleMoreButton} />}
         </Header>
         <BannerSection>
           <GroupTitle>
-            {data.roomName} {!data.isPublic && <img src={lockIcon} alt="자물쇠 아이콘"></img>}
+            {data.roomName} {!data.isPublic && <img src={lockIcon} alt="자물쇠 아이콘" />}
           </GroupTitle>
           <SubTitle>
             <div>소개글</div>
@@ -283,20 +301,16 @@ const ParticipatedGroupDetail = () => {
         </BannerSection>
       </TopBackground>
 
-      <GroupBookSection
-        title={data.bookTitle}
-        author={data.authorName}
-        onClick={handleBookSectionClick}
-      />
-
+      <GroupBookSection title={data.bookTitle} author={data.authorName} onClick={handleBookSectionClick} />
       <RecordSection
         currentPage={data.currentPage}
         progress={data.userPercentage}
         onClick={handleRecordSectionClick}
       />
-
-      <CommentSection message={commentData.message} onClick={handleCommentSectionClick} />
-
+      <CommentSection
+        message="모임방 멤버들과 간단한 인사를 나눠보세요!"
+        onClick={handleCommentSectionClick}
+      />
       <HotTopicSection
         polls={polls}
         hasPolls={hasPolls}

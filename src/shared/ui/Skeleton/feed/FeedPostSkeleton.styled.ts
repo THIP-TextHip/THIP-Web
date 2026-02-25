@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import Skeleton from './Skeleton';
+import Skeleton from '../base/Skeleton';
 
 export const Container = styled.div`
   display: flex;

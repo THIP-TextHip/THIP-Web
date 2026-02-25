@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import MenuButton from '@/components/Mypage/MenuButton';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import { useLogout } from '@/hooks/useLogout';
 import alert from '../../assets/mypage/alert.svg';
@@ -13,6 +12,7 @@ import terms from '../../assets/mypage/terms.svg';
 import NavBar from '@/components/common/NavBar';
 import { getMyProfile, type GetMyProfileResponse } from '@/api/users/getMyProfile';
 import { useEffect, useState } from 'react';
+import Skeleton from '@/shared/ui/Skeleton';
 import {
   Wrapper,
   Header,
@@ -22,6 +22,9 @@ import {
   SectionTitle,
   MenuGrid,
   BottomMenu,
+  ProfileSkeletonContainer,
+  ProfileSkeletonLeft,
+  ProfileSkeletonText,
 } from './Mypage.styled';
 
 const Mypage = () => {
@@ -35,7 +38,8 @@ const Mypage = () => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const profile = await getMyProfile();
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [profile] = await Promise.all([getMyProfile(), minLoadingTime]);
         setProfile(profile);
       } catch (error) {
         console.error('프로필 정보 로드 실패:', error);
@@ -47,24 +51,9 @@ const Mypage = () => {
   }, []);
 
   const handleEditClick = () => {
+    if (!profile) return;
     navigate('/mypage/edit', { state: { profile } });
   };
-
-  if (loading) {
-    return (
-      <Wrapper>
-        <LoadingSpinner message="내 정보를 불러오는 중..." size="large" fullHeight={true} />
-      </Wrapper>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <Wrapper>
-        <div>프로필 정보를 불러올 수 없습니다.</div>
-      </Wrapper>
-    );
-  }
 
   const handleLogout = () => {
     openConfirm({
@@ -116,20 +105,33 @@ const Mypage = () => {
     <Wrapper>
       <Header>내 정보</Header>
       <Container>
-        <UserProfile>
-          <div className="userInfo">
-            <img src={profile.profileImageUrl} />
-            <div className="user">
-              <div className="username">{profile.nickname}</div>
-              <div className="usertitle" style={{ color: profile.aliasColor }}>
-                {profile.aliasName}
+        {loading || !profile ? (
+          <ProfileSkeletonContainer>
+            <ProfileSkeletonLeft>
+              <Skeleton.Circle width={54} />
+              <ProfileSkeletonText>
+                <Skeleton.Text width={80} height={18} />
+                <Skeleton.Text width={60} height={14} />
+              </ProfileSkeletonText>
+            </ProfileSkeletonLeft>
+            <Skeleton.Box width={52} height={34} borderRadius={20} />
+          </ProfileSkeletonContainer>
+        ) : (
+          <UserProfile>
+            <div className="userInfo">
+              <img src={profile.profileImageUrl} alt={`${profile.nickname} 프로필`} />
+              <div className="user">
+                <div className="username">{profile.nickname}</div>
+                <div className="usertitle" style={{ color: profile.aliasColor }}>
+                  {profile.aliasName}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="edit" onClick={handleEditClick}>
-            편집
-          </div>
-        </UserProfile>
+            <div className="edit" onClick={handleEditClick}>
+              편집
+            </div>
+          </UserProfile>
+        )}
         <Section>
           <SectionTitle>내 활동</SectionTitle>
           <MenuGrid>

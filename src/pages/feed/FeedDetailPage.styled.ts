@@ -12,3 +12,15 @@ export const Wrapper = styled.div`
   margin: 0 auto;
   background-color: #121212;
 `;
+
+export const SkeletonWrapper = styled.div`
+  width: 100%;
+  padding-bottom: 80px;
+`;
+
+export const CommentSkeletonItem = styled.div`
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  align-items: flex-start;
+`;
