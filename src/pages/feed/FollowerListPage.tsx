@@ -129,7 +129,7 @@ const FollowerListPage = () => {
 
   return (
     <Wrapper>
-      <TitleHeader leftIcon={<img src={leftArrow} />} onLeftClick={handleBackClick} title={title} />
+      <TitleHeader leftIcon={<img src={leftArrow} alt="뒤로가기" />} onLeftClick={handleBackClick} title={title} />
       <TotalBar>전체 {totalCount}</TotalBar>
       {loading && userList.length === 0 ? (
         <UserProfileList>
