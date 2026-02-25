@@ -129,8 +129,8 @@ const SavePage = () => {
         const [feedsResponse, booksResponse] = await Promise.all([
           getSavedFeedsInMy(null),
           getSavedBooksInMy(),
-          minLoadingTime,
         ]);
+        await minLoadingTime;
 
         setSavedFeeds(feedsResponse.data.feedList);
         setFeedNextCursor(feedsResponse.data.nextCursor);

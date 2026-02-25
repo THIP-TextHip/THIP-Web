@@ -49,8 +49,8 @@ const Search = () => {
       const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
       const [response] = await Promise.all([
         getRecentSearch('BOOK'),
-        minLoadingTime,
       ]);
+      await minLoadingTime;
 
       if (response.isSuccess) {
         setRecentSearches(response.data.recentSearchList);
@@ -169,8 +169,8 @@ const Search = () => {
       const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
       const [response] = await Promise.all([
         getSearchBooks(term, 1, isManualSearch),
-        minLoadingTime,
       ]);
+      await minLoadingTime;
 
       if (response.isSuccess) {
         const convertedResults = convertToSearchedBooks(response.data.searchResult);

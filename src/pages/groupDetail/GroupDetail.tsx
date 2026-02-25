@@ -93,8 +93,8 @@ const GroupDetail = () => {
         const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [response] = await Promise.all([
           getRoomDetail(Number(roomId)),
-          minLoadingTime,
         ]);
+        await minLoadingTime;
 
         if (response.isSuccess) {
           setRoomData(response.data);

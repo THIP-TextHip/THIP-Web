@@ -46,16 +46,15 @@ const FollowerListPage = () => {
           }
           const [data] = await Promise.all([
             getFollowerList(userId, { size: 10, cursor: cursor || null }),
-            minLoadingTime,
           ]);
           response = data;
         } else {
           const [data] = await Promise.all([
             getFollowingList({ size: 10, cursor: cursor || null }),
-            minLoadingTime,
           ]);
           response = data;
         }
+        await minLoadingTime;
 
         let userData: FollowData[] = [];
         if (type === 'followerlist') {

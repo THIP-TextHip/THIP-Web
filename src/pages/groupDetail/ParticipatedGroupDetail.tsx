@@ -82,8 +82,8 @@ const ParticipatedGroupDetail = () => {
         const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [response] = await Promise.all([
           getRoomPlaying(parseInt(roomId)),
-          minLoadingTime,
         ]);
+        await minLoadingTime;
 
         if (response.isSuccess) {
           setRoomData(response);

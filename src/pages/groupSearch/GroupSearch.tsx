@@ -100,8 +100,8 @@ const GroupSearch = () => {
             categoryParam,
             isAllCategory,
           ),
-          minLoadingTime,
         ]);
+        await minLoadingTime;
         if (res.isSuccess) {
           const { roomList, nextCursor: nc, isLast: last } = res.data;
 

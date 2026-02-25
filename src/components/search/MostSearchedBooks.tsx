@@ -30,8 +30,8 @@ export default function MostSearchedBooks() {
         const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [response] = await Promise.all([
           getMostSearchedBooks(),
-          minLoadingTime,
         ]);
+        await minLoadingTime;
 
         if (response.isSuccess) {
           setBooks(response.data.bookList);

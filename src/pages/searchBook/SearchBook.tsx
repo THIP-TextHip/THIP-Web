@@ -85,8 +85,8 @@ const SearchBook = () => {
         const [bookResponse, recruitingResponse] = await Promise.all([
           getBookDetail(isbn),
           getRecruitingRooms(isbn),
-          minLoadingTime,
         ]);
+        await minLoadingTime;
 
         if (bookResponse.isSuccess) {
           setBookDetail(bookResponse.data);
@@ -120,8 +120,8 @@ const SearchBook = () => {
       const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
       const [res] = await Promise.all([
         getFeedsByIsbn(isbn, toFeedSort(selectedFilter), null),
-        minLoadingTime,
       ]);
+      await minLoadingTime;
       if (res.isSuccess) {
         setFeeds(res.data.feeds);
         setNextCursor(res.data.nextCursor);

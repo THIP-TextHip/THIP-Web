@@ -38,12 +38,11 @@ const OtherFeedPage = () => {
         const [feedResponse, profileResponse] = (await Promise.all([
           getOtherFeed(Number(userId)),
           getOtherProfile(Number(userId)),
-          minLoadingTime,
         ])) as [
           Awaited<ReturnType<typeof getOtherFeed>>,
           Awaited<ReturnType<typeof getOtherProfile>>,
-          void,
         ];
+        await minLoadingTime;
 
         setFeedData(feedResponse.data.feedList);
         setProfileData(profileResponse.data);

@@ -34,8 +34,8 @@ const GroupMembers = () => {
         const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [response] = await Promise.all([
           getRoomMembers(parseInt(currentRoomId)),
-          minLoadingTime,
         ]);
+        await minLoadingTime;
 
         if (response.isSuccess) {
           const convertedMembers = convertRoomMembersToMembers(response.data.userList);
