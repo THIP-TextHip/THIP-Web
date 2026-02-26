@@ -73,7 +73,7 @@ export const EmptySubText = styled.p`
   text-align: center;
 `;
 
-export const LoadingText = styled.p`
+export const LoadingText = styled.div`
   color: ${colors.grey[100]};
   font-size: ${typography.fontSize.sm};
   text-align: center;

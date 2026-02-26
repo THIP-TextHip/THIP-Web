@@ -7,3 +7,10 @@ export const Container = styled.div`
   background-color: var(--color-black-main);
   margin: 0 auto;
 `;
+
+export const SkeletonWrapper = styled.div`
+  min-height: 100vh;
+  padding-top: 136px;
+  padding-bottom: 125px;
+  background-color: var(--color-black-main);
+`;

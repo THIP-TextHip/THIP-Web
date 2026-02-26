@@ -4,7 +4,7 @@ import TabBar from '../../components/feed/TabBar';
 import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { FeedPostSkeleton, OtherFeedSkeleton } from '@/shared/ui/Skeleton';
 import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
@@ -12,6 +12,8 @@ import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
 import { useFeedCache, writeFeedCache } from '@/hooks/useFeedCache';
 import { Container } from './Feed.styled';
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
+import { Container, SkeletonWrapper } from './Feed.styled';
 import type { PostData } from '@/types/post';
 
 const tabs = ['피드', '내 피드'];
@@ -146,6 +148,46 @@ const Feed = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [activeTab, totalLoading, myLoading, totalIsLast, myIsLast, loadMoreFeeds]);
+  const handleSearchButton = () => {
+    navigate('/feed/search');
+  };
+
+  const handleNoticeButton = () => {
+    navigate('/notice');
+  };
+
+  const totalFeed = useInifinieScroll<PostData>({
+    enabled: activeTab === '피드',
+    reloadKey: activeTab,
+    fetchPage: async cursor => {
+      await waitForToken();
+      const response = await getTotalFeeds(cursor ? { cursor } : undefined);
+      return {
+        items: response.data.feedList,
+        nextCursor: response.data.nextCursor || null,
+        isLast: response.data.isLast,
+      };
+    },
+    mergeItems: (prev, next) => {
+      const existingIds = new Set(prev.map(post => post.feedId));
+      const newPosts = next.filter(post => !existingIds.has(post.feedId));
+      return [...prev, ...newPosts];
+    },
+  });
+
+  const myFeed = useInifinieScroll<PostData>({
+    enabled: activeTab === '내 피드',
+    reloadKey: activeTab,
+    fetchPage: async cursor => {
+      await waitForToken();
+      const response = await getMyFeeds(cursor ? { cursor } : undefined);
+      return {
+        items: response.data.feedList,
+        nextCursor: response.data.nextCursor || null,
+        isLast: response.data.isLast,
+      };
+    },
+  });
 
   useEffect(() => {
     if (skipScrollResetRef.current) {
@@ -154,6 +196,8 @@ const Feed = () => {
     }
     window.scrollTo(0, 0);
   }, [activeTab]);
+
+  const currentFeed = activeTab === '피드' ? totalFeed : myFeed;
 
   useEffect(() => {
     const activeTabHasPosts =
@@ -181,6 +225,27 @@ const Feed = () => {
   ]);
 
   const isLoading = initialLoading || tabLoading;
+    const loadFeedsWithToken = async () => {
+      await waitForToken();
+
+      setTabLoading(true);
+
+      try {
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+
+        if (activeTab === '피드') {
+          await Promise.all([loadTotalFeeds(), minLoadingTime]);
+        } else if (activeTab === '내 피드') {
+          await Promise.all([loadMyFeeds(), minLoadingTime]);
+        }
+      } finally {
+        setTabLoading(false);
+        setInitialLoading(false);
+      }
+    };
+
+    loadFeedsWithToken();
+  }, [activeTab, waitForToken, loadTotalFeeds, loadMyFeeds]);
 
   return (
     <Container>
@@ -196,6 +261,40 @@ const Feed = () => {
         <TotalFeed showHeader={true} posts={totalFeedPosts} isMyFeed={false} isLast={totalIsLast} />
       ) : (
         <MyFeed showHeader={false} posts={myFeedPosts} isMyFeed={true} isLast={myIsLast} />
+      {initialLoading || tabLoading ? (
+        activeTab === '내 피드' ? (
+          <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />
+        ) : (
+          <SkeletonWrapper>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <FeedPostSkeleton key={index} />
+            ))}
+          </SkeletonWrapper>
+        )
+      ) : (
+        <>
+          {activeTab === '피드' ? (
+            <>
+              <TotalFeed
+                showHeader={true}
+                posts={totalFeed.items}
+                isMyFeed={false}
+                isLast={totalFeed.isLast}
+              />
+            </>
+          ) : (
+            <>
+              <MyFeed
+                showHeader={false}
+                posts={myFeed.items}
+                isMyFeed={true}
+                isLast={myFeed.isLast}
+              />
+            </>
+          )}
+          {!currentFeed.isLast && <div ref={currentFeed.sentinelRef} style={{ height: 40 }} />}
+          {currentFeed.isLoadingMore && <LoadingSpinner size="small" fullHeight={false} />}
+        </>
       )}
       <NavBar src={writefab} path="/post/create" />
     </Container>

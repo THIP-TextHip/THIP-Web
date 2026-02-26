@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TitleHeader from '@/components/common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { getNotifications, type NotificationItem } from '@/api/notifications/getNotifications';
 import { postNotificationsCheck } from '@/api/notifications/postNotificationsCheck';
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 import {
   Wrapper,
   TabContainer,
@@ -22,12 +23,6 @@ import {
 
 const Notice = () => {
   const [selected, setSelected] = useState<string>('');
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [isLast, setIsLast] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const isLoadingRef = useRef<boolean>(false);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
   const handleBackButton = () => {
@@ -38,60 +33,23 @@ const Notice = () => {
     setSelected(prev => (prev === tab ? '' : tab));
   };
 
-  const loadNotifications = useCallback(
-    async (cursor?: string | null) => {
-      try {
-        if (isLoadingRef.current) return;
-        isLoadingRef.current = true;
-        setIsLoading(true);
-        const params: { cursor?: string | null; type?: 'feed' | 'room' } = { cursor };
-        if (selected === '피드') params.type = 'feed';
-        if (selected === '모임') params.type = 'room';
-
-        const res = await getNotifications(params);
-        if (res.isSuccess) {
-          setNotifications(prev =>
-            cursor ? [...prev, ...res.data.notifications] : res.data.notifications,
-          );
-          setNextCursor(res.data.nextCursor || null);
-          setIsLast(res.data.isLast);
-        }
-      } finally {
-        setIsLoading(false);
-        isLoadingRef.current = false;
-      }
+  const notificationList = useInifinieScroll<NotificationItem>({
+    enabled: true,
+    reloadKey: selected,
+    fetchPage: async cursor => {
+      const params: { cursor?: string | null; type?: 'feed' | 'room' } = { cursor };
+      if (selected === '피드') params.type = 'feed';
+      if (selected === '모임') params.type = 'room';
+      const res = await getNotifications(params);
+      return {
+        items: res.data.notifications,
+        nextCursor: res.data.nextCursor || null,
+        isLast: res.data.isLast,
+      };
     },
-    [selected],
-  );
-
-  useEffect(() => {
-    setNotifications([]);
-    setNextCursor(null);
-    setIsLast(false);
-    void loadNotifications(null);
-  }, [selected, loadNotifications]);
-
-  useEffect(() => {
-    if (!sentinelRef.current) return;
-    const el = sentinelRef.current;
-    const observer = new IntersectionObserver(
-      entries => {
-        const entry = entries[0];
-        if (entry.isIntersecting && !isLoading && !isLast && nextCursor !== null) {
-          void loadNotifications(nextCursor);
-        }
-      },
-      { root: null, rootMargin: '0px', threshold: 0.1 },
-    );
-
-    observer.observe(el);
-    return () => {
-      observer.unobserve(el);
-      observer.disconnect();
-    };
-  }, [isLoading, isLast, nextCursor, loadNotifications]);
-
-  const filteredNotifications = notifications;
+    rootMargin: '100px 0px',
+    threshold: 0.1,
+  });
 
   const tabs = ['피드', '모임'];
 
@@ -178,10 +136,10 @@ const Notice = () => {
       </TabContainer>
 
       <NotificationList>
-        {filteredNotifications.length === 0 ? (
+        {notificationList.items.length === 0 && !notificationList.isLoading ? (
           <EmptyState>새로운 알림이 없어요</EmptyState>
         ) : (
-          filteredNotifications.map((notif, idx) => (
+          notificationList.items.map((notif, idx) => (
             <NotificationCard
               key={notif.notificationId ?? idx}
               read={notif.isChecked}
@@ -199,7 +157,7 @@ const Notice = () => {
         )}
       </NotificationList>
 
-      <Sentinel ref={sentinelRef} />
+      {!notificationList.isLast && <Sentinel ref={notificationList.sentinelRef} />}
     </Wrapper>
   );
 };

@@ -14,8 +14,8 @@ import {
   EmptyMessage,
   MainText,
   SubText,
-  LoadingMessage,
 } from './MostSearchedBooks.styled';
+import { MostSearchedBooksSkeleton } from '@/shared/ui/Skeleton';
 
 export default function MostSearchedBooks() {
   const [books, setBooks] = useState<MostSearchedBook[]>([]);
@@ -27,7 +27,11 @@ export default function MostSearchedBooks() {
     const fetchMostSearchedBooks = async () => {
       try {
         setIsLoading(true);
-        const response = await getMostSearchedBooks();
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [response] = await Promise.all([
+          getMostSearchedBooks(),
+        ]);
+        await minLoadingTime;
 
         if (response.isSuccess) {
           setBooks(response.data.bookList);
@@ -55,15 +59,17 @@ export default function MostSearchedBooks() {
     const day = String(now.getDate()).padStart(2, '0');
     return `${month}.${day}. 기준`;
   };
+  if (isLoading) {
+    return <MostSearchedBooksSkeleton />;
+  }
+
   return (
     <Container>
       <Header>
         <Title>가장 많이 검색된 책</Title>
         <DateText>{getCurrentDate()}</DateText>
       </Header>
-      {isLoading ? (
-        <LoadingMessage>로딩 중...</LoadingMessage>
-      ) : error ? (
+      {error ? (
         <EmptyMessage>
           <MainText>데이터를 불러올 수 없어요.</MainText>
           <SubText>{error}</SubText>

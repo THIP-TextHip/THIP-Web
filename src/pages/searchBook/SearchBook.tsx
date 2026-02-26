@@ -21,7 +21,6 @@ import {
   EmptyTitle,
   EmptySubText,
   FeedPostContainer,
-  LoadingBox,
 } from './SearchBook.styled';
 import { useNavigate, useParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -30,7 +29,7 @@ import saveIcon from '../../assets/common/SaveIcon.svg';
 import filledSaveIcon from '../../assets/common/filledSaveIcon.svg';
 import rightChevron from '../../assets/common/right-Chevron.svg';
 import plusIcon from '../../assets/common/plus.svg';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IntroModal } from '@/components/search/IntroModal';
 import { getBookDetail, type BookDetail } from '@/api/books/getBookDetail';
 import { getRecruitingRooms, type RecruitingRoomsData } from '@/api/books/getRecruitingRooms';
@@ -39,8 +38,9 @@ import { Filter } from '@/components/common/Filter';
 import FeedPost from '@/components/feed/FeedPost';
 import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
 import { usePopupStore } from '@/stores/popupStore';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { FeedPostSkeleton, BookDetailSkeleton } from '@/shared/ui/Skeleton';
 import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 
 const FILTER = ['최신순', '인기순'] as const;
 const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
@@ -61,13 +61,6 @@ const SearchBook = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [feeds, setFeeds] = useState<FeedItem[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [isLast, setIsLast] = useState(true);
-  const [isLoadingFeeds, setIsLoadingFeeds] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const openPopup = usePopupStore(state => state.openPopup);
 
   useEffect(() => {
@@ -82,10 +75,12 @@ const SearchBook = () => {
         setIsLoading(true);
         setError(null);
 
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [bookResponse, recruitingResponse] = await Promise.all([
           getBookDetail(isbn),
           getRecruitingRooms(isbn),
         ]);
+        await minLoadingTime;
 
         if (bookResponse.isSuccess) {
           setBookDetail(bookResponse.data);
@@ -116,7 +111,11 @@ const SearchBook = () => {
       setNextCursor(null);
       setIsLast(true);
 
-      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), null);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [res] = await Promise.all([
+        getFeedsByIsbn(isbn, toFeedSort(selectedFilter), null),
+      ]);
+      await minLoadingTime;
       if (res.isSuccess) {
         setFeeds(res.data.feeds);
         setNextCursor(res.data.nextCursor);
@@ -163,8 +162,9 @@ const SearchBook = () => {
       });
       if (node) observerRef.current.observe(node);
     },
-    [isLoadingMore, isLast, loadMore],
-  );
+    rootMargin: '100px 0px',
+    threshold: 0.1,
+  });
 
   const handleBackButton = () => navigate(-1);
   const handleIntroClick = () => setShowIntroModal(true);
@@ -239,17 +239,14 @@ const SearchBook = () => {
     }
   }, [bookDetail, openPopup]);
 
-  if (isLoading || error || !bookDetail) {
-    if (isLoading) {
-      return <LoadingSpinner fullHeight={true} size="large" message="책 정보 불러오는 중..." />;
-    }
+  if (error) {
     return (
       <Wrapper>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
         </Header>
         <div style={{ padding: '100px 20px', textAlign: 'center', color: 'white' }}>
-          {isLoading ? '로딩 중...' : error || '책 정보를 찾을 수 없습니다.'}
+          {error}
         </div>
       </Wrapper>
     );
@@ -257,23 +254,26 @@ const SearchBook = () => {
 
   return (
     <Wrapper>
-      <TopBackground bookImgUrl={bookDetail.imageUrl} />
+      {bookDetail && <TopBackground bookImgUrl={bookDetail.imageUrl} />}
       <Header>
         <IconButton src={leftArrow} onClick={handleBackButton} />
       </Header>
 
-      <BannerSection>
-        <BookInfo>
-          <BookTitle>{bookDetail.title}</BookTitle>
-          <Author>
-            {bookDetail.authorName} 저 · {bookDetail.publisher}
-          </Author>
-        </BookInfo>
+      {isLoading || !bookDetail ? (
+        <BookDetailSkeleton />
+      ) : (
+        <BannerSection>
+          <BookInfo>
+            <BookTitle>{bookDetail.title}</BookTitle>
+            <Author>
+              {bookDetail.authorName} 저 · {bookDetail.publisher}
+            </Author>
+          </BookInfo>
 
-        <Intro onClick={handleIntroClick}>
-          <SubTitle>소개</SubTitle>
-          <SubText>{bookDetail.description}</SubText>
-        </Intro>
+          <Intro onClick={handleIntroClick}>
+            <SubTitle>소개</SubTitle>
+            <SubText>{bookDetail.description}</SubText>
+          </Intro>
 
         <ButtonSection>
           <RecruitingGroupButton onClick={handleRecruitingGroupButton}>
@@ -290,6 +290,7 @@ const SearchBook = () => {
           </RightArea>
         </ButtonSection>
       </BannerSection>
+      )}
 
       <FeedSection>
         <FeedTitle>피드 글 둘러보기</FeedTitle>
@@ -302,14 +303,15 @@ const SearchBook = () => {
           />
         </FilterContainer>
         {isLoadingFeeds && feeds.length === 0 ? (
-          <LoadingBox>불러오는 중...</LoadingBox>
+          <FeedPostContainer>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <FeedPostSkeleton key={i} />
+            ))}
+          </FeedPostContainer>
         ) : feeds.length > 0 ? (
           <FeedPostContainer>
-            {feeds.map((post, idx) => (
-              <div
-                key={post.feedId}
-                ref={idx === feeds.length - 1 ? el => lastFeedElementCallback(el) : undefined}
-              >
+            {feeds.items.map(post => (
+              <div key={post.feedId}>
                 <FeedPost
                   showHeader={true}
                   isMyFeed={false}
@@ -330,6 +332,8 @@ const SearchBook = () => {
                 />
               </div>
             ))}
+            {!feeds.isLast && <div ref={feeds.sentinelRef} style={{ height: 20 }} />}
+            {feeds.isLoadingMore && <LoadingBox>불러오는 중...</LoadingBox>}
           </FeedPostContainer>
         ) : (
           <EmptyState>
@@ -339,7 +343,7 @@ const SearchBook = () => {
         )}
       </FeedSection>
 
-      {showIntroModal && (
+      {showIntroModal && bookDetail && (
         <IntroModal title="소개" content={bookDetail.description} onClose={handleCloseIntroModal} />
       )}
     </Wrapper>
