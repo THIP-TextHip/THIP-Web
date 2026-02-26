@@ -113,6 +113,11 @@ const Memory = () => {
     if (!roomId) {
       return;
     }
+
+    if (activeFilter === 'page' && !selectedPageRange) {
+      return;
+    }
+
     setError(null);
     setLoading(true);
 
@@ -292,6 +297,17 @@ const Memory = () => {
     setShowUploadProgress(false);
   }, []);
 
+  const handleRecordDelete = useCallback(
+    (id: string) => {
+      if (activeTab === 'group') {
+        setGroupRecords(prev => prev.filter(r => r.id !== id));
+      } else {
+        setMyRecords(prev => prev.filter(r => r.id !== id));
+      }
+    },
+    [activeTab],
+  );
+
   const readingProgress = totalPages > 0 ? Math.round((currentUserPage / totalPages) * 100) : 0;
 
   if (recordsList.error) {
@@ -356,6 +372,7 @@ const Memory = () => {
             onPageRangeClear={handlePageRangeClear}
             onPageRangeSet={handlePageRangeSet}
             onUploadComplete={handleUploadComplete}
+            onDelete={handleRecordDelete}
           />
         )}
       </ScrollableContent>
