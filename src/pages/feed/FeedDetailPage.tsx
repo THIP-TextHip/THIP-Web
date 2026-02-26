@@ -164,7 +164,14 @@ const FeedDetailPage = () => {
   }
 
   if (error || !feedData) {
-    return <Wrapper />;
+    return (
+      <Wrapper>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+      </Wrapper>
+    );
   }
 
   return (

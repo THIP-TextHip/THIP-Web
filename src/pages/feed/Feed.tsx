@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import NavBar from '../../components/common/NavBar';
 import TabBar from '../../components/feed/TabBar';
 import MyFeed from '../../components/feed/MyFeed';
@@ -22,9 +22,9 @@ const Feed = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { waitForToken } = useSocialLoginToken();
-  const { initialCache } = useFeedCache();
 
   const initialTabFromState = (location.state as { initialTab?: string } | null)?.initialTab;
+  const { initialCache } = useFeedCache({ disableRestore: !!initialTabFromState });
   const isRestoringFromCache = initialCache !== null && !initialTabFromState;
 
   useEffect(() => {
@@ -36,118 +36,7 @@ const Feed = () => {
     initialTabFromState ?? (isRestoringFromCache ? initialCache!.activeTab : tabs[0]),
   );
 
-  const [totalFeedPosts, setTotalFeedPosts] = useState<PostData[]>(
-    isRestoringFromCache ? initialCache!.totalFeedPosts : [],
-  );
-  const [totalNextCursor, setTotalNextCursor] = useState<string>(
-    isRestoringFromCache ? initialCache!.totalNextCursor : '',
-  );
-  const [totalIsLast, setTotalIsLast] = useState(
-    isRestoringFromCache ? initialCache!.totalIsLast : false,
-  );
-  const [totalLoading, setTotalLoading] = useState(false);
-
-  const [myFeedPosts, setMyFeedPosts] = useState<PostData[]>(
-    isRestoringFromCache ? initialCache!.myFeedPosts : [],
-  );
-  const [myNextCursor, setMyNextCursor] = useState<string>(
-    isRestoringFromCache ? initialCache!.myNextCursor : '',
-  );
-  const [myIsLast, setMyIsLast] = useState(isRestoringFromCache ? initialCache!.myIsLast : false);
-  const [myLoading, setMyLoading] = useState(false);
-
-  const [tabLoading, setTabLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(!isRestoringFromCache);
-
-  const skipFirstFetchRef = useRef(isRestoringFromCache);
   const skipScrollResetRef = useRef(isRestoringFromCache);
-
-  const loadTotalFeeds = useCallback(async (cursor?: string) => {
-    try {
-      setTotalLoading(true);
-      const response = await getTotalFeeds(cursor ? { cursor } : undefined);
-      setTotalFeedPosts(prev => {
-        if (!cursor) return response.data.feedList;
-        const existingIds = new Set(prev.map(p => p.feedId));
-        return [...prev, ...response.data.feedList.filter(p => !existingIds.has(p.feedId))];
-      });
-      setTotalNextCursor(response.data.nextCursor);
-      setTotalIsLast(response.data.isLast);
-    } catch (error) {
-      console.error('전체 피드 로드 실패:', error);
-    } finally {
-      setTotalLoading(false);
-    }
-  }, []);
-
-  const loadMyFeeds = useCallback(async (cursor?: string) => {
-    try {
-      setMyLoading(true);
-      const response = await getMyFeeds(cursor ? { cursor } : undefined);
-      setMyFeedPosts(prev =>
-        cursor ? [...prev, ...response.data.feedList] : response.data.feedList,
-      );
-      setMyNextCursor(response.data.nextCursor);
-      setMyIsLast(response.data.isLast);
-    } catch (error) {
-      console.error('내 피드 로드 실패:', error);
-    } finally {
-      setMyLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (skipFirstFetchRef.current) {
-      skipFirstFetchRef.current = false;
-      return;
-    }
-
-    const load = async () => {
-      await waitForToken();
-      setTabLoading(true);
-      try {
-        if (activeTab === '피드') await loadTotalFeeds();
-        else await loadMyFeeds();
-      } finally {
-        setTabLoading(false);
-        setInitialLoading(false);
-      }
-    };
-
-    load();
-  }, [activeTab, waitForToken, loadTotalFeeds, loadMyFeeds]);
-
-  const loadMoreFeeds = useCallback(() => {
-    if (activeTab === '피드') {
-      if (!totalIsLast && !totalLoading && totalNextCursor) loadTotalFeeds(totalNextCursor);
-    } else {
-      if (!myIsLast && !myLoading && myNextCursor) loadMyFeeds(myNextCursor);
-    }
-  }, [
-    activeTab,
-    totalIsLast,
-    totalLoading,
-    totalNextCursor,
-    myIsLast,
-    myLoading,
-    myNextCursor,
-    loadTotalFeeds,
-    loadMyFeeds,
-  ]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const isLoading = activeTab === '피드' ? totalLoading : myLoading;
-      const isLast = activeTab === '피드' ? totalIsLast : myIsLast;
-      if (isLoading || isLast) return;
-
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-      if (scrollTop + clientHeight >= scrollHeight - 200) loadMoreFeeds();
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [activeTab, totalLoading, myLoading, totalIsLast, myIsLast, loadMoreFeeds]);
 
   const totalFeed = useInifinieScroll<PostData>({
     enabled: activeTab === '피드',
@@ -166,6 +55,9 @@ const Feed = () => {
       const newPosts = next.filter(post => !existingIds.has(post.feedId));
       return [...prev, ...newPosts];
     },
+    initialItems: isRestoringFromCache ? initialCache!.totalFeedPosts : undefined,
+    initialCursor: isRestoringFromCache ? initialCache!.totalNextCursor || null : undefined,
+    initialIsLast: isRestoringFromCache ? initialCache!.totalIsLast : undefined,
   });
 
   const myFeed = useInifinieScroll<PostData>({
@@ -180,6 +72,9 @@ const Feed = () => {
         isLast: response.data.isLast,
       };
     },
+    initialItems: isRestoringFromCache ? initialCache!.myFeedPosts : undefined,
+    initialCursor: isRestoringFromCache ? initialCache!.myNextCursor || null : undefined,
+    initialIsLast: isRestoringFromCache ? initialCache!.myIsLast : undefined,
   });
 
   useEffect(() => {
@@ -193,28 +88,25 @@ const Feed = () => {
   const currentFeed = activeTab === '피드' ? totalFeed : myFeed;
 
   useEffect(() => {
-    const activeTabHasPosts =
-      activeTab === '피드' ? totalFeedPosts.length > 0 : myFeedPosts.length > 0;
-    if (initialLoading || tabLoading || !activeTabHasPosts) return;
+    const hasItems = totalFeed.items.length > 0 || myFeed.items.length > 0;
+    if (!hasItems) return;
     writeFeedCache({
       activeTab,
-      totalFeedPosts,
-      myFeedPosts,
-      totalNextCursor,
-      myNextCursor,
-      totalIsLast,
-      myIsLast,
+      totalFeedPosts: totalFeed.items,
+      myFeedPosts: myFeed.items,
+      totalNextCursor: totalFeed.nextCursor ?? '',
+      myNextCursor: myFeed.nextCursor ?? '',
+      totalIsLast: totalFeed.isLast,
+      myIsLast: myFeed.isLast,
     });
   }, [
     activeTab,
-    totalFeedPosts,
-    myFeedPosts,
-    totalNextCursor,
-    myNextCursor,
-    totalIsLast,
-    myIsLast,
-    initialLoading,
-    tabLoading,
+    totalFeed.items,
+    myFeed.items,
+    totalFeed.nextCursor,
+    myFeed.nextCursor,
+    totalFeed.isLast,
+    myFeed.isLast,
   ]);
 
   return (
@@ -225,7 +117,7 @@ const Feed = () => {
         rightButtonClick={() => navigate('/notice')}
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-      {initialLoading || tabLoading ? (
+      {currentFeed.isLoading ? (
         activeTab === '내 피드' ? (
           <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />
         ) : (
@@ -238,23 +130,19 @@ const Feed = () => {
       ) : (
         <>
           {activeTab === '피드' ? (
-            <>
-              <TotalFeed
-                showHeader={true}
-                posts={totalFeed.items}
-                isMyFeed={false}
-                isLast={totalFeed.isLast}
-              />
-            </>
+            <TotalFeed
+              showHeader={true}
+              posts={totalFeed.items}
+              isMyFeed={false}
+              isLast={totalFeed.isLast}
+            />
           ) : (
-            <>
-              <MyFeed
-                showHeader={false}
-                posts={myFeed.items}
-                isMyFeed={true}
-                isLast={myFeed.isLast}
-              />
-            </>
+            <MyFeed
+              showHeader={false}
+              posts={myFeed.items}
+              isMyFeed={true}
+              isLast={myFeed.isLast}
+            />
           )}
           {!currentFeed.isLast && <div ref={currentFeed.sentinelRef} style={{ height: 40 }} />}
           {currentFeed.isLoadingMore && <LoadingSpinner size="small" fullHeight={false} />}

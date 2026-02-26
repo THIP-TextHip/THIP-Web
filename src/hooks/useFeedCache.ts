@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { PostData } from '@/types/post';
 
 const FEED_CACHE_KEY = 'feed_page_cache';
@@ -43,11 +43,12 @@ export function writeFeedCache(payload: FeedCachePayload): void {
   }
 }
 
-export function useFeedCache() {
+export function useFeedCache(options?: { disableRestore?: boolean }) {
   const [initialCache] = useState<FeedCache | null>(readCache);
+  const disableRestoreRef = useRef(options?.disableRestore ?? false);
 
   useEffect(() => {
-    if (!initialCache) return;
+    if (disableRestoreRef.current || !initialCache) return;
     const y = initialCache.scrollY;
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
