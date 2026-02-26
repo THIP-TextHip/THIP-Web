@@ -23,44 +23,13 @@ const FollowerListPage = () => {
     navigate(-1);
   };
 
-  const loadUserList = useCallback(
-    async (cursor?: string) => {
-      if (loading) return;
-
-      try {
-        setLoading(true);
-        setError(null);
-        let response;
-
-        const minLoadingTime = !cursor ? new Promise(resolve => setTimeout(resolve, 500)) : null;
-
-        if (type === 'followerlist') {
-          if (!userId) {
-            setError('사용자 ID가 없습니다.');
-            return;
-          }
-          const [data] = await Promise.all([
-            getFollowerList(userId, { size: 10, cursor: cursor || null }),
-          ]);
-          response = data;
-        } else {
-          const [data] = await Promise.all([
-            getFollowingList({ size: 10, cursor: cursor || null }),
-          ]);
-          response = data;
-        }
-        await minLoadingTime;
-
-        let userData: FollowData[] = [];
-        if (type === 'followerlist') {
-          userData = (response.data as { followers: FollowData[] })?.followers || [];
-        } else {
-          userData = (response.data as { followings: FollowData[] })?.followings || [];
-        }
-
-        if (!response || !response.data) {
-          setError('API 응답이 없습니다.');
-          return;
+  const userList = useInifinieScroll<FollowData>({
+    enabled: true,
+    reloadKey: `${type ?? ''}-${userId ?? ''}`,
+    fetchPage: async cursor => {
+      if (type === 'followerlist') {
+        if (!userId) {
+          return { items: [], nextCursor: null, isLast: true };
         }
         const response = await getFollowerList(userId, { size: 10, cursor });
         const total = response.data.totalFollowerCount;
@@ -91,9 +60,13 @@ const FollowerListPage = () => {
 
   return (
     <Wrapper>
-      <TitleHeader leftIcon={<img src={leftArrow} alt="뒤로가기" />} onLeftClick={handleBackClick} title={title} />
+      <TitleHeader
+        leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+        onLeftClick={handleBackClick}
+        title={title}
+      />
       <TotalBar>전체 {totalCount}</TotalBar>
-      {loading && userList.length === 0 ? (
+      {userList.isLoading && userList.items.length === 0 ? (
         <UserProfileList>
           {Array.from({ length: 5 }).map((_, i) => (
             <UserProfileItemSkeleton key={i} type={type as UserProfileType} />

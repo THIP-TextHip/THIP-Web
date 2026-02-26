@@ -36,7 +36,11 @@ export function writeFeedCache(payload: FeedCachePayload): void {
     scrollY: window.scrollY,
     timestamp: Date.now(),
   };
-  sessionStorage.setItem(FEED_CACHE_KEY, JSON.stringify(cache));
+  try {
+    sessionStorage.setItem(FEED_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // ignore (storage quota exceeded or private browsing)
+  }
 }
 
 export function useFeedCache() {

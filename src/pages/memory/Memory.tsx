@@ -6,7 +6,6 @@ import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
 import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddButton';
 import Snackbar from '../../components/common/Modal/Snackbar';
 import GlobalCommentBottomSheet from '../../components/common/CommentBottomSheet/GlobalCommentBottomSheet';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useCommentBottomSheetStore } from '@/stores/commentBottomSheetStore';
 import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
@@ -89,9 +88,6 @@ const Memory = () => {
     }
   }, [location.search]);
 
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
   const [showUploadProgress, setShowUploadProgress] = useState(false);
 
   const [roomCompleted, setRoomCompleted] = useState(false);
@@ -109,37 +105,26 @@ const Memory = () => {
         return { items: [], nextCursor: null, isLast: true };
       }
 
-  const loadMemoryPosts = useCallback(async () => {
-    if (!roomId) {
-      return;
-    }
-    setError(null);
-    setLoading(true);
+      try {
+        const params: GetMemoryPostsParams = {
+          roomId: parseInt(roomId, 10),
+          type: activeTab === 'group' ? 'group' : 'mine',
+          cursor,
+        };
 
-    try {
-      const params: GetMemoryPostsParams = {
-        roomId: parseInt(roomId, 10),
-        type: activeTab === 'group' ? 'group' : 'mine',
-        cursor,
-      };
+        if (activeTab === 'group') {
+          params.sort = selectedSort;
+        }
 
-      if (activeTab === 'group') {
-        params.sort = selectedSort;
-      }
+        if (activeFilter === 'overall') {
+          params.isOverview = true;
+        } else if (selectedPageRange) {
+          params.pageStart = selectedPageRange.start;
+          params.pageEnd = selectedPageRange.end;
+          params.isPageFilter = true;
+        }
 
-      if (activeFilter === 'overall') {
-        params.isOverview = true;
-      } else if (selectedPageRange) {
-        params.pageStart = selectedPageRange.start;
-        params.pageEnd = selectedPageRange.end;
-        params.isPageFilter = true;
-      }
-
-      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
-      const [response] = await Promise.all([getMemoryPosts(params), minLoadingTime]);
-
-      if (response.isSuccess) {
-        const convertedRecords = response.data.postList.map(convertPostToRecord);
+        const [response] = await Promise.all([getMemoryPosts(params)]);
 
         if (!response.isSuccess) {
           throw new Error(response.message || '기록을 불러오는 중 오류가 발생했습니다.');
@@ -167,12 +152,8 @@ const Memory = () => {
         }
         throw new Error('기록을 불러오는 중 오류가 발생했습니다.');
       }
-
-      setError('기록을 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, [roomId, activeTab, selectedSort, activeFilter, selectedPageRange]);
+    },
+  });
 
   useEffect(() => {
     const checkRoomStatus = async () => {
@@ -217,11 +198,11 @@ const Memory = () => {
     if (location.state?.newRecord) {
       const newRecord = location.state.newRecord as Record;
       setShowUploadProgress(true);
-      setRecordItems(prev => [newRecord, ...prev]);
+      recordsList.setItems(prev => [newRecord, ...prev]);
 
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, navigate, location.pathname, setRecordItems]);
+  }, [location.state, navigate, location.pathname]);
 
   const currentRecords = useMemo(() => recordsList.items, [recordsList.items]);
 
@@ -316,7 +297,7 @@ const Memory = () => {
         <MemoryHeader onBackClick={handleBackClick} />
       </FixedHeader>
       <ScrollableContent>
-        {loading ? (
+        {recordsList.isLoading ? (
           <Content>
             <FixedSection inert>
               <RecordTabs activeTab={activeTab} onTabChange={handleTabChange} />
