@@ -5,13 +5,13 @@ import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
 import { FeedPostSkeleton, OtherFeedSkeleton } from '@/shared/ui/Skeleton';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
 import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
 import { useFeedCache, writeFeedCache } from '@/hooks/useFeedCache';
-import { Container } from './Feed.styled';
 import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 import { Container, SkeletonWrapper } from './Feed.styled';
 import type { PostData } from '@/types/post';
@@ -148,13 +148,6 @@ const Feed = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [activeTab, totalLoading, myLoading, totalIsLast, myIsLast, loadMoreFeeds]);
-  const handleSearchButton = () => {
-    navigate('/feed/search');
-  };
-
-  const handleNoticeButton = () => {
-    navigate('/notice');
-  };
 
   const totalFeed = useInifinieScroll<PostData>({
     enabled: activeTab === '피드',
@@ -224,29 +217,6 @@ const Feed = () => {
     tabLoading,
   ]);
 
-  const isLoading = initialLoading || tabLoading;
-    const loadFeedsWithToken = async () => {
-      await waitForToken();
-
-      setTabLoading(true);
-
-      try {
-        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
-
-        if (activeTab === '피드') {
-          await Promise.all([loadTotalFeeds(), minLoadingTime]);
-        } else if (activeTab === '내 피드') {
-          await Promise.all([loadMyFeeds(), minLoadingTime]);
-        }
-      } finally {
-        setTabLoading(false);
-        setInitialLoading(false);
-      }
-    };
-
-    loadFeedsWithToken();
-  }, [activeTab, waitForToken, loadTotalFeeds, loadMyFeeds]);
-
   return (
     <Container>
       <MainHeader
@@ -255,12 +225,6 @@ const Feed = () => {
         rightButtonClick={() => navigate('/notice')}
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-      {isLoading ? (
-        <LoadingSpinner size="large" fullHeight={true} />
-      ) : activeTab === '피드' ? (
-        <TotalFeed showHeader={true} posts={totalFeedPosts} isMyFeed={false} isLast={totalIsLast} />
-      ) : (
-        <MyFeed showHeader={false} posts={myFeedPosts} isMyFeed={true} isLast={myIsLast} />
       {initialLoading || tabLoading ? (
         activeTab === '내 피드' ? (
           <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />

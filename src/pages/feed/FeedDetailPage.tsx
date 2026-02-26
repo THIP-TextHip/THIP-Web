@@ -6,7 +6,6 @@ import leftArrow from '../../assets/common/leftArrow.svg';
 import moreIcon from '../../assets/common/more.svg';
 import ReplyList from '@/components/common/Post/ReplyList';
 import MessageInput from '@/components/today-words/MessageInput';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { getFeedDetail, type FeedDetailData } from '@/api/feeds/getFeedDetail';
@@ -45,12 +44,8 @@ const FeedDetailPage = () => {
       try {
         setLoading(true);
 
-        const feedResponse = await getFeedDetail(Number(feedId));
         const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
-        const [feedResponse, commentsResponse] = await Promise.all([
-          getFeedDetail(Number(feedId)),
-          getComments(Number(feedId), { postType: 'FEED' }),
-        ]);
+        const feedResponse = await getFeedDetail(Number(feedId));
         await minLoadingTime;
 
         setFeedData(feedResponse.data);
@@ -148,9 +143,6 @@ const FeedDetailPage = () => {
   if (loading) {
     return (
       <Wrapper>
-        <LoadingSpinner size="large" fullHeight={true} />
-      </Wrapper>
-    );
         <TitleHeader
           leftIcon={<img src={leftArrow} alt="뒤로가기" />}
           onLeftClick={handleBackClick}
@@ -169,10 +161,6 @@ const FeedDetailPage = () => {
         </SkeletonWrapper>
       </Wrapper>
     );
-  }
-
-  if (error) {
-    return <></>;
   }
 
   if (error || !feedData) {
