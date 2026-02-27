@@ -205,9 +205,7 @@ const SearchBook = () => {
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
         </Header>
-        <div style={{ padding: '100px 20px', textAlign: 'center', color: 'white' }}>
-          {error}
-        </div>
+        <div style={{ padding: '100px 20px', textAlign: 'center', color: 'white' }}>{error}</div>
       </Wrapper>
     );
   }
@@ -235,21 +233,21 @@ const SearchBook = () => {
             <SubText>{bookDetail.description}</SubText>
           </Intro>
 
-        <ButtonSection>
-          <RecruitingGroupButton onClick={handleRecruitingGroupButton}>
-            모집중인 모임방 {recruitingRoomsData?.totalRoomCount || 0}개{' '}
-            <img src={rightChevron} alt="오른쪽 화살표 아이콘" />
-          </RecruitingGroupButton>
-          <RightArea>
-            <WritePostButton onClick={handleWritePostButton}>
-              피드에 글쓰기 <img src={plusIcon} alt="더하기 아이콘" />
-            </WritePostButton>
-            <SaveButton onClick={handleSaveButton} style={{ opacity: isSaveLoading ? 0.6 : 1 }}>
-              <img src={isSaved ? filledSaveIcon : saveIcon} alt="저장 버튼" />
-            </SaveButton>
-          </RightArea>
-        </ButtonSection>
-      </BannerSection>
+          <ButtonSection>
+            <RecruitingGroupButton onClick={handleRecruitingGroupButton}>
+              모집중인 모임방 {recruitingRoomsData?.totalRoomCount || 0}개{' '}
+              <img src={rightChevron} alt="오른쪽 화살표 아이콘" />
+            </RecruitingGroupButton>
+            <RightArea>
+              <WritePostButton onClick={handleWritePostButton}>
+                피드에 글쓰기 <img src={plusIcon} alt="더하기 아이콘" />
+              </WritePostButton>
+              <SaveButton onClick={handleSaveButton} style={{ opacity: isSaveLoading ? 0.6 : 1 }}>
+                <img src={isSaved ? filledSaveIcon : saveIcon} alt="저장 버튼" />
+              </SaveButton>
+            </RightArea>
+          </ButtonSection>
+        </BannerSection>
       )}
 
       <FeedSection>

@@ -15,6 +15,9 @@ interface UseInifinieScrollOptions<T> {
   rootRef?: RefObject<HTMLElement | null>;
   rootMargin?: string;
   threshold?: number;
+  initialItems?: T[];
+  initialCursor?: string | null;
+  initialIsLast?: boolean;
 }
 
 export const useInifinieScroll = <T>({
@@ -25,6 +28,9 @@ export const useInifinieScroll = <T>({
   rootRef,
   rootMargin = '200px 0px',
   threshold = 0,
+  initialItems,
+  initialCursor,
+  initialIsLast,
 }: UseInifinieScrollOptions<T>) => {
   const [items, setItems] = useState<T[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -36,6 +42,7 @@ export const useInifinieScroll = <T>({
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const isFetchingRef = useRef(false);
   const fetchPageRef = useRef(fetchPage);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     fetchPageRef.current = fetchPage;
@@ -89,11 +96,21 @@ export const useInifinieScroll = <T>({
 
   useEffect(() => {
     if (!enabled) return;
+
+    if (!initializedRef.current && initialItems && initialItems.length > 0) {
+      initializedRef.current = true;
+      setItems(initialItems);
+      setNextCursor(initialCursor ?? null);
+      setIsLast(initialIsLast ?? false);
+      return;
+    }
+
+    initializedRef.current = true;
     setItems([]);
     setNextCursor(null);
     setIsLast(false);
     void loadFirstPage();
-  }, [enabled, reloadKey, loadFirstPage]);
+  }, [enabled, reloadKey, loadFirstPage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!enabled || !sentinelRef.current) return;
@@ -115,6 +132,7 @@ export const useInifinieScroll = <T>({
   return {
     items,
     setItems,
+    nextCursor,
     isLast,
     isLoading,
     isLoadingMore,

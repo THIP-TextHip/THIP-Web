@@ -29,6 +29,7 @@ import { pinRecordToFeed } from '@/api/record/pinRecordToFeed';
 interface RecordItemProps {
   record: Record;
   shouldBlur?: boolean;
+  onDelete?: (id: string) => void;
 }
 
 const isSamePollOptions = (a: PollOption[], b: PollOption[]) => {
@@ -50,7 +51,7 @@ const isSamePollOptions = (a: PollOption[], b: PollOption[]) => {
   });
 };
 
-const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
+const RecordItem = ({ record, shouldBlur = false, onDelete }: RecordItemProps) => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
   const { openMoreMenu, openConfirm, openSnackbar, closePopup } = usePopupActions();
@@ -167,7 +168,7 @@ const RecordItem = ({ record, shouldBlur = false }: RecordItemProps) => {
           variant: 'top',
           onClose: () => {},
         });
-        window.location.reload();
+        onDelete?.(record.id);
       } else {
         openSnackbar({
           message: '삭제에 실패했습니다. 다시 시도해주세요.',

@@ -8,7 +8,7 @@ import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import GroupSearchResult from '@/components/search/GroupSearchResult';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
-import { getSearchRooms } from '@/api/rooms/getSearchRooms';
+import { getSearchRooms, type SearchRoomItem } from '@/api/rooms/getSearchRooms';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AllRoomsButton } from './GroupSearch.styled';
 import { useInifinieScroll } from '@/hooks/useInifinieScroll';
@@ -38,7 +38,6 @@ const GroupSearch = () => {
 
   useEffect(() => {
     fetchRecentSearches();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -146,7 +145,7 @@ const GroupSearch = () => {
 
       const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
       const res = await getSearchRooms(
-        queryTerm,
+        debouncedSearchTerm,
         toSortKey(selectedFilter),
         cursor ?? undefined,
         searchStatus === 'searched',
@@ -159,7 +158,6 @@ const GroupSearch = () => {
       if (!res.isSuccess) {
         throw new Error(res.message || '검색 실패');
       }
-
       return {
         items: res.data.roomList,
         nextCursor: res.data.nextCursor,

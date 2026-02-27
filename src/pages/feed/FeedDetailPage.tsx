@@ -135,13 +135,7 @@ const FeedDetailPage = () => {
   };
 
   const handleBackClick = () => {
-    window.close();
-
-    if (window.opener) {
-      window.close();
-    } else {
-      navigate(-1);
-    }
+    navigate(-1);
   };
 
   if (loading) {
@@ -167,12 +161,15 @@ const FeedDetailPage = () => {
     );
   }
 
-  if (error) {
-    return <></>;
-  }
-
-  if (!feedData) {
-    return <></>;
+  if (error || !feedData) {
+    return (
+      <Wrapper>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+      </Wrapper>
+    );
   }
 
   return (
