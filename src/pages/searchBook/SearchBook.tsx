@@ -108,12 +108,17 @@ const SearchBook = () => {
     enabled: !!isbn,
     reloadKey: `${isbn ?? ''}-${selectedFilter}`,
     fetchPage: async cursor => {
-      if (!isbn) return { items: [], nextCursor: null, isLast: true };
-      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), cursor ?? null);
-      if (!res.isSuccess) throw new Error(res.message || '피드 로드 실패');
+      if (!isbn) {
+        return { items: [], nextCursor: null, isLast: true };
+      }
+
+      const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
+      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), cursor);
+      if (minLoadingTime) await minLoadingTime;
+
       return {
         items: res.data.feeds,
-        nextCursor: res.data.nextCursor,
+        nextCursor: res.data.nextCursor || null,
         isLast: res.data.isLast,
       };
     },

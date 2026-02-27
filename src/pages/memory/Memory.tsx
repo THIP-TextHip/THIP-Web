@@ -70,6 +70,11 @@ const Memory = () => {
   const [selectedPageRange, setSelectedPageRange] = useState<{ start: number; end: number } | null>(
     null,
   );
+  const [showUploadProgress, setShowUploadProgress] = useState(false);
+  const [roomCompleted, setRoomCompleted] = useState(false);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [currentUserPage, setCurrentUserPage] = useState<number>(0);
+  const scrollRootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -77,24 +82,15 @@ const Memory = () => {
     const filterParam = searchParams.get('filter');
 
     if (pageParam && filterParam === 'poll') {
-      const page = parseInt(pageParam);
+      const page = parseInt(pageParam, 10);
       if (!isNaN(page)) {
         setSelectedPageRange({ start: page, end: page });
         setActiveFilter('page');
         setActiveTab('group');
-
         navigate(location.pathname, { replace: true });
       }
     }
-  }, [location.search]);
-
-  const [showUploadProgress, setShowUploadProgress] = useState(false);
-
-  const [roomCompleted, setRoomCompleted] = useState(false);
-
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [currentUserPage, setCurrentUserPage] = useState<number>(0);
-  const scrollRootRef = useRef<HTMLDivElement | null>(null);
+  }, [location.search, location.pathname, navigate]);
 
   const recordsList = useInifinieScroll<Record>({
     enabled: !!roomId,
@@ -105,27 +101,29 @@ const Memory = () => {
         return { items: [], nextCursor: null, isLast: true };
       }
 
+      const params: GetMemoryPostsParams = {
+        roomId: parseInt(roomId, 10),
+        type: activeTab === 'group' ? 'group' : 'mine',
+        cursor,
+      };
+
+      if (activeTab === 'group') {
+        params.sort = selectedSort;
+      }
+      
+      if (activeFilter === 'overall') {
+        params.isOverview = true;
+      } else if (selectedPageRange) {
+        params.pageStart = selectedPageRange.start;
+        params.pageEnd = selectedPageRange.end;
+        params.isPageFilter = true;
+      }
+            
       try {
-        const params: GetMemoryPostsParams = {
-          roomId: parseInt(roomId, 10),
-          type: activeTab === 'group' ? 'group' : 'mine',
-          cursor,
-        };
-
-        if (activeTab === 'group') {
-          params.sort = selectedSort;
-        }
-
-        if (activeFilter === 'overall') {
-          params.isOverview = true;
-        } else if (selectedPageRange) {
-          params.pageStart = selectedPageRange.start;
-          params.pageEnd = selectedPageRange.end;
-          params.isPageFilter = true;
-        }
-
-        const [response] = await Promise.all([getMemoryPosts(params)]);
-
+        const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
+        const response = await getMemoryPosts(params);
+        if (minLoadingTime) await minLoadingTime;
+        
         if (!response.isSuccess) {
           throw new Error(response.message || '기록을 불러오는 중 오류가 발생했습니다.');
         }
@@ -153,17 +151,19 @@ const Memory = () => {
         throw new Error('기록을 불러오는 중 오류가 발생했습니다.');
       }
     },
+    rootMargin: '100px 0px',
+    threshold: 0.1,
   });
+  const { setItems: setRecordItems } = recordsList;
 
   useEffect(() => {
     const checkRoomStatus = async () => {
       if (!roomId) return;
 
       try {
-        const response = await getRoomPlaying(parseInt(roomId));
+        const response = await getRoomPlaying(parseInt(roomId, 10));
         if (response.isSuccess) {
-          const completed = isRoomCompleted(response.data.progressEndDate);
-          setRoomCompleted(completed);
+          setRoomCompleted(isRoomCompleted(response.data.progressEndDate));
         }
       } catch (error) {
         console.error('모임방 상태 확인 오류:', error);
@@ -180,6 +180,7 @@ const Memory = () => {
       postType?: 'RECORD' | 'VOTE';
       openComments?: boolean;
     } | null;
+
     const state = (location.state as MemoryLocationState) || null;
     const initialPage = state?.page;
     if (initialPage && !selectedPageRange) {
@@ -198,35 +199,26 @@ const Memory = () => {
     if (location.state?.newRecord) {
       const newRecord = location.state.newRecord as Record;
       setShowUploadProgress(true);
-      recordsList.setItems(prev => [newRecord, ...prev]);
-
+      setRecordItems(prev => [newRecord, ...prev]);
       navigate(location.pathname, { replace: true });
     }
   }, [location.state, navigate, location.pathname]);
 
-  const currentRecords = useMemo(() => recordsList.items, [recordsList.items]);
-
-  const sortedRecords = useMemo(() => {
-    return currentRecords;
-  }, [currentRecords]);
-
   const filteredRecords = useMemo(() => {
-    const filtered = sortedRecords;
-
     if (activeFilter === 'overall') {
-      const overallRecords = filtered.filter(record => record.recordType === 'overall');
-      return overallRecords;
-    } else if (activeFilter === 'page' && selectedPageRange) {
-      const pageRecords = filtered.filter(record => {
-        if (record.recordType === 'overall') return false;
-        const page = parseInt(record.pageRange || '0');
-        return page >= selectedPageRange.start && page <= selectedPageRange.end;
-      });
-      return pageRecords;
+      return recordsList.items.filter(record => record.recordType === 'overall');
     }
 
-    return filtered;
-  }, [sortedRecords, activeFilter, selectedPageRange]);
+    if (activeFilter === 'page' && selectedPageRange) {
+      return recordsList.items.filter(record => {
+        if (record.recordType === 'overall') return false;
+        const page = parseInt(record.pageRange || '0', 10);
+        return page >= selectedPageRange.start && page <= selectedPageRange.end;
+      });
+    }
+
+    return recordsList.items;
+  }, [recordsList.items, activeFilter, selectedPageRange]);
 
   const handleBackClick = useCallback(() => {
     if (roomId) {
@@ -281,6 +273,7 @@ const Memory = () => {
   );
 
   const readingProgress = totalPages > 0 ? Math.round((currentUserPage / totalPages) * 100) : 0;
+  const showInitialSkeleton = recordsList.isLoading && recordsList.items.length === 0;
 
   if (recordsList.error) {
     return (
@@ -303,10 +296,10 @@ const Memory = () => {
       <FixedHeader>
         <MemoryHeader onBackClick={handleBackClick} />
       </FixedHeader>
-      <ScrollableContent>
-        {recordsList.isLoading ? (
+      <ScrollableContent ref={scrollRootRef}>
+        {showInitialSkeleton ? (
           <Content>
-            <FixedSection inert>
+            <FixedSection>
               <RecordTabs activeTab={activeTab} onTabChange={handleTabChange} />
               {activeTab === 'group' && (
                 <RecordFilters
@@ -330,22 +323,24 @@ const Memory = () => {
             </ScrollableSection>
           </Content>
         ) : (
-          <MemoryContent
-            activeTab={activeTab}
-            activeFilter={activeFilter}
-            readingProgress={readingProgress}
-            selectedSort={selectedSort}
-            records={filteredRecords}
-            selectedPageRange={selectedPageRange}
-            showUploadProgress={showUploadProgress}
-            onTabChange={handleTabChange}
-            onFilterChange={handleFilterChange}
-            onSortChange={handleSortChange}
-            onPageRangeClear={handlePageRangeClear}
-            onPageRangeSet={handlePageRangeSet}
-            onUploadComplete={handleUploadComplete}
-            onDelete={handleRecordDelete}
-          />
+          <>
+            <MemoryContent
+              activeTab={activeTab}
+              activeFilter={activeFilter}
+              readingProgress={readingProgress}
+              selectedSort={selectedSort}
+              records={filteredRecords}
+              selectedPageRange={selectedPageRange}
+              showUploadProgress={showUploadProgress}
+              onTabChange={handleTabChange}
+              onFilterChange={handleFilterChange}
+              onSortChange={handleSortChange}
+              onPageRangeClear={handlePageRangeClear}
+              onPageRangeSet={handlePageRangeSet}
+              onUploadComplete={handleUploadComplete}
+            />
+            {!recordsList.isLast && <div ref={recordsList.sentinelRef} style={{ height: 20 }} />}
+          </>
         )}
       </ScrollableContent>
 

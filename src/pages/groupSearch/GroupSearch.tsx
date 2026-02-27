@@ -24,7 +24,6 @@ const GroupSearch = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchStatus, setSearchStatus] = useState<SearchStatus>('idle');
-
   const [selectedFilter, setSelectedFilter] = useState<string>('마감임박순');
   const toSortKey = useCallback(
     (f: string): SortKey => (f === '인기순' ? 'memberCount' : 'deadline'),
@@ -32,12 +31,9 @@ const GroupSearch = () => {
   );
   const [category, setCategory] = useState<string>('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
-
   const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
-
   const [showTabs, setShowTabs] = useState(false);
 
   useEffect(() => {
@@ -50,7 +46,7 @@ const GroupSearch = () => {
     }
   }, [searchStatus]);
 
-  const fetchRecentSearches = async () => {
+  const fetchRecentSearches = useCallback(async () => {
     try {
       setIsLoadingRecentSearches(true);
       const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
@@ -61,13 +57,14 @@ const GroupSearch = () => {
     } finally {
       setIsLoadingRecentSearches(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (location.state?.allRooms) {
       navigate(location.pathname, { replace: true });
 
       setSearchTerm('');
+      setDebouncedSearchTerm('');
       setSearchStatus('searched');
       setShowTabs(true);
       setCategory('');
@@ -135,20 +132,29 @@ const GroupSearch = () => {
     }
   }, [searchStatus, searchTerm]);
 
-  const searchResult = useInifinieScroll<SearchRoomItem>({
-    enabled: searchStatus === 'searched' || (searchStatus === 'searching' && !!debouncedSearchTerm),
-    reloadKey: `${debouncedSearchTerm}-${selectedFilter}-${category}-${searchStatus}`,
+  const queryTerm = searchStatus === 'searched' ? searchTerm.trim() : debouncedSearchTerm.trim();
+  const isAllCategory = !queryTerm && category === '';
+
+  const searchResult = useInifinieScroll({
+    enabled: searchStatus !== 'idle' && (searchStatus === 'searched' || !!queryTerm),
+    reloadKey: `${searchStatus}-${queryTerm}-${selectedFilter}-${category}`,
     fetchPage: async cursor => {
-      const isFinalized = searchStatus === 'searched';
-      const isAllCategory = !debouncedSearchTerm && category === '';
+      if (searchStatus === 'searching' && !queryTerm) {
+        return { items: [], nextCursor: null, isLast: true };
+      }
+
+      const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
       const res = await getSearchRooms(
         debouncedSearchTerm,
         toSortKey(selectedFilter),
         cursor ?? undefined,
-        isFinalized,
+        searchStatus === 'searched',
         category,
         isAllCategory,
       );
+
+      if (minLoadingTime) await minLoadingTime;
+
       if (!res.isSuccess) {
         throw new Error(res.message || '검색 실패');
       }

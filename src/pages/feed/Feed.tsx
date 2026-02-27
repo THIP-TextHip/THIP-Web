@@ -5,7 +5,6 @@ import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
 import { FeedPostSkeleton, OtherFeedSkeleton } from '@/shared/ui/Skeleton';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
@@ -13,6 +12,7 @@ import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
 import { useFeedCache, writeFeedCache } from '@/hooks/useFeedCache';
 import { useInifinieScroll } from '@/hooks/useInifinieScroll';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { Container, SkeletonWrapper } from './Feed.styled';
 import type { PostData } from '@/types/post';
 
@@ -86,28 +86,7 @@ const Feed = () => {
   }, [activeTab]);
 
   const currentFeed = activeTab === '피드' ? totalFeed : myFeed;
-
-  useEffect(() => {
-    const hasItems = totalFeed.items.length > 0 || myFeed.items.length > 0;
-    if (!hasItems) return;
-    writeFeedCache({
-      activeTab,
-      totalFeedPosts: totalFeed.items,
-      myFeedPosts: myFeed.items,
-      totalNextCursor: totalFeed.nextCursor ?? '',
-      myNextCursor: myFeed.nextCursor ?? '',
-      totalIsLast: totalFeed.isLast,
-      myIsLast: myFeed.isLast,
-    });
-  }, [
-    activeTab,
-    totalFeed.items,
-    myFeed.items,
-    totalFeed.nextCursor,
-    myFeed.nextCursor,
-    totalFeed.isLast,
-    myFeed.isLast,
-  ]);
+  const showInitialLoading = currentFeed.isLoading && currentFeed.items.length === 0;
 
   return (
     <Container>
@@ -117,7 +96,7 @@ const Feed = () => {
         rightButtonClick={() => navigate('/notice')}
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-      {currentFeed.isLoading ? (
+      {showInitialLoading ? (
         activeTab === '내 피드' ? (
           <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />
         ) : (
@@ -130,12 +109,14 @@ const Feed = () => {
       ) : (
         <>
           {activeTab === '피드' ? (
-            <TotalFeed
-              showHeader={true}
-              posts={totalFeed.items}
-              isMyFeed={false}
-              isLast={totalFeed.isLast}
-            />
+            <>
+              <TotalFeed
+                showHeader={true}
+                posts={totalFeed.items}
+                isTotalFeed={true}
+                isLast={totalFeed.isLast}
+              />
+            </>
           ) : (
             <MyFeed
               showHeader={false}

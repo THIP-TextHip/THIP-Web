@@ -19,21 +19,23 @@ const FollowerListPage = () => {
 
   const [totalCount, setTotalCount] = useState(0);
 
-  const handleBackClick = () => {
-    navigate(-1);
-  };
-
   const userList = useInifinieScroll<FollowData>({
-    enabled: true,
-    reloadKey: `${type ?? ''}-${userId ?? ''}`,
+    enabled: !!type,
+    reloadKey: `${type}-${userId ?? ''}`,
     fetchPage: async cursor => {
+      const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
+
       if (type === 'followerlist') {
         if (!userId) {
-          return { items: [], nextCursor: null, isLast: true };
+          throw new Error('사용자 ID가 없습니다.');
         }
+
         const response = await getFollowerList(userId, { size: 10, cursor });
+        if (minLoadingTime) await minLoadingTime;
+
         const total = response.data.totalFollowerCount;
         if (typeof total === 'number') setTotalCount(total);
+
         return {
           items: response.data.followers || [],
           nextCursor: response.data.nextCursor || null,
@@ -42,8 +44,11 @@ const FollowerListPage = () => {
       }
 
       const response = await getFollowingList({ size: 10, cursor });
+      if (minLoadingTime) await minLoadingTime;
+
       const total = response.data.totalFollowingCount;
       if (typeof total === 'number') setTotalCount(total);
+
       return {
         items: response.data.followings || [],
         nextCursor: response.data.nextCursor || null,
@@ -58,15 +63,18 @@ const FollowerListPage = () => {
     window.scrollTo(0, 0);
   }, [type, userId]);
 
+  const showInitialSkeleton = userList.isLoading && userList.items.length === 0;
+
   return (
     <Wrapper>
       <TitleHeader
         leftIcon={<img src={leftArrow} alt="뒤로가기" />}
-        onLeftClick={handleBackClick}
+        onLeftClick={() => navigate(-1)}
         title={title}
       />
       <TotalBar>전체 {totalCount}</TotalBar>
-      {userList.isLoading && userList.items.length === 0 ? (
+
+      {showInitialSkeleton ? (
         <UserProfileList>
           {Array.from({ length: 5 }).map((_, i) => (
             <UserProfileItemSkeleton key={i} type={type as UserProfileType} />
@@ -89,6 +97,7 @@ const FollowerListPage = () => {
               isMyself={user.isMyself}
             />
           ))}
+
           {!userList.isLast && <div ref={userList.sentinelRef} style={{ height: 20 }} />}
           {userList.isLoadingMore && (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>

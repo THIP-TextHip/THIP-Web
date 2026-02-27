@@ -43,10 +43,8 @@ const FeedDetailPage = () => {
 
       try {
         setLoading(true);
-
         const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
-        const feedResponse = await getFeedDetail(Number(feedId));
-        await minLoadingTime;
+        const [feedResponse] = await Promise.all([getFeedDetail(Number(feedId)), minLoadingTime]);
 
         setFeedData(feedResponse.data);
         setError(null);
