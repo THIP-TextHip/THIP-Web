@@ -69,121 +69,6 @@ const SavePage = () => {
     navigate('/mypage');
   };
 
-  const loadSavedBooks = useCallback(async (cursor: string | null = null) => {
-    try {
-      setBookLoading(true);
-      const response = await getSavedBooksInMy(cursor);
-
-      if (cursor === null) {
-        setSavedBooks(response.data.bookList);
-      } else {
-        setSavedBooks(prev => [...prev, ...response.data.bookList]);
-      }
-
-      setBookNextCursor(response.data.nextCursor);
-      setBookIsLast(response.data.isLast);
-    } catch (error) {
-      console.error('저장된 책 목록 로드 실패:', error);
-    } finally {
-      setBookLoading(false);
-    }
-  }, []);
-
-  const loadSavedFeeds = useCallback(async (cursor: string | null = null) => {
-    try {
-      setFeedLoading(true);
-      const response = await getSavedFeedsInMy(cursor);
-
-      if (cursor === null) {
-        setSavedFeeds(response.data.feedList);
-      } else {
-        setSavedFeeds(prev => [...prev, ...response.data.feedList]);
-      }
-
-      setFeedNextCursor(response.data.nextCursor);
-      setFeedIsLast(response.data.isLast);
-    } catch (error) {
-      console.error('저장된 피드 로드 실패:', error);
-    } finally {
-      setFeedLoading(false);
-    }
-  }, []);
-
-  const loadMoreBooks = useCallback(async () => {
-    if (!bookNextCursor || bookIsLast || bookLoading) return;
-
-    try {
-      await loadSavedBooks(bookNextCursor);
-    } catch (error) {
-      console.error('책 추가 로드 실패:', error);
-    }
-  }, [bookNextCursor, bookIsLast, bookLoading, loadSavedBooks]);
-
-  const lastBookElementCallback = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (bookLoading || bookIsLast) return;
-
-      if (node) {
-        const observer = new IntersectionObserver(entries => {
-          if (entries[0].isIntersecting && !bookLoading && !bookIsLast) {
-            loadMoreBooks();
-          }
-        });
-
-        observer.observe(node);
-      }
-    },
-    [bookLoading, bookIsLast, loadMoreBooks],
-  );
-
-  useEffect(() => {
-    const loadAllData = async () => {
-      try {
-        setInitialLoading(true);
-
-        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
-        const [feedsResponse, booksResponse] = await Promise.all([
-          getSavedFeedsInMy(null),
-          getSavedBooksInMy(),
-        ]);
-        await minLoadingTime;
-
-        setSavedFeeds(feedsResponse.data.feedList);
-        setFeedNextCursor(feedsResponse.data.nextCursor);
-        setFeedIsLast(feedsResponse.data.isLast);
-
-        setSavedBooks(booksResponse.data.bookList);
-        setBookNextCursor(booksResponse.data.nextCursor);
-        setBookIsLast(booksResponse.data.isLast);
-      } catch (error) {
-        console.error('초기 데이터 로드 실패:', error);
-      } finally {
-        setInitialLoading(false);
-      }
-    };
-
-    loadAllData();
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !feedIsLast && !feedLoading && feedNextCursor) {
-            loadSavedFeeds(feedNextCursor);
-          }
-        });
-      },
-      { threshold: 0.1 },
-    );
-
-    if (feedObserverRef.current) {
-      observer.observe(feedObserverRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [feedIsLast, feedLoading, feedNextCursor, loadSavedFeeds]);
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [activeTab]);
@@ -230,7 +115,7 @@ const SavePage = () => {
         title="저장"
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-      {initialLoading ? (
+      {showInitialLoading ? (
         activeTab === '피드' ? (
           <SkeletonWrapper>
             {Array.from({ length: 3 }).map((_, index) => (
@@ -291,7 +176,10 @@ const SavePage = () => {
                 </BookInfo>
               </LeftSection>
               <SaveIcon onClick={() => handleSaveToggle(book.isbn)}>
-                <img src={book.isSaved ? activeSave : save} alt={book.isSaved ? '저장됨' : '저장'} />
+                <img
+                  src={book.isSaved ? activeSave : save}
+                  alt={book.isSaved ? '저장됨' : '저장'}
+                />
               </SaveIcon>
             </BookItem>
           ))}

@@ -44,12 +44,8 @@ const FeedDetailPage = () => {
       try {
         setLoading(true);
 
-        const feedResponse = await getFeedDetail(Number(feedId));
         const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
-        const [feedResponse, commentsResponse] = await Promise.all([
-          getFeedDetail(Number(feedId)),
-          getComments(Number(feedId), { postType: 'FEED' }),
-        ]);
+        const feedResponse = await getFeedDetail(Number(feedId));
         await minLoadingTime;
 
         setFeedData(feedResponse.data);
@@ -141,13 +137,7 @@ const FeedDetailPage = () => {
   };
 
   const handleBackClick = () => {
-    window.close();
-
-    if (window.opener) {
-      window.close();
-    } else {
-      navigate(-1);
-    }
+    navigate(-1);
   };
 
   if (loading) {
@@ -173,12 +163,15 @@ const FeedDetailPage = () => {
     );
   }
 
-  if (error) {
-    return <></>;
-  }
-
-  if (!feedData) {
-    return <></>;
+  if (error || !feedData) {
+    return (
+      <Wrapper>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+      </Wrapper>
+    );
   }
 
   return (
