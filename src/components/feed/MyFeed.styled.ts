@@ -3,7 +3,6 @@ import { colors, typography } from '@/styles/global/global';
 
 export const Container = styled.div`
   min-height: 100vh;
-  padding-top: 136px;
   padding-bottom: 125px; //이전 76px
   background-color: var(--color-black-main);
 `;
