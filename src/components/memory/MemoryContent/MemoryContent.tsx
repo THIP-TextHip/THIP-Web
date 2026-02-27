@@ -23,6 +23,7 @@ interface MemoryContentProps {
   onPageRangeClear: () => void;
   onPageRangeSet: (range: { start: number; end: number }) => void;
   onUploadComplete: () => void;
+  onDelete?: (id: string) => void;
 }
 
 const MemoryContent = ({
@@ -39,6 +40,7 @@ const MemoryContent = ({
   onPageRangeClear,
   onPageRangeSet,
   onUploadComplete,
+  onDelete,
 }: MemoryContentProps) => {
   return (
     <Content>
@@ -66,7 +68,7 @@ const MemoryContent = ({
 
         {records.length === 0 && <EmptyRecord type={activeTab} />}
 
-        {records.length > 0 && <RecordList records={records} />}
+        {records.length > 0 && <RecordList records={records} onDelete={onDelete} />}
       </ScrollableSection>
     </Content>
   );

@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import NavBar from '../../components/common/NavBar';
 import TabBar from '../../components/feed/TabBar';
 import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
 import { FeedPostSkeleton, OtherFeedSkeleton } from '@/shared/ui/Skeleton';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
 import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
+import { useFeedCache, writeFeedCache } from '@/hooks/useFeedCache';
 import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { Container, SkeletonWrapper } from './Feed.styled';
@@ -20,25 +22,22 @@ const tabs = ['피드', '내 피드'];
 const Feed = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const initialTabFromState = (location.state as { initialTab?: string } | null)?.initialTab;
-  const [activeTab, setActiveTab] = useState<string>(initialTabFromState ?? tabs[0]);
-
   const { waitForToken } = useSocialLoginToken();
 
+  const initialTabFromState = (location.state as { initialTab?: string } | null)?.initialTab;
+  const { initialCache } = useFeedCache({ disableRestore: !!initialTabFromState });
+  const isRestoringFromCache = initialCache !== null && !initialTabFromState;
+
   useEffect(() => {
-    if (initialTabFromState) {
-      navigate('.', { replace: true });
-    }
+    if (initialTabFromState) navigate('.', { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSearchButton = () => {
-    navigate('/feed/search');
-  };
+  const [activeTab, setActiveTab] = useState<string>(
+    initialTabFromState ?? (isRestoringFromCache ? initialCache!.activeTab : tabs[0]),
+  );
 
-  const handleNoticeButton = () => {
-    navigate('/notice');
-  };
+  const skipScrollResetRef = useRef(isRestoringFromCache);
 
   const totalFeed = useInifinieScroll<PostData>({
     enabled: activeTab === '피드',
@@ -57,6 +56,9 @@ const Feed = () => {
       const newPosts = next.filter(post => !existingIds.has(post.feedId));
       return [...prev, ...newPosts];
     },
+    initialItems: isRestoringFromCache ? initialCache!.totalFeedPosts : undefined,
+    initialCursor: isRestoringFromCache ? initialCache!.totalNextCursor || null : undefined,
+    initialIsLast: isRestoringFromCache ? initialCache!.totalIsLast : undefined,
   });
 
   const myFeed = useInifinieScroll<PostData>({
@@ -71,9 +73,16 @@ const Feed = () => {
         isLast: response.data.isLast,
       };
     },
+    initialItems: isRestoringFromCache ? initialCache!.myFeedPosts : undefined,
+    initialCursor: isRestoringFromCache ? initialCache!.myNextCursor || null : undefined,
+    initialIsLast: isRestoringFromCache ? initialCache!.myIsLast : undefined,
   });
 
   useEffect(() => {
+    if (skipScrollResetRef.current) {
+      skipScrollResetRef.current = false;
+      return;
+    }
     window.scrollTo(0, 0);
   }, [activeTab]);
 
@@ -84,8 +93,8 @@ const Feed = () => {
     <Container>
       <MainHeader
         type="home"
-        leftButtonClick={handleSearchButton}
-        rightButtonClick={handleNoticeButton}
+        leftButtonClick={() => navigate('/feed/search')}
+        rightButtonClick={() => navigate('/notice')}
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
       {showInitialLoading ? (
@@ -110,14 +119,12 @@ const Feed = () => {
               />
             </>
           ) : (
-            <>
-              <MyFeed
-                showHeader={false}
-                posts={myFeed.items}
-                isMyFeed={true}
-                isLast={myFeed.isLast}
-              />
-            </>
+            <MyFeed
+              showHeader={false}
+              posts={myFeed.items}
+              isMyFeed={true}
+              isLast={myFeed.isLast}
+            />
           )}
           {!currentFeed.isLast && <div ref={currentFeed.sentinelRef} style={{ height: 40 }} />}
           {currentFeed.isLoadingMore && <LoadingSpinner size="small" fullHeight={false} />}

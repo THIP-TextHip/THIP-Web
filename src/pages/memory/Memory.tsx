@@ -110,7 +110,7 @@ const Memory = () => {
       if (activeTab === 'group') {
         params.sort = selectedSort;
       }
-
+      
       if (activeFilter === 'overall') {
         params.isOverview = true;
       } else if (selectedPageRange) {
@@ -118,12 +118,12 @@ const Memory = () => {
         params.pageEnd = selectedPageRange.end;
         params.isPageFilter = true;
       }
-
+            
       try {
         const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
         const response = await getMemoryPosts(params);
         if (minLoadingTime) await minLoadingTime;
-
+        
         if (!response.isSuccess) {
           throw new Error(response.message || '기록을 불러오는 중 오류가 발생했습니다.');
         }
@@ -202,7 +202,7 @@ const Memory = () => {
       setRecordItems(prev => [newRecord, ...prev]);
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, navigate, location.pathname, setRecordItems]);
+  }, [location.state, navigate, location.pathname]);
 
   const filteredRecords = useMemo(() => {
     if (activeFilter === 'overall') {
@@ -265,6 +265,13 @@ const Memory = () => {
     setShowUploadProgress(false);
   }, []);
 
+  const handleRecordDelete = useCallback(
+    (id: string) => {
+      recordsList.setItems(prev => prev.filter(r => r.id !== id));
+    },
+    [recordsList],
+  );
+
   const readingProgress = totalPages > 0 ? Math.round((currentUserPage / totalPages) * 100) : 0;
   const showInitialSkeleton = recordsList.isLoading && recordsList.items.length === 0;
 
@@ -289,7 +296,6 @@ const Memory = () => {
       <FixedHeader>
         <MemoryHeader onBackClick={handleBackClick} />
       </FixedHeader>
-
       <ScrollableContent ref={scrollRootRef}>
         {showInitialSkeleton ? (
           <Content>

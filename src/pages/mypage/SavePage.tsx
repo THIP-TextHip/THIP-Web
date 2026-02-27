@@ -176,7 +176,10 @@ const SavePage = () => {
                 </BookInfo>
               </LeftSection>
               <SaveIcon onClick={() => handleSaveToggle(book.isbn)}>
-                <img src={book.isSaved ? activeSave : save} alt={book.isSaved ? '저장됨' : '저장'} />
+                <img
+                  src={book.isSaved ? activeSave : save}
+                  alt={book.isSaved ? '저장됨' : '저장'}
+                />
               </SaveIcon>
             </BookItem>
           ))}
