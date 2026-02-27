@@ -5,7 +5,6 @@ import MyFeed from '../../components/feed/MyFeed';
 import TotalFeed from '../../components/feed/TotalFeed';
 import MainHeader from '@/components/common/MainHeader';
 import { FeedPostSkeleton, OtherFeedSkeleton } from '@/shared/ui/Skeleton';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import writefab from '../../assets/common/writefab.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getTotalFeeds } from '@/api/feeds/getTotalFeed';
