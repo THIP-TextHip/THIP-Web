@@ -3,6 +3,7 @@ import { Container } from './PostHeader.styled';
 interface PostHeaderProps {
   creatorProfileImageUrl?: string;
   creatorNickname?: string;
+  alias?: string;
   aliasName?: string;
   aliasColor?: string;
   postDate: string;
@@ -14,6 +15,7 @@ interface PostHeaderProps {
 const PostHeader = ({
   creatorProfileImageUrl,
   creatorNickname,
+  alias,
   aliasName,
   aliasColor,
   postDate,
@@ -41,7 +43,7 @@ const PostHeader = ({
         <div className="infoBox">
           <div className="username">{creatorNickname}</div>
           <div className="usertitle" style={{ color: aliasColor }}>
-            {aliasName}
+            {aliasName ?? alias}
           </div>
         </div>
       </div>
