@@ -3,6 +3,9 @@ import { useLocation } from 'react-router-dom';
 import { getToken } from '@/api/auth';
 import { useAuthReadyStore } from '@/stores/authReadyStore';
 
+let sharedTokenPromise: Promise<void> | null = null;
+let sharedLoginTokenKey: string | null = null;
+
 export const useSocialLoginToken = () => {
   const location = useLocation();
 
@@ -10,52 +13,52 @@ export const useSocialLoginToken = () => {
   const setReady = useAuthReadyStore(s => s.setReady);
 
   useEffect(() => {
-    const handleSocialLoginToken = async (): Promise<void> => {
-      const params = new URLSearchParams(window.location.search);
-      const loginTokenKey = params.get('loginTokenKey');
-
-      if (!loginTokenKey) {
-        return;
-      }
-
-      try {
-        const response = await getToken({ loginTokenKey });
-
-        if (response.isSuccess) {
-          const { token, isNewUser } = response.data;
-
-          if (isNewUser) {
-            localStorage.setItem('preAuthToken', token);
-            localStorage.removeItem('authToken');
-          } else {
-            localStorage.setItem('authToken', token);
-            localStorage.removeItem('preAuthToken');
-          }
-
-          const newUrl = window.location.pathname;
-          window.history.replaceState({}, document.title, newUrl);
-        } else {
-          console.error('토큰 발급 실패:', response.message);
-        }
-      } catch (error) {
-        console.error('토큰 발급 중 오류 발생:', error);
-      }
-      setReady(true);
-    };
-
     const urlParams = new URLSearchParams(location.search);
-    const isSocialLoginComplete = urlParams.get('loginTokenKey');
+    const loginTokenKey = urlParams.get('loginTokenKey');
 
-    if (isSocialLoginComplete) {
-      tokenPromise.current = handleSocialLoginToken();
-    } else {
+    if (!loginTokenKey) {
       setReady(true);
+      return;
     }
+
+    if (!sharedTokenPromise || sharedLoginTokenKey !== loginTokenKey) {
+      setReady(false);
+      sharedLoginTokenKey = loginTokenKey;
+      sharedTokenPromise = (async () => {
+        try {
+          const response = await getToken({ loginTokenKey });
+
+          if (response.isSuccess) {
+            const { token, isNewUser } = response.data;
+
+            if (isNewUser) {
+              localStorage.setItem('preAuthToken', token);
+              localStorage.removeItem('authToken');
+            } else {
+              localStorage.setItem('authToken', token);
+              localStorage.removeItem('preAuthToken');
+            }
+
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+          } else {
+            console.error('토큰 발급 실패:', response.message);
+          }
+        } catch (error) {
+          console.error('토큰 발급 중 오류 발생:', error);
+        } finally {
+          setReady(true);
+        }
+      })();
+    }
+
+    tokenPromise.current = sharedTokenPromise;
   }, [location.pathname, location.search, setReady]);
 
   const waitForToken = useCallback(async (): Promise<void> => {
-    if (tokenPromise.current) {
-      await tokenPromise.current;
+    const pendingTokenPromise = tokenPromise.current ?? sharedTokenPromise;
+    if (pendingTokenPromise) {
+      await pendingTokenPromise;
     }
   }, []);
 

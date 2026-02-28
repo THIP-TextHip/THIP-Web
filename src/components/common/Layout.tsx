@@ -3,9 +3,13 @@ import { useEffect } from 'react';
 import ScrollToTop from './ScrollToTop';
 import AsideDecoration from './AsideDecoration';
 import { sendPageView } from '@/shared/lib/analytics/ga';
+import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
+import { useAuthReadyStore } from '@/stores/authReadyStore';
 
 const Layout = () => {
   const location = useLocation();
+  useSocialLoginToken();
+  const isAuthReady = useAuthReadyStore(s => s.isReady);
 
   useEffect(() => {
     const path = location.pathname;
@@ -39,7 +43,7 @@ const Layout = () => {
     <>
       <ScrollToTop />
       <AsideDecoration />
-      <Outlet />
+      {isAuthReady ? <Outlet /> : null}
     </>
   );
 };
