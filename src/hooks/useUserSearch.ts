@@ -33,11 +33,13 @@ export const useUserSearch = ({
       try {
         setLoading(true);
         setError(null);
+        const minLoadingTime = !isLoadMore ? new Promise(resolve => setTimeout(resolve, 500)) : null;
         const response = await getUsers({
           keyword: searchKeyword,
           size,
           isFinalized,
         });
+        if (minLoadingTime) await minLoadingTime;
 
         const newUserList = response.data.userList;
 
