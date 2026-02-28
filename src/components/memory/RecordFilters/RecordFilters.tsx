@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FilterType } from '../../../pages/memory/Memory';
 import type { SortType } from '../SortDropdown';
 import PageInputMode from './PageInputMode';
@@ -31,6 +31,12 @@ const RecordFilters = ({
   const [showInputMode, setShowInputMode] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  useEffect(() => {
+    if (activeFilter !== 'page' || selectedPageRange) {
+      setShowInputMode(false);
+    }
+  }, [activeFilter, selectedPageRange]);
+
   const handlePageFilterClick = () => {
     if (selectedPageRange) {
       if (onPageRangeClear) {
@@ -39,7 +45,9 @@ const RecordFilters = ({
       }
     } else {
       setShowInputMode(true);
-      onFilterChange('page');
+      if (activeFilter !== 'page') {
+        onFilterChange('page');
+      }
     }
   };
 

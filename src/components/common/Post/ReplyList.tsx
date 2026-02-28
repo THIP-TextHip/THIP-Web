@@ -54,6 +54,7 @@ const ReplyList = ({
 
   const list = isInfiniteMode ? commentFeed.items : commentList;
   const hasComments = list.length > 0;
+  const isInitialLoading = isInfiniteMode && commentFeed.isLoading && list.length === 0;
 
   const handleReload = useCallback(() => {
     if (isInfiniteMode) {
@@ -65,9 +66,6 @@ const ReplyList = ({
 
   return (
     <Container disableBottomMargin={disableBottomMargin}>
-      {isInfiniteMode && commentFeed.isLoading && list.length === 0 && (
-        <LoadingSpinner size="small" fullHeight={false} />
-      )}
       {hasComments ? (
         list.map((comment, commentIndex) => (
           <div className="comment-group" key={comment.commentId || `comment-${commentIndex}`}>
@@ -81,12 +79,12 @@ const ReplyList = ({
             ))}
           </div>
         ))
-      ) : (
+      ) : !isInitialLoading ? (
         <EmptyState disableBottomMargin={disableBottomMargin}>
           <div className="title">아직 댓글이 없어요</div>
           <div className="sub-title">첫번째 댓글을 남겨보세요</div>
         </EmptyState>
-      )}
+      ) : null}
 
       {isInfiniteMode && !commentFeed.isLast && <div ref={commentFeed.sentinelRef} style={{ height: 20 }} />}
       {isInfiniteMode && commentFeed.isLoadingMore && <LoadingSpinner size="small" fullHeight={false} />}

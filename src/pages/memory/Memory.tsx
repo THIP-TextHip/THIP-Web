@@ -75,6 +75,8 @@ const Memory = () => {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [currentUserPage, setCurrentUserPage] = useState<number>(0);
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
+  const resolvedFilter: FilterType | null =
+    activeFilter === 'page' && !selectedPageRange ? null : activeFilter;
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -94,7 +96,7 @@ const Memory = () => {
 
   const recordsList = useInifinieScroll<Record>({
     enabled: !!roomId,
-    reloadKey: `${roomId}-${activeTab}-${selectedSort}-${activeFilter}-${selectedPageRange?.start ?? ''}-${selectedPageRange?.end ?? ''}`,
+    reloadKey: `${roomId}-${activeTab}-${selectedSort}-${resolvedFilter}-${selectedPageRange?.start ?? ''}-${selectedPageRange?.end ?? ''}`,
     rootRef: scrollRootRef,
     fetchPage: async cursor => {
       if (!roomId) {
@@ -110,20 +112,20 @@ const Memory = () => {
       if (activeTab === 'group') {
         params.sort = selectedSort;
       }
-      
-      if (activeFilter === 'overall') {
+
+      if (resolvedFilter === 'overall') {
         params.isOverview = true;
-      } else if (selectedPageRange) {
+      } else if (resolvedFilter === 'page' && selectedPageRange) {
         params.pageStart = selectedPageRange.start;
         params.pageEnd = selectedPageRange.end;
         params.isPageFilter = true;
       }
-            
+
       try {
         const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
         const response = await getMemoryPosts(params);
         if (minLoadingTime) await minLoadingTime;
-        
+
         if (!response.isSuccess) {
           throw new Error(response.message || '기록을 불러오는 중 오류가 발생했습니다.');
         }
@@ -202,7 +204,7 @@ const Memory = () => {
       setRecordItems(prev => [newRecord, ...prev]);
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, navigate, location.pathname]);
+  }, [location.state, navigate, location.pathname, setRecordItems]);
 
   const filteredRecords = useMemo(() => {
     if (activeFilter === 'overall') {
@@ -236,6 +238,10 @@ const Memory = () => {
 
   const handleFilterChange = useCallback(
     (filter: FilterType) => {
+      if (filter === 'page' && activeFilter === 'page' && !selectedPageRange) {
+        return;
+      }
+
       if (activeFilter === filter) {
         setActiveFilter(null);
         setSelectedPageRange(null);
@@ -244,7 +250,7 @@ const Memory = () => {
         setSelectedPageRange(null);
       }
     },
-    [activeFilter],
+    [activeFilter, selectedPageRange],
   );
 
   const handleSortChange = useCallback((sort: SortType) => {
@@ -338,6 +344,7 @@ const Memory = () => {
               onPageRangeClear={handlePageRangeClear}
               onPageRangeSet={handlePageRangeSet}
               onUploadComplete={handleUploadComplete}
+              onDelete={handleRecordDelete}
             />
             {!recordsList.isLast && <div ref={recordsList.sentinelRef} style={{ height: 20 }} />}
           </>

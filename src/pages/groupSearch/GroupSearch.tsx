@@ -36,16 +36,6 @@ const GroupSearch = () => {
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [showTabs, setShowTabs] = useState(false);
 
-  useEffect(() => {
-    fetchRecentSearches();
-  }, []);
-
-  useEffect(() => {
-    if (searchStatus === 'idle') {
-      fetchRecentSearches();
-    }
-  }, [searchStatus]);
-
   const fetchRecentSearches = useCallback(async () => {
     try {
       setIsLoadingRecentSearches(true);
@@ -58,6 +48,16 @@ const GroupSearch = () => {
       setIsLoadingRecentSearches(false);
     }
   }, []);
+
+  useEffect(() => {
+    fetchRecentSearches();
+  }, [fetchRecentSearches]);
+
+  useEffect(() => {
+    if (searchStatus === 'idle') {
+      fetchRecentSearches();
+    }
+  }, [searchStatus, fetchRecentSearches]);
 
   useEffect(() => {
     if (location.state?.allRooms) {
@@ -135,7 +135,7 @@ const GroupSearch = () => {
   const queryTerm = searchStatus === 'searched' ? searchTerm.trim() : debouncedSearchTerm.trim();
   const isAllCategory = !queryTerm && category === '';
 
-  const searchResult = useInifinieScroll({
+  const searchResult = useInifinieScroll<SearchRoomItem>({
     enabled: searchStatus !== 'idle' && (searchStatus === 'searched' || !!queryTerm),
     reloadKey: `${searchStatus}-${queryTerm}-${selectedFilter}-${category}`,
     fetchPage: async cursor => {
@@ -145,7 +145,7 @@ const GroupSearch = () => {
 
       const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
       const res = await getSearchRooms(
-        debouncedSearchTerm,
+        queryTerm,
         toSortKey(selectedFilter),
         cursor ?? undefined,
         searchStatus === 'searched',

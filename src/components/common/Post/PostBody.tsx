@@ -13,6 +13,7 @@ const PostBody = ({
   feedId,
   contentUrls = [],
 }: PostBodyProps) => {
+  const navigate = useNavigate();
   const previewImages = contentUrls.slice(0, 3);
   const hasImage = previewImages.length > 0;
   const contentRef = useRef<HTMLDivElement>(null);
