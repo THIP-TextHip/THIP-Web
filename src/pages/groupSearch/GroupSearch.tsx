@@ -3,7 +3,7 @@ import { Modal, Overlay } from '@/components/group/Modal.styles';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import SearchBar from '@/components/search/SearchBar';
 import rightChevron from '../../assets/common/right-Chevron.svg';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import GroupSearchResult from '@/components/search/GroupSearchResult';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
@@ -35,16 +35,7 @@ const GroupSearch = () => {
   const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [showTabs, setShowTabs] = useState(false);
-
-  useEffect(() => {
-    fetchRecentSearches();
-  }, []);
-
-  useEffect(() => {
-    if (searchStatus === 'idle') {
-      fetchRecentSearches();
-    }
-  }, [searchStatus]);
+  const prevSearchStatusRef = useRef<SearchStatus>('idle');
 
   const fetchRecentSearches = useCallback(async () => {
     try {
@@ -58,6 +49,17 @@ const GroupSearch = () => {
       setIsLoadingRecentSearches(false);
     }
   }, []);
+
+  useEffect(() => {
+    fetchRecentSearches();
+  }, [fetchRecentSearches]);
+
+  useEffect(() => {
+    if (searchStatus === 'idle' && prevSearchStatusRef.current !== 'idle') {
+      fetchRecentSearches();
+    }
+    prevSearchStatusRef.current = searchStatus;
+  }, [searchStatus, fetchRecentSearches]);
 
   useEffect(() => {
     if (location.state?.allRooms) {
@@ -135,7 +137,7 @@ const GroupSearch = () => {
   const queryTerm = searchStatus === 'searched' ? searchTerm.trim() : debouncedSearchTerm.trim();
   const isAllCategory = !queryTerm && category === '';
 
-  const searchResult = useInifinieScroll({
+  const searchResult = useInifinieScroll<SearchRoomItem>({
     enabled: searchStatus !== 'idle' && (searchStatus === 'searched' || !!queryTerm),
     reloadKey: `${searchStatus}-${queryTerm}-${selectedFilter}-${category}`,
     fetchPage: async cursor => {
@@ -145,7 +147,7 @@ const GroupSearch = () => {
 
       const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
       const res = await getSearchRooms(
-        debouncedSearchTerm,
+        queryTerm,
         toSortKey(selectedFilter),
         cursor ?? undefined,
         searchStatus === 'searched',

@@ -22,10 +22,6 @@ const tabs = ['피드', '내 피드'];
 const Feed = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const initialTabFromState = (location.state as { initialTab?: string } | null)?.initialTab;
-  const [activeTab, setActiveTab] = useState<string>(initialTabFromState ?? tabs[0]);
-  const [isFollowListLoading, setIsFollowListLoading] = useState(activeTab === '피드');
-
   const { waitForToken } = useSocialLoginToken();
 
   const initialTabFromState = (location.state as { initialTab?: string } | null)?.initialTab;
@@ -40,7 +36,7 @@ const Feed = () => {
   const [activeTab, setActiveTab] = useState<string>(
     initialTabFromState ?? (isRestoringFromCache ? initialCache!.activeTab : tabs[0]),
   );
-
+  const [isFollowListLoading, setIsFollowListLoading] = useState(activeTab === '피드');
   const skipScrollResetRef = useRef(isRestoringFromCache);
 
   const totalFeed = useInifinieScroll<PostData>({
@@ -96,12 +92,34 @@ const Feed = () => {
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    const hasItems = totalFeed.items.length > 0 || myFeed.items.length > 0;
+    if (!hasItems) return;
+
+    writeFeedCache({
+      activeTab,
+      totalFeedPosts: totalFeed.items,
+      myFeedPosts: myFeed.items,
+      totalNextCursor: totalFeed.nextCursor ?? '',
+      myNextCursor: myFeed.nextCursor ?? '',
+      totalIsLast: totalFeed.isLast,
+      myIsLast: myFeed.isLast,
+    });
+  }, [
+    activeTab,
+    totalFeed.items,
+    myFeed.items,
+    totalFeed.nextCursor,
+    myFeed.nextCursor,
+    totalFeed.isLast,
+    myFeed.isLast,
+  ]);
+
   const currentFeed = activeTab === '피드' ? totalFeed : myFeed;
   const showFeedInitialLoading = totalFeed.isLoading && totalFeed.items.length === 0;
   const showMyFeedInitialLoading = myFeed.isLoading && myFeed.items.length === 0;
   const showInitialLoading =
     activeTab === '피드' ? showFeedInitialLoading || isFollowListLoading : showMyFeedInitialLoading;
-
   return (
     <Container>
       <MainHeader

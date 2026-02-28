@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserSearch } from '@/hooks/useUserSearch';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
-import { Content, SearchBarContainer, Wrapper, LoadingMessage } from './UserSearch.styled';
+import { Content, SearchBarContainer, Wrapper } from './UserSearch.styled';
 
 const UserSearch = () => {
   const navigate = useNavigate();
@@ -30,7 +30,8 @@ const UserSearch = () => {
   const fetchRecentSearches = async () => {
     setIsRecentLoading(true);
     try {
-      const response = await getRecentSearch('USER');
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([getRecentSearch('USER'), minLoadingTime]);
       setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
     } catch {
       setRecentSearches([]);
@@ -107,27 +108,13 @@ const UserSearch = () => {
       </SearchBarContainer>
       <Content>
         {isSearching ? (
-          <>
-            {userList.length === 0 && (loading || !isSearched) ? (
-              <LoadingMessage>검색 중...</LoadingMessage>
-            ) : isSearched ? (
-              <UserSearchResult
-                type={'searched'}
-                searchedUserList={userList}
-                loading={loading}
-                hasMore={hasMore}
-                onLoadMore={loadMore}
-              />
-            ) : (
-              <UserSearchResult
-                type={'searching'}
-                searchedUserList={userList}
-                loading={loading}
-                hasMore={hasMore}
-                onLoadMore={loadMore}
-              />
-            )}
-          </>
+          <UserSearchResult
+            type={isSearched ? 'searched' : 'searching'}
+            searchedUserList={userList}
+            loading={loading}
+            hasMore={hasMore}
+            onLoadMore={loadMore}
+          />
         ) : (
           <>
             <RecentSearchTabs
