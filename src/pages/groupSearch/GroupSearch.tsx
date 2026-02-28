@@ -3,7 +3,7 @@ import { Modal, Overlay } from '@/components/group/Modal.styles';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import SearchBar from '@/components/search/SearchBar';
 import rightChevron from '../../assets/common/right-Chevron.svg';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import GroupSearchResult from '@/components/search/GroupSearchResult';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
@@ -35,6 +35,7 @@ const GroupSearch = () => {
   const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [showTabs, setShowTabs] = useState(false);
+  const prevSearchStatusRef = useRef<SearchStatus>('idle');
 
   const fetchRecentSearches = useCallback(async () => {
     try {
@@ -54,9 +55,10 @@ const GroupSearch = () => {
   }, [fetchRecentSearches]);
 
   useEffect(() => {
-    if (searchStatus === 'idle') {
+    if (searchStatus === 'idle' && prevSearchStatusRef.current !== 'idle') {
       fetchRecentSearches();
     }
+    prevSearchStatusRef.current = searchStatus;
   }, [searchStatus, fetchRecentSearches]);
 
   useEffect(() => {
