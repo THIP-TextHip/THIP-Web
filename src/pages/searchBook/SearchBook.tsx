@@ -274,8 +274,11 @@ const SearchBook = () => {
                   showHeader={true}
                   isMyFeed={false}
                   feedId={post.feedId}
+                  creatorId={post.creatorId}
                   creatorNickname={post.creatorNickname}
                   creatorProfileImageUrl={post.creatorProfileImageUrl}
+                  aliasName={post.aliasName}
+                  aliasColor={post.aliasColor}
                   postDate={post.postDate}
                   isbn={post.isbn}
                   bookTitle={post.bookTitle}

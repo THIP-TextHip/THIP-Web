@@ -4,6 +4,8 @@ export interface PostData {
   creatorNickname?: string;
   creatorProfileImageUrl?: string;
   alias?: string;
+  aliasName?: string;
+  aliasColor?: string;
   postDate: string;
   isbn: string;
   bookTitle: string;
