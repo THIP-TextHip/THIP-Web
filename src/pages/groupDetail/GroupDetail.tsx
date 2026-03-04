@@ -47,6 +47,7 @@ import bookCoverLargeImg from '../../assets/books/bookCoverLarge.svg';
 import PasswordModal from '@/components/group/PasswordModal';
 import { usePopupStore } from '@/stores/popupStore';
 import { BannerSkeleton, BookSkeleton } from '@/shared/ui/Skeleton';
+import SEOHead from '@/components/common/SEOHead';
 
 const GroupDetail = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -91,9 +92,7 @@ const GroupDetail = () => {
         setError(null);
 
         const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
-        const [response] = await Promise.all([
-          getRoomDetail(Number(roomId)),
-        ]);
+        const [response] = await Promise.all([getRoomDetail(Number(roomId))]);
         await minLoadingTime;
 
         if (response.isSuccess) {
@@ -293,6 +292,10 @@ const GroupDetail = () => {
 
   return (
     <Wrapper>
+      <SEOHead
+        title={roomData.roomName}
+        description={`${roomData.bookTitle} 독서모임 | THIP에서 함께 읽어요.`}
+      />
       <TopBackground genre={category}>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />

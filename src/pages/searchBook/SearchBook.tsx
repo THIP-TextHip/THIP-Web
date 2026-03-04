@@ -42,6 +42,7 @@ import { usePopupStore } from '@/stores/popupStore';
 import { FeedPostSkeleton, BookDetailSkeleton } from '@/shared/ui/Skeleton';
 import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 import { useInifinieScroll } from '@/hooks/useInifinieScroll';
+import SEOHead from '@/components/common/SEOHead';
 
 const FILTER = ['최신순', '인기순'] as const;
 const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
@@ -212,6 +213,12 @@ const SearchBook = () => {
 
   return (
     <Wrapper>
+      {bookDetail && (
+        <SEOHead
+          title={bookDetail.title}
+          description={`${bookDetail.authorName} 저 | THIP에서 독서모임과 독후감을 만나보세요.`}
+        />
+      )}
       {bookDetail && <TopBackground bookImgUrl={bookDetail.imageUrl} />}
       <Header>
         <IconButton src={leftArrow} onClick={handleBackButton} />
