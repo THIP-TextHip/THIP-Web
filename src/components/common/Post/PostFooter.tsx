@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import styled from '@emotion/styled';
+import { useEffect, useRef, useState } from 'react';
 import like from '../../../assets/feed/like.svg';
 import activeLike from '../../../assets/feed/activeLike.svg';
 import comment from '../../../assets/feed/comment.svg';
@@ -8,40 +7,9 @@ import activeSave from '../../../assets/feed/activeSave.svg';
 import lockIcon from '../../../assets/feed/lockIcon.svg';
 import { postSaveFeed } from '@/api/feeds/postSave';
 import { postFeedLike } from '@/api/feeds/postFeedLike';
-
-const Container = styled.div<{ isDetail: boolean }>`
-  width: 100%;
-  height: 24px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
-  img {
-    cursor: pointer;
-  }
-
-  .left {
-    display: flex;
-    flex-direction: row;
-    gap: 12px;
-    .count {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      color: var(--color-white);
-      font-size: var(--string-size-small03, 12px);
-      font-weight: var(--string-weight-medium, 500);
-      line-height: normal;
-      letter-spacing: 0.012px;
-      gap: 2px;
-
-      &.comment img {
-        cursor: ${({ isDetail }) => (isDetail ? 'default' : 'pointer')};
-      }
-    }
-  }
-`;
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
+import { Container } from './PostFooter.styled';
+import { useNavigate } from 'react-router-dom';
 
 interface PostFooterProps {
   likeCount: number;
@@ -66,59 +34,92 @@ const PostFooter = ({
   isDetail = false,
   onSaveToggle,
 }: PostFooterProps) => {
+  const navigate = useNavigate();
   const [liked, setLiked] = useState(isLiked);
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
   const [saved, setSaved] = useState(isSaved);
 
-  const handleLike = async () => {
-    try {
-      const response = await postFeedLike(feedId, !liked);
+  const likedRef = useRef(isLiked);
+  const savedRef = useRef(isSaved);
+  const { isLoading: isLikeLoading, run: runLike } = usePreventDoubleClick();
+  const { isLoading: isSaveLoading, run: runSave } = usePreventDoubleClick();
 
-      if (response.isSuccess) {
-        // 성공 시 상태 업데이트
-        setLiked(response.data.isLiked);
-        setLikeCount(prev => (response.data.isLiked ? prev + 1 : prev - 1));
-        console.log('좋아요 상태 변경 성공:', response.data.isLiked);
-      } else {
-        console.error('좋아요 상태 변경 실패:', response.message);
+  useEffect(() => {
+    setLiked(isLiked);
+    likedRef.current = isLiked;
+  }, [isLiked]);
+
+  useEffect(() => {
+    setSaved(isSaved);
+    savedRef.current = isSaved;
+  }, [isSaved]);
+
+  const handleLike = () => {
+    runLike(async () => {
+      const nextLiked = !likedRef.current;
+      likedRef.current = nextLiked;
+      setLiked(nextLiked);
+      setLikeCount(prev => (nextLiked ? prev + 1 : prev - 1));
+
+      try {
+        const response = await postFeedLike(feedId, nextLiked);
+        if (!response.isSuccess && likedRef.current === nextLiked) {
+          const rollbackState = !nextLiked;
+          likedRef.current = rollbackState;
+          setLiked(rollbackState);
+          setLikeCount(prev => (nextLiked ? prev - 1 : prev + 1));
+        }
+      } catch {
+        if (likedRef.current === nextLiked) {
+          const rollbackState = !nextLiked;
+          likedRef.current = rollbackState;
+          setLiked(rollbackState);
+          setLikeCount(prev => (nextLiked ? prev - 1 : prev + 1));
+        }
       }
-    } catch (error) {
-      console.error('좋아요 API 호출 실패:', error);
-    }
+    });
   };
 
-  const handleSave = async () => {
-    try {
-      const response = await postSaveFeed(feedId, !saved);
+  const handleSave = () => {
+    runSave(async () => {
+      const nextSaved = !savedRef.current;
+      savedRef.current = nextSaved;
+      setSaved(nextSaved);
+      onSaveToggle?.(feedId, nextSaved);
 
-      if (response.isSuccess) {
-        const newSaveState = response.data?.isSaved ?? !saved;
-        // 성공 시 상태 업데이트
-        setSaved(newSaveState);
-        console.log('저장 상태 변경 성공:', newSaveState);
-        
-        // 부모 컴포넌트에 알림
-        if (onSaveToggle) {
-          onSaveToggle(feedId, newSaveState);
+      try {
+        const response = await postSaveFeed(feedId, nextSaved);
+        if (!response.isSuccess && savedRef.current === nextSaved) {
+          const rollbackState = !nextSaved;
+          savedRef.current = rollbackState;
+          setSaved(rollbackState);
+          onSaveToggle?.(feedId, rollbackState);
         }
-      } else {
-        console.error('저장 상태 변경 실패:', response.message);
+      } catch {
+        if (savedRef.current === nextSaved) {
+          const rollbackState = !nextSaved;
+          savedRef.current = rollbackState;
+          setSaved(rollbackState);
+          onSaveToggle?.(feedId, rollbackState);
+        }
       }
-    } catch (error) {
-      console.error('저장 API 호출 실패:', error);
-    }
+    });
   };
 
   const handleComment = () => {
     if (isDetail) return;
-    window.open(`/feed/${feedId}`, '_blank');
+    navigate(`/feed/${feedId}`);
   };
 
   return (
     <Container isDetail={isDetail}>
       <div className="left">
         <div className="count">
-          <img src={liked ? activeLike : like} onClick={handleLike} />
+          <img
+            src={liked ? activeLike : like}
+            onClick={handleLike}
+            style={{ opacity: isLikeLoading ? 0.6 : 1 }}
+          />
           <div>{likeCount}</div>
         </div>
         <div className="count comment">
@@ -134,7 +135,12 @@ const PostFooter = ({
             <img src={lockIcon} alt="비공개" />
           )
         ) : (
-          <img src={saved ? activeSave : save} onClick={handleSave} alt="저장" />
+          <img
+            src={saved ? activeSave : save}
+            onClick={handleSave}
+            alt="저장"
+            style={{ opacity: isSaveLoading ? 0.6 : 1 }}
+          />
         )}
       </div>
     </Container>

@@ -1,5 +1,4 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import styled from '@emotion/styled';
 import Fab from './Fab';
 import FeedIcon from '../../assets/navbar/feed.svg';
 import GroupIcon from '../../assets/navbar/group.svg';
@@ -9,51 +8,7 @@ import FeedIconActive from '../../assets/navbar/feed-active.svg';
 import GroupIconActive from '../../assets/navbar/group-active.svg';
 import SearchIconActive from '../../assets/navbar/search-active.svg';
 import MyIconActive from '../../assets/navbar/my-active.svg';
-
-const NavWrapper = styled.div`
-  position: relative;
-`;
-
-const NavContainer = styled.div`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 auto;
-
-  min-width: 320px;
-  max-width: 767px;
-  height: 75px;
-  padding: 16px 32px;
-
-  border-top: 1px solid var(--color-grey-300);
-  border-radius: 12px 12px 0px 0px;
-  background-color: var(--color-black-main);
-`;
-
-const NavItem = styled.div<{ active?: boolean }>`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  font-size: 12px;
-  color: ${({ active }) => (active ? 'var(--color-purple-main)' : 'var(--color-grey-300)')};
-
-  svg {
-    display: flex;
-    width: 24px;
-    height: 24px;
-    padding: 4px 2px;
-    justify-content: center;
-    align-items: center;
-  }
-`;
+import { NavWrapper, NavContainer, NavItem } from './NavBar.styled';
 
 type RouteItem = {
   path: string;

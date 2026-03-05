@@ -26,13 +26,13 @@ interface BookListProps {
   isSearchMode?: boolean;
 }
 
-const BookList = ({ 
-  books, 
-  onBookSelect, 
-  onLoadMore, 
-  hasNextPage = false, 
+const BookList = ({
+  books,
+  onBookSelect,
+  onLoadMore,
+  hasNextPage = false,
   isLoadingMore = false,
-  isSearchMode = false 
+  isSearchMode = false,
 }: BookListProps) => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
@@ -41,20 +41,22 @@ const BookList = ({
     e.currentTarget.style.display = 'none';
   };
 
-  // 무한스크롤을 위한 Intersection Observer 설정
-  const lastBookElementRef = useCallback((node: HTMLDivElement | null) => {
-    if (isLoadingMore) return;
-    
-    if (observerRef.current) observerRef.current.disconnect();
-    
-    observerRef.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasNextPage && onLoadMore) {
-        onLoadMore();
-      }
-    });
-    
-    if (node) observerRef.current.observe(node);
-  }, [isLoadingMore, hasNextPage, onLoadMore, isSearchMode]);
+  const lastBookElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoadingMore) return;
+
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasNextPage && onLoadMore) {
+          onLoadMore();
+        }
+      });
+
+      if (node) observerRef.current.observe(node);
+    },
+    [isLoadingMore, hasNextPage, onLoadMore, isSearchMode],
+  );
 
   useEffect(() => {
     return () => {
@@ -67,8 +69,8 @@ const BookList = ({
   return (
     <StyledBookList>
       {books.map((book, index) => (
-        <BookItem 
-          key={`${book.id}-${book.isbn}`} 
+        <BookItem
+          key={`${book.id}-${book.isbn}`}
           onClick={() => onBookSelect(book)}
           ref={index === books.length - 1 ? lastBookElementRef : null}
         >
@@ -80,8 +82,7 @@ const BookList = ({
           </BookInfo>
         </BookItem>
       ))}
-      
-      {/* 더 많은 데이터가 있고 로딩 중일 때 로딩 표시 */}
+
       {isLoadingMore && (
         <LoadingContainer ref={loadingRef}>
           <LoadingText>더 많은 책을 불러오는 중...</LoadingText>

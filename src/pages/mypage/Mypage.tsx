@@ -1,8 +1,5 @@
-import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
-import { colors, typography } from '@/styles/global/global';
 import MenuButton from '@/components/Mypage/MenuButton';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import { useLogout } from '@/hooks/useLogout';
 import alert from '../../assets/mypage/alert.svg';
@@ -15,6 +12,20 @@ import terms from '../../assets/mypage/terms.svg';
 import NavBar from '@/components/common/NavBar';
 import { getMyProfile, type GetMyProfileResponse } from '@/api/users/getMyProfile';
 import { useEffect, useState } from 'react';
+import Skeleton from '@/shared/ui/Skeleton';
+import {
+  Wrapper,
+  Header,
+  UserProfile,
+  Container,
+  Section,
+  SectionTitle,
+  MenuGrid,
+  BottomMenu,
+  ProfileSkeletonContainer,
+  ProfileSkeletonLeft,
+  ProfileSkeletonText,
+} from './Mypage.styled';
 
 const Mypage = () => {
   const [profile, setProfile] = useState<GetMyProfileResponse['data'] | null>(null);
@@ -27,7 +38,8 @@ const Mypage = () => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const profile = await getMyProfile();
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [profile] = await Promise.all([getMyProfile(), minLoadingTime]);
         setProfile(profile);
       } catch (error) {
         console.error('프로필 정보 로드 실패:', error);
@@ -39,36 +51,19 @@ const Mypage = () => {
   }, []);
 
   const handleEditClick = () => {
+    if (!profile) return;
     navigate('/mypage/edit', { state: { profile } });
   };
-
-  if (loading) {
-    return (
-      <Wrapper>
-        <LoadingSpinner message="내 정보를 불러오는 중..." size="large" fullHeight={true} />
-      </Wrapper>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <Wrapper>
-        <div>프로필 정보를 불러올 수 없습니다.</div>
-      </Wrapper>
-    );
-  }
 
   const handleLogout = () => {
     openConfirm({
       title: '로그아웃',
       disc: '또 THIP 해주실거죠?',
       onConfirm: () => {
-        console.log('로그아웃 실행');
         closePopup();
-        logout(); // 실제 로그아웃 로직 실행
+        logout();
       },
       onClose: () => {
-        console.log('로그아웃 취소');
         closePopup();
       },
     });
@@ -110,20 +105,33 @@ const Mypage = () => {
     <Wrapper>
       <Header>내 정보</Header>
       <Container>
-        <UserProfile>
-          <div className="userInfo">
-            <img src={profile.profileImageUrl} />
-            <div className="user">
-              <div className="username">{profile.nickname}</div>
-              <div className="usertitle" style={{ color: profile.aliasColor }}>
-                {profile.aliasName}
+        {loading ? (
+          <ProfileSkeletonContainer>
+            <ProfileSkeletonLeft>
+              <Skeleton.Circle width={54} />
+              <ProfileSkeletonText>
+                <Skeleton.Text width={80} height={18} />
+                <Skeleton.Text width={60} height={14} />
+              </ProfileSkeletonText>
+            </ProfileSkeletonLeft>
+            <Skeleton.Box width={52} height={34} borderRadius={20} />
+          </ProfileSkeletonContainer>
+        ) : !profile ? null : (
+          <UserProfile>
+            <div className="userInfo">
+              <img src={profile.profileImageUrl} alt={`${profile.nickname} 프로필`} />
+              <div className="user">
+                <div className="username">{profile.nickname}</div>
+                <div className="usertitle" style={{ color: profile.aliasColor }}>
+                  {profile.aliasName}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="edit" onClick={handleEditClick}>
-            편집
-          </div>
-        </UserProfile>
+            <div className="edit" onClick={handleEditClick}>
+              편집
+            </div>
+          </UserProfile>
+        )}
         <Section>
           <SectionTitle>내 활동</SectionTitle>
           <MenuGrid>
@@ -159,141 +167,5 @@ const Mypage = () => {
     </Wrapper>
   );
 };
-
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  align-items: center;
-  min-width: 320px;
-  max-width: 767px;
-  min-height: 100vh;
-  margin: 0 auto;
-  background-color: #121212;
-`;
-
-const Header = styled.div`
-  background-color: ${colors.black.main};
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  max-width: 767px;
-  margin: 0 auto;
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-
-  color: ${colors.white};
-  font-size: ${typography.fontSize['2xl']};
-  font-style: normal;
-  font-weight: ${typography.fontWeight.bold};
-  line-height: 24px;
-`;
-
-const UserProfile = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 0 20px;
-
-  .userInfo {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-
-    img {
-      width: 54px;
-      height: 54px;
-      border-radius: 54px;
-      border: 0.5px solid var(--color-white);
-    }
-
-    .user {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      .username {
-        color: var(--color-text-primary_white, #fefefe);
-        font-size: var(--string-size-large01, 18px);
-        font-weight: var(--string-weight-semibold, 600);
-        line-height: var(--string-lineheight-height24, 24px); /* 133.333% */
-        letter-spacing: 0.018px;
-      }
-
-      .usertitle {
-        font-size: var(--string-size-medium01, 14px);
-        font-weight: var(--string-weight-regular, 400);
-        line-height: var(--string-lineheight-feedcontent_height20, 20px); /* 142.857% */
-      }
-    }
-  }
-
-  .edit {
-    padding: 8px 12px;
-    border-radius: 20px;
-    border: 1px solid #888;
-
-    color: var(--color-text-secondary_grey00, #dadada);
-    font-size: var(--string-size-medium01, 14px);
-    font-weight: var(--string-weight-medium, 500);
-    line-height: normal;
-    cursor: pointer;
-  }
-`;
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-height: 100vh;
-  padding-top: 76px;
-  gap: 40px;
-`;
-
-const Section = styled.div``;
-
-const SectionTitle = styled.div`
-  width: 100%;
-  padding: 0 20px;
-  padding-bottom: 12px;
-
-  color: ${colors.white};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  line-height: 24px;
-`;
-
-const MenuGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  padding: 0 20px;
-
-  @media (min-width: 612px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-`;
-
-const BottomMenu = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  margin-top: auto;
-  padding-bottom: 93px;
-
-  color: ${colors.grey[200]};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-  line-height: 20px;
-  cursor: pointer;
-`;
 
 export default Mypage;

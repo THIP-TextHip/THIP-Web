@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import styled from '@emotion/styled';
 import Profile from './Profile';
 import FeedPost from './FeedPost';
 import type { FeedListProps } from '../../types/post';
-import { colors, typography } from '@/styles/global/global';
 import TotalBar from './TotalBar';
 import { getMyProfile } from '@/api/feeds/getMyProfile';
 import type { MyProfileData } from '@/types/profile';
+import { OtherFeedSkeleton } from '@/shared/ui/Skeleton';
+import { Container, EmptyState } from './MyFeed.styled';
 
 const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
   const [profileData, setProfileData] = useState<MyProfileData | null>(null);
@@ -14,7 +14,6 @@ const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
 
   const hasPosts = posts.length > 0;
 
-  // 프로필 데이터 로드
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -31,10 +30,17 @@ const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
     loadProfile();
   }, []);
 
-  if (loading || !profileData) {
+  if (loading) {
+    return <OtherFeedSkeleton showFollowButton={false} paddingTop={136} />;
+  }
+
+  if (!profileData) {
     return (
-      <></>
-      // <LoadingSpinner message="내 피드 정보를 불러오는 중..." size="large" fullHeight={true} />
+      <Container>
+        <EmptyState>
+          <div>프로필 정보를 불러오지 못했어요</div>
+        </EmptyState>
+      </Container>
     );
   }
 
@@ -69,26 +75,5 @@ const MyFeed = ({ showHeader, posts = [], isLast = false }: FeedListProps) => {
     </Container>
   );
 };
-
-const Container = styled.div`
-  min-height: 100vh;
-  padding-top: 136px;
-  padding-bottom: 125px; //이전 76px
-  background-color: var(--color-black-main);
-`;
-
-const EmptyState = styled.div`
-  display: flex;
-  min-height: calc(100% - 75px);
-  justify-content: center;
-  align-items: center;
-  margin-top: 150px;
-
-  color: ${colors.white};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  line-height: 24px;
-  letter-spacing: 0.018px;
-`;
 
 export default MyFeed;

@@ -16,13 +16,11 @@ const SortDropdown = ({ isOpen, selectedSort, onSortSelect }: SortDropdownProps)
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
-      // 다음 프레임에서 애니메이션 시작
       requestAnimationFrame(() => {
         setIsAnimating(true);
       });
     } else {
       setIsAnimating(false);
-      // 애니메이션 완료 후 DOM에서 제거
       setTimeout(() => {
         setShouldRender(false);
       }, 150);

@@ -2,8 +2,6 @@ import NavBar from '@/components/common/NavBar';
 import TitleHeader from '@/components/common/TitleHeader';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import SearchBar from '@/components/search/SearchBar';
-import { colors } from '@/styles/global/global';
-import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { UserSearchResult } from './UserSearchResult';
@@ -11,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserSearch } from '@/hooks/useUserSearch';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
+import { Content, SearchBarContainer, Wrapper } from './UserSearch.styled';
 
 const UserSearch = () => {
   const navigate = useNavigate();
@@ -26,20 +25,18 @@ const UserSearch = () => {
   });
 
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
+  const [isRecentLoading, setIsRecentLoading] = useState(false);
 
   const fetchRecentSearches = async () => {
+    setIsRecentLoading(true);
     try {
-      const response = await getRecentSearch('USER');
-
-      if (response.isSuccess) {
-        setRecentSearches(response.data.recentSearchList);
-      } else {
-        console.error('최근 검색어 조회 실패:', response.message);
-        setRecentSearches([]);
-      }
-    } catch (error) {
-      console.error('최근 검색어 조회 오류:', error);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([getRecentSearch('USER'), minLoadingTime]);
+      setRecentSearches(response.isSuccess ? response.data.recentSearchList : []);
+    } catch {
       setRecentSearches([]);
+    } finally {
+      setIsRecentLoading(false);
     }
   };
 
@@ -62,17 +59,10 @@ const UserSearch = () => {
   };
 
   const handleDelete = async (recentSearchId: number) => {
-    try {
-      const response = await deleteRecentSearch(recentSearchId);
+    const response = await deleteRecentSearch(recentSearchId);
 
-      if (response.isSuccess) {
-        // 삭제 성공 후 최근 검색어 리스트를 다시 호출
-        await fetchRecentSearches();
-      } else {
-        console.error('최근 검색어 삭제 실패:', response.message);
-      }
-    } catch (error) {
-      console.error('최근 검색어 삭제 오류:', error);
+    if (response.isSuccess) {
+      await fetchRecentSearches();
     }
   };
 
@@ -118,31 +108,20 @@ const UserSearch = () => {
       </SearchBarContainer>
       <Content>
         {isSearching ? (
-          <>
-            {isSearched ? (
-              <UserSearchResult
-                type={'searched'}
-                searchedUserList={userList}
-                loading={loading}
-                hasMore={hasMore}
-                onLoadMore={loadMore}
-              />
-            ) : (
-              <UserSearchResult
-                type={'searching'}
-                searchedUserList={userList}
-                loading={loading}
-                hasMore={hasMore}
-                onLoadMore={loadMore}
-              />
-            )}
-          </>
+          <UserSearchResult
+            type={isSearched ? 'searched' : 'searching'}
+            searchedUserList={userList}
+            loading={loading}
+            hasMore={hasMore}
+            onLoadMore={loadMore}
+          />
         ) : (
           <>
             <RecentSearchTabs
               recentSearches={recentSearches.map(item => item.searchTerm)}
               handleDelete={handleDeleteWrapper}
               handleRecentSearchClick={handleRecentSearchClick}
+              isLoading={isRecentLoading}
             />
           </>
         )}
@@ -153,28 +132,3 @@ const UserSearch = () => {
 };
 
 export default UserSearch;
-
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  min-width: 320px;
-  max-width: 767px;
-  height: 100vh;
-  margin: 0 auto;
-  background: ${colors.black.main};
-`;
-
-const SearchBarContainer = styled.div`
-  position: fixed;
-  top: 56px;
-  left: 0;
-  right: 0;
-  max-width: 767px;
-  margin: 0 auto;
-  background: ${colors.black.main};
-`;
-
-const Content = styled.div`
-  margin-top: 132px;
-`;

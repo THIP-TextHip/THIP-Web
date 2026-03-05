@@ -1,0 +1,141 @@
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import TitleHeader from '@/components/common/TitleHeader';
+import { usePopupActions } from '@/hooks/usePopupActions';
+import leftArrow from '@/assets/common/leftArrow.svg';
+import infoIcon from '@/assets/common/infoIcon_white.svg';
+import { createAiReview } from '@/api/record';
+import {
+  Container,
+  LoadingContent,
+  MessageContainer,
+  Message,
+  SubMessage,
+  ResultContent,
+  InfoBanner,
+  ContentText,
+  CopyButton,
+} from './AIWrite.styled';
+
+const AIWrite = () => {
+  const navigate = useNavigate();
+  const { roomId } = useParams<{ roomId: string }>();
+  const { openSnackbar, openConfirm, closePopup } = usePopupActions();
+  const [isLoading, setIsLoading] = useState(true);
+  const [aiContent, setAiContent] = useState('');
+
+  useEffect(() => {
+    const fetchAiReview = async () => {
+      if (!roomId) return;
+
+      try {
+        const result = await createAiReview(Number(roomId));
+
+        if (result.isSuccess) {
+          setAiContent(result.data.content);
+        } else {
+          openSnackbar({
+            message: result.message,
+            variant: 'top',
+            isError: true,
+            onClose: () => {},
+          });
+          navigate(`/rooms/${roomId}/memory`);
+        }
+      } catch (error) {
+        console.error('AI 독서감상문 생성 실패:', error);
+        let errorMessage = 'AI 독서감상문 생성에 실패했습니다';
+
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as {
+            response?: {
+              data?: {
+                message?: string;
+              };
+            };
+          };
+          if (axiosError.response?.data?.message) {
+            errorMessage = axiosError.response.data.message;
+          }
+        }
+
+        openSnackbar({
+          message: errorMessage,
+          variant: 'top',
+          isError: true,
+          onClose: () => {},
+        });
+        navigate(`/rooms/${roomId}/memory`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAiReview();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId]);
+
+  const handleBackClick = () => {
+    openConfirm({
+      title: 'AI 독서감상문 생성 (Beta)',
+      disc: '생성된 감상문은 다시 볼 수 없으며, 잔여 이용횟수는 차감돼요. 계속하시겠어요?',
+      confirmText: '확인',
+      cancelText: '취소',
+      onConfirm: () => {
+        closePopup();
+        navigate(`/rooms/${roomId}/memory`);
+      },
+    });
+  };
+
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(aiContent);
+      openSnackbar({
+        message: '클립보드에 복사가 완료되었어요',
+        variant: 'top',
+        onClose: () => {},
+      });
+    } catch (error) {
+      console.error('클립보드 복사 실패:', error);
+      openSnackbar({
+        message: '복사에 실패했습니다',
+        variant: 'bottom',
+        isError: true,
+        onClose: () => {},
+      });
+    }
+  };
+
+  return (
+    <Container>
+      <TitleHeader
+        title="AI 독서감상문"
+        leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+        onLeftClick={handleBackClick}
+      />
+
+      {isLoading ? (
+        <LoadingContent>
+          <LoadingSpinner size="large" />
+          <MessageContainer>
+            <Message>독서 감상문을 생성중이에요!</Message>
+            <SubMessage>조금만 기다려주세요</SubMessage>
+          </MessageContainer>
+        </LoadingContent>
+      ) : (
+        <ResultContent>
+          <InfoBanner>
+            <img src={infoIcon} alt="정보" />
+            <span>내 기록과 총평을 바탕으로 생성된 감상문입니다.</span>
+          </InfoBanner>
+          <ContentText>{aiContent}</ContentText>
+          <CopyButton onClick={handleCopyToClipboard}>클립보드에 복사</CopyButton>
+        </ResultContent>
+      )}
+    </Container>
+  );
+};
+
+export default AIWrite;

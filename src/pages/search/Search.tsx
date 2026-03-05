@@ -4,14 +4,15 @@ import { BookSearchResult } from '@/components/search/BookSearchResult';
 import MostSearchedBooks from '@/components/search/MostSearchedBooks';
 import RecentSearchTabs from '@/components/search/RecentSearchTabs';
 import SearchBar from '@/components/search/SearchBar';
-import { colors, typography } from '@/styles/global/global';
-import styled from '@emotion/styled';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { getSearchBooks, convertToSearchedBooks } from '@/api/books/getSearchBooks';
 import { getRecentSearch, type RecentSearchData } from '@/api/recentsearch/getRecentSearch';
 import { deleteRecentSearch } from '@/api/recentsearch/deleteRecentSearch';
+import { Wrapper, Header, SearchBarContainer, Content } from './Search.styled';
+import { BookItemSkeleton, RecentSearchTabsSkeleton } from '@/shared/ui/Skeleton';
+import { Wrapper as BookListWrapper, List } from '@/components/search/BookSearchResult.styled';
 
 export interface SearchedBook {
   id: number;
@@ -36,6 +37,7 @@ const Search = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const [recentSearches, setRecentSearches] = useState<RecentSearchData[]>([]);
+  const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
   const [searchTimeoutId, setSearchTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -43,7 +45,12 @@ const Search = () => {
 
   const fetchRecentSearches = async () => {
     try {
-      const response = await getRecentSearch('BOOK');
+      setIsLoadingRecentSearches(true);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([
+        getRecentSearch('BOOK'),
+      ]);
+      await minLoadingTime;
 
       if (response.isSuccess) {
         setRecentSearches(response.data.recentSearchList);
@@ -54,6 +61,8 @@ const Search = () => {
     } catch (error) {
       console.error('최근 검색어 조회 오류:', error);
       setRecentSearches([]);
+    } finally {
+      setIsLoadingRecentSearches(false);
     }
   };
 
@@ -157,7 +166,11 @@ const Search = () => {
     setHasMore(true);
 
     try {
-      const response = await getSearchBooks(term, 1, isManualSearch);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([
+        getSearchBooks(term, 1, isManualSearch),
+      ]);
+      await minLoadingTime;
 
       if (response.isSuccess) {
         const convertedResults = convertToSearchedBooks(response.data.searchResult);
@@ -281,7 +294,13 @@ const Search = () => {
         {isSearching ? (
           <>
             {isLoading && searchResults.length === 0 ? (
-              <LoadingMessage>검색 중...</LoadingMessage>
+              <BookListWrapper>
+                <List>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <BookItemSkeleton key={i} />
+                  ))}
+                </List>
+              </BookListWrapper>
             ) : (
               <BookSearchResult
                 type={isFinalized ? 'searched' : 'searching'}
@@ -295,11 +314,15 @@ const Search = () => {
           </>
         ) : (
           <>
-            <RecentSearchTabs
-              recentSearches={recentSearches.map(item => item.searchTerm)}
-              handleDelete={handleDeleteWrapper}
-              handleRecentSearchClick={handleRecentSearchClick}
-            />
+            {isLoadingRecentSearches ? (
+              <RecentSearchTabsSkeleton />
+            ) : (
+              <RecentSearchTabs
+                recentSearches={recentSearches.map(item => item.searchTerm)}
+                handleDelete={handleDeleteWrapper}
+                handleRecentSearchClick={handleRecentSearchClick}
+              />
+            )}
             <MostSearchedBooks />
           </>
         )}
@@ -310,56 +333,3 @@ const Search = () => {
 };
 
 export default Search;
-
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  min-width: 320px;
-  max-width: 767px;
-  height: 100%;
-  min-height: 100vh;
-  margin: 0 auto;
-  background: ${colors.black.main};
-`;
-
-const Header = styled.div`
-  display: flex;
-  width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 56px;
-  max-width: 767px;
-  margin: 0 auto;
-  color: ${colors.white};
-  font-size: ${typography.fontSize['2xl']};
-  font-weight: ${typography.fontWeight['bold']};
-  padding: 16px 20px;
-  background: ${colors.black.main};
-  z-index: 1;
-`;
-
-const SearchBarContainer = styled.div`
-  position: fixed;
-  top: 56px;
-  left: 0;
-  right: 0;
-  max-width: 767px;
-  margin: 0 auto;
-  background: ${colors.black.main};
-`;
-
-const Content = styled.div`
-  margin-top: 132px;
-`;
-
-const LoadingMessage = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
-  color: ${colors.white};
-  font-size: ${typography.fontSize.base};
-`;

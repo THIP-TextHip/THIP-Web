@@ -15,9 +15,15 @@ interface BookSearchBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectBook: (book: Book) => void;
+  showGroupTab?: boolean;
 }
 
-const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBottomSheetProps) => {
+const BookSearchBottomSheet = ({
+  isOpen,
+  onClose,
+  onSelectBook,
+  showGroupTab = true,
+}: BookSearchBottomSheetProps) => {
   const {
     searchQuery,
     filteredBooks,
@@ -37,16 +43,14 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     loadMoreSearchResults,
     loadMoreSavedBooks,
     loadMoreGroupBooks,
-  } = useBookSearch();
+  } = useBookSearch(showGroupTab);
 
-  // 컴포넌트가 열릴 때 초기 데이터 로드
   useEffect(() => {
     if (isOpen) {
       loadInitialData();
     }
   }, [isOpen]);
 
-  // 바디 스크롤 제어
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -59,7 +63,6 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     };
   }, [isOpen]);
 
-  // Handlers
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -83,16 +86,14 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
 
   const showBookList = !isLoading && !error && !showEmptyState;
   const isSearchMode = searchQuery.trim() !== '';
-  
-  // 현재 탭에 맞는 무한 스크롤 핸들러 결정
+
   const getLoadMoreHandler = () => {
     if (isSearchMode) {
       return loadMoreSearchResults;
     }
     return activeTab === 'saved' ? loadMoreSavedBooks : loadMoreGroupBooks;
   };
-  
-  // 현재 상태에 맞는 무한 스크롤 정보
+
   const currentHasNextPage = isSearchMode ? hasNextPage : currentTabHasNext;
   const currentIsLoadingMore = isSearchMode ? isLoadingMore : currentTabIsLoadingMore;
 
@@ -100,7 +101,6 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
     <Overlay isVisible={isOpen} onClick={handleOverlayClick}>
       <BottomSheetContainer isVisible={isOpen}>
         <Content>
-          {/* 검색 헤더 */}
           <BookSearchHeader
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -108,10 +108,14 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
             onClear={handleClearSearch}
           />
 
-          {/* 탭 영역 */}
-          {showTabs && <BookSearchTabs activeTab={activeTab} onTabChange={handleTabChange} />}
+          {showTabs && (
+            <BookSearchTabs
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              showGroupTab={showGroupTab}
+            />
+          )}
 
-          {/* 책 목록 영역 */}
           <BookListContainer>
             <BookSearchStates
               isLoading={isLoading}
@@ -122,8 +126,8 @@ const BookSearchBottomSheet = ({ isOpen, onClose, onSelectBook }: BookSearchBott
             />
 
             {showBookList && (
-              <BookList 
-                books={filteredBooks} 
+              <BookList
+                books={filteredBooks}
                 onBookSelect={handleBookSelect}
                 onLoadMore={getLoadMoreHandler()}
                 hasNextPage={currentHasNextPage}

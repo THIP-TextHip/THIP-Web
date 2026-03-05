@@ -1,18 +1,33 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import TitleHeader from '../../components/common/TitleHeader';
 import TabBar from '@/components/feed/TabBar';
 import FeedPost from '@/components/feed/FeedPost';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import save from '../../assets/feed/save.svg';
 import activeSave from '../../assets/feed/activeSave.svg';
-import styled from '@emotion/styled';
-import { colors, typography } from '@/styles/global/global';
 import { getSavedBooksInMy, type SavedBookInMy } from '@/api/books/getSavedBooksInMy';
 import { getSavedFeedsInMy, type SavedFeedInMy } from '@/api/feeds/getSavedFeedsInMy';
 import { postSaveBook } from '@/api/books/postSaveBook';
-
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import Skeleton, { FeedPostSkeleton } from '@/shared/ui/Skeleton';
+import {
+  Wrapper,
+  FeedContainer,
+  EmptyState,
+  BookList,
+  BookItem,
+  Cover,
+  LeftSection,
+  BookInfo,
+  Title,
+  Subtitle,
+  SaveIcon,
+  SkeletonWrapper,
+  BookSkeletonItem,
+  BookSkeletonLeft,
+} from './SavePage.styled';
 
 const tabs = ['피드', '책'];
 
@@ -20,195 +35,77 @@ const SavePage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
-  // 피드 관련 상태
-  const [savedFeeds, setSavedFeeds] = useState<SavedFeedInMy[]>([]);
-  const [feedNextCursor, setFeedNextCursor] = useState<string | null>(null);
-  const [feedIsLast, setFeedIsLast] = useState(false);
-  const [feedLoading, setFeedLoading] = useState(false);
+  const savedFeeds = useInifinieScroll<SavedFeedInMy>({
+    enabled: activeTab === '피드',
+    reloadKey: activeTab,
+    fetchPage: async cursor => {
+      const response = await getSavedFeedsInMy(cursor);
+      return {
+        items: response.data.feedList,
+        nextCursor: response.data.nextCursor || null,
+        isLast: response.data.isLast,
+      };
+    },
+    rootMargin: '100px 0px',
+    threshold: 0.1,
+  });
 
-  // 책 관련 상태
-  const [savedBooks, setSavedBooks] = useState<SavedBookInMy[]>([]);
-  const [bookNextCursor, setBookNextCursor] = useState<string | null>(null);
-  const [bookIsLast, setBookIsLast] = useState(false);
-  const [bookLoading, setBookLoading] = useState(false);
-
-  // 초기 로딩 상태
-  const [initialLoading, setInitialLoading] = useState(true);
-
-  // Intersection Observer ref
-  const feedObserverRef = useRef<HTMLDivElement>(null);
-  const bookObserverRef = useRef<HTMLDivElement>(null);
+  const savedBooks = useInifinieScroll<SavedBookInMy>({
+    enabled: activeTab === '책',
+    reloadKey: activeTab,
+    fetchPage: async cursor => {
+      const response = await getSavedBooksInMy(cursor);
+      return {
+        items: response.data.bookList,
+        nextCursor: response.data.nextCursor || null,
+        isLast: response.data.isLast,
+      };
+    },
+    rootMargin: '100px 0px',
+    threshold: 0.1,
+  });
 
   const handleBack = () => {
     navigate('/mypage');
   };
-
-  // 저장된 책 목록 로드 함수 (무한스크롤)
-  const loadSavedBooks = useCallback(async (cursor: string | null = null) => {
-    try {
-      setBookLoading(true);
-      const response = await getSavedBooksInMy(cursor);
-
-      if (cursor === null) {
-        // 첫 로드
-        setSavedBooks(response.data.bookList);
-      } else {
-        // 추가 로드
-        setSavedBooks(prev => [...prev, ...response.data.bookList]);
-      }
-
-      setBookNextCursor(response.data.nextCursor);
-      setBookIsLast(response.data.isLast);
-    } catch (error) {
-      console.error('저장된 책 목록 로드 실패:', error);
-    } finally {
-      setBookLoading(false);
-    }
-  }, []);
-
-  // 저장된 피드 목록 로드 함수
-  const loadSavedFeeds = useCallback(async (cursor: string | null = null) => {
-    try {
-      setFeedLoading(true);
-      const response = await getSavedFeedsInMy(cursor);
-
-      if (cursor === null) {
-        // 첫 로드
-        setSavedFeeds(response.data.feedList);
-      } else {
-        // 추가 로드
-        setSavedFeeds(prev => [...prev, ...response.data.feedList]);
-      }
-
-      setFeedNextCursor(response.data.nextCursor);
-      setFeedIsLast(response.data.isLast);
-    } catch (error) {
-      console.error('저장된 피드 로드 실패:', error);
-    } finally {
-      setFeedLoading(false);
-    }
-  }, []);
-
-  // 저장된 책 목록 로드 함수
-  const loadMoreBooks = useCallback(async () => {
-    if (!bookNextCursor || bookIsLast || bookLoading) return;
-
-    try {
-      await loadSavedBooks(bookNextCursor);
-    } catch (error) {
-      console.error('책 추가 로드 실패:', error);
-    }
-  }, [bookNextCursor, bookIsLast, bookLoading, loadSavedBooks]);
-
-  // 책 Intersection Observer 콜백
-  const lastBookElementCallback = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (bookLoading || bookIsLast) return;
-
-      if (node) {
-        const observer = new IntersectionObserver(entries => {
-          if (entries[0].isIntersecting && !bookLoading && !bookIsLast) {
-            loadMoreBooks();
-          }
-        });
-
-        observer.observe(node);
-      }
-    },
-    [bookLoading, bookIsLast, loadMoreBooks],
-  );
-
-  // 페이지 진입 시 모든 데이터 로드 (한 번만 실행)
-  useEffect(() => {
-    const loadAllData = async () => {
-      try {
-        setInitialLoading(true);
-
-        // 두 API를 병렬로 호출
-        const [feedsResponse, booksResponse] = await Promise.all([
-          getSavedFeedsInMy(null),
-          getSavedBooksInMy(),
-        ]);
-
-        // 피드 데이터 설정
-        setSavedFeeds(feedsResponse.data.feedList);
-        setFeedNextCursor(feedsResponse.data.nextCursor);
-        setFeedIsLast(feedsResponse.data.isLast);
-
-        // 책 데이터 설정
-        setSavedBooks(booksResponse.data.bookList);
-        setBookNextCursor(booksResponse.data.nextCursor);
-        setBookIsLast(booksResponse.data.isLast);
-      } catch (error) {
-        console.error('초기 데이터 로드 실패:', error);
-      } finally {
-        setInitialLoading(false);
-      }
-    };
-
-    loadAllData();
-  }, []); // 빈 의존성 배열로 변경
-
-  // Intersection Observer 설정 (피드)
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !feedIsLast && !feedLoading && feedNextCursor) {
-            loadSavedFeeds(feedNextCursor);
-          }
-        });
-      },
-      { threshold: 0.1 },
-    );
-
-    if (feedObserverRef.current) {
-      observer.observe(feedObserverRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [feedIsLast, feedLoading, feedNextCursor, loadSavedFeeds]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [activeTab]);
 
   const handleSaveToggle = async (isbn: string) => {
+    const currentBook = savedBooks.items.find(book => book.isbn === isbn);
+    if (!currentBook) return;
+
+    const nextSaved = !currentBook.isSaved;
+    const previousBooks = savedBooks.items;
+
+    if (!nextSaved) {
+      savedBooks.setItems(prev => prev.filter(book => book.isbn !== isbn));
+    } else {
+      savedBooks.setItems(prev =>
+        prev.map(book => (book.isbn === isbn ? { ...book, isSaved: nextSaved } : book)),
+      );
+    }
+
     try {
-      const currentBook = savedBooks.find(book => book.isbn === isbn);
-      if (!currentBook) return;
-
-      const newSaveState = !currentBook.isSaved;
-      await postSaveBook(isbn, newSaveState);
-
-      // 저장 취소인 경우 저장된 책 목록을 다시 불러옴
-      if (!newSaveState) {
-        await loadSavedBooks();
-      } else {
-        // 저장인 경우 로컬 상태만 업데이트
-        setSavedBooks(prev =>
-          prev.map(book => (book.isbn === isbn ? { ...book, isSaved: newSaveState } : book)),
-        );
+      const response = await postSaveBook(isbn, nextSaved);
+      if (!response.isSuccess) {
+        savedBooks.setItems(previousBooks);
       }
-
-      console.log('저장 토글:', isbn, newSaveState);
-    } catch (error) {
-      console.error('저장 토글 실패:', error);
+    } catch {
+      savedBooks.setItems(previousBooks);
     }
   };
 
-  // 피드 저장 토글 처리
-  const handleFeedSaveToggle = async (feedId: number, newSaveState: boolean) => {
-    try {
-      if (!newSaveState) {
-        // 저장 취소인 경우 리스트에서 제거
-        setSavedFeeds(prev => prev.filter(feed => feed.feedId !== feedId));
-        console.log('피드 저장 취소 완료:', feedId);
-      }
-    } catch (error) {
-      console.error('피드 저장 상태 변경 실패:', error);
+  const handleFeedSaveToggle = (feedId: number, newSaveState: boolean) => {
+    if (!newSaveState) {
+      savedFeeds.setItems(prev => prev.filter(feed => feed.feedId !== feedId));
     }
   };
+
+  const currentList = activeTab === '피드' ? savedFeeds : savedBooks;
+  const showInitialLoading = currentList.isLoading && currentList.items.length === 0;
 
   return (
     <Wrapper>
@@ -218,28 +115,45 @@ const SavePage = () => {
         title="저장"
       />
       <TabBar tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-      {initialLoading ? (
-        <LoadingSpinner fullHeight={true} size="large" />
+      {showInitialLoading ? (
+        activeTab === '피드' ? (
+          <SkeletonWrapper>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <FeedPostSkeleton key={index} />
+            ))}
+          </SkeletonWrapper>
+        ) : (
+          <SkeletonWrapper>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <BookSkeletonItem key={index}>
+                <BookSkeletonLeft>
+                  <Skeleton.Box width={80} height={107} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <Skeleton.Text width={120} height={16} />
+                    <Skeleton.Text width={100} height={12} />
+                  </div>
+                </BookSkeletonLeft>
+                <Skeleton.Box width={24} height={24} />
+              </BookSkeletonItem>
+            ))}
+          </SkeletonWrapper>
+        )
       ) : activeTab === '피드' ? (
         <>
-          {savedFeeds.length > 0 ? (
+          {savedFeeds.items.length > 0 ? (
             <FeedContainer>
-              {savedFeeds.map((feed, index) => (
+              {savedFeeds.items.map((feed, index) => (
                 <FeedPost
                   key={feed.feedId}
                   showHeader={true}
                   isMyFeed={false}
-                  isLast={index === savedFeeds.length - 1}
+                  isLast={index === savedFeeds.items.length - 1}
                   onSaveToggle={handleFeedSaveToggle}
                   {...feed}
                 />
               ))}
-              {/* 무한스크롤을 위한 observer 요소 */}
-              {!feedIsLast && (
-                <div ref={feedObserverRef} style={{ height: '20px' }}>
-                  {feedLoading && <LoadingSpinner fullHeight={false} size="small" />}
-                </div>
-              )}
+              {!savedFeeds.isLast && <div ref={savedFeeds.sentinelRef} style={{ height: 20 }} />}
+              {savedFeeds.isLoadingMore && <LoadingSpinner fullHeight={false} size="small" />}
             </FeedContainer>
           ) : (
             <EmptyState>
@@ -248,39 +162,30 @@ const SavePage = () => {
             </EmptyState>
           )}
         </>
-      ) : savedBooks.length > 0 ? (
-        <>
-          <BookList>
-            {savedBooks.map((book, index) => (
-              <BookItem
-                key={book.bookId}
-                ref={index === savedBooks.length - 1 ? lastBookElementCallback : null}
-              >
-                <LeftSection>
-                  <Cover src={book.bookImageUrl} alt={`${book.bookTitle} 커버`} />
-                  <BookInfo>
-                    <Title>{book.bookTitle}</Title>
-                    <Subtitle>
-                      {book.authorName} 저 · {book.publisher}
-                    </Subtitle>
-                  </BookInfo>
-                </LeftSection>
-                <SaveIcon onClick={() => handleSaveToggle(book.isbn)}>
-                  <img
-                    src={book.isSaved ? activeSave : save}
-                    alt={book.isSaved ? '저장됨' : '저장'}
-                  />
-                </SaveIcon>
-              </BookItem>
-            ))}
-            {/* 무한스크롤을 위한 observer 요소 */}
-            {!bookIsLast && (
-              <div ref={bookObserverRef} style={{ height: '20px' }}>
-                {bookLoading && <LoadingSpinner fullHeight={false} size="small" />}
-              </div>
-            )}
-          </BookList>
-        </>
+      ) : savedBooks.items.length > 0 ? (
+        <BookList>
+          {savedBooks.items.map(book => (
+            <BookItem key={book.bookId}>
+              <LeftSection>
+                <Cover src={book.bookImageUrl} alt={`${book.bookTitle} 커버`} />
+                <BookInfo>
+                  <Title>{book.bookTitle}</Title>
+                  <Subtitle>
+                    {book.authorName} 저 · {book.publisher}
+                  </Subtitle>
+                </BookInfo>
+              </LeftSection>
+              <SaveIcon onClick={() => handleSaveToggle(book.isbn)}>
+                <img
+                  src={book.isSaved ? activeSave : save}
+                  alt={book.isSaved ? '저장됨' : '저장'}
+                />
+              </SaveIcon>
+            </BookItem>
+          ))}
+          {!savedBooks.isLast && <div ref={savedBooks.sentinelRef} style={{ height: 20 }} />}
+          {savedBooks.isLoadingMore && <LoadingSpinner fullHeight={false} size="small" />}
+        </BookList>
       ) : (
         <EmptyState>
           <div className="title">아직 저장한 책이 없어요</div>
@@ -290,116 +195,5 @@ const SavePage = () => {
     </Wrapper>
   );
 };
-
-export const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 130px;
-  min-width: 320px;
-  max-width: 767px;
-  min-height: 100vh;
-  margin: 0 auto;
-  background-color: #121212;
-`;
-
-const FeedContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`;
-
-const EmptyState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-width: 320px;
-  max-width: 540px;
-  min-height: 100%;
-  padding: 40px 20px;
-  margin: 0 auto;
-  margin-bottom: 20px;
-  gap: 8px;
-  flex: 1;
-
-  .title {
-    color: ${colors.white};
-    text-align: center;
-    font-size: ${typography.fontSize.lg};
-    font-weight: ${typography.fontWeight.semibold};
-    line-height: 24px;
-  }
-
-  .sub-title {
-    color: ${colors.grey[100]};
-    text-align: center;
-    font-size: ${typography.fontSize.sm};
-    font-weight: ${typography.fontWeight.regular};
-    line-height: normal;
-  }
-`;
-
-const BookList = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-width: 320px;
-  max-width: 767px;
-  padding-top: 32px;
-  margin: 0 auto;
-  width: 100%;
-`;
-
-const BookItem = styled.div`
-  width: 94.8%;
-  margin: 0 auto;
-  display: flex;
-  border-bottom: 1px solid ${colors.darkgrey.dark};
-  padding: 12px;
-
-  &:last-child {
-    border-bottom: none;
-  }
-  justify-content: space-between;
-`;
-
-const Cover = styled.img`
-  width: 80px;
-  height: 107px;
-  object-fit: cover;
-`;
-
-const LeftSection = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-`;
-
-const BookInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Title = styled.h3`
-  font-size: ${typography.fontSize.base};
-  font-weight: ${typography.fontWeight.semibold};
-  color: ${colors.white};
-`;
-
-const Subtitle = styled.span`
-  font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.medium};
-  color: ${colors.grey[200]};
-  margin-top: 8px;
-`;
-
-const SaveIcon = styled.div`
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-`;
 
 export default SavePage;

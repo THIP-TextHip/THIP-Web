@@ -4,16 +4,14 @@ import SearchBar from '@/components/search/SearchBar';
 import type { Group as GroupType } from '@/components/group/MyGroupBox';
 import { MyGroupBox } from '../../components/group/MyGroupBox';
 import Blank from '@/components/common/Blank';
-import styled from '@emotion/styled';
 import { RecruitingGroupCarousel, type Section } from '@/components/group/RecruitingGroupCarousel';
 import { useState, useEffect } from 'react';
 import { MyGroupModal } from '@/components/group/MyGroupModal';
-import CompletedGroupModal from '@/components/group/CompletedGroupModal';
 import { useNavigate } from 'react-router-dom';
 import makegroupfab from '../../assets/common/makegroupfab.svg';
 import searchChar from '../../assets/common/searchChar.svg';
 import { getRoomsByCategory, type RoomItem } from '@/api/rooms/getRoomsByCategory';
-import { colors, typography } from '@/styles/global/global';
+import { AllRoomsButton, Wrapper } from './Group.styled';
 
 const convertRoomItemToGroup = (
   room: RoomItem,
@@ -32,7 +30,6 @@ const convertRoomItemToGroup = (
 const Group = () => {
   const navigate = useNavigate();
   const [isMyGroupModalOpen, setIsMyGroupModalOpen] = useState(false);
-  const [isCompletedGroupModalOpen, setIsCompletedGroupModalOpen] = useState(false);
   const [sections, setSections] = useState<Section[]>([
     { title: '최근 생성된 독서 모임방', groups: [] },
     { title: '마감 임박한 독서 모임방', groups: [] },
@@ -86,9 +83,6 @@ const Group = () => {
   const openMyGroupModal = () => setIsMyGroupModalOpen(true);
   const closeMyGroupModal = () => setIsMyGroupModalOpen(false);
 
-  const openCompletedGroupModal = () => setIsCompletedGroupModalOpen(true);
-  const closeCompletedGroupModal = () => setIsCompletedGroupModalOpen(false);
-
   const handleSearchBarClick = () => {
     navigate('/group/search');
   };
@@ -108,12 +102,7 @@ const Group = () => {
   return (
     <Wrapper>
       {isMyGroupModalOpen && <MyGroupModal onClose={closeMyGroupModal} />}
-      {isCompletedGroupModalOpen && <CompletedGroupModal onClose={closeCompletedGroupModal} />}
-      <MainHeader
-        type="group"
-        leftButtonClick={openCompletedGroupModal}
-        rightButtonClick={handleNoticeButton}
-      />
+      <MainHeader type="group" rightButtonClick={handleNoticeButton} />
       <SearchBar placeholder="모임방 참여할 사람!" onClick={handleSearchBarClick} />
       <MyGroupBox onMyGroupsClick={openMyGroupModal}></MyGroupBox>
       <Blank height={'10px'} margin={'32px 0'}></Blank>
@@ -128,36 +117,3 @@ const Group = () => {
 };
 
 export default Group;
-
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-width: 320px;
-  max-width: 767px;
-  min-height: 100vh;
-  margin: 0 auto;
-  padding-top: 56px;
-  background-color: ${colors.black.main};
-`;
-
-const AllRoomsButton = styled.div`
-  display: flex;
-  position: relative;
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.medium};
-  width: 83%;
-  border-radius: 12px;
-  padding: 14px 12px;
-  margin-bottom: 12px;
-  color: ${colors.white};
-  background-color: ${colors.darkgrey.main};
-  cursor: pointer;
-  > img {
-    position: absolute;
-    right: 5%;
-    top: -2px;
-  }
-`;

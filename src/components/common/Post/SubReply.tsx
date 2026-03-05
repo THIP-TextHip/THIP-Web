@@ -1,6 +1,4 @@
-import { useState, useRef } from 'react';
-import styled from '@emotion/styled';
-import { typography, colors } from '@/styles/global/global';
+import { useEffect, useState, useRef } from 'react';
 import PostHeader from './PostHeader';
 import type { ReplyData } from '@/api/comments/getComments';
 import like from '../../../assets/feed/like.svg';
@@ -8,8 +6,10 @@ import activeLike from '../../../assets/feed/activeLike.svg';
 import replyIcon from '../../../assets/feed/replyIcon.svg';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 import { postLike } from '@/api/comments/postLike';
 import { deleteComment } from '@/api/comments/deleteComment';
+import { DeletedContainer, Container, ReplyIcon, Content, ReplySection } from './SubReply.styled';
 
 interface SubReplyProps extends ReplyData {
   onDelete?: () => void;
@@ -35,57 +35,55 @@ const SubReply = ({
   const [liked, setLiked] = useState<boolean>(isLike);
   const [currentLikeCount, setCurrentLikeCount] = useState<number>(likeCount);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { isLoading: isLikeLoading, run: runLike } = usePreventDoubleClick();
 
   const { startReply } = useReplyActions();
   const { openMoreMenu, closePopup, openSnackbar } = usePopupActions();
+
+  useEffect(() => {
+    setLiked(isLike);
+    setCurrentLikeCount(likeCount);
+  }, [isLike, likeCount]);
 
   const handleReplyClick = () => {
     startReply(creatorNickname, commentId);
   };
 
-  const handleLike = async () => {
-    try {
-      const response = await postLike(commentId, !liked);
+  const handleLike = () => {
+    runLike(async () => {
+      const previousLiked = liked;
+      const previousLikeCount = currentLikeCount;
+      const nextLiked = !liked;
 
-      if (response.isSuccess) {
-        console.log('좋아요 상태 변경 성공:', response);
-        // 서버 응답으로 상태 업데이트
-        setLiked(response.data.isLiked);
-        setCurrentLikeCount(prev => (response.data.isLiked ? prev + 1 : prev - 1));
-      } else {
-        console.error('좋아요 상태 변경 실패:', response.message);
+      setLiked(nextLiked);
+      setCurrentLikeCount(prev => (nextLiked ? prev + 1 : prev - 1));
+
+      try {
+        const response = await postLike(commentId, nextLiked);
+        if (!response.isSuccess) {
+          setLiked(previousLiked);
+          setCurrentLikeCount(previousLikeCount);
+          openSnackbar({
+            message: response.message || '좋아요 처리 중 오류가 발생했습니다.',
+            variant: 'top',
+            onClose: () => {},
+          });
+        }
+      } catch {
+        setLiked(previousLiked);
+        setCurrentLikeCount(previousLikeCount);
         openSnackbar({
-          message: response.message || '좋아요 처리 중 오류가 발생했습니다.',
+          message: '좋아요 처리 중 오류가 발생했습니다.',
           variant: 'top',
           onClose: () => {},
         });
       }
-    } catch (error) {
-      console.error('좋아요 상태 변경 실패:', error);
-    }
+    });
   };
-
-  // 이전 더보기 모달
-  // const handleMoreClick = () => {
-  //   if (containerRef.current) {
-  //     const rect = containerRef.current.getBoundingClientRect();
-  //     openReplyModal({
-  //       isOpen: true,
-  //       userId: creatorId,
-  //       commentId: commentId,
-  //       position: {
-  //         x: rect.right,
-  //         y: rect.bottom,
-  //       },
-  //       onClose: closePopup,
-  //     });
-  //   }
-  // };
 
   const handleDelete = async () => {
     try {
       const response = await deleteComment(commentId);
-      // 먼저 현재 모달/메뉴를 닫아 UI를 정리
       closePopup();
 
       if (response.isSuccess) {
@@ -121,7 +119,6 @@ const SubReply = ({
 
   const handleMoreClick = () => {
     if (isWriter) {
-      // 작성자인 경우: 삭제하기만 표시
       openMoreMenu({
         onDelete: handleDelete,
         type: 'reply',
@@ -129,7 +126,6 @@ const SubReply = ({
         onClose: closePopup,
       });
     } else {
-      // 작성자가 아닌 경우: 신고하기만 표시
       openMoreMenu({
         onReport: () => {
           closePopup();
@@ -146,7 +142,6 @@ const SubReply = ({
     }
   };
 
-  // 삭제된 댓글인 경우 처리
   if (isDeleted) {
     return (
       <DeletedContainer>
@@ -194,6 +189,7 @@ const SubReply = ({
                 handleLike();
               }}
               alt="좋아요"
+              style={{ opacity: isLikeLoading ? 0.6 : 1 }}
             />
             <div className="count">{currentLikeCount}</div>
           </div>
@@ -202,86 +198,5 @@ const SubReply = ({
     </Container>
   );
 };
-
-const DeletedContainer = styled.div`
-  display: flex;
-  width: 100%;
-
-  .deleted-text {
-    color: ${colors.grey[300]};
-    font-size: ${typography.fontSize.sm};
-    font-weight: ${typography.fontWeight.regular};
-    line-height: 20px;
-  }
-`;
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  gap: 8px;
-`;
-
-const ReplyIcon = styled.div`
-  img {
-    width: 24px;
-    height: 24px;
-  }
-`;
-
-const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 12px;
-`;
-
-const ReplySection = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 20px;
-
-  .left {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-
-    .reply {
-      color: ${colors.grey[100]};
-      font-size: ${typography.fontSize.sm};
-      font-weight: ${typography.fontWeight.regular};
-      line-height: 20px;
-
-      .reply-nickname {
-        color: ${colors.white};
-        font-size: ${typography.fontSize.sm};
-        font-weight: ${typography.fontWeight.regular};
-        line-height: 20px;
-      }
-    }
-    .sub-reply {
-      color: ${colors.grey[300]};
-      font-size: ${typography.fontSize.xs};
-      font-weight: ${typography.fontWeight.semibold};
-      line-height: normal;
-      cursor: pointer;
-    }
-  }
-
-  .right {
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-
-    .count {
-      text-align: center;
-      color: ${colors.grey[100]};
-      font-size: 10px;
-      font-weight: ${typography.fontWeight.medium};
-      line-height: normal;
-    }
-  }
-`;
 
 export default SubReply;

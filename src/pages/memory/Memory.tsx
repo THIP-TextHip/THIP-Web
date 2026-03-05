@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import type { SortType } from '../../components/memory/SortDropdown';
 import MemoryHeader from '../../components/memory/MemoryHeader/MemoryHeader';
@@ -6,17 +6,25 @@ import MemoryContent from '../../components/memory/MemoryContent/MemoryContent';
 import MemoryAddButton from '../../components/memory/MemoryAddButton/MemoryAddButton';
 import Snackbar from '../../components/common/Modal/Snackbar';
 import GlobalCommentBottomSheet from '../../components/common/CommentBottomSheet/GlobalCommentBottomSheet';
-import { useCommentBottomSheetStore } from '@/stores/useCommentBottomSheetStore';
+import { useCommentBottomSheetStore } from '@/stores/commentBottomSheetStore';
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
 import { Container, FixedHeader, ScrollableContent, FloatingElements } from './Memory.styled';
 import { getMemoryPosts } from '../../api/memory/getMemoryPosts';
 import { getRoomPlaying } from '../../api/rooms/getRoomPlaying';
 import { isRoomCompleted } from '../../utils/roomStatus';
 import type { GetMemoryPostsParams, Post, Record } from '../../types/memory';
+import { RecordItemSkeleton } from '@/shared/ui/Skeleton';
+import RecordTabs from '../../components/memory/RecordTabs';
+import RecordFilters from '../../components/memory/RecordFilters/RecordFilters';
+import {
+  Content,
+  FixedSection,
+  ScrollableSection,
+} from '../../components/memory/MemoryContent/MemoryContent.styled';
 
 export type RecordType = 'group' | 'my';
 export type FilterType = 'page' | 'overall';
 
-// API 포스트를 기존 Record 타입으로 변환하는 함수
 const convertPostToRecord = (post: Post): Record => {
   return {
     id: post.postId.toString(),
@@ -55,7 +63,6 @@ const Memory = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { openCommentBottomSheet } = useCommentBottomSheetStore();
 
-  // 상태 관리
   const [activeTab, setActiveTab] = useState<RecordType>('group');
   const [activeFilter, setActiveFilter] = useState<FilterType | null>(null);
   const [selectedSort, setSelectedSort] = useState<SortType>('latest');
@@ -63,6 +70,13 @@ const Memory = () => {
   const [selectedPageRange, setSelectedPageRange] = useState<{ start: number; end: number } | null>(
     null,
   );
+  const [showUploadProgress, setShowUploadProgress] = useState(false);
+  const [roomCompleted, setRoomCompleted] = useState(false);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [currentUserPage, setCurrentUserPage] = useState<number>(0);
+  const scrollRootRef = useRef<HTMLDivElement | null>(null);
+  const resolvedFilter: FilterType | null =
+    activeFilter === 'page' && !selectedPageRange ? null : activeFilter;
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -70,75 +84,51 @@ const Memory = () => {
     const filterParam = searchParams.get('filter');
 
     if (pageParam && filterParam === 'poll') {
-      const page = parseInt(pageParam);
+      const page = parseInt(pageParam, 10);
       if (!isNaN(page)) {
-        console.log('✅ 페이지 필터 적용:', { page });
         setSelectedPageRange({ start: page, end: page });
         setActiveFilter('page');
         setActiveTab('group');
-
         navigate(location.pathname, { replace: true });
       }
     }
-  }, [location.search]);
+  }, [location.search, location.pathname, navigate]);
 
-  // API 관련 상태
-  const [error, setError] = useState<string | null>(null);
-  const [isOverviewEnabled, setIsOverviewEnabled] = useState(false);
+  const recordsList = useInifinieScroll<Record>({
+    enabled: !!roomId,
+    reloadKey: `${roomId}-${activeTab}-${selectedSort}-${resolvedFilter}-${selectedPageRange?.start ?? ''}-${selectedPageRange?.end ?? ''}`,
+    rootRef: scrollRootRef,
+    fetchPage: async cursor => {
+      if (!roomId) {
+        return { items: [], nextCursor: null, isLast: true };
+      }
 
-  // 업로드 프로그레스 상태
-  const [showUploadProgress, setShowUploadProgress] = useState(false);
-
-  // 모임방 완료 상태
-  const [roomCompleted, setRoomCompleted] = useState(false);
-
-  // 기록 데이터
-  const [myRecords, setMyRecords] = useState<Record[]>([]);
-  const [groupRecords, setGroupRecords] = useState<Record[]>([]);
-  // API에서 받은 페이지 정보
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [currentUserPage, setCurrentUserPage] = useState<number>(0);
-
-  // API 데이터 로드 함수
-  const loadMemoryPosts = useCallback(async () => {
-    if (!roomId) {
-      console.log('❌ roomId가 없습니다:', roomId);
-      return;
-    }
-    setError(null);
-
-    try {
-      // API 파라미터 구성
       const params: GetMemoryPostsParams = {
-        roomId: parseInt(roomId),
+        roomId: parseInt(roomId, 10),
         type: activeTab === 'group' ? 'group' : 'mine',
+        cursor,
       };
 
-      // group 탭인 경우에만 sort 파라미터 추가
       if (activeTab === 'group') {
         params.sort = selectedSort;
       }
 
-      // 필터 적용
-      if (activeFilter === 'overall') {
+      if (resolvedFilter === 'overall') {
         params.isOverview = true;
-      } else if (selectedPageRange) {
+      } else if (resolvedFilter === 'page' && selectedPageRange) {
         params.pageStart = selectedPageRange.start;
         params.pageEnd = selectedPageRange.end;
         params.isPageFilter = true;
       }
 
-      const response = await getMemoryPosts(params);
-      if (response.isSuccess) {
-        const convertedRecords = response.data.postList.map(convertPostToRecord);
+      try {
+        const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
+        const response = await getMemoryPosts(params);
+        if (minLoadingTime) await minLoadingTime;
 
-        if (activeTab === 'group') {
-          setGroupRecords(convertedRecords);
-        } else {
-          setMyRecords(convertedRecords);
+        if (!response.isSuccess) {
+          throw new Error(response.message || '기록을 불러오는 중 오류가 발생했습니다.');
         }
-
-        setIsOverviewEnabled(response.data.isOverviewEnabled);
 
         if (response.data.totalPages !== undefined) {
           setTotalPages(response.data.totalPages);
@@ -146,34 +136,36 @@ const Memory = () => {
         if (response.data.currentUserPage !== undefined) {
           setCurrentUserPage(response.data.currentUserPage);
         }
-      } else {
-        setError(response.message);
-      }
-    } catch (error) {
-      // Axios 에러인 경우 상세 정보 출력
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response?: { data?: { code?: number } } };
-        if (axiosError.response?.data?.code === 40002) {
-          setError('독서 진행률이 80% 이상이어야 총평을 볼 수 있습니다.');
-          setActiveFilter(null); // 총평 필터를 자동으로 해제
-          return; // 다른 에러 메시지 설정하지 않음
+
+        return {
+          items: response.data.postList.map(convertPostToRecord),
+          nextCursor: response.data.nextCursor,
+          isLast: response.data.isLast,
+        };
+      } catch (error) {
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as { response?: { data?: { code?: number } } };
+          if (axiosError.response?.data?.code === 40002) {
+            setActiveFilter(null);
+            throw new Error('독서 진행률이 80% 이상이어야 총평을 볼 수 있습니다.');
+          }
         }
+        throw new Error('기록을 불러오는 중 오류가 발생했습니다.');
       }
+    },
+    rootMargin: '100px 0px',
+    threshold: 0.1,
+  });
+  const { setItems: setRecordItems } = recordsList;
 
-      setError('기록을 불러오는 중 오류가 발생했습니다.');
-    }
-  }, [roomId, activeTab, selectedSort, activeFilter, selectedPageRange]);
-
-  // 모임방 상태 확인
   useEffect(() => {
     const checkRoomStatus = async () => {
       if (!roomId) return;
 
       try {
-        const response = await getRoomPlaying(parseInt(roomId));
+        const response = await getRoomPlaying(parseInt(roomId, 10));
         if (response.isSuccess) {
-          const completed = isRoomCompleted(response.data.progressEndDate);
-          setRoomCompleted(completed);
+          setRoomCompleted(isRoomCompleted(response.data.progressEndDate));
         }
       } catch (error) {
         console.error('모임방 상태 확인 오류:', error);
@@ -183,12 +175,6 @@ const Memory = () => {
     checkRoomStatus();
   }, [roomId]);
 
-  // 컴포넌트 마운트 시 데이터 로드
-  useEffect(() => {
-    loadMemoryPosts();
-  }, [loadMemoryPosts]);
-
-  // Notice에서 넘어온 state(page, focusPostId 등)로 초기 필터 적용
   useEffect(() => {
     type MemoryLocationState = {
       page?: number;
@@ -196,6 +182,7 @@ const Memory = () => {
       postType?: 'RECORD' | 'VOTE';
       openComments?: boolean;
     } | null;
+
     const state = (location.state as MemoryLocationState) || null;
     const initialPage = state?.page;
     if (initialPage && !selectedPageRange) {
@@ -203,62 +190,38 @@ const Memory = () => {
       setActiveFilter('page');
     }
 
-    // 댓글 모달 자동 오픈 처리
     if (state?.openComments && state.focusPostId && state.postType) {
       openCommentBottomSheet(state.focusPostId, state.postType);
-      // 동일 경로 재진입 시 중복 오픈 방지를 위해 state 제거
       navigate(location.pathname, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state, roomId]);
 
-  // 새로운 기록이 추가되었을 때 처리 (작성 완료 후 돌아왔을 때)
   useEffect(() => {
     if (location.state?.newRecord) {
       const newRecord = location.state.newRecord as Record;
       setShowUploadProgress(true);
-
-      if (activeTab === 'group') {
-        setGroupRecords(prev => [newRecord, ...prev]);
-      } else {
-        setMyRecords(prev => [newRecord, ...prev]);
-      }
-
-      // 상태 정리
+      setRecordItems(prev => [newRecord, ...prev]);
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, activeTab, navigate, location.pathname]);
+  }, [location.state, navigate, location.pathname, setRecordItems]);
 
-  // 현재 탭에 따른 기록 목록 결정
-  const currentRecords = useMemo(() => {
-    return activeTab === 'group' ? groupRecords : myRecords;
-  }, [activeTab, groupRecords, myRecords]);
-
-  // 정렬된 기록 목록
-  const sortedRecords = useMemo(() => {
-    return currentRecords;
-  }, [currentRecords]);
-
-  // 필터링된 기록 목록
   const filteredRecords = useMemo(() => {
-    const filtered = sortedRecords;
-
     if (activeFilter === 'overall') {
-      const overallRecords = filtered.filter(record => record.recordType === 'overall');
-      return overallRecords;
-    } else if (activeFilter === 'page' && selectedPageRange) {
-      const pageRecords = filtered.filter(record => {
-        if (record.recordType === 'overall') return false;
-        const page = parseInt(record.pageRange || '0');
-        return page >= selectedPageRange.start && page <= selectedPageRange.end;
-      });
-      return pageRecords;
+      return recordsList.items.filter(record => record.recordType === 'overall');
     }
 
-    return filtered;
-  }, [sortedRecords, activeFilter, selectedPageRange]);
+    if (activeFilter === 'page' && selectedPageRange) {
+      return recordsList.items.filter(record => {
+        if (record.recordType === 'overall') return false;
+        const page = parseInt(record.pageRange || '0', 10);
+        return page >= selectedPageRange.start && page <= selectedPageRange.end;
+      });
+    }
 
-  // 이벤트 핸들러들
+    return recordsList.items;
+  }, [recordsList.items, activeFilter, selectedPageRange]);
+
   const handleBackClick = useCallback(() => {
     if (roomId) {
       navigate(`/group/detail/joined/${roomId}`);
@@ -275,6 +238,10 @@ const Memory = () => {
 
   const handleFilterChange = useCallback(
     (filter: FilterType) => {
+      if (filter === 'page' && activeFilter === 'page' && !selectedPageRange) {
+        return;
+      }
+
       if (activeFilter === filter) {
         setActiveFilter(null);
         setSelectedPageRange(null);
@@ -283,7 +250,7 @@ const Memory = () => {
         setSelectedPageRange(null);
       }
     },
-    [activeFilter],
+    [activeFilter, selectedPageRange],
   );
 
   const handleSortChange = useCallback((sort: SortType) => {
@@ -304,23 +271,25 @@ const Memory = () => {
     setShowUploadProgress(false);
   }, []);
 
-  // 독서 진행률 계산 (전체 페이지 대비 현재 페이지 퍼센트)
+  const handleRecordDelete = useCallback(
+    (id: string) => {
+      recordsList.setItems(prev => prev.filter(r => r.id !== id));
+    },
+    [recordsList],
+  );
+
   const readingProgress = totalPages > 0 ? Math.round((currentUserPage / totalPages) * 100) : 0;
+  const showInitialSkeleton = recordsList.isLoading && recordsList.items.length === 0;
 
-  // 총평 활성화 상태를 읽기 진행률에 따라 표시용으로 활용
-  const overviewStatus = isOverviewEnabled ? '총평 활성화' : '총평 비활성화';
-  console.log('📊 현재 상태:', overviewStatus, `진행률: ${readingProgress}%`);
-
-  // 에러 상태 렌더링
-  if (error) {
+  if (recordsList.error) {
     return (
       <Container>
         <FixedHeader>
           <MemoryHeader onBackClick={handleBackClick} />
         </FixedHeader>
         <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>
-          오류가 발생했습니다: {error}
-          <button onClick={loadMemoryPosts} style={{ marginLeft: '10px' }}>
+          오류가 발생했습니다: {recordsList.error}
+          <button onClick={() => recordsList.reload()} style={{ marginLeft: '10px' }}>
             다시 시도
           </button>
         </div>
@@ -328,29 +297,58 @@ const Memory = () => {
     );
   }
 
-  // 메인 렌더링
   return (
     <Container>
       <FixedHeader>
         <MemoryHeader onBackClick={handleBackClick} />
       </FixedHeader>
-
-      <ScrollableContent>
-        <MemoryContent
-          activeTab={activeTab}
-          activeFilter={activeFilter}
-          readingProgress={readingProgress}
-          selectedSort={selectedSort}
-          records={filteredRecords}
-          selectedPageRange={selectedPageRange}
-          showUploadProgress={showUploadProgress}
-          onTabChange={handleTabChange}
-          onFilterChange={handleFilterChange}
-          onSortChange={handleSortChange}
-          onPageRangeClear={handlePageRangeClear}
-          onPageRangeSet={handlePageRangeSet}
-          onUploadComplete={handleUploadComplete}
-        />
+      <ScrollableContent ref={scrollRootRef}>
+        {showInitialSkeleton ? (
+          <Content>
+            <FixedSection>
+              <RecordTabs activeTab={activeTab} onTabChange={handleTabChange} />
+              {activeTab === 'group' && (
+                <RecordFilters
+                  activeFilter={activeFilter}
+                  readingProgress={readingProgress}
+                  selectedSort={selectedSort}
+                  onFilterChange={handleFilterChange}
+                  onSortChange={handleSortChange}
+                  selectedPageRange={selectedPageRange}
+                  onPageRangeClear={handlePageRangeClear}
+                  onPageRangeSet={handlePageRangeSet}
+                />
+              )}
+            </FixedSection>
+            <ScrollableSection>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <RecordItemSkeleton key={i} />
+                ))}
+              </div>
+            </ScrollableSection>
+          </Content>
+        ) : (
+          <>
+            <MemoryContent
+              activeTab={activeTab}
+              activeFilter={activeFilter}
+              readingProgress={readingProgress}
+              selectedSort={selectedSort}
+              records={filteredRecords}
+              selectedPageRange={selectedPageRange}
+              showUploadProgress={showUploadProgress}
+              onTabChange={handleTabChange}
+              onFilterChange={handleFilterChange}
+              onSortChange={handleSortChange}
+              onPageRangeClear={handlePageRangeClear}
+              onPageRangeSet={handlePageRangeSet}
+              onUploadComplete={handleUploadComplete}
+              onDelete={handleRecordDelete}
+            />
+            {!recordsList.isLast && <div ref={recordsList.sentinelRef} style={{ height: 20 }} />}
+          </>
+        )}
       </ScrollableContent>
 
       {!roomCompleted && (

@@ -21,13 +21,22 @@ import {
   MetaTopRow,
   MetaInfo,
   Meta,
+  ErrorContainer,
 } from './ParticipatedGroupDetail.styled';
+import TitleHeader from '@/components/common/TitleHeader';
 import RecordSection from '../../components/group/RecordSection';
 import CommentSection from '../../components/group/CommentSection';
 import HotTopicSection from '../../components/group/HotTopicSection';
 import GroupBookSection from '../../components/group/GroupBookSection';
 import GroupActionBottomSheet from '../../components/group/GroupActionBottomSheet';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import {
+  BannerSkeleton,
+  GroupBookSectionSkeleton,
+  RecordSectionSkeleton,
+  CommentSectionSkeleton,
+  HotTopicSectionSkeleton,
+} from '@/shared/ui/Skeleton';
 import {
   getRoomPlaying,
   type RoomPlayingResponse,
@@ -42,7 +51,6 @@ import { IconButton } from '@/components/common/IconButton';
 import lockIcon from '../../assets/group/lock.svg';
 import calendarIcon from '../../assets/group/calendar.svg';
 import peopleIcon from '../../assets/common/darkPeople.svg';
-import styled from '@emotion/styled';
 import { isRoomCompleted } from '@/utils/roomStatus';
 
 const ParticipatedGroupDetail = () => {
@@ -50,15 +58,16 @@ const ParticipatedGroupDetail = () => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
 
-  // API 상태 관리
   const [roomData, setRoomData] = useState<RoomPlayingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // UI 상태 관리
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
-  // API 호출
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
   useEffect(() => {
     const fetchRoomDetail = async () => {
       if (!roomId) {
@@ -69,7 +78,12 @@ const ParticipatedGroupDetail = () => {
 
       try {
         setLoading(true);
-        const response = await getRoomPlaying(parseInt(roomId));
+
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [response] = await Promise.all([
+          getRoomPlaying(parseInt(roomId)),
+        ]);
+        await minLoadingTime;
 
         if (response.isSuccess) {
           setRoomData(response);
@@ -78,13 +92,12 @@ const ParticipatedGroupDetail = () => {
         }
       } catch (err: unknown) {
         console.error('방 상세 정보 조회 오류:', err);
-        
-        // 방 접근 권한이 없는 경우 - 모임 홈으로 리다이렉트
+
         if (err instanceof Error && err.message === '방 접근 권한이 없습니다.') {
           navigate('/group', { replace: true });
           return;
         }
-        
+
         setError('방 정보를 불러오는 중 오류가 발생했습니다.');
       } finally {
         setLoading(false);
@@ -111,7 +124,6 @@ const ParticipatedGroupDetail = () => {
       title: '모임방을 삭제하시겠어요?',
       disc: '방을 삭제하게 되면\n독서메이트들과의 추억이 사라집니다.',
       onConfirm: () => {
-        console.log('방 삭제 확정');
         openSnackbar({
           message: '삭제 기능은 현재 개발 중입니다.',
           variant: 'top',
@@ -131,7 +143,7 @@ const ParticipatedGroupDetail = () => {
 
         try {
           const response = await leaveRoom(parseInt(roomId));
-          
+
           if (response.isSuccess) {
             openSnackbar({
               message: '모임 나가기를 완료했어요.',
@@ -139,10 +151,8 @@ const ParticipatedGroupDetail = () => {
               isError: false,
               onClose: () => {},
             });
-            // 모임 홈으로 이동
             navigate('/group', { replace: true });
           } else {
-            // API에서 반환한 에러 메시지 사용
             openSnackbar({
               message: response.message,
               variant: 'top',
@@ -152,17 +162,16 @@ const ParticipatedGroupDetail = () => {
           }
         } catch (error: unknown) {
           console.error('방 나가기 오류:', error);
-          
-          // 서버 응답이 있는 경우 메시지 사용, 없으면 기본 메시지
+
           let errorMessage = '방 나가기 중 오류가 발생했습니다.';
-          
+
           if (error && typeof error === 'object' && 'response' in error) {
             const axiosError = error as { response?: { data?: { message?: string } } };
             if (axiosError.response?.data?.message) {
               errorMessage = axiosError.response.data.message;
             }
           }
-          
+
           openSnackbar({
             message: errorMessage,
             variant: 'top',
@@ -204,59 +213,53 @@ const ParticipatedGroupDetail = () => {
     navigate(`/group/${roomId}/members`);
   };
 
-  // 로딩 상태
-  if (loading) {
+  if (error) {
     return (
       <ParticipatedWrapper>
-        <LoadingContainer>로딩 중...</LoadingContainer>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+        <ErrorContainer>{error}</ErrorContainer>
       </ParticipatedWrapper>
     );
   }
 
-  // 에러 상태
-  if (error || !roomData) {
+  if (loading || !roomData) {
     return (
       <ParticipatedWrapper>
-        <ErrorContainer>{error || '데이터를 불러올 수 없습니다.'}</ErrorContainer>
+        <TopBackground genre="">
+          <Header>
+            <IconButton src={leftArrow} onClick={handleBackButton} />
+          </Header>
+          <BannerSection>
+            <BannerSkeleton />
+          </BannerSection>
+        </TopBackground>
+        <GroupBookSectionSkeleton />
+        <RecordSectionSkeleton />
+        <CommentSectionSkeleton />
+        <HotTopicSectionSkeleton />
       </ParticipatedWrapper>
     );
   }
 
-  const { data } = roomData;
-
-  // API 데이터를 컴포넌트에 맞게 변환
+  const data = roomData.data;
   const polls: Poll[] = convertVotesToPolls(data.currentVotes);
   const hasPolls = polls.length > 0;
-
-  // 날짜 포맷팅 (YYYY-MM-DD -> YYYY.MM.DD)
-  const formatDate = (dateString: string) => {
-    return dateString.replace(/-/g, '.');
-  };
-
-  // 장르에 따른 배경색 결정 (카테고리 컬러 사용)
-  const getGenreForBackground = () => {
-    // categoryColor를 사용하거나 기본값으로 장르명 사용
-    return data.category;
-  };
-
-  // 댓글 섹션 메시지
-  const commentData = {
-    message: '모임방 멤버들과 간단한 인사를 나눠보세요!',
-  };
-
-  // 모임방 완료 여부 확인
-  const isCompleted = roomData ? isRoomCompleted(roomData.data.progressEndDate) : false;
+  const isCompleted = isRoomCompleted(data.progressEndDate);
+  const formatDate = (dateString: string) => dateString.replace(/-/g, '.');
 
   return (
     <ParticipatedWrapper>
-      <TopBackground genre={getGenreForBackground()}>
+      <TopBackground genre={data.category}>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
           {!isCompleted && <IconButton src={moreIcon} onClick={handleMoreButton} />}
         </Header>
         <BannerSection>
           <GroupTitle>
-            {data.roomName} {!data.isPublic && <img src={lockIcon} alt="자물쇠 아이콘"></img>}
+            {data.roomName} {!data.isPublic && <img src={lockIcon} alt="자물쇠 아이콘" />}
           </GroupTitle>
           <SubTitle>
             <div>소개글</div>
@@ -298,20 +301,16 @@ const ParticipatedGroupDetail = () => {
         </BannerSection>
       </TopBackground>
 
-      <GroupBookSection
-        title={data.bookTitle}
-        author={data.authorName}
-        onClick={handleBookSectionClick}
-      />
-
+      <GroupBookSection title={data.bookTitle} author={data.authorName} onClick={handleBookSectionClick} />
       <RecordSection
         currentPage={data.currentPage}
         progress={data.userPercentage}
         onClick={handleRecordSectionClick}
       />
-
-      <CommentSection message={commentData.message} onClick={handleCommentSectionClick} />
-
+      <CommentSection
+        message="모임방 멤버들과 간단한 인사를 나눠보세요!"
+        onClick={handleCommentSectionClick}
+      />
       <HotTopicSection
         polls={polls}
         hasPolls={hasPolls}
@@ -330,25 +329,5 @@ const ParticipatedGroupDetail = () => {
     </ParticipatedWrapper>
   );
 };
-
-const LoadingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  color: var(--color-grey-200);
-  font-size: var(--string-size-base, 16px);
-`;
-
-const ErrorContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  color: var(--color-red);
-  font-size: var(--string-size-base, 16px);
-  text-align: center;
-  padding: 20px;
-`;
 
 export default ParticipatedGroupDetail;

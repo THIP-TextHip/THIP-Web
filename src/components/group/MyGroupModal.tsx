@@ -1,13 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
-import styled from '@emotion/styled';
 import TitleHeader from '../common/TitleHeader';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import type { Group } from './MyGroupBox';
 import { GroupCard } from './GroupCard';
 import { Modal, Overlay } from './Modal.styles';
 import { getMyRooms, type Room, type RoomType } from '@/api/rooms/getMyRooms';
-import { colors, typography } from '@/styles/global/global';
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from '../common/LoadingSpinner';
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
+import {
+  TabContainer,
+  Tab,
+  Content,
+  BottomSpinner,
+  ErrorMessage,
+  EmptyState,
+  EmptyTitle,
+  EmptySubText,
+} from './MyGroupModal.styled';
 
 interface MyGroupModalProps {
   onClose: () => void;
@@ -21,13 +31,8 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     };
   }, []);
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<'진행중' | '모집중' | ''>('');
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [isLast, setIsLast] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const [selected, setSelected] = useState<'진행중' | '모집중' | '완료' | ''>('');
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   const convertRoomToGroup = (room: Room): Group => {
     return {
@@ -44,132 +49,33 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     };
   };
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        setNextCursor(null);
-        setIsLast(false);
+  const roomType: RoomType =
+    selected === '진행중'
+      ? 'playing'
+      : selected === '모집중'
+        ? 'recruiting'
+        : selected === '완료'
+          ? 'expired'
+          : 'playingAndRecruiting';
 
-        const roomType: RoomType =
-          selected === '진행중'
-            ? 'playing'
-            : selected === '모집중'
-              ? 'recruiting'
-              : 'playingAndRecruiting';
-
-        const response = await getMyRooms(roomType, null);
-
-        if (response.isSuccess) {
-          setRooms(response.data.roomList);
-          setNextCursor(response.data.nextCursor);
-          setIsLast(response.data.isLast);
-        } else {
-          setError(response.message);
-        }
-      } catch (error) {
-        console.error('방 목록 조회 실패:', error);
-        setError('방 목록을 불러오는데 실패했습니다.');
-      } finally {
-        setIsLoading(false);
+  const roomList = useInifinieScroll<Room>({
+    enabled: true,
+    reloadKey: roomType,
+    rootRef: contentRef,
+    fetchPage: async cursor => {
+      const response = await getMyRooms(roomType, cursor);
+      if (!response.isSuccess) {
+        throw new Error(response.message || '방 목록을 불러오는데 실패했습니다.');
       }
-    };
-
-    fetchRooms();
-  }, [selected]);
-
-  const isFetchingRef = useRef(false);
-
-  const loadMore = async () => {
-    if (isFetchingRef.current || isLast || !nextCursor) return;
-
-    isFetchingRef.current = true;
-    setIsLoading(true);
-    try {
-      const roomType: RoomType =
-        selected === '진행중'
-          ? 'playing'
-          : selected === '모집중'
-            ? 'recruiting'
-            : 'playingAndRecruiting';
-
-      const res = await getMyRooms(roomType, nextCursor);
-      if (res.isSuccess) {
-        setRooms(prev => [...prev, ...res.data.roomList]);
-        setNextCursor(res.data.nextCursor);
-        setIsLast(res.data.isLast);
-      } else {
-        setError(res.message);
-      }
-    } catch (e) {
-      console.log(e);
-      setError('방 목록을 불러오는데 실패했습니다.');
-    } finally {
-      setIsLoading(false);
-      isFetchingRef.current = false;
-    }
-  };
-
-  const handleScroll = async (e: React.UIEvent<HTMLDivElement>) => {
-    const el = e.currentTarget;
-    const { scrollTop, scrollHeight, clientHeight } = el;
-    if (scrollHeight - scrollTop - clientHeight < 100) {
-      await loadMore();
-    }
-  };
-
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        setNextCursor(null);
-        setIsLast(false);
-
-        const roomType: RoomType =
-          selected === '진행중'
-            ? 'playing'
-            : selected === '모집중'
-              ? 'recruiting'
-              : 'playingAndRecruiting';
-
-        const res = await getMyRooms(roomType, null);
-        if (res.isSuccess) {
-          setRooms(res.data.roomList);
-          setNextCursor(res.data.nextCursor);
-          setIsLast(res.data.isLast);
-        } else {
-          setError(res.message);
-        }
-      } catch (e) {
-        console.log(e);
-        setError('방 목록을 불러오는데 실패했습니다.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRooms();
-  }, [selected]);
-
-  useEffect(() => {
-    const tryFill = async () => {
-      if (!contentRef.current || isLast) return;
-      let guard = 2; // 최대 3페이지까지 자동 프리로드(필요시 늘리기)
-      while (
-        guard-- > 0 &&
-        contentRef.current &&
-        contentRef.current.scrollHeight <= contentRef.current.clientHeight &&
-        !isLast &&
-        nextCursor
-      ) {
-        await loadMore();
-        await new Promise(requestAnimationFrame);
-      }
-    };
-    tryFill();
-  }, [rooms, nextCursor, isLast]);
+      return {
+        items: response.data.roomList,
+        nextCursor: response.data.nextCursor,
+        isLast: response.data.isLast,
+      };
+    },
+    rootMargin: '100px 0px',
+    threshold: 0.1,
+  });
 
   useEffect(() => {
     if (contentRef.current) {
@@ -177,10 +83,12 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     }
   }, [selected]);
 
-  const convertedGroups = rooms.map(convertRoomToGroup);
+  const convertedGroups = roomList.items.map(convertRoomToGroup);
 
   const handleGroupCardClick = (group: Group) => {
-    if (selected === '모집중') {
+    if (selected === '완료') {
+      navigate(`/group/detail/joined/${group.id}`);
+    } else if (selected === '모집중') {
       navigate(`/group/detail/${group.id}`);
     } else if (selected === '진행중') {
       navigate(`/group/detail/joined/${group.id}`);
@@ -202,7 +110,7 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
         />
 
         <TabContainer>
-          {(['진행중', '모집중'] as const).map(tab => (
+          {(['진행중', '모집중', '완료'] as const).map(tab => (
             <Tab
               key={tab}
               selected={tab === selected}
@@ -213,8 +121,8 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
           ))}
         </TabContainer>
 
-        <Content ref={contentRef} onScroll={handleScroll}>
-          {error && <ErrorMessage>{error}</ErrorMessage>}
+        <Content ref={contentRef}>
+          {roomList.error && <ErrorMessage>{roomList.error}</ErrorMessage>}
 
           {convertedGroups.map(group => (
             <GroupCard
@@ -222,27 +130,39 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
               group={group}
               isOngoing={group.isOnGoing}
               type="modal"
+              isCompleted={selected === '완료'}
               onClick={() => handleGroupCardClick(group)}
             />
           ))}
 
-          {isLoading && <BottomSpinner>불러오는 중…</BottomSpinner>}
+          {!roomList.isLast && (
+            <div ref={roomList.sentinelRef} style={{ gridColumn: '1 / -1', height: 20 }} />
+          )}
+          {roomList.isLoadingMore && (
+            <BottomSpinner>
+              <LoadingSpinner size="small" fullHeight={false} />
+            </BottomSpinner>
+          )}
 
-          {!isLoading && convertedGroups.length === 0 && (
+          {!roomList.isLoading && convertedGroups.length === 0 && !roomList.error && (
             <EmptyState>
               <EmptyTitle>
                 {selected === '진행중'
                   ? '진행중인 모임방이 없어요'
                   : selected === '모집중'
                     ? '모집중인 모임방이 없어요'
-                    : '참여중인 모임방이 없어요'}
+                    : selected === '완료'
+                      ? '완료된 모임방이 없어요'
+                      : '참여중인 모임방이 없어요'}
               </EmptyTitle>
               <EmptySubText>
                 {selected === '진행중'
                   ? '진행중인 모임방에 참여해보세요!'
                   : selected === '모집중'
                     ? '모집중인 모임방에 참여해보세요!'
-                    : '첫 번째 모임방에 참여해보세요!'}
+                    : selected === '완료'
+                      ? '아직 완료된 모임방이 없습니다.'
+                      : '첫 번째 모임방에 참여해보세요!'}
               </EmptySubText>
             </EmptyState>
           )}
@@ -251,83 +171,3 @@ export const MyGroupModal = ({ onClose }: MyGroupModalProps) => {
     </Overlay>
   );
 };
-
-const TabContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  margin: 20px;
-`;
-
-const Tab = styled.button<{ selected: boolean }>`
-  white-space: nowrap;
-  padding: 8px 12px;
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-  border: none;
-  border-radius: 16px;
-  background: ${({ selected }) => (selected ? colors.purple.main : colors.darkgrey.main)};
-  color: #fff;
-  cursor: pointer;
-`;
-
-const Content = styled.div`
-  display: grid;
-  gap: 20px;
-  overflow-y: auto;
-  padding: 0 20px 20px 20px;
-  grid-template-columns: 1fr;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  margin-bottom: 60px;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  @media (min-width: 584px) {
-    grid-template-columns: 1fr 1fr;
-  }
-`;
-
-const BottomSpinner = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px 0 24px;
-  color: ${colors.grey[100]};
-  font-size: ${typography.fontSize.sm};
-`;
-
-const ErrorMessage = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
-  color: #ff6b6b;
-  font-size: ${typography.fontSize.base};
-`;
-
-const EmptyState = styled.div`
-  grid-column: 1 / -1; /* 그리드 2열일 때도 전체 너비 차지 */
-  flex: 1;
-  min-height: 78vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
-  margin-bottom: 70px;
-  color: ${colors.grey[100]};
-  text-align: center;
-`;
-
-const EmptyTitle = styled.p`
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  margin-bottom: 8px;
-  color: ${colors.white};
-`;
-
-const EmptySubText = styled.p`
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-  color: ${colors.grey[100]};
-`;

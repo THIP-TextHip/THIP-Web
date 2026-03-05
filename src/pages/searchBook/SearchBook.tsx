@@ -21,6 +21,7 @@ import {
   EmptyTitle,
   EmptySubText,
   FeedPostContainer,
+  LoadingBox,
 } from './SearchBook.styled';
 import { useNavigate, useParams } from 'react-router-dom';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -29,18 +30,19 @@ import saveIcon from '../../assets/common/SaveIcon.svg';
 import filledSaveIcon from '../../assets/common/filledSaveIcon.svg';
 import rightChevron from '../../assets/common/right-Chevron.svg';
 import plusIcon from '../../assets/common/plus.svg';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IntroModal } from '@/components/search/IntroModal';
 import { getBookDetail, type BookDetail } from '@/api/books/getBookDetail';
 import { getRecruitingRooms, type RecruitingRoomsData } from '@/api/books/getRecruitingRooms';
 import { postSaveBook } from '@/api/books/postSaveBook';
 import { Filter } from '@/components/common/Filter';
 import FeedPost from '@/components/feed/FeedPost';
-import styled from '@emotion/styled';
-import { colors, typography } from '@/styles/global/global';
 import { getFeedsByIsbn, type FeedItem, type FeedSort } from '@/api/feeds/getFeedsByIsbn';
-import { usePopupStore } from '@/stores/usePopupStore';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { usePopupStore } from '@/stores/popupStore';
+import { FeedPostSkeleton, BookDetailSkeleton } from '@/shared/ui/Skeleton';
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
+import { useInifinieScroll } from '@/hooks/useInifinieScroll';
+import SEOHead from '@/components/common/SEOHead';
 
 const FILTER = ['최신순', '인기순'] as const;
 const toFeedSort = (f: (typeof FILTER)[number]): FeedSort => (f === '최신순' ? 'latest' : 'like');
@@ -55,18 +57,12 @@ const SearchBook = () => {
   const [bookDetail, setBookDetail] = useState<BookDetail | null>(null);
   const [recruitingRoomsData, setRecruitingRoomsData] = useState<RecruitingRoomsData | null>(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const isSavedRef = useRef(false);
+  const { isLoading: isSaveLoading, run: runSave } = usePreventDoubleClick();
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [feeds, setFeeds] = useState<FeedItem[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [isLast, setIsLast] = useState(true);
-  const [isLoadingFeeds, setIsLoadingFeeds] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const openPopup = usePopupStore(state => state.openPopup);
 
   useEffect(() => {
@@ -81,25 +77,25 @@ const SearchBook = () => {
         setIsLoading(true);
         setError(null);
 
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
         const [bookResponse, recruitingResponse] = await Promise.all([
           getBookDetail(isbn),
           getRecruitingRooms(isbn),
         ]);
+        await minLoadingTime;
 
         if (bookResponse.isSuccess) {
           setBookDetail(bookResponse.data);
           setIsSaved(bookResponse.data.isSaved);
+          isSavedRef.current = bookResponse.data.isSaved;
         } else {
           setError(bookResponse.message);
         }
 
         if (recruitingResponse.isSuccess) {
           setRecruitingRoomsData(recruitingResponse.data);
-        } else {
-          console.error('모집중인 모임방 조회 실패:', recruitingResponse.message);
         }
-      } catch (err) {
-        console.error('데이터 조회 오류:', err);
+      } catch {
         setError('정보를 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
@@ -109,67 +105,27 @@ const SearchBook = () => {
     fetchBookDetail();
   }, [isbn]);
 
-  const loadFirstFeeds = useCallback(async () => {
-    if (!isbn) return;
-    try {
-      setIsLoadingFeeds(true);
-      setFeeds([]);
-      setNextCursor(null);
-      setIsLast(true);
-
-      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), null);
-      if (res.isSuccess) {
-        setFeeds(res.data.feeds);
-        setNextCursor(res.data.nextCursor);
-        setIsLast(res.data.isLast);
-      } else {
-        console.error('피드 조회 실패:', res.message);
+  const feeds = useInifinieScroll<FeedItem>({
+    enabled: !!isbn,
+    reloadKey: `${isbn ?? ''}-${selectedFilter}`,
+    fetchPage: async cursor => {
+      if (!isbn) {
+        return { items: [], nextCursor: null, isLast: true };
       }
-    } catch (e) {
-      console.error('피드 조회 오류:', e);
-    } finally {
-      setIsLoadingFeeds(false);
-    }
-  }, [isbn, selectedFilter]);
 
-  useEffect(() => {
-    loadFirstFeeds();
-  }, [loadFirstFeeds]);
+      const minLoadingTime = cursor ? null : new Promise(resolve => setTimeout(resolve, 500));
+      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), cursor);
+      if (minLoadingTime) await minLoadingTime;
 
-  const loadMore = useCallback(async () => {
-    if (!isbn || !nextCursor || isLast || isLoadingMore) return;
-    try {
-      setIsLoadingMore(true);
-      const res = await getFeedsByIsbn(isbn, toFeedSort(selectedFilter), nextCursor);
-      if (res.isSuccess) {
-        setFeeds(prev => [...prev, ...res.data.feeds]);
-        setNextCursor(res.data.nextCursor);
-        setIsLast(res.data.isLast);
-      } else {
-        console.error('피드 추가 로드 실패:', res.message);
-      }
-    } catch (e) {
-      console.error('피드 추가 로드 오류:', e);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [isbn, nextCursor, isLast, isLoadingMore, selectedFilter]);
-
-  const lastFeedElementCallback = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isLoadingMore || isLast) return;
-
-      if (observerRef.current) observerRef.current.disconnect();
-
-      observerRef.current = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && !isLoadingMore && !isLast) {
-          loadMore();
-        }
-      });
-      if (node) observerRef.current.observe(node);
+      return {
+        items: res.data.feeds,
+        nextCursor: res.data.nextCursor || null,
+        isLast: res.data.isLast,
+      };
     },
-    [isLoadingMore, isLast, loadMore],
-  );
+    rootMargin: '100px 0px',
+    threshold: 0.1,
+  });
 
   const handleBackButton = () => navigate(-1);
   const handleIntroClick = () => setShowIntroModal(true);
@@ -210,21 +166,28 @@ const SearchBook = () => {
     }
   };
 
-  const handleSaveButton = async () => {
-    if (!isbn || isSaving) return;
-    try {
-      setIsSaving(true);
-      const response = await postSaveBook(isbn, !isSaved);
-      if (response.isSuccess) {
-        setIsSaved(response.data.isSaved);
-      } else {
-        console.error('북마크 실패:', response.message);
+  const handleSaveButton = () => {
+    if (!isbn) return;
+    runSave(async () => {
+      const nextSaved = !isSavedRef.current;
+      isSavedRef.current = nextSaved;
+      setIsSaved(nextSaved);
+
+      try {
+        const response = await postSaveBook(isbn, nextSaved);
+        if (!response.isSuccess && isSavedRef.current === nextSaved) {
+          const rollback = !nextSaved;
+          isSavedRef.current = rollback;
+          setIsSaved(rollback);
+        }
+      } catch {
+        if (isSavedRef.current === nextSaved) {
+          const rollback = !nextSaved;
+          isSavedRef.current = rollback;
+          setIsSaved(rollback);
+        }
       }
-    } catch (error) {
-      console.error('북마크 중 오류 발생:', error);
-    } finally {
-      setIsSaving(false);
-    }
+    });
   };
 
   useEffect(() => {
@@ -237,57 +200,62 @@ const SearchBook = () => {
     }
   }, [bookDetail, openPopup]);
 
-  if (isLoading || error || !bookDetail) {
-    if (isLoading) {
-      return <LoadingSpinner fullHeight={true} size="large" message="책 정보 불러오는 중..." />;
-    }
+  if (error) {
     return (
       <Wrapper>
         <Header>
           <IconButton src={leftArrow} onClick={handleBackButton} />
         </Header>
-        <div style={{ padding: '100px 20px', textAlign: 'center', color: 'white' }}>
-          {isLoading ? '로딩 중...' : error || '책 정보를 찾을 수 없습니다.'}
-        </div>
+        <div style={{ padding: '100px 20px', textAlign: 'center', color: 'white' }}>{error}</div>
       </Wrapper>
     );
   }
 
   return (
     <Wrapper>
-      <TopBackground bookImgUrl={bookDetail.imageUrl} />
+      {bookDetail && (
+        <SEOHead
+          title={bookDetail.title}
+          description={`${bookDetail.authorName} 저 | THIP에서 독서모임과 독후감을 만나보세요.`}
+        />
+      )}
+      {bookDetail && <TopBackground bookImgUrl={bookDetail.imageUrl} />}
       <Header>
         <IconButton src={leftArrow} onClick={handleBackButton} />
       </Header>
 
-      <BannerSection>
-        <BookInfo>
-          <BookTitle>{bookDetail.title}</BookTitle>
-          <Author>
-            {bookDetail.authorName} 저 · {bookDetail.publisher}
-          </Author>
-        </BookInfo>
+      {isLoading || !bookDetail ? (
+        <BookDetailSkeleton />
+      ) : (
+        <BannerSection>
+          <BookInfo>
+            <BookTitle>{bookDetail.title}</BookTitle>
+            <Author>
+              {bookDetail.authorName} 저 · {bookDetail.publisher}
+            </Author>
+          </BookInfo>
 
-        <Intro onClick={handleIntroClick}>
-          <SubTitle>소개</SubTitle>
-          <SubText>{bookDetail.description}</SubText>
-        </Intro>
+          <Intro onClick={handleIntroClick}>
+            <SubTitle>소개</SubTitle>
+            <SubText>{bookDetail.description}</SubText>
+          </Intro>
 
-        <ButtonSection>
-          <RecruitingGroupButton onClick={handleRecruitingGroupButton}>
-            모집중인 모임방 {recruitingRoomsData?.totalRoomCount || 0}개{' '}
-            <img src={rightChevron} alt="오른쪽 화살표 아이콘" />
-          </RecruitingGroupButton>
-          <RightArea>
-            <WritePostButton onClick={handleWritePostButton}>
-              피드에 글쓰기 <img src={plusIcon} alt="더하기 아이콘" />
-            </WritePostButton>
-            <SaveButton onClick={handleSaveButton} disabled={isSaving}>
-              <img src={isSaved ? filledSaveIcon : saveIcon} alt="저장 버튼" />
-            </SaveButton>
-          </RightArea>
-        </ButtonSection>
-      </BannerSection>
+          <ButtonSection>
+            <RecruitingGroupButton onClick={handleRecruitingGroupButton}>
+              모집중인 모임방 {recruitingRoomsData?.totalRoomCount || 0}개{' '}
+              <img src={rightChevron} alt="오른쪽 화살표 아이콘" />
+            </RecruitingGroupButton>
+            <RightArea>
+              <WritePostButton onClick={handleWritePostButton}>
+                피드에 글쓰기 <img src={plusIcon} alt="더하기 아이콘" />
+              </WritePostButton>
+              <SaveButton onClick={handleSaveButton} style={{ opacity: isSaveLoading ? 0.6 : 1 }}>
+                <img src={isSaved ? filledSaveIcon : saveIcon} alt="저장 버튼" />
+              </SaveButton>
+            </RightArea>
+          </ButtonSection>
+        </BannerSection>
+      )}
 
       <FeedSection>
         <FeedTitle>피드 글 둘러보기</FeedTitle>
@@ -299,21 +267,25 @@ const SearchBook = () => {
             setSelectedFilter={filter => setSelectedFilter(filter as (typeof FILTER)[number])}
           />
         </FilterContainer>
-        {isLoadingFeeds && feeds.length === 0 ? (
-          <LoadingBox>불러오는 중...</LoadingBox>
-        ) : feeds.length > 0 ? (
+        {feeds.isLoading && feeds.items.length === 0 ? (
           <FeedPostContainer>
-            {feeds.map((post, idx) => (
-              <div
-                key={post.feedId}
-                ref={idx === feeds.length - 1 ? el => lastFeedElementCallback(el) : undefined}
-              >
+            {Array.from({ length: 3 }).map((_, i) => (
+              <FeedPostSkeleton key={i} />
+            ))}
+          </FeedPostContainer>
+        ) : feeds.items.length > 0 ? (
+          <FeedPostContainer>
+            {feeds.items.map(post => (
+              <div key={post.feedId}>
                 <FeedPost
                   showHeader={true}
                   isMyFeed={false}
                   feedId={post.feedId}
+                  creatorId={post.creatorId}
                   creatorNickname={post.creatorNickname}
                   creatorProfileImageUrl={post.creatorProfileImageUrl}
+                  aliasName={post.aliasName}
+                  aliasColor={post.aliasColor}
                   postDate={post.postDate}
                   isbn={post.isbn}
                   bookTitle={post.bookTitle}
@@ -328,6 +300,8 @@ const SearchBook = () => {
                 />
               </div>
             ))}
+            {!feeds.isLast && <div ref={feeds.sentinelRef} style={{ height: 20 }} />}
+            {feeds.isLoadingMore && <LoadingBox>불러오는 중...</LoadingBox>}
           </FeedPostContainer>
         ) : (
           <EmptyState>
@@ -337,7 +311,7 @@ const SearchBook = () => {
         )}
       </FeedSection>
 
-      {showIntroModal && (
+      {showIntroModal && bookDetail && (
         <IntroModal title="소개" content={bookDetail.description} onClose={handleCloseIntroModal} />
       )}
     </Wrapper>
@@ -345,12 +319,3 @@ const SearchBook = () => {
 };
 
 export default SearchBook;
-
-const LoadingBox = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 32px 20px;
-  color: ${colors.white};
-  font-size: ${typography.fontSize.base};
-`;

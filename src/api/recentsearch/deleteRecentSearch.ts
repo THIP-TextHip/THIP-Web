@@ -1,6 +1,5 @@
 import { apiClient } from '../index';
 
-// 최근 검색어 삭제 응답 타입
 export interface DeleteRecentSearchResponse {
   isSuccess: boolean;
   code: number;

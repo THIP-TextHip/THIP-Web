@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import styled from '@emotion/styled';
 import NavBar from '../../components/common/NavBar';
 import TitleHeader from '@/components/common/TitleHeader';
 import writefab from '../../assets/common/writefab.svg';
@@ -9,12 +8,8 @@ import OtherFeed from '@/components/feed/OtherFeed';
 import { getOtherFeed, type OtherFeedItem } from '@/api/feeds/getOtherFeed';
 import { getOtherProfile } from '@/api/users/getOtherProfile';
 import type { OtherProfileData } from '@/types/profile';
-
-const Container = styled.div`
-  min-width: 320px;
-  max-width: 767px;
-  margin: 0 auto;
-`;
+import { OtherFeedSkeleton } from '@/shared/ui/Skeleton';
+import { Container } from './MyFeedPage.styled';
 
 const OtherFeedPage = () => {
   const navigate = useNavigate();
@@ -28,7 +23,6 @@ const OtherFeedPage = () => {
     navigate(-1);
   };
 
-  // 다른 사용자 피드 및 프로필 데이터 로드
   useEffect(() => {
     const loadOtherData = async () => {
       if (!userId) {
@@ -40,11 +34,15 @@ const OtherFeedPage = () => {
       try {
         setLoading(true);
 
-        // 피드 데이터와 프로필 데이터를 병렬로 로드
-        const [feedResponse, profileResponse] = await Promise.all([
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [feedResponse, profileResponse] = (await Promise.all([
           getOtherFeed(Number(userId)),
           getOtherProfile(Number(userId)),
-        ]);
+        ])) as [
+          Awaited<ReturnType<typeof getOtherFeed>>,
+          Awaited<ReturnType<typeof getOtherProfile>>,
+        ];
+        await minLoadingTime;
 
         setFeedData(feedResponse.data.feedList);
         setProfileData(profileResponse.data);
@@ -61,7 +59,16 @@ const OtherFeedPage = () => {
   }, [userId]);
 
   if (loading) {
-    return <></>;
+    return (
+      <Container>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+        <OtherFeedSkeleton />
+        <NavBar src={writefab} path="/post/create" />
+      </Container>
+    );
   }
 
   if (error) {
@@ -80,7 +87,7 @@ const OtherFeedPage = () => {
         posts={feedData}
         isMyFeed={false}
         profileData={profileData}
-        showFollowButton={!profileData?.isWriter} // isWriter가 true면 팔로우 버튼 숨김
+        showFollowButton={!profileData?.isWriter}
       />
       <NavBar src={writefab} path="/post/create" />
     </Container>

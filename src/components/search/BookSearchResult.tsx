@@ -1,7 +1,19 @@
 import type { SearchedBook } from '@/pages/search/Search';
-import styled from '@emotion/styled';
-import { colors, typography } from '@/styles/global/global';
 import { useNavigate } from 'react-router-dom';
+import {
+  Wrapper,
+  List,
+  BookItem,
+  ResultHeader,
+  Cover,
+  BookInfo,
+  Title,
+  Subtitle,
+  EmptyWrapper,
+  MainText,
+  SubText,
+  RequestButton,
+} from './BookSearchResult.styled';
 
 interface BookSearchResultProps {
   type: 'searching' | 'searched';
@@ -64,107 +76,10 @@ export function BookSearchResult({
           ))
         )}
 
-        {/* 로딩 상태 표시 */}
         {isLoading && searchedBookList.length > 0 && <></>}
 
-        {/* 더 이상 데이터가 없음을 표시 */}
         {!hasMore && searchedBookList.length > 0 && <></>}
       </List>
     </Wrapper>
   );
 }
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 0 20px;
-  margin-bottom: 72px;
-`;
-
-const List = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const BookItem = styled.div`
-  display: flex;
-  border-bottom: 1px solid ${colors.darkgrey.dark};
-  padding: 12px 0;
-  cursor: pointer;
-`;
-
-const ResultHeader = styled.div`
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.medium};
-  color: ${colors.white};
-  padding-bottom: 8px;
-  border-bottom: 1px solid ${colors.darkgrey.dark};
-`;
-
-const Cover = styled.img`
-  width: 80px;
-  height: 107px;
-  flex-shrink: 0;
-  object-fit: cover;
-`;
-
-const BookInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-left: 12px;
-  min-width: 0;
-`;
-
-const Title = styled.h3`
-  font-size: ${typography.fontSize.base};
-  font-weight: ${typography.fontWeight.semibold};
-  color: ${colors.white};
-  line-height: 20px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-word;
-`;
-
-const Subtitle = styled.span`
-  font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.medium};
-  color: ${colors.grey[200]};
-  margin-top: 8px;
-  line-height: 20px;
-`;
-
-const EmptyWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 60vh;
-`;
-
-const MainText = styled.p`
-  color: ${colors.white};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  margin-bottom: 8px;
-`;
-
-const SubText = styled.p`
-  color: ${colors.grey[100]};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-  margin-bottom: 20px;
-`;
-
-const RequestButton = styled.button`
-  background-color: ${colors.purple.main};
-  color: ${colors.white};
-  padding: 10px 12px;
-  font-size: ${typography.fontSize.base};
-  border: none;
-  border-radius: 12px;
-  font-weight: ${typography.fontWeight.semibold};
-  cursor: pointer;
-`;

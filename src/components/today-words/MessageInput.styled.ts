@@ -80,7 +80,6 @@ export const MessageInput = styled.textarea`
     color: ${semanticColors.text.ghost};
   }
 
-  /* 스크롤바 숨기기 */
   scrollbar-width: none;
   -ms-overflow-style: none;
   &::-webkit-scrollbar {

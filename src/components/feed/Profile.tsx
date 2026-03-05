@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import styled from '@emotion/styled';
+import { useState, useEffect, useRef } from 'react';
 import MyFollower from './MyFollower';
 import { postFollow } from '@/api/users/postFollow';
-import { usePopupStore } from '@/stores/usePopupStore';
+import { Container, UserProfile } from './Profile.styled';
+import { usePopupStore } from '@/stores/popupStore';
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 
 export interface ProfileProps {
   showFollowButton?: boolean;
@@ -30,45 +31,60 @@ const Profile = ({
   isMyFeed,
 }: ProfileProps) => {
   const [followed, setFollowed] = useState(isFollowing);
+  const followedRef = useRef<boolean>(!!isFollowing);
   const { openPopup } = usePopupStore();
+  const { isLoading: isFollowLoading, run: runFollow } = usePreventDoubleClick();
 
   useEffect(() => {
     setFollowed(isFollowing);
+    followedRef.current = !!isFollowing;
   }, [isFollowing]);
 
-  const toggleFollow = async () => {
-    if (!userId) {
-      console.error('userId가 없습니다.');
-      return;
-    }
+  const toggleFollow = () => {
+    if (!userId) return;
+    runFollow(async () => {
+      const nextFollowed = !followedRef.current;
+      followedRef.current = nextFollowed;
+      setFollowed(nextFollowed);
 
-    try {
-      console.log('현재 팔로우 상태:', followed);
-      console.log('요청할 타입:', !followed);
+      try {
+        const response = await postFollow(userId, nextFollowed);
+        if (followedRef.current !== nextFollowed) return;
 
-      // 현재 팔로우 상태의 반대값으로 API 호출
-      const response = await postFollow(userId, !followed);
+        if (!response.isSuccess) {
+          const rollbackState = !nextFollowed;
+          followedRef.current = rollbackState;
+          setFollowed(rollbackState);
+          openPopup('snackbar', {
+            message: response.message || (nextFollowed ? '띱하기에 실패했어요.' : '띱취소에 실패했어요.'),
+            variant: 'top',
+            onClose: () => {},
+          });
+          return;
+        }
 
-      console.log('API 응답:', response);
+        if (response.data.isFollowing !== nextFollowed) {
+          followedRef.current = response.data.isFollowing;
+          setFollowed(response.data.isFollowing);
+        }
 
-      // API 응답으로 팔로우 상태 업데이트
-      setFollowed(response.data.isFollowing);
-      console.log(`${nickname} - ${response.data.isFollowing ? '띱 완료' : '띱 취소'}`);
-
-      // Snackbar 표시
-      const message = response.data.isFollowing
-        ? `${nickname}님을 띱 했어요.`
-        : `${nickname}님을 띱 취소했어요.`;
-
-      openPopup('snackbar', {
-        message,
-        variant: 'top',
-        onClose: () => {},
-      });
-    } catch (error) {
-      console.error('팔로우/언팔로우 실패:', error);
-      // 에러 발생 시 상태 변경하지 않음
-    }
+        openPopup('snackbar', {
+          message: response.data.isFollowing ? `${nickname}님을 띱 했어요.` : `${nickname}님을 띱 취소했어요.`,
+          variant: 'top',
+          onClose: () => {},
+        });
+      } catch {
+        if (followedRef.current !== nextFollowed) return;
+        const rollbackState = !nextFollowed;
+        followedRef.current = rollbackState;
+        setFollowed(rollbackState);
+        openPopup('snackbar', {
+          message: nextFollowed ? '띱하기에 실패했어요.' : '띱취소에 실패했어요.',
+          variant: 'top',
+          onClose: () => {},
+        });
+      }
+    });
   };
 
   return (
@@ -84,7 +100,7 @@ const Profile = ({
           </div>
         </div>
         {showFollowButton && !isMyFeed && (
-          <div className="followbutton" onClick={toggleFollow}>
+          <div className="followbutton" onClick={toggleFollow} style={{ opacity: isFollowLoading ? 0.6 : 1 }}>
             {followed ? '띱 취소' : '띱 하기'}
           </div>
         )}
@@ -97,70 +113,4 @@ const Profile = ({
     </Container>
   );
 };
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  /* min-width: 320px;
-  max-width: 540px; */
-  height: 166px;
-  padding: 0 20px;
-  padding-top: 32px;
-  margin: 0 auto;
-`;
-
-const UserProfile = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-
-  .userInfo {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-
-    img {
-      width: 54px;
-      height: 54px;
-      border-radius: 54px;
-      border: 0.5px solid var(--color-white);
-    }
-
-    .user {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      .username {
-        color: var(--color-text-primary_white, #fefefe);
-        font-size: var(--string-size-large01, 18px);
-        font-weight: var(--string-weight-semibold, 600);
-        line-height: var(--string-lineheight-height24, 24px); /* 133.333% */
-        letter-spacing: 0.018px;
-      }
-
-      .usertitle {
-        font-size: var(--string-size-medium01, 14px);
-        font-weight: var(--string-weight-regular, 400);
-        line-height: var(--string-lineheight-feedcontent_height20, 20px); /* 142.857% */
-      }
-    }
-  }
-
-  .followbutton {
-    padding: 8px 12px;
-    border-radius: 20px;
-    border: 1px solid #888;
-
-    color: var(--color-text-secondary_grey00, #dadada);
-    font-size: var(--string-size-medium01, 14px);
-    font-weight: var(--string-weight-medium, 500);
-    line-height: normal;
-    cursor: pointer;
-  }
-`;
-
 export default Profile;

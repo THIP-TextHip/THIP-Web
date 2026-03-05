@@ -33,11 +33,13 @@ export const useUserSearch = ({
       try {
         setLoading(true);
         setError(null);
+        const minLoadingTime = !isLoadMore ? new Promise(resolve => setTimeout(resolve, 500)) : null;
         const response = await getUsers({
           keyword: searchKeyword,
           size,
           isFinalized,
         });
+        if (minLoadingTime) await minLoadingTime;
 
         const newUserList = response.data.userList;
 
@@ -58,7 +60,6 @@ export const useUserSearch = ({
     [size, isFinalized],
   );
 
-  // 디바운스된 키워드가 변경될 때 검색 실행
   useEffect(() => {
     searchUsers(debouncedKeyword);
   }, [debouncedKeyword, searchUsers]);
