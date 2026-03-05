@@ -1,27 +1,30 @@
-import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import people from '../../assets/feed/people.svg';
 import character from '../../assets/feed/character.svg';
-import { typography } from '@/styles/global/global';
 import { getRecentFollowing, type RecentWriterData } from '@/api/users/getRecentFollowing';
+import Skeleton from '@/shared/ui/Skeleton';
+import { Container, FollowContainer, EmptyFollowerContainer } from './FollowList.styled';
 
-const FollowList = () => {
+interface FollowListProps {
+  onLoadingChange?: (loading: boolean) => void;
+}
+
+const FollowList = ({ onLoadingChange }: FollowListProps) => {
   const navigate = useNavigate();
   const [myFollowings, setMyFollowings] = useState<RecentWriterData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // API에서 최근 글 작성한 팔로우 리스트 조회
   const fetchRecentFollowing = async () => {
     try {
       setLoading(true);
-      const response = await getRecentFollowing();
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+      const [response] = await Promise.all([getRecentFollowing(), minLoadingTime]);
 
       if (response.isSuccess) {
         setMyFollowings(response.data.myFollowingUsers);
       } else {
-        console.error('최근 팔로우 작성자 조회 실패:', response.message);
         setMyFollowings([]);
       }
     } catch (error) {
@@ -32,10 +35,13 @@ const FollowList = () => {
     }
   };
 
-  // 컴포넌트 마운트 시 데이터 조회
   useEffect(() => {
     fetchRecentFollowing();
   }, []);
+
+  useEffect(() => {
+    onLoadingChange?.(loading);
+  }, [loading, onLoadingChange]);
 
   const hasFollowers = myFollowings.length > 0;
   const visible = hasFollowers ? myFollowings.slice(0, 10) : [];
@@ -54,12 +60,37 @@ const FollowList = () => {
 
   return (
     <Container>
-      <div className="title">
-        <img src={people} />
-        <div>내 띱</div>
-      </div>
       {loading ? (
-        <></>
+        <div className="title">
+          <div className="titleSkeletonIcon">
+            <Skeleton.Box width={14} height={14} />
+          </div>
+          <div className="titleSkeletonText">
+            <Skeleton.Text width={24} height={12} />
+          </div>
+        </div>
+      ) : (
+        <div className="title">
+          <img src={people} alt="내 띱" />
+          <div>내 띱</div>
+        </div>
+      )}
+      {loading ? (
+        <FollowContainer>
+          <div className="followerList">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div className="followers skeletonItem" key={i}>
+                <Skeleton.Circle width={36} />
+                <div className="username skeletonUsername">
+                  <Skeleton.Text width={30} height={10} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="arrowSkeleton">
+            <Skeleton.Box width={16} height={16} />
+          </div>
+        </FollowContainer>
       ) : hasFollowers ? (
         <FollowContainer>
           <div className="followerList">
@@ -81,97 +112,4 @@ const FollowList = () => {
     </Container>
   );
 };
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 20px;
-  padding-top: 20px;
-  background-color: var(--color-black-main);
-
-  .title {
-    display: flex;
-    flex-direction: row;
-    color: var(--color-white);
-    font-size: ${typography.fontSize['2xs']};
-    font-weight: var(--font-weight-medium);
-    line-height: 20px;
-  }
-`;
-
-const FollowContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-
-  img {
-    cursor: pointer;
-  }
-
-  .followerList {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 12px;
-
-    /* ✅ 스크롤바 숨기기 */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE, Edge */
-    .followerList::-webkit-scrollbar {
-      display: none; /* Chrome, Safari */
-    }
-
-    .followers {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      cursor: pointer;
-
-      .username {
-        width: 36px;
-        overflow: hidden;
-        color: #fff;
-        text-overflow: ellipsis;
-        text-align: center;
-        white-space: nowrap;
-        font-size: ${typography.fontSize['2xs']};
-        font-weight: var(--string-weight-regular, 400);
-        line-height: 20px;
-      }
-
-      img {
-        display: flex;
-        width: 36px;
-        height: 36px;
-        flex-shrink: 0;
-        border-radius: 36px;
-        border: 0.5px solid #888;
-      }
-    }
-  }
-`;
-
-const EmptyFollowerContainer = styled.div`
-  display: flex;
-  width: 100%;
-  padding: 0 12px;
-  margin: 12px 0;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 12px;
-  background-color: var(--color-darkgrey-dark);
-
-  color: var(--color-grey-100);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  line-height: 20px;
-  cursor: pointer;
-`;
-
 export default FollowList;

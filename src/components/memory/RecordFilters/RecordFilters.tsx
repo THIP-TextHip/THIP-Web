@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FilterType } from '../../../pages/memory/Memory';
 import type { SortType } from '../SortDropdown';
 import PageInputMode from './PageInputMode';
@@ -31,22 +31,27 @@ const RecordFilters = ({
   const [showInputMode, setShowInputMode] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  useEffect(() => {
+    if (activeFilter !== 'page' || selectedPageRange) {
+      setShowInputMode(false);
+    }
+  }, [activeFilter, selectedPageRange]);
+
   const handlePageFilterClick = () => {
     if (selectedPageRange) {
-      // 이미 선택된 범위가 있으면 초기화
       if (onPageRangeClear) {
         onPageRangeClear();
         setShowInputMode(false);
       }
     } else {
-      // 입력 모드로 전환
       setShowInputMode(true);
-      onFilterChange('page');
+      if (activeFilter !== 'page') {
+        onFilterChange('page');
+      }
     }
   };
 
   const handleInputChange = (type: 'start' | 'end', value: string) => {
-    // 숫자만 입력 허용 (빈 문자열 또는 숫자)
     if (value === '' || /^\d+$/.test(value)) {
       if (type === 'start') {
         setStartPage(value);
@@ -65,9 +70,7 @@ const RecordFilters = ({
     const start = parseInt(startPage);
     const end = parseInt(endPage);
 
-    // NaN 체크 포함한 유효성 검사
     if (!isNaN(start) && !isNaN(end) && start > 0 && end > 0 && start <= end) {
-      // 페이지 범위를 상위 컴포넌트에 전달
       if (onPageRangeSet) {
         onPageRangeSet({ start, end });
       }
@@ -101,13 +104,13 @@ const RecordFilters = ({
   };
 
   const isValid = Boolean(
-    startPage && 
-    endPage && 
-    !isNaN(parseInt(startPage)) && 
-    !isNaN(parseInt(endPage)) && 
-    parseInt(startPage) > 0 && 
-    parseInt(endPage) > 0 && 
-    parseInt(startPage) <= parseInt(endPage)
+    startPage &&
+      endPage &&
+      !isNaN(parseInt(startPage)) &&
+      !isNaN(parseInt(endPage)) &&
+      parseInt(startPage) > 0 &&
+      parseInt(endPage) > 0 &&
+      parseInt(startPage) <= parseInt(endPage),
   );
   const hasAnyInput = startPage.length > 0 || endPage.length > 0;
   const isPageInputMode = showInputMode && activeFilter === 'page' && !selectedPageRange;

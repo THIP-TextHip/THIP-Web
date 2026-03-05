@@ -12,7 +12,7 @@ export const mockMembers: Member[] = [
     id: '1',
     nickname: 'Thiper',
     role: '칭호칭호',
-    profileImage: '', // 빈 문자열로 기본 이미지 처리
+    profileImage: '',
     points: 0,
     followersCount: 0,
   },

@@ -1,9 +1,21 @@
-import styled from '@emotion/styled';
 import { useMemo } from 'react';
+import type { RefObject } from 'react';
 import { GroupCard } from '../group/GroupCard';
-import { colors, typography } from '@/styles/global/global';
 import { Filter } from '../common/Filter';
 import type { SearchRoomItem } from '@/api/rooms/getSearchRooms';
+import LoadingSpinner from '../common/LoadingSpinner';
+import {
+  TabContainer,
+  Tab,
+  Content,
+  GroupCardHeader,
+  GroupNum,
+  EmptyContent,
+  EmptyMainText,
+  EmptySubText,
+  LoadingText,
+  ErrorText,
+} from './GroupSearchResult.styled';
 
 const FILTER = ['마감임박순', '인기순'];
 const CATEGORIES = ['전체', '문학', '과학·IT', '사회과학', '인문학', '예술'] as const;
@@ -16,7 +28,7 @@ interface Props {
   isLoading: boolean;
   isLoadingMore?: boolean;
   hasMore?: boolean;
-  lastRoomElementCallback?: (node: HTMLDivElement | null) => void;
+  sentinelRef?: RefObject<HTMLDivElement | null>;
   error: string | null;
   selectedFilter: string;
   setSelectedFilter: (v: string) => void;
@@ -43,7 +55,8 @@ const GroupSearchResult = ({
   rooms,
   isLoading,
   isLoadingMore = false,
-  lastRoomElementCallback,
+  hasMore = false,
+  sentinelRef,
   error,
   selectedFilter,
   setSelectedFilter,
@@ -53,7 +66,10 @@ const GroupSearchResult = ({
   onClickRoom,
 }: Props) => {
   const mapped = useMemo(() => rooms.map(mapToGroupCardModel), [rooms]);
-  const isEmpty = !isLoading && mapped.length === 0;
+  // searching 중에는 아직 debounce 대기 중일 수 있으므로 빈 결과 화면을 표시하지 않음
+  const isEmpty = !isLoading && mapped.length === 0 && type !== 'searching';
+  // 기존 결과를 유지한 채 재검색 중인 상태 (필터·카테고리 변경 시)
+  const isRefetching = isLoading && mapped.length > 0;
 
   return (
     <>
@@ -77,7 +93,8 @@ const GroupSearchResult = ({
 
       {(showTabs || type === 'searched') && (
         <GroupCardHeader>
-          <GroupNum>전체 {mapped.length}</GroupNum>
+          {/* 재검색 중엔 이전 카운트를 유지하고, 초기 검색 완료 시 카운트를 표시 */}
+          <GroupNum>{isLoading && !isRefetching ? '' : `전체 ${mapped.length}`}</GroupNum>
           <Filter
             filters={FILTER}
             selectedFilter={selectedFilter}
@@ -86,7 +103,7 @@ const GroupSearchResult = ({
         </GroupCardHeader>
       )}
 
-      <Content>
+      <Content isRefetching={isRefetching}>
         {error && <ErrorText>{error}</ErrorText>}
 
         {isEmpty ? (
@@ -103,97 +120,19 @@ const GroupSearchResult = ({
               isOngoing={false}
               isFirstCard={type === 'searching' && idx === 0}
               onClick={() => onClickRoom(Number(group.id))}
-              ref={idx === mapped.length - 1 ? lastRoomElementCallback : undefined}
             />
           ))
         )}
 
-        {isLoadingMore && mapped.length > 0 && <LoadingText>불러오는 중...</LoadingText>}
+        {hasMore && <div ref={sentinelRef} style={{ height: 20 }} />}
+        {isLoadingMore && mapped.length > 0 && (
+          <LoadingText>
+            <LoadingSpinner size="small" fullHeight={false} />
+          </LoadingText>
+        )}
       </Content>
     </>
   );
 };
 
 export default GroupSearchResult;
-
-const TabContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 0 20px;
-  margin-bottom: 16px;
-`;
-
-const Tab = styled.button<{ selected?: boolean }>`
-  white-space: nowrap;
-  padding: 8px 12px;
-  font-size: ${typography.fontSize.xs};
-  font-weight: ${typography.fontWeight.regular};
-  border: none;
-  border-radius: 16px;
-  background: ${({ selected }) => (selected ? `${colors.purple.main}` : `${colors.darkgrey.main}`)};
-  color: #fff;
-  cursor: pointer;
-`;
-
-const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  padding: 0 20px 60px;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-`;
-const GroupCardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 0 20px;
-  margin-bottom: 10px;
-`;
-
-const GroupNum = styled.span`
-  display: flex;
-  align-items: center;
-  color: ${colors.white};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.medium};
-`;
-
-const EmptyContent = styled.div`
-  display: flex;
-  height: 60vh;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-`;
-
-const EmptyMainText = styled.p`
-  color: ${colors.white};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  text-align: center;
-`;
-
-const EmptySubText = styled.p`
-  color: ${colors.grey[100]};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-  text-align: center;
-`;
-
-const LoadingText = styled.p`
-  color: ${colors.grey[100]};
-  font-size: ${typography.fontSize.sm};
-  text-align: center;
-`;
-
-const ErrorText = styled.p`
-  color: #ff6b6b;
-  font-size: ${typography.fontSize.sm};
-  text-align: center;
-`;

@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
-import styled from '@emotion/styled';
+import { useState, useEffect } from 'react';
 import TitleHeader from '@/components/common/TitleHeader';
 import FeedDetailPost from '@/components/feed/FeedDetailPost';
 import leftArrow from '../../assets/common/leftArrow.svg';
@@ -10,15 +9,16 @@ import MessageInput from '@/components/today-words/MessageInput';
 import { usePopupActions } from '@/hooks/usePopupActions';
 import { useReplyActions } from '@/hooks/useReplyActions';
 import { getFeedDetail, type FeedDetailData } from '@/api/feeds/getFeedDetail';
-import { getComments, type CommentData } from '@/api/comments/getComments';
 import { deleteFeedPost } from '@/api/feeds/deleteFeedPost';
-import { useReplyStore } from '@/stores/useReplyStore';
+import Skeleton, { FeedPostSkeleton } from '@/shared/ui/Skeleton';
+import { Wrapper, SkeletonWrapper, CommentSkeletonItem } from './FeedDetailPage.styled';
+import { useReplyStore } from '@/stores/replyStore';
 
 const FeedDetailPage = () => {
   const navigate = useNavigate();
   const { feedId } = useParams<{ feedId: string }>();
   const [feedData, setFeedData] = useState<FeedDetailData | null>(null);
-  const [commentList, setCommentList] = useState<CommentData[]>([]);
+  const [replyReloadKey, setReplyReloadKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,40 +26,15 @@ const FeedDetailPage = () => {
   const { isReplying, replyContent, setReplyContent, submitComment, cancelReply } =
     useReplyActions();
   const { nickname } = useReplyStore();
-  // 댓글 목록을 다시 로드하는 함수
-  const reloadComments = useCallback(async () => {
-    if (!feedId) return;
 
-    try {
-      const commentsResponse = await getComments(Number(feedId), { postType: 'FEED' });
-      setCommentList(commentsResponse.data.commentList);
-
-      // 피드 데이터의 댓글 수를 실제 댓글 목록 길이로 업데이트
-      if (feedData) {
-        setFeedData(prev =>
-          prev
-            ? {
-                ...prev,
-                commentCount: commentsResponse.data.commentList.length,
-              }
-            : null,
-        );
-      }
-    } catch (err) {
-      console.error('댓글 목록 다시 로드 실패:', err);
-    }
-  }, [feedId, feedData]);
-
-  // 페이지를 떠날 때 답글 상태 초기화
   useEffect(() => {
     return () => {
       cancelReply();
     };
   }, [cancelReply]);
 
-  // 피드 상세 정보와 댓글 목록 로드
   useEffect(() => {
-    const loadFeedDetailAndComments = async () => {
+    const loadFeedDetail = async () => {
       if (!feedId) {
         setError('피드 ID가 없습니다.');
         setLoading(false);
@@ -68,38 +43,32 @@ const FeedDetailPage = () => {
 
       try {
         setLoading(true);
-
-        // 피드 상세 정보와 댓글 목록을 병렬로 로드
-        const [feedResponse, commentsResponse] = await Promise.all([
-          getFeedDetail(Number(feedId)),
-          getComments(Number(feedId), { postType: 'FEED' }),
-        ]);
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [feedResponse] = await Promise.all([getFeedDetail(Number(feedId)), minLoadingTime]);
 
         setFeedData(feedResponse.data);
-        setCommentList(commentsResponse.data.commentList);
         setError(null);
       } catch (err) {
-        console.error('피드 상세 정보 또는 댓글 로드 실패:', err);
+        console.error('피드 상세 정보 로드 실패:', err);
         setError('피드 정보를 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
       }
     };
 
-    loadFeedDetailAndComments();
+    loadFeedDetail();
   }, [feedId]);
 
   const handleCommentSubmit = async () => {
     await submitComment({
       postId: Number(feedId),
       postType: 'FEED',
-      onSuccess: reloadComments,
+      onSuccess: () => setReplyReloadKey(prev => prev + 1),
     });
   };
 
   const handleMoreClick = () => {
     if (feedData?.isWriter) {
-      // 작성자인 경우: 수정하기, 삭제하기 메뉴
       openMoreMenu({
         onEdit: () => {
           closePopup();
@@ -166,27 +135,41 @@ const FeedDetailPage = () => {
   };
 
   const handleBackClick = () => {
-    // 새 탭에서 열린 경우 탭 닫기
-    window.close();
-
-    // 만약 window.close()가 작동하지 않으면 (같은 도메인이 아닌 경우) 이전 페이지로 이동
-    if (window.opener) {
-      window.close();
-    } else {
-      navigate(-1);
-    }
+    navigate(-1);
   };
 
   if (loading) {
-    return <></>;
+    return (
+      <Wrapper>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+        <SkeletonWrapper>
+          <FeedPostSkeleton />
+          {Array.from({ length: 5 }).map((_, index) => (
+            <CommentSkeletonItem key={index}>
+              <Skeleton.Circle width={36} />
+              <div style={{ flex: 1 }}>
+                <Skeleton.Text width={80} height={14} />
+                <Skeleton.Text lines={2} height={14} gap={6} />
+              </div>
+            </CommentSkeletonItem>
+          ))}
+        </SkeletonWrapper>
+      </Wrapper>
+    );
   }
 
-  if (error) {
-    return <></>;
-  }
-
-  if (!feedData) {
-    return <></>;
+  if (error || !feedData) {
+    return (
+      <Wrapper>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+      </Wrapper>
+    );
   }
 
   return (
@@ -198,7 +181,7 @@ const FeedDetailPage = () => {
         onRightClick={handleMoreClick}
       />
       <FeedDetailPost {...feedData} />
-      <ReplyList commentList={commentList} onReload={reloadComments} />
+      <ReplyList postId={Number(feedId)} postType="FEED" reloadKey={`${replyReloadKey}`} />
       <MessageInput
         placeholder="여러분의 생각을 남겨주세요."
         value={replyContent}
@@ -211,18 +194,5 @@ const FeedDetailPage = () => {
     </Wrapper>
   );
 };
-
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  align-items: center;
-  min-width: 320px;
-  max-width: 767px;
-  min-height: 100vh;
-  padding-top: 56px;
-  margin: 0 auto;
-  background-color: #121212;
-`;
 
 export default FeedDetailPage;

@@ -1,9 +1,7 @@
-import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
 import Profile from './Profile';
 import FeedPost from './FeedPost';
 import TotalBar from './TotalBar';
-import { colors, typography } from '../../styles/global/global';
 import type { OtherFeedItem } from '@/api/feeds/getOtherFeed';
 import type { OtherProfileData } from '@/types/profile';
 import { getOtherFeed } from '@/api/feeds/getOtherFeed';
@@ -11,6 +9,7 @@ import { getMyFeeds } from '@/api/feeds/getMyFeed';
 import { getMyProfile } from '@/api/feeds/getMyProfile';
 import type { PostData } from '@/types/post';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { Container, EmptyState } from './OtherFeed.styled';
 
 interface OtherFeedProps {
   showHeader?: boolean;
@@ -18,7 +17,7 @@ interface OtherFeedProps {
   isMyFeed?: boolean;
   profileData?: OtherProfileData | null;
   userId?: number;
-  showFollowButton?: boolean; // showFollowButton prop 추가
+  showFollowButton?: boolean;
   isMyself?: boolean;
 }
 
@@ -34,7 +33,6 @@ const OtherFeed = ({
   const [loading, setLoading] = useState(false);
   const [totalFeedCount, setTotalFeedCount] = useState(profileData?.totalFeedCount || 0);
 
-  // isMyself 값에 따라 적절한 API 호출
   useEffect(() => {
     const loadFeeds = async () => {
       if (!userId) return;
@@ -43,16 +41,13 @@ const OtherFeed = ({
         setLoading(true);
 
         if (isMyself) {
-          // 자신의 피드인 경우 getMyFeeds와 getMyProfile 병렬 호출
           const [feedsResponse, profileResponse] = await Promise.all([
             getMyFeeds(),
-            getMyProfile()
+            getMyProfile(),
           ]);
           setFeedPosts(feedsResponse.data.feedList);
-          // getMyProfile에서 총 피드 수 업데이트
           setTotalFeedCount(profileResponse.data.totalFeedCount);
         } else {
-          // 다른 사용자의 피드인 경우 getOtherFeed 호출
           const response = await getOtherFeed(userId);
           setFeedPosts(response.data.feedList);
         }
@@ -103,26 +98,5 @@ const OtherFeed = ({
     </Container>
   );
 };
-
-const Container = styled.div`
-  min-height: 100vh;
-  padding-top: 56px;
-  padding-bottom: 155px;
-  background-color: var(--color-black-main);
-`;
-
-const EmptyState = styled.div`
-  display: flex;
-  height: 473px;
-  padding: 32px 0 20px 0;
-  justify-content: center;
-  align-items: center;
-
-  color: ${colors.white};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  line-height: 24px;
-  letter-spacing: 0.018px;
-`;
 
 export default OtherFeed;

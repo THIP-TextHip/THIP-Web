@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import styled from '@emotion/styled';
 import NavBar from '../../components/common/NavBar';
 import TitleHeader from '@/components/common/TitleHeader';
 import writefab from '../../assets/common/writefab.svg';
@@ -9,12 +8,8 @@ import OtherFeed from '@/components/feed/OtherFeed';
 import { getOtherFeed, type OtherFeedItem } from '@/api/feeds/getOtherFeed';
 import { getOtherProfile } from '@/api/users/getOtherProfile';
 import type { OtherProfileData } from '@/types/profile';
-
-const Container = styled.div`
-  min-width: 320px;
-  max-width: 767px;
-  margin: 0 auto;
-`;
+import { OtherFeedSkeleton } from '@/shared/ui/Skeleton';
+import { Container } from './MyFeedPage.styled';
 
 const MyFeedPage = () => {
   const navigate = useNavigate();
@@ -28,7 +23,6 @@ const MyFeedPage = () => {
     navigate(-1);
   };
 
-  // 다른 사용자 피드 및 프로필 데이터 로드
   useEffect(() => {
     const loadOtherData = async () => {
       if (!userId) {
@@ -40,13 +34,15 @@ const MyFeedPage = () => {
       try {
         setLoading(true);
 
-        const [feedResponse, profileResponse] = await Promise.all([
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [feedResponse, profileResponse] = (await Promise.all([
           getOtherFeed(Number(userId)),
           getOtherProfile(Number(userId)),
-        ]);
-
-        console.log('🔍 MyFeedPage - Profile Response:', profileResponse.data);
-        console.log('🔍 MyFeedPage - isWriter 값:', profileResponse.data.isWriter);
+        ])) as [
+          Awaited<ReturnType<typeof getOtherFeed>>,
+          Awaited<ReturnType<typeof getOtherProfile>>,
+        ];
+        await minLoadingTime;
 
         setFeedData(feedResponse.data.feedList);
         setProfileData(profileResponse.data);
@@ -63,7 +59,16 @@ const MyFeedPage = () => {
   }, [userId]);
 
   if (loading) {
-    return <></>;
+    return (
+      <Container>
+        <TitleHeader
+          leftIcon={<img src={leftArrow} alt="뒤로가기" />}
+          onLeftClick={handleBackClick}
+        />
+        <OtherFeedSkeleton showFollowButton={false} />
+        <NavBar src={writefab} path="/post/create" />
+      </Container>
+    );
   }
 
   if (error) {
@@ -82,7 +87,7 @@ const MyFeedPage = () => {
         posts={feedData}
         isMyFeed={true}
         profileData={profileData}
-        showFollowButton={false} // 띱하기 버튼 숨김
+        showFollowButton={false}
         isMyself={true}
       />
       <NavBar src={writefab} path="/post/create" />

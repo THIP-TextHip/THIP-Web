@@ -1,9 +1,8 @@
 import TitleHeader from '@/components/common/TitleHeader';
-import { colors, typography } from '@/styles/global/global';
-import styled from '@emotion/styled';
 import leftArrow from '../../assets/common/leftArrow.svg';
 import { useNavigate } from 'react-router-dom';
 import { Wrapper } from '@/components/common/Wrapper';
+import { TextWrapper, MainText, SubText } from './ApplyBook.styled';
 
 const ApplyBook = () => {
   const navigate = useNavigate();
@@ -27,25 +26,3 @@ const ApplyBook = () => {
 };
 
 export default ApplyBook;
-
-const TextWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 60vh;
-`;
-
-const MainText = styled.p`
-  color: ${colors.white};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-  margin-bottom: 12px;
-`;
-
-const SubText = styled.p`
-  color: ${colors.grey[100]};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-  margin-bottom: 6px;
-`;

@@ -1,24 +1,27 @@
-import { colors, typography } from '@/styles/global/global';
-import styled from '@emotion/styled';
 import tabDeleteIcon from '../../assets/searchBar/tabDelete.svg';
 import { IconButton } from '../common/IconButton';
+import { Container, Title, TabContainer, Tab, Text } from './RecentSearchTabs.styled';
 
 interface RecentSearchTabsProps {
   recentSearches: string[];
   handleDelete: (term: string) => void;
   handleRecentSearchClick: (term: string) => void;
+  isLoading?: boolean;
 }
 
 const RecentSearchTabs = ({
   recentSearches,
   handleDelete,
   handleRecentSearchClick,
+  isLoading = false,
 }: RecentSearchTabsProps) => {
   return (
     <Container>
       <Title>최근 검색어</Title>
       <TabContainer>
-        {recentSearches.length === 0 ? (
+        {isLoading ? (
+          <Text>최근 검색어를 불러오고 있습니다.</Text>
+        ) : recentSearches.length === 0 ? (
           <Text>최근 검색어가 아직 없어요.</Text>
         ) : (
           recentSearches.map(recentSearch => (
@@ -34,38 +37,3 @@ const RecentSearchTabs = ({
 };
 
 export default RecentSearchTabs;
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin: 0 20px;
-`;
-
-const Title = styled.h2`
-  color: ${colors.grey[100]};
-  font-size: ${typography.fontSize.lg};
-  font-weight: ${typography.fontWeight.semibold};
-`;
-
-const TabContainer = styled.div`
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-`;
-
-const Tab = styled.span`
-  display: flex;
-  justify-content: space-between;
-  border: 1px solid ${colors.grey[300]};
-  border-radius: 20px;
-  padding: 8px 12px;
-`;
-
-const Text = styled.p`
-  color: ${colors.grey[200]};
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.regular};
-  text-align: center;
-  line-height: 24px;
-`;

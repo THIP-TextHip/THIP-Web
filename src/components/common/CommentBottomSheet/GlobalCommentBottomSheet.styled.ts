@@ -50,6 +50,26 @@ export const Content = styled.div`
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+
+  scrollbar-width: thin;
+  scrollbar-color: ${colors.grey[100]} transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${colors.grey[100]};
+    border-radius: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: ${colors.white};
+  }
 `;
 
 export const LoadingState = styled.div`

@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import type { PollOption } from '../../../types/memory';
 import { postVote } from '@/api/record/postVote';
 import { usePopupActions } from '@/hooks/usePopupActions';
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
+import type { VoteItemResult } from '@/types/record';
 import {
   PollSection,
   PollQuestion,
@@ -19,9 +21,9 @@ import {
 interface PollRecordProps {
   content: string;
   pollOptions: PollOption[];
-  postId: number; // 투표 API 호출에 필요한 postId
-  shouldBlur?: boolean; // 블라인드 처리 여부
-  onVoteUpdate?: (updatedOptions: PollOption[]) => void; // 투표 결과 업데이트 콜백
+  postId: number;
+  shouldBlur?: boolean;
+  onVoteUpdate?: (updatedOptions: PollOption[]) => void;
 }
 
 const PollRecord = ({
@@ -33,17 +35,43 @@ const PollRecord = ({
 }: PollRecordProps) => {
   const [animate, setAnimate] = useState(false);
   const [currentOptions, setCurrentOptions] = useState(pollOptions);
-  const [isVoting, setIsVoting] = useState(false);
+  const optionsRef = useRef<PollOption[]>(pollOptions);
+  const { isLoading: isVoting, run: runVote } = usePreventDoubleClick();
   const pollRef = useRef<HTMLDivElement>(null);
   const { roomId } = useParams<{ roomId: string }>();
   const { openSnackbar } = usePopupActions();
+
+  const mergeServerVoteItems = (
+    serverVoteItems: VoteItemResult[],
+    baseOptions: PollOption[],
+  ): PollOption[] => {
+    const serverByVoteItemId = new Map(serverVoteItems.map(item => [item.voteItemId, item]));
+
+    const mergedInBaseOrder = baseOptions.map(base => {
+      const server = serverByVoteItemId.get(base.voteItemId);
+      if (!server) return base;
+
+      return {
+        ...base,
+        percentage: server.percentage,
+        count: server.count,
+        isVoted: server.isVoted,
+        voteItemId: server.voteItemId,
+      };
+    });
+
+    const maxCount = Math.max(...mergedInBaseOrder.map(item => item.count));
+    return mergedInBaseOrder.map(item => ({
+      ...item,
+      isHighest: item.count === maxCount,
+    }));
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
           if (entry.isIntersecting && !animate) {
-            // 약간의 지연 후 애니메이션 시작
             setTimeout(() => {
               setAnimate(true);
             }, 100);
@@ -51,7 +79,7 @@ const PollRecord = ({
         });
       },
       {
-        threshold: 0.3, // 30% 보일 때 애니메이션 시작
+        threshold: 0.3,
         rootMargin: '0px 0px -50px 0px',
       },
     );
@@ -68,97 +96,109 @@ const PollRecord = ({
     };
   }, [animate]);
 
-  // pollOptions가 변경되면 currentOptions 업데이트
   useEffect(() => {
     setCurrentOptions(pollOptions);
+    optionsRef.current = pollOptions;
   }, [pollOptions]);
 
-  // 투표 옵션 클릭 핸들러
-  const handleOptionClick = async (e: React.MouseEvent, option: PollOption) => {
-    e.stopPropagation(); // 이벤트 버블링 방지
+  const handleOptionClick = (e: React.MouseEvent, option: PollOption) => {
+    e.stopPropagation();
     if (isVoting || !roomId || shouldBlur) return;
 
-    setIsVoting(true);
+    runVote(async () => {
+      const previousOptions = optionsRef.current;
+      const latest = optionsRef.current.find(item => item.voteItemId === option.voteItemId);
+      if (!latest) return;
 
-    try {
-      const voteData = {
-        voteItemId: option.voteItemId,
-        type: !option.isVoted, // 현재 투표 상태의 반대로 설정
-      };
+      const previousVotedOption = optionsRef.current.find(item => item.isVoted);
+      const isSwitchingVote =
+        !!previousVotedOption && previousVotedOption.voteItemId !== option.voteItemId;
+      const nextVoted = isSwitchingVote ? true : !latest.isVoted;
 
-      const response = await postVote(parseInt(roomId), postId, voteData);
+      const optimisticOptions = optionsRef.current.map(item => {
+        if (item.voteItemId === option.voteItemId) {
+          return {
+            ...item,
+            isVoted: nextVoted,
+            count: Math.max(0, item.count + (nextVoted ? 1 : -1)),
+          };
+        }
 
-      if (response.isSuccess) {
-        // API 응답으로 받은 투표 결과를 현재 옵션 형태로 변환
-        const updatedOptions = currentOptions.map(opt => {
-          const updatedItem = response.data.voteItems.find(
-            (item: PollOption) => item.voteItemId === opt.voteItemId,
-          );
-          if (updatedItem) {
-            return {
-              ...opt,
-              percentage: updatedItem.percentage,
-              count: updatedItem.count,
-              isVoted: updatedItem.isVoted,
-              isHighest:
-                updatedItem.count ===
-                Math.max(...response.data.voteItems.map((item: PollOption) => item.count)),
-            };
-          }
-          return opt;
+        if (isSwitchingVote && item.voteItemId === previousVotedOption?.voteItemId) {
+          return {
+            ...item,
+            isVoted: false,
+            count: Math.max(0, item.count - 1),
+          };
+        }
+
+        return {
+          ...item,
+          isVoted: item.isVoted,
+          count: item.count,
+        };
+      });
+
+      const maxCount = Math.max(...optimisticOptions.map(item => item.count));
+      const normalizedOptions = optimisticOptions.map(item => ({
+        ...item,
+        isHighest: item.count === maxCount,
+      }));
+
+      optionsRef.current = normalizedOptions;
+      setCurrentOptions(normalizedOptions);
+      onVoteUpdate?.(normalizedOptions);
+
+      try {
+        const response = await postVote(parseInt(roomId, 10), postId, {
+          voteItemId: option.voteItemId,
+          type: nextVoted,
         });
+        const target = optionsRef.current.find(item => item.voteItemId === option.voteItemId);
+        if (!target || target.isVoted !== nextVoted) return;
 
+        if (!response.isSuccess) {
+          optionsRef.current = previousOptions;
+          setCurrentOptions(previousOptions);
+          onVoteUpdate?.(previousOptions);
+          openSnackbar({
+            message: response.message || '투표 처리 중 오류가 발생했습니다.',
+            variant: 'top',
+            onClose: () => {},
+          });
+          return;
+        }
+
+        const updatedOptions = mergeServerVoteItems(response.data.voteItems, optionsRef.current);
+        optionsRef.current = updatedOptions;
         setCurrentOptions(updatedOptions);
         onVoteUpdate?.(updatedOptions);
 
-        // 성공 메시지
-        const actionText = voteData.type ? '투표했습니다' : '투표를 취소했습니다';
         openSnackbar({
-          message: actionText,
+          message: nextVoted ? '투표했습니다' : '투표를 취소했습니다',
           variant: 'top',
           onClose: () => {},
         });
-      } else {
-        // 에러 처리
-        let errorMessage = '투표 처리 중 오류가 발생했습니다.';
-
-        if (response.code === 120001) {
-          errorMessage = '이미 투표한 투표항목입니다.';
-        } else if (response.code === 120002) {
-          errorMessage = '투표하지 않은 투표항목은 취소할 수 없습니다.';
-        } else if (response.code === 140011) {
-          errorMessage = '방 접근 권한이 없습니다.';
-        } else if (response.code === 120000) {
-          errorMessage = '투표는 존재하지만 투표항목이 비어있습니다.';
-        } else if (response.message) {
-          errorMessage = response.message; // 서버에서 보낸 메시지 사용
+      } catch {
+        const target = optionsRef.current.find(item => item.voteItemId === option.voteItemId);
+        if (target && target.isVoted === nextVoted) {
+          optionsRef.current = previousOptions;
+          setCurrentOptions(previousOptions);
+          onVoteUpdate?.(previousOptions);
         }
-
         openSnackbar({
-          message: errorMessage,
+          message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
           variant: 'top',
           onClose: () => {},
         });
       }
-    } catch (error) {
-      console.error('투표 API 호출 실패:', error);
-      openSnackbar({
-        message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
-        variant: 'top',
-        onClose: () => {},
-      });
-    } finally {
-      setIsVoting(false);
-    }
+    });
   };
 
-  // 아무도 투표하지 않았는지 확인 (모든 옵션이 0표인지 확인)
   const hasVotes = currentOptions.some(option => option.count > 0);
 
-  // 전체 투표수 계산
   const totalVotes = currentOptions.reduce((sum, option) => sum + option.count, 0);
 
-  // 각 옵션의 퍼센트 계산 (애니메이션용)
   const getPercentage = (count: number) => {
     if (totalVotes === 0) return 0;
     return (count / totalVotes) * 100;
@@ -184,7 +224,7 @@ const PollRecord = ({
                 percentage={hasVotes ? getPercentage(option.count) : 0}
                 isHighest={hasVotes && option.isHighest}
                 animate={hasVotes && animate}
-                delay={index * 200} // 각 옵션마다 200ms 지연
+                delay={index * 200}
               />
             </PollBar>
             <PollContent>

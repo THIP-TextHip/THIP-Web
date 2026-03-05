@@ -1,8 +1,8 @@
 import { useRef, useEffect } from 'react';
-import styled from '@emotion/styled';
-import { colors, typography } from '@/styles/global/global';
 import UserProfileItem from '@/components/feed/UserProfileItem';
 import type { UserData } from '@/api/users/getUsers';
+import { UserProfileItemSkeleton } from '@/shared/ui/Skeleton';
+import { EmptyWrapper, List, ObserverDiv, ResultHeader, Wrapper } from './UserSearchResult.styled';
 
 interface UserSearchResultProps {
   type: 'searching' | 'searched';
@@ -19,12 +19,10 @@ export function UserSearchResult({
   hasMore,
   onLoadMore,
 }: UserSearchResultProps) {
-  const isEmptySearchedUserList = () => {
-    if (searchedUserList.length === 0) return true;
-    else return false;
-  };
+  const showInitialSkeleton = !!loading && searchedUserList.length === 0;
+  const showResultHeader = type === 'searched' && !showInitialSkeleton;
+  const isEmpty = searchedUserList.length === 0 && type !== 'searching';
 
-  // 무한 스크롤을 위한 Intersection Observer
   const observerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,10 +45,16 @@ export function UserSearchResult({
   return (
     <Wrapper>
       <List>
-        {type === 'searching' ? <></> : <ResultHeader>전체 {searchedUserList.length}</ResultHeader>}
+        {showResultHeader ? <ResultHeader>전체 {searchedUserList.length}</ResultHeader> : null}
 
-        {isEmptySearchedUserList() ? (
-          <EmptyWrapper>{loading ? '사용자 찾는 중...' : '찾는 사용자가 없어요.'}</EmptyWrapper>
+        {showInitialSkeleton ? (
+          <>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <UserProfileItemSkeleton key={i} type="followerlist" />
+            ))}
+          </>
+        ) : isEmpty ? (
+          <EmptyWrapper>찾는 사용자가 없어요.</EmptyWrapper>
         ) : (
           <>
             {searchedUserList.map((user, index) => (
@@ -68,49 +72,3 @@ export function UserSearchResult({
     </Wrapper>
   );
 }
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 0 20px;
-  margin-bottom: 72px;
-`;
-
-const List = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  /* min-width: 320px;
-  max-width: 540px; */
-  margin: 0 auto;
-  margin-bottom: 72px;
-`;
-
-const ResultHeader = styled.div`
-  width: 100%;
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.medium};
-  color: ${colors.white};
-  padding-bottom: 8px;
-  border-bottom: 1px solid ${colors.darkgrey.dark};
-`;
-
-const EmptyWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  padding-top: 40%;
-  color: var(--color-text-primary_white, #fefefe);
-  text-align: center;
-  font-size: var(--string-size-large01, 18px);
-  font-weight: var(--string-weight-semibold, 600);
-  line-height: var(--string-lineheight-height24, 24px); /* 133.333% */
-`;
-
-const ObserverDiv = styled.div`
-  height: 100px;
-`;

@@ -209,7 +209,6 @@ export const BookTitle = styled.h3`
   -webkit-box-orient: vertical;
 `;
 
-// 로딩 상태 스타일
 export const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -223,7 +222,6 @@ export const LoadingText = styled.p`
   margin: 0;
 `;
 
-// 에러 상태 스타일
 export const ErrorContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -238,7 +236,6 @@ export const ErrorText = styled.p`
   text-align: center;
 `;
 
-// 빈 상태 스타일
 export const EmptyContainer = styled.div`
   display: flex;
   flex-direction: column;

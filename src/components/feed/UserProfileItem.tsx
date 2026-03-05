@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import styled from '@emotion/styled';
+import { useEffect, useRef, useState } from 'react';
 import rightArrow from '../../assets/feed/rightArrow.svg';
 import type { UserProfileItemProps } from '@/types/user';
-import { colors, typography } from '@/styles/global/global';
 import { postFollow } from '@/api/users/postFollow';
-import { usePopupStore } from '@/stores/usePopupStore';
+import { Wrapper, UserProfile } from './UserProfileItem.styled';
+import { usePopupStore } from '@/stores/popupStore';
+import { usePreventDoubleClick } from '@/hooks/usePreventDoubleClick';
 
 const UserProfileItem = ({
   profileImageUrl,
@@ -20,8 +20,15 @@ const UserProfileItem = ({
   isMyself,
 }: UserProfileItemProps) => {
   const navigate = useNavigate();
-  const [followed, setFollowed] = useState(isFollowing);
+  const [followed, setFollowed] = useState(!!isFollowing);
+  const followedRef = useRef<boolean>(!!isFollowing);
   const { openPopup } = usePopupStore();
+  const { isLoading: isFollowLoading, run: runFollow } = usePreventDoubleClick();
+
+  useEffect(() => {
+    setFollowed(!!isFollowing);
+    followedRef.current = !!isFollowing;
+  }, [isFollowing]);
 
   const handleProfileClick = () => {
     if (isMyself) {
@@ -31,28 +38,35 @@ const UserProfileItem = ({
     }
   };
 
-  const toggleFollow = async (e: React.MouseEvent) => {
+  const toggleFollow = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!userId) return;
+    runFollow(async () => {
+      const nextFollowed = !followedRef.current;
+      followedRef.current = nextFollowed;
+      setFollowed(nextFollowed);
 
-    try {
-      const response = await postFollow(userId, !followed);
-      // API 응답으로 팔로우 상태 업데이트
-      setFollowed(response.data.isFollowing);
-      console.log(`${nickname} - ${response.data.isFollowing ? '띱 완료' : '띱 취소'}`);
+      try {
+        const response = await postFollow(userId, nextFollowed);
+        if (followedRef.current !== nextFollowed) return;
 
-      // Snackbar 표시
-      const message = response.data.isFollowing
-        ? `${nickname}님을 띱 했어요.`
-        : `${nickname}님을 띱 취소했어요.`;
+        if (response.data.isFollowing !== nextFollowed) {
+          followedRef.current = response.data.isFollowing;
+          setFollowed(response.data.isFollowing);
+        }
 
-      openPopup('snackbar', {
-        message,
-        variant: 'top',
-        onClose: () => {},
-      });
-    } catch (error) {
-      console.error('팔로우/언팔로우 실패:', error);
-    }
+        openPopup('snackbar', {
+          message: response.data.isFollowing ? `${nickname}님을 띱 했어요.` : `${nickname}님을 띱 취소했어요.`,
+          variant: 'top',
+          onClose: () => {},
+        });
+      } catch {
+        if (followedRef.current !== nextFollowed) return;
+        const rollbackState = !nextFollowed;
+        followedRef.current = rollbackState;
+        setFollowed(rollbackState);
+      }
+    });
   };
 
   return (
@@ -68,7 +82,7 @@ const UserProfileItem = ({
           </div>
         </div>
         {type === 'followlist' && (
-          <div className="followbutton" onClick={toggleFollow}>
+          <div className="followbutton" onClick={toggleFollow} style={{ opacity: isFollowLoading ? 0.6 : 1 }}>
             {followed ? '띱 취소' : '띱 하기'}
           </div>
         )}
@@ -82,79 +96,4 @@ const UserProfileItem = ({
     </Wrapper>
   );
 };
-
-const Wrapper = styled.div<{ isLast?: boolean }>`
-  width: 100%;
-  /* max-width: 500px;
-  min-width: 320px; */
-  margin: 0 auto;
-  height: 78px;
-  padding: 20px 0;
-  border-bottom: ${({ isLast }) => (isLast ? 'none' : '1px solid var(--color-darkgrey-dark)')};
-  background-color: ${colors.black.main};
-`;
-
-const UserProfile = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-
-  .userInfo {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4px;
-
-    img {
-      width: 36px;
-      height: 36px;
-      border-radius: 36px;
-      border: 0.5px solid ${colors.grey[300]};
-    }
-
-    .user {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      .username {
-        color: ${colors.white};
-        font-size: ${typography.fontSize.sm};
-        font-weight: ${typography.fontWeight.medium};
-        line-height: normal;
-      }
-
-      .usertitle {
-        font-size: ${typography.fontSize.xs};
-        font-weight: ${typography.fontWeight.regular};
-      }
-    }
-  }
-
-  .followbutton {
-    padding: 8px 12px;
-    border-radius: 20px;
-    border: 1px solid ${colors.grey[300]};
-    text-align: center;
-    color: ${colors.grey[100]};
-    font-size: ${typography.fontSize.sm};
-    font-weight: ${typography.fontWeight.medium};
-    line-height: normal;
-    cursor: pointer;
-  }
-
-  .followlistbutton {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 2px;
-    color: ${colors.white};
-    font-size: ${typography.fontSize['2xs']};
-    font-weight: ${typography.fontWeight.regular};
-    line-height: 20px;
-  }
-`;
-
 export default UserProfileItem;

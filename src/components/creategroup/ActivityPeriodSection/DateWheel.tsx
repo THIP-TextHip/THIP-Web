@@ -133,7 +133,6 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  // 터치 및 휠 이벤트를 non-passive로 등록하기 위한 useEffect
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -160,7 +159,6 @@ const DateWheel = ({ values, selectedValue, onChange, label, width = 50 }: DateW
       moveToIndex(delta);
     };
 
-    // non-passive 옵션으로 이벤트 리스너 등록
     container.addEventListener('touchstart', handleTouchStartNonPassive, { passive: false });
     container.addEventListener('touchmove', handleTouchMoveNonPassive, { passive: false });
     container.addEventListener('touchend', handleTouchEndNonPassive, { passive: false });

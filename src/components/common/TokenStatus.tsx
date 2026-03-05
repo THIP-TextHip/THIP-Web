@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Container } from './TokenStatus.styled';
 
 const TokenStatus = () => {
   const [tokenStatus, setTokenStatus] = useState<string>('확인 중...');
@@ -16,30 +17,12 @@ const TokenStatus = () => {
     };
 
     checkToken();
-    // 5초마다 상태 확인
     const interval = setInterval(checkToken, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '10px',
-        right: '10px',
-        background: '#333',
-        color: 'white',
-        padding: '8px 12px',
-        borderRadius: '4px',
-        fontSize: '12px',
-        zIndex: 9999,
-        fontFamily: 'monospace',
-      }}
-    >
-      {tokenStatus}
-    </div>
-  );
+  return <Container>{tokenStatus}</Container>;
 };
 
 export default TokenStatus;

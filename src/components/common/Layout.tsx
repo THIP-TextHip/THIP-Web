@@ -2,13 +2,16 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import ScrollToTop from './ScrollToTop';
 import AsideDecoration from './AsideDecoration';
-import { sendPageView } from '@/lib/ga';
+import { sendPageView } from '@/shared/lib/analytics/ga';
+import { useSocialLoginToken } from '@/hooks/useSocialLoginToken';
+import { useAuthReadyStore } from '@/stores/authReadyStore';
 
 const Layout = () => {
   const location = useLocation();
+  useSocialLoginToken();
+  const isAuthReady = useAuthReadyStore(s => s.isReady);
 
   useEffect(() => {
-    // 라우트별 페이지 타이틀 설정 (첫 세그먼트 기준으로 그룹핑)
     const path = location.pathname;
     const titleRules: Array<[RegExp, string]> = [
       [/^\/$/, 'THIP - 로그인'],
@@ -40,7 +43,7 @@ const Layout = () => {
     <>
       <ScrollToTop />
       <AsideDecoration />
-      <Outlet />
+      {isAuthReady ? <Outlet /> : null}
     </>
   );
 };

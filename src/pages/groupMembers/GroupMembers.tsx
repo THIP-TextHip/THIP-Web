@@ -3,27 +3,24 @@ import { useNavigate, useParams } from 'react-router-dom';
 import TitleHeader from '../../components/common/TitleHeader';
 import MemberList from '../../components/members/MemberList';
 import leftArrow from '../../assets/common/leftArrow.svg';
-import { Wrapper, LoadingContainer, ErrorContainer, EmptyContainer } from './GroupMembers.styled';
+import { Wrapper, ErrorContainer, EmptyContainer } from './GroupMembers.styled';
 import {
   getRoomMembers,
   convertRoomMembersToMembers,
   type Member,
-  type RoomMembersResponse,
 } from '@/api/rooms/getRoomMembers';
+import { MemberListSkeleton } from '@/shared/ui/Skeleton';
 
 const GroupMembers = () => {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
 
-  // API 상태 관리
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // API 호출
   useEffect(() => {
     const fetchMembers = async () => {
-      // roomId 우선 순위: URL 파라미터 > localStorage > 기본값 1
       const currentRoomId = roomId || localStorage.getItem('currentRoomId') || '1';
 
       if (!currentRoomId) {
@@ -34,7 +31,11 @@ const GroupMembers = () => {
 
       try {
         setLoading(true);
-        const response: RoomMembersResponse = await getRoomMembers(parseInt(currentRoomId));
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 500));
+        const [response] = await Promise.all([
+          getRoomMembers(parseInt(currentRoomId)),
+        ]);
+        await minLoadingTime;
 
         if (response.isSuccess) {
           const convertedMembers = convertRoomMembersToMembers(response.data.userList);
@@ -44,13 +45,12 @@ const GroupMembers = () => {
         }
       } catch (err: unknown) {
         console.error('독서메이트 조회 오류:', err);
-        
-        // 방 접근 권한이 없는 경우 - 모임 홈으로 리다이렉트
+
         if (err instanceof Error && err.message === '방 접근 권한이 없습니다.') {
           navigate('/group', { replace: true });
           return;
         }
-        
+
         setError('독서메이트 목록을 불러오는 중 오류가 발생했습니다.');
       } finally {
         setLoading(false);
@@ -65,8 +65,6 @@ const GroupMembers = () => {
   };
 
   const handleMemberClick = (memberId: string) => {
-    // MemberList 컴포넌트에서 isMyself에 따른 네비게이션 처리를 담당하므로
-    // 여기서는 기본 동작을 유지
     const member = members.find(m => m.id === memberId);
     if (member?.isMyself) {
       navigate(`/myfeed/${memberId}`);
@@ -75,7 +73,6 @@ const GroupMembers = () => {
     }
   };
 
-  // 로딩 상태
   if (loading) {
     return (
       <>
@@ -85,13 +82,12 @@ const GroupMembers = () => {
           onLeftClick={handleBackClick}
         />
         <Wrapper>
-          <LoadingContainer>로딩 중...</LoadingContainer>
+          <MemberListSkeleton />
         </Wrapper>
       </>
     );
   }
 
-  // 에러 상태
   if (error) {
     return (
       <>
