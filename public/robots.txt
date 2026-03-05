@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /search/book/
+Allow: /group/detail/
+Allow: /feed/
+Disallow: /mypage
+Disallow: /signup
+Disallow: /memory/
+Sitemap: https://thip.co.kr/sitemap.xml
