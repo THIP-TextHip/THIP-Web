@@ -2,22 +2,27 @@
 
 > 독서를 기록하는 가장 힙한 방법 — 커뮤니티형 독서 기록 플랫폼
 
-
 ---
 
 ## 주요 화면
-
 
 <img width="1920" height="1080" alt="튜토리얼(1)" src="https://github.com/user-attachments/assets/83d707dd-6208-42b7-8249-2a0a3bbd1f9d" />
 
 <img width="1920" height="1080" alt="피드(2)" src="https://github.com/user-attachments/assets/eaf15522-a35c-459a-8ebf-c416e473d4ab" />
 
+<img width="1920" height="1080" alt="1.글쓰기.gif" src="docs/images/1-글쓰기.gif" />
+
 <img width="5760" height="3240" alt="피드(3)" src="https://github.com/user-attachments/assets/6aec3a18-db90-455c-ae11-eb1626b3e701" />
+
+<img width="1920" height="1080" alt="2.피드.gif" src="docs/images/2-피드.gif" />
 
 <img width="1920" height="1080" alt="모임(4)" src="https://github.com/user-attachments/assets/b8bfa7eb-ce78-4071-8c79-6c951f098dec" />
 
+<img width="1920" height="1080" alt="3.모임(1).gif" src="docs/images/3-모임(1).gif" />
+
 <img width="1920" height="1080" alt="모임(5)" src="https://github.com/user-attachments/assets/fb74b8e2-4728-4a5e-8fb5-bb91f621a721" />
 
+<img width="1920" height="1080" alt="3.모임(2).gif" src="docs/images/3-모임(2).gif" />
 
 ---
 
@@ -34,6 +39,7 @@
 | HTTP            | ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=flat-square&logo=axios&logoColor=white)                                                                                                                    |
 | Deploy          | ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white)                                                                                                                 |
 | Package Manager | ![pnpm](https://img.shields.io/badge/pnpm-F69220?style=flat-square&logo=pnpm&logoColor=white)                                                                                                                       |
+
 ---
 
 ## 프로젝트 구조
@@ -135,7 +141,8 @@ VITE_FRONTEND_URL=https://your-frontend-url.com
 
 <div align="center">
 
-| **김희용** | **이지현** | **지호준** | 
-| :------: |  :------: | :------: | 
-| [<img src="https://github.com/user-attachments/assets/2f304cf1-0797-4763-8823-d6190004c602" height=150 width=150> <br/> @heeeeyong](https://github.com/heeeeyong) | [<img src="https://github.com/user-attachments/assets/3c796227-22d9-48bc-8286-7fe226ece0c2" height=150 width=150> <br/> @ljh130334](https://github.com/ljh130334) | [<img src="https://github.com/user-attachments/assets/1215080e-59d4-4584-812f-5ec46fb8fbd9" height=150 width=150> <br/> @ho0010](https://github.com/ho0010) | 
+|                                                                            **김희용**                                                                             |                                                                            **이지현**                                                                             |                                                                         **지호준**                                                                          |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [<img src="https://github.com/user-attachments/assets/2f304cf1-0797-4763-8823-d6190004c602" height=150 width=150> <br/> @heeeeyong](https://github.com/heeeeyong) | [<img src="https://github.com/user-attachments/assets/3c796227-22d9-48bc-8286-7fe226ece0c2" height=150 width=150> <br/> @ljh130334](https://github.com/ljh130334) | [<img src="https://github.com/user-attachments/assets/1215080e-59d4-4584-812f-5ec46fb8fbd9" height=150 width=150> <br/> @ho0010](https://github.com/ho0010) |
+
 </div>
